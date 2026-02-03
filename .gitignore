@@ -1,0 +1,88 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+build/
+out/
+*.tsbuildinfo
+
+# Turbo
+.turbo/
+
+# IDE & Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+*.sublime-project
+*.sublime-workspace
+
+# Linting & Formatting cache
+.eslintcache
+.stylelintcache
+.prettiercache
+
+# Testing & Coverage
+coverage/
+.nyc_output/
+*.lcov
+
+# Environment files
+.env
+.env.local
+.env.*.local
+.env.production
+.env.development
+docker/.env
+docker/.env.local
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+turbo-debug.log*
+lerna-debug.log*
+
+# OS-specific
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+tmp/
+temp/
+
+# Database
+*.sqlite
+*.sqlite3
+*.db
+*.db-shm
+*.db-wal
+
+# Drizzle migrations (if auto-generated)
+# packages/database/drizzle/
+
+# Credentials & Secrets (never commit)
+credentials/
+secrets/
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Docker
+docker/secrets/

@@ -1,0 +1,34 @@
+# Development container with hot reload
+FROM node:22-alpine
+
+# Install pnpm
+RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
+
+# Install development tools
+RUN apk add --no-cache git bash
+
+WORKDIR /app
+
+# Copy package files first for better layer caching
+COPY package.json pnpm-workspace.yaml pnpm-lock.yaml* ./
+COPY packages/protocol/package.json ./packages/protocol/
+COPY packages/database/package.json ./packages/database/
+COPY packages/redis/package.json ./packages/redis/
+COPY packages/shared-types/package.json ./packages/shared-types/
+COPY packages/config/package.json ./packages/config/
+COPY apps/login-server/package.json ./apps/login-server/
+COPY apps/connection-server/package.json ./apps/connection-server/
+COPY tools/data-importer/package.json ./tools/data-importer/
+
+# Install all dependencies
+RUN pnpm install || pnpm install --no-frozen-lockfile
+
+# Source will be mounted as volume for hot reload
+VOLUME /app/packages
+VOLUME /app/apps
+VOLUME /app/tools
+
+EXPOSE 44453/udp 44455/udp
+
+# Default command - can be overridden
+CMD ["pnpm", "dev"]

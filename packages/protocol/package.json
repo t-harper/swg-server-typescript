@@ -1,0 +1,42 @@
+{
+  "name": "@swg/protocol",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./soe": {
+      "types": "./dist/soe/index.d.ts",
+      "import": "./dist/soe/index.js"
+    },
+    "./swg": {
+      "types": "./dist/swg/index.d.ts",
+      "import": "./dist/swg/index.js"
+    },
+    "./swg/messages/*": {
+      "types": "./dist/swg/messages/*.d.ts",
+      "import": "./dist/swg/messages/*.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "pako": "^2.1.0"
+  },
+  "devDependencies": {
+    "@types/pako": "^2.0.3",
+    "typescript": "^5.7.0",
+    "vitest": "^2.1.0"
+  }
+}

@@ -1,0 +1,90 @@
+version: '3.8'
+
+# Development compose file with hot reload
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+services:
+  dev:
+    build:
+      context: ..
+      dockerfile: Dockerfile.dev
+    container_name: swg-dev
+    ports:
+      - "44453:44453/udp"
+      - "44455:44455/udp"
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: ${MYSQL_USER:-swg}
+      DB_PASSWORD: ${MYSQL_PASSWORD:-swgpass}
+      DB_NAME: ${MYSQL_DATABASE:-swg}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      NODE_ENV: development
+    volumes:
+      - ../packages:/app/packages
+      - ../apps:/app/apps
+      - ../tools:/app/tools
+      - ../tsconfig.json:/app/tsconfig.json
+      - ../turbo.json:/app/turbo.json
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - swg-network
+    stdin_open: true
+    tty: true
+
+  mysql:
+    image: mysql:8.0
+    container_name: swg-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-swgroot}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-swg}
+      MYSQL_USER: ${MYSQL_USER:-swg}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-swgpass}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 5s
+      retries: 10
+    networks:
+      - swg-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: swg-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      timeout: 5s
+      retries: 10
+    networks:
+      - swg-network
+
+  adminer:
+    image: adminer
+    container_name: swg-adminer
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+    networks:
+      - swg-network
+
+volumes:
+  mysql_data:
+  redis_data:
+
+networks:
+  swg-network:
+    driver: bridge

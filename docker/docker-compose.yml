@@ -1,0 +1,106 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: swg-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-swgroot}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-swg}
+      MYSQL_USER: ${MYSQL_USER:-swg}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-swgpass}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 5s
+      retries: 10
+    networks:
+      - swg-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: swg-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      timeout: 5s
+      retries: 10
+    networks:
+      - swg-network
+
+  login-server:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: login-server
+    container_name: swg-login
+    ports:
+      - "44453:44453/udp"
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: ${MYSQL_USER:-swg}
+      DB_PASSWORD: ${MYSQL_PASSWORD:-swgpass}
+      DB_NAME: ${MYSQL_DATABASE:-swg}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      LOGIN_PORT: 44453
+      LOGIN_BIND: 0.0.0.0
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - swg-network
+
+  connection-server:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: connection-server
+    container_name: swg-connection
+    ports:
+      - "44455:44455/udp"
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: ${MYSQL_USER:-swg}
+      DB_PASSWORD: ${MYSQL_PASSWORD:-swgpass}
+      DB_NAME: ${MYSQL_DATABASE:-swg}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      CONNECTION_PORT: 44455
+      CONNECTION_BIND: 0.0.0.0
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - swg-network
+
+  adminer:
+    image: adminer
+    container_name: swg-adminer
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+    networks:
+      - swg-network
+
+volumes:
+  mysql_data:
+  redis_data:
+
+networks:
+  swg-network:
+    driver: bridge
