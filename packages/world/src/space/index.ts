@@ -1,71 +1,11 @@
 /**
- * @swg/world
- * World management for the SWG server
- *
- * This package provides:
- * - QuadTree spatial indexing for efficient range queries
- * - Zone management for planets and space regions
- * - Bounding box utilities for collision detection
+ * @swg/world - Space Zone exports
+ * Jump to Lightspeed (JTL) space zone system
  */
 
-// Spatial indexing
+// Types and enums
 export {
-  // Bounding Box
-  type BoundingBox,
-  createBoundingBox,
-  fromCenterRadius,
-  merge,
-  intersects,
-  contains,
-  containsPoint,
-  expand,
-  getWidth,
-  getHeight,
-  getCenter,
-  getArea,
-  intersectsCircle,
-  subdivide,
-} from './spatial/bounding-box.js';
-
-export {
-  // QuadTree
-  type Spatial,
-  type QuadTreeNode,
-  QuadTree,
-} from './spatial/quad-tree.js';
-
-// Zone management
-export {
-  // Zone
-  type SceneObject,
-  type ZoneMessage,
-  type MessageHandler,
-  Zone,
-} from './zone/zone.js';
-
-export {
-  // Zone Configuration
-  type TerrainInfo,
-  type ZoneConfig,
-  type ZoneProperties,
-  ZONE_CONFIGS,
-  getEnabledZoneIds,
-  getGroundZoneIds,
-  getSpaceZoneIds,
-  getZoneConfig,
-} from './zone/zone-config.js';
-
-export {
-  // Zone Manager
-  type TransferResult,
-  type ZoneLoadStatus,
-  type ZoneEventHandler,
-  ZoneManager,
-} from './zone/zone-manager.js';
-
-// Space zones (JTL)
-export {
-  // Types and enums
+  // Enums
   SpaceZoneId,
   SpaceSectorType,
   SpaceFaction,
@@ -73,6 +13,7 @@ export {
   StationService,
   ShipClass,
   DockingStatus,
+  // Interfaces
   type SpaceBounds,
   type AsteroidField,
   type Nebula,
@@ -82,24 +23,36 @@ export {
   type SpaceZoneConfig,
   type SpaceShip,
   type CollisionResult,
+  // Utility functions
   createSpaceBounds,
   isWithinSpaceBounds,
   distance3D,
   distanceSquared3D,
-  // Space zone class
+} from './space-types.js';
+
+// Space zone class
+export {
   SpaceZone,
   createSpaceZone,
   type SpaceZoneMessage,
   type SpaceMessageHandler,
   type DockingState,
-  // Space zone loader
+} from './space-zone.js';
+
+// Space zone loader
+export {
   SpaceZoneLoader,
   createSpaceZoneLoader,
   SPACE_ZONE_CONFIGS,
   findHyperspaceRoute,
-  // Network messages
+} from './space-zone-loader.js';
+
+// Network messages
+export {
+  // Base types
   type SpaceNetworkMessage,
   type SpaceMessage,
+  // Message types
   type EnterSpaceZoneMessage,
   type LeaveSpaceZoneMessage,
   type HyperspaceRequestMessage,
@@ -119,10 +72,12 @@ export {
   type AsteroidWarningMessage,
   type RadarContactMessage,
   type RadarContact,
+  // Enums
   LeaveSpaceReason,
   HyperspaceDenyReason,
   DamageType,
   RadarContactType,
+  // Factory functions
   createEnterSpaceZoneMessage,
   createLeaveSpaceZoneMessage,
   createHyperspaceRequestMessage,
@@ -133,4 +88,4 @@ export {
   createShipDamageMessage,
   createShipDestroyedMessage,
   createRadarContactMessage,
-} from './space/index.js';
+} from './space-messages.js';
