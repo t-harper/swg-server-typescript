@@ -122,7 +122,7 @@ export class EquipmentManager {
    */
   constructor(itemLookup?: (itemId: ObjectId) => TangibleObject | undefined) {
     this.equippedItems = new Map();
-    this.activeWeaponSlot = EquipmentSlot.RIGHT_WEAPON;
+    this.activeWeaponSlot = WeaponSlot.PRIMARY;
     this.itemLookup = itemLookup ?? null;
   }
 
@@ -241,14 +241,14 @@ export class EquipmentManager {
     // Check two-handed weapon restrictions
     if (item.twoHanded && isWeaponSlot(slot)) {
       // Two-handed weapons require the right weapon slot and empty left slot
-      if (slot !== EquipmentSlot.RIGHT_WEAPON) {
+      if (slot !== WeaponSlot.PRIMARY) {
         return {
           allowed: false,
           reason: EquipmentFailureReason.EQUIPMENT_CONFLICT,
           message: 'Two-handed weapons must be equipped in the primary weapon slot',
         };
       }
-      if (this.equippedItems.has(EquipmentSlot.LEFT_WEAPON)) {
+      if (this.equippedItems.has(WeaponSlot.SECONDARY)) {
         return {
           allowed: false,
           reason: EquipmentFailureReason.EQUIPMENT_CONFLICT,
@@ -258,8 +258,8 @@ export class EquipmentManager {
     }
 
     // Check if equipping in left weapon slot with two-handed weapon
-    if (slot === EquipmentSlot.LEFT_WEAPON) {
-      const rightWeaponId = this.equippedItems.get(EquipmentSlot.RIGHT_WEAPON);
+    if (slot === WeaponSlot.SECONDARY) {
+      const rightWeaponId = this.equippedItems.get(WeaponSlot.PRIMARY);
       if (rightWeaponId && this.itemLookup) {
         const rightWeapon = this.itemLookup(rightWeaponId) as WeaponObject | undefined;
         // Would need to check if right weapon is two-handed
@@ -414,9 +414,9 @@ export class EquipmentManager {
   swapWeapon(playerId: ObjectId): WeaponChangedEvent | null {
     const oldSlot = this.activeWeaponSlot;
     const newSlot =
-      oldSlot === EquipmentSlot.RIGHT_WEAPON
-        ? EquipmentSlot.LEFT_WEAPON
-        : EquipmentSlot.RIGHT_WEAPON;
+      oldSlot === WeaponSlot.PRIMARY
+        ? WeaponSlot.SECONDARY
+        : WeaponSlot.PRIMARY;
 
     // Check if the new slot has a weapon
     const newWeaponId = this.equippedItems.get(newSlot);
@@ -552,7 +552,7 @@ export class EquipmentManager {
    */
   clearAll(): void {
     this.equippedItems.clear();
-    this.activeWeaponSlot = EquipmentSlot.RIGHT_WEAPON;
+    this.activeWeaponSlot = WeaponSlot.PRIMARY;
   }
 
   /**
@@ -568,7 +568,7 @@ export class EquipmentManager {
   private getSlotsForObjectType(objectType: ObjectType): EquipmentSlotType[] {
     switch (objectType) {
       case ObjectType.Weapon:
-        return [EquipmentSlot.RIGHT_WEAPON, EquipmentSlot.LEFT_WEAPON];
+        return [WeaponSlot.PRIMARY, WeaponSlot.SECONDARY];
 
       case ObjectType.Armor:
         return [

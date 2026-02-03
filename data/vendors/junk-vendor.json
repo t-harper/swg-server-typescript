@@ -1,0 +1,56 @@
+{
+  "templateName": "junk_vendor",
+  "displayName": "Junk Dealer",
+  "description": "A junk dealer vendor NPC that buys unwanted items from players.",
+
+  "vendorType": "junk",
+  "quality": "standard",
+
+  "inventorySize": 50,
+  "maintenanceCostPerDay": 150,
+
+  "defaultName": "Junk Dealer",
+  "defaultDescription": "I'll buy your unwanted junk!",
+
+  "features": {
+    "canSellItems": true,
+    "canBuyJunk": true,
+    "canSellCreatures": false,
+    "searchable": true
+  },
+
+  "junkBuying": {
+    "enabled": true,
+    "buyPriceModifier": 0.25,
+    "categories": [
+      "armor",
+      "weapon",
+      "clothing",
+      "misc",
+      "component",
+      "loot"
+    ],
+    "excludedCategories": [
+      "resource",
+      "quest_item",
+      "deed"
+    ]
+  },
+
+  "appearance": {
+    "species": "human",
+    "gender": "random",
+    "outfit": "trader_casual",
+    "animations": ["vendor_idle", "vendor_examine", "vendor_haggle"]
+  },
+
+  "voiceLines": {
+    "greeting": ["Got some junk to sell?", "I buy all sorts of things!"],
+    "buyOffer": ["I can give you {price} for that.", "Best I can do is {price} credits."],
+    "sale": ["Nice doing business with you!", "Pleasure dealing with you!"],
+    "farewell": ["Bring me more junk anytime!", "I'm always buying!"]
+  },
+
+  "appearanceTemplate": "object/tangible/vendor/vendor_junk.iff",
+  "templateCrc": 0
+}

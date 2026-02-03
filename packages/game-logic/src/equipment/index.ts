@@ -7,6 +7,7 @@
 export {
   EquipmentSlot,
   type EquipmentSlotType,
+  WeaponSlot,
   type SlotCapacity,
   type SlotArrangement,
   type EquippedItem,

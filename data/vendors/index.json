@@ -1,0 +1,8 @@
+{
+  "vendors": [
+    "standard-vendor.json",
+    "junk-vendor.json"
+  ],
+  "styles": "vendor-styles.json",
+  "description": "Player vendor templates and customization options for the SWG server"
+}

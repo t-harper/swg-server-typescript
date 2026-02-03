@@ -9,3 +9,4 @@ export * from './posture.js';
 export * from './character-name.js';
 export * from './character-creation.js';
 export * from './zone-messages.js';
+export * from './bazaar/index.js';

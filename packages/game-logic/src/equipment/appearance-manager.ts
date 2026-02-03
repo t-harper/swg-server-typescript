@@ -115,7 +115,7 @@ export function getAppearanceData(
     visibleItems.push(equippedItem);
 
     // Track weapon appearance separately
-    if (slot === EquipmentSlot.RIGHT_WEAPON || slot === EquipmentSlot.LEFT_WEAPON) {
+    if (slot === EquipmentSlot.RIGHT_HAND || slot === EquipmentSlot.LEFT_HAND) {
       weaponAppearance = {
         weaponId: itemId,
         templateCrc: item?.templateCrc ?? 0,

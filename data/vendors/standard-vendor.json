@@ -1,0 +1,36 @@
+{
+  "templateName": "standard_vendor",
+  "displayName": "Standard Vendor",
+  "description": "A standard vendor NPC for selling items in player shops.",
+
+  "vendorType": "standard",
+  "quality": "basic",
+
+  "inventorySize": 25,
+  "maintenanceCostPerDay": 100,
+
+  "defaultName": "Vendor",
+  "defaultDescription": "Browse my wares!",
+
+  "features": {
+    "canSellItems": true,
+    "canBuyJunk": false,
+    "canSellCreatures": false,
+    "searchable": true
+  },
+
+  "appearance": {
+    "species": "human",
+    "gender": "random",
+    "animations": ["vendor_idle", "vendor_greet", "vendor_sale"]
+  },
+
+  "voiceLines": {
+    "greeting": ["Welcome, customer!", "What can I help you find?"],
+    "sale": ["Excellent choice!", "You won't regret that purchase!"],
+    "farewell": ["Come back soon!", "Thank you for shopping!"]
+  },
+
+  "appearanceTemplate": "object/tangible/vendor/vendor_standard.iff",
+  "templateCrc": 0
+}

@@ -536,3 +536,86 @@ export {
   getWaterSurveyToolTemplates,
   getOrganicSurveyToolTemplates,
 } from './data/survey-tools/index.js';
+
+// Player Vendor System
+export {
+  PlayerVendor,
+  VendorType,
+  VndrProperty,
+  VENDOR_INVENTORY_SIZES,
+  VENDOR_MAINTENANCE_COSTS,
+  MAINTENANCE_WARNING_DAYS,
+  getVendorTypeName,
+  type VendorItem,
+  type VendorSaleResult,
+  type MaintenanceStatus,
+} from './player-vendor.js';
+
+// Vendor network messages
+export {
+  VendorOperation,
+  VendorMessageCrc,
+  // Browse messages
+  type VendorBrowseMessage,
+  type VendorBrowseResponseMessage,
+  createVendorBrowseMessage,
+  createVendorBrowseResponse,
+  // Buy messages
+  type VendorBuyMessage,
+  type VendorBuyResponseMessage,
+  createVendorBuyMessage,
+  createVendorBuyResponse,
+  // Add item messages
+  type VendorAddItemMessage,
+  type VendorAddItemResponseMessage,
+  createVendorAddItemMessage,
+  createVendorAddItemResponse,
+  // Remove item messages
+  type VendorRemoveItemMessage,
+  type VendorRemoveItemResponseMessage,
+  createVendorRemoveItemMessage,
+  createVendorRemoveItemResponse,
+  // Withdraw messages
+  type VendorWithdrawMessage,
+  type VendorWithdrawResponseMessage,
+  createVendorWithdrawMessage,
+  createVendorWithdrawResponse,
+  // Status messages
+  type VendorStatusMessage,
+  type VendorStatusResponseMessage,
+  createVendorStatusMessage,
+  createVendorStatusResponse,
+  // Update price messages
+  type VendorUpdatePriceMessage,
+  type VendorUpdatePriceResponseMessage,
+  createVendorUpdatePriceMessage,
+  createVendorUpdatePriceResponse,
+  // Maintenance messages
+  type VendorAddMaintenanceMessage,
+  type VendorAddMaintenanceResponseMessage,
+  createVendorAddMaintenanceMessage,
+  createVendorAddMaintenanceResponse,
+  // Union types and type guards
+  type AnyVendorRequestMessage,
+  type AnyVendorResponseMessage,
+  isVendorBrowseMessage,
+  isVendorBuyMessage,
+  isVendorAddItemMessage,
+  isVendorRemoveItemMessage,
+  isVendorWithdrawMessage,
+  isVendorStatusMessage,
+  requiresOwnerPrivilege,
+} from './vendor-messages.js';
+
+// Bazaar Terminal System
+export {
+  BazaarTerminal,
+  BazaarTerminalType,
+  BAZAAR_TERMINAL_CRC,
+  DEFAULT_COMMISSION_RATE,
+  DEFAULT_GALACTIC_COMMISSION_RATE,
+  MAX_COMMISSION_RATE,
+  createLocalBazaarTerminal,
+  createGalacticBazaarTerminal,
+  createCommodityTerminal,
+} from './bazaar-terminal.js';

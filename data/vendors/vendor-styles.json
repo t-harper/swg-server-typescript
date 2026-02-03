@@ -1,0 +1,224 @@
+{
+  "vendorStyles": {
+    "human_male_formal": {
+      "species": "human",
+      "gender": "male",
+      "outfit": "formal_merchant",
+      "hairStyle": "short_neat",
+      "accessory": "monocle",
+      "description": "A formal human male vendor with professional attire"
+    },
+    "human_female_formal": {
+      "species": "human",
+      "gender": "female",
+      "outfit": "formal_merchant",
+      "hairStyle": "bun",
+      "description": "A formal human female vendor with professional attire"
+    },
+    "human_male_casual": {
+      "species": "human",
+      "gender": "male",
+      "outfit": "casual_trader",
+      "hairStyle": "medium",
+      "description": "A casual human male vendor"
+    },
+    "human_female_casual": {
+      "species": "human",
+      "gender": "female",
+      "outfit": "casual_trader",
+      "hairStyle": "ponytail",
+      "description": "A casual human female vendor"
+    },
+    "twi_lek_male": {
+      "species": "twilek",
+      "gender": "male",
+      "outfit": "exotic_merchant",
+      "skinColor": "blue",
+      "description": "A Twi'lek male vendor"
+    },
+    "twi_lek_female": {
+      "species": "twilek",
+      "gender": "female",
+      "outfit": "exotic_merchant",
+      "skinColor": "green",
+      "description": "A Twi'lek female vendor"
+    },
+    "rodian": {
+      "species": "rodian",
+      "gender": "male",
+      "outfit": "hunter_trader",
+      "description": "A Rodian vendor specializing in hunting goods"
+    },
+    "mon_calamari": {
+      "species": "moncalamari",
+      "gender": "male",
+      "outfit": "aquatic_merchant",
+      "description": "A Mon Calamari vendor"
+    },
+    "wookiee": {
+      "species": "wookiee",
+      "gender": "male",
+      "outfit": "wookiee_bandolier",
+      "description": "A Wookiee vendor"
+    },
+    "bothan": {
+      "species": "bothan",
+      "gender": "male",
+      "outfit": "spy_trader",
+      "description": "A Bothan vendor"
+    },
+    "zabrak_male": {
+      "species": "zabrak",
+      "gender": "male",
+      "outfit": "warrior_merchant",
+      "hornPattern": "crown",
+      "description": "A Zabrak male vendor"
+    },
+    "zabrak_female": {
+      "species": "zabrak",
+      "gender": "female",
+      "outfit": "warrior_merchant",
+      "hornPattern": "small",
+      "description": "A Zabrak female vendor"
+    },
+    "trandoshan": {
+      "species": "trandoshan",
+      "gender": "male",
+      "outfit": "bounty_hunter_trader",
+      "description": "A Trandoshan vendor specializing in hunting equipment"
+    },
+    "ithorian": {
+      "species": "ithorian",
+      "gender": "male",
+      "outfit": "nature_merchant",
+      "description": "An Ithorian vendor specializing in organic goods"
+    },
+    "sullustan": {
+      "species": "sullustan",
+      "gender": "male",
+      "outfit": "tech_trader",
+      "description": "A Sullustan vendor specializing in technology"
+    }
+  },
+
+  "qualityTiers": {
+    "basic": {
+      "inventorySize": 25,
+      "maintenanceCostPerDay": 100,
+      "purchaseCost": 5000,
+      "allowedStyles": ["human_male_casual", "human_female_casual"],
+      "description": "A basic vendor with limited inventory"
+    },
+    "standard": {
+      "inventorySize": 50,
+      "maintenanceCostPerDay": 200,
+      "purchaseCost": 15000,
+      "allowedStyles": "all",
+      "description": "A standard vendor with moderate inventory"
+    },
+    "premium": {
+      "inventorySize": 100,
+      "maintenanceCostPerDay": 400,
+      "purchaseCost": 50000,
+      "allowedStyles": "all",
+      "features": ["priority_search"],
+      "description": "A premium vendor with large inventory and priority search placement"
+    },
+    "elite": {
+      "inventorySize": 200,
+      "maintenanceCostPerDay": 800,
+      "purchaseCost": 150000,
+      "allowedStyles": "all",
+      "features": ["priority_search", "custom_greeting", "multiple_locations"],
+      "description": "An elite vendor with maximum inventory and all features"
+    }
+  },
+
+  "outfits": {
+    "formal_merchant": {
+      "chest": "merchant_coat_formal",
+      "legs": "merchant_pants_formal",
+      "feet": "dress_shoes",
+      "description": "Formal merchant attire suitable for upscale shops"
+    },
+    "casual_trader": {
+      "chest": "trader_shirt",
+      "legs": "trader_pants",
+      "feet": "boots_leather",
+      "description": "Casual trader clothing for everyday commerce"
+    },
+    "exotic_merchant": {
+      "chest": "exotic_robe",
+      "legs": "exotic_leggings",
+      "feet": "sandals_exotic",
+      "accessories": ["jewelry_necklace"],
+      "description": "Exotic merchant attire for specialty shops"
+    },
+    "hunter_trader": {
+      "chest": "hunting_vest",
+      "legs": "cargo_pants",
+      "feet": "boots_rugged",
+      "accessories": ["bandolier"],
+      "description": "Hunter-style clothing for weapon and supply vendors"
+    },
+    "aquatic_merchant": {
+      "chest": "aquatic_tunic",
+      "legs": "aquatic_pants",
+      "feet": "water_shoes",
+      "description": "Moisture-resistant attire for aquatic species"
+    },
+    "tech_trader": {
+      "chest": "tech_jumpsuit_top",
+      "legs": "tech_jumpsuit_bottom",
+      "feet": "tech_boots",
+      "accessories": ["visor_tech", "tool_belt"],
+      "description": "Technical attire for technology vendors"
+    },
+    "nature_merchant": {
+      "chest": "organic_robe",
+      "legs": "organic_pants",
+      "feet": "natural_sandals",
+      "description": "Natural fiber clothing for organic goods vendors"
+    },
+    "warrior_merchant": {
+      "chest": "warrior_tunic",
+      "legs": "warrior_pants",
+      "feet": "warrior_boots",
+      "accessories": ["arm_guards"],
+      "description": "Warrior-inspired attire for combat goods vendors"
+    }
+  },
+
+  "animations": {
+    "vendor_idle": {
+      "priority": 1,
+      "loop": true,
+      "variants": ["idle_stand", "idle_look_around", "idle_shift_weight"]
+    },
+    "vendor_greet": {
+      "priority": 2,
+      "loop": false,
+      "variants": ["wave", "nod", "bow_slight"]
+    },
+    "vendor_sale": {
+      "priority": 2,
+      "loop": false,
+      "variants": ["clap_hands", "thumbs_up", "happy_gesture"]
+    },
+    "vendor_examine": {
+      "priority": 2,
+      "loop": false,
+      "variants": ["rub_chin", "look_at_item", "hold_up_item"]
+    },
+    "vendor_haggle": {
+      "priority": 2,
+      "loop": false,
+      "variants": ["shake_head", "hand_wave_no", "counter_offer"]
+    },
+    "vendor_farewell": {
+      "priority": 2,
+      "loop": false,
+      "variants": ["wave_goodbye", "nod_farewell", "bow_goodbye"]
+    }
+  }
+}
