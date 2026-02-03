@@ -1,0 +1,200 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "armor-template.schema.json",
+  "title": "SWG Armor Template",
+  "description": "Schema for defining armor piece templates in Star Wars Galaxies",
+  "type": "object",
+  "required": ["name", "armorRating", "armorLayer", "effectiveness", "encumbrance"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Display name of the armor type"
+    },
+    "description": {
+      "type": "string",
+      "description": "Detailed description of the armor"
+    },
+    "armorRating": {
+      "type": "integer",
+      "enum": [0, 1, 2, 3],
+      "description": "Armor rating: 0=None, 1=Light, 2=Medium, 3=Heavy"
+    },
+    "armorLayer": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 11,
+      "description": "Body part covered: 0=Chest, 1=Back, 2=Helmet, 3=LeftArm, 4=RightArm, 5=Gloves, 6=LeftLeg, 7=RightLeg, 8=Boots, 9=Belt, 10=LeftBicep, 11=RightBicep"
+    },
+    "effectiveness": {
+      "type": "object",
+      "required": ["kinetic", "energy", "blast", "stun", "heat", "cold", "acid", "electricity"],
+      "properties": {
+        "kinetic": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Effectiveness vs kinetic damage (0-1)"
+        },
+        "energy": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Effectiveness vs energy damage (0-1)"
+        },
+        "blast": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Effectiveness vs blast damage (0-1)"
+        },
+        "stun": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Effectiveness vs stun damage (0-1)"
+        },
+        "heat": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Effectiveness vs heat/fire damage (0-1)"
+        },
+        "cold": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Effectiveness vs cold/ice damage (0-1)"
+        },
+        "acid": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Effectiveness vs acid damage (0-1)"
+        },
+        "electricity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Effectiveness vs electrical damage (0-1)"
+        }
+      }
+    },
+    "lightsaberResist": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "default": 0,
+      "description": "Resistance to lightsaber damage (0-1)"
+    },
+    "encumbrance": {
+      "type": "object",
+      "required": ["health", "action", "mind"],
+      "properties": {
+        "health": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Health pool reduction"
+        },
+        "action": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Action pool reduction"
+        },
+        "mind": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Mind pool reduction"
+        }
+      }
+    },
+    "coverageSlots": {
+      "type": "array",
+      "items": {
+        "type": "integer"
+      },
+      "description": "Equipment slots this armor occupies"
+    },
+    "socketSlots": {
+      "type": "integer",
+      "minimum": 0,
+      "default": 0,
+      "description": "Number of modification socket slots"
+    },
+    "specialProtection": {
+      "type": "number",
+      "minimum": 0,
+      "default": 0,
+      "description": "Special protection bonus vs specific attacks"
+    },
+    "protectionType": {
+      "type": "string",
+      "default": "",
+      "description": "Type of special protection (e.g., 'Jedi', 'BH')"
+    },
+    "requiredCertification": {
+      "type": "string",
+      "default": "",
+      "description": "Required certification to equip this armor"
+    },
+    "condition": {
+      "type": "object",
+      "properties": {
+        "max": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Maximum condition value"
+        },
+        "current": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Starting condition value"
+        }
+      }
+    },
+    "volume": {
+      "type": "integer",
+      "minimum": 1,
+      "default": 1,
+      "description": "Inventory space consumed"
+    },
+    "complexity": {
+      "type": "integer",
+      "minimum": 0,
+      "default": 0,
+      "description": "Crafting complexity value"
+    },
+    "variants": {
+      "type": "array",
+      "description": "Individual armor piece variants",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "armorLayer", "coverageSlots"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for this variant"
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name of this variant"
+          },
+          "armorLayer": {
+            "type": "integer",
+            "description": "Body part this variant covers"
+          },
+          "coverageSlots": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "Equipment slots this variant occupies"
+          },
+          "templateCrc": {
+            "type": "string",
+            "description": "IFF template path for this variant"
+          }
+        }
+      }
+    }
+  }
+}

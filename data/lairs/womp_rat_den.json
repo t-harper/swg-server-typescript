@@ -1,0 +1,44 @@
+{
+  "templateName": "womp_rat_den",
+  "displayName": "Womp Rat Den",
+  "description": "A burrowed den housing a colony of womp rats. Disturbing it will provoke the inhabitants.",
+
+  "lairType": "creature",
+
+  "appearanceTemplate": "object/tangible/lair/creature_lair/shared_lair_womp_rat.iff",
+  "scale": 1.0,
+
+  "creatureTemplates": ["womp_rat"],
+  "bossTemplate": "giant_womp_rat",
+  "babyTemplate": "womp_rat_juvenile",
+  "babySpawnChance": 0.15,
+
+  "minCreatures": 2,
+  "maxCreatures": 5,
+  "spawnRadius": 24,
+  "respawnDelay": 45000,
+  "spawnBehavior": "on_damage",
+  "detectionRadius": 32,
+
+  "waveCount": 3,
+  "creaturesPerWave": 3,
+  "waveTriggerDamage": 0.25,
+  "waveCooldown": 4000,
+
+  "healthMultiplier": 1.0,
+  "baseHealth": 3000,
+  "armor": 0,
+  "regeneratesHealth": true,
+  "healthRegenRate": 5,
+  "regenDelay": 30000,
+
+  "xpBonus": 150,
+  "lootTable": "loot_lair_womp_rat",
+  "creditRange": [10, 50],
+
+  "faction": "creature",
+  "aggressive": false,
+  "socialGroup": "womp_rat_colony",
+  "creatureRoamRadius": 16,
+  "creatureLeashDistance": 48
+}

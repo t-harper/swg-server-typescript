@@ -1,0 +1,21 @@
+{
+  "name": "Generic Crafting Tool",
+  "description": "A basic crafting tool for simple assembly tasks.",
+  "templateId": "object/tangible/crafting/station/generic_tool.iff",
+  "craftingToolType": 0,
+  "stationType": null,
+  "isStation": false,
+  "toolQuality": 0,
+  "effectiveness": 5,
+  "complexityLimit": 15,
+  "assemblyBonus": 0,
+  "experimentationBonus": 0,
+  "maxUses": -1,
+  "requiredSkill": "",
+  "maxCondition": 500,
+  "complexity": 3,
+  "volume": 1,
+  "stfFile": "crafting_tool_n",
+  "stfName": "generic_tool",
+  "placementRules": null
+}

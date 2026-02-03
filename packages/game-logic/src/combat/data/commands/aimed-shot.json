@@ -1,0 +1,75 @@
+{
+  "commandName": "aimedShot",
+  "commandCrc": 3241287245,
+  "displayName": "Aimed Shot",
+  "description": "A carefully aimed shot that deals increased damage with high accuracy. Marksman ability.",
+
+  "targetType": 1,
+  "maxRange": 64,
+  "minRange": 10,
+
+  "healthCost": 0,
+  "actionCost": 50,
+  "mindCost": 0,
+  "forceCost": 0,
+
+  "warmupTime": 1500,
+  "cooldownTime": 6000,
+  "animationTime": 1200,
+  "globalCooldown": 1000,
+
+  "requiredWeaponType": [4, 5, 6],
+  "requiredStance": [0, 1],
+  "requiredSkill": "marksman_novice",
+  "requiredSkillLevel": 1,
+  "requiredCombatLevel": 1,
+
+  "damageMultiplier": 1.5,
+  "accuracyBonus": 25,
+  "stateChance": 15,
+  "stateToApply": 4,
+  "stateDuration": 5000,
+  "damageType": 1,
+  "primaryTarget": 0,
+  "secondaryTarget": null,
+  "secondaryRatio": 0,
+
+  "aoeRadius": 0,
+  "coneAngle": 0,
+  "maxTargets": 1,
+  "chainToCommand": null,
+  "chainWindow": 0,
+  "chainFromCommands": [],
+
+  "flags": {
+    "stationaryOnly": true,
+    "mobileOk": false,
+    "requiresCombat": false,
+    "outOfCombatOnly": false,
+    "canTargetSelf": false,
+    "canTargetFriendly": false,
+    "canTargetEnemy": true,
+    "canTargetDead": false,
+    "alwaysHits": false,
+    "cannotMiss": false,
+    "cannotBlock": false,
+    "cannotDodge": false,
+    "cannotParry": false,
+    "isHeal": false,
+    "isBuff": false,
+    "isDebuff": false,
+    "requiresLineOfSight": true,
+    "canCrit": true,
+    "breaksOnDamage": false
+  },
+
+  "animationCrc": 0,
+  "clientEffectCrc": 0,
+  "hitEffectCrc": 0,
+
+  "_comment": {
+    "requiredWeaponType": "4=Pistol, 5=Carbine, 6=Rifle",
+    "requiredStance": "0=Standing, 1=Crouched",
+    "stateToApply": "4=Dizzy"
+  }
+}

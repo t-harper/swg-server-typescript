@@ -1,0 +1,377 @@
+{
+  "version": 1,
+  "skills": [
+    {
+      "skillName": "crafting_artisan_novice",
+      "parentSkill": null,
+      "graphType": "profession",
+      "isTitle": true,
+      "xpType": "crafting",
+      "xpCost": 0,
+      "xpCap": 1000,
+      "skillPointsRequired": 15,
+      "requiredSkills": [],
+      "requiredSpecies": [],
+      "skillMods": {
+        "assembly": 10,
+        "experimentation": 5,
+        "survey": 10
+      },
+      "commands": ["sample", "survey", "craft"],
+      "certifications": ["cert_crafting_generic", "cert_survey_tool_basic"],
+      "professionName": "Artisan",
+      "isMaster": false
+    },
+    {
+      "skillName": "crafting_artisan_survey_01",
+      "parentSkill": "crafting_artisan_novice",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "crafting",
+      "xpCost": 2000,
+      "xpCap": 5000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["crafting_artisan_novice"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "survey": 10,
+        "sampling": 5
+      },
+      "commands": [],
+      "certifications": ["cert_survey_tool_mineral"],
+      "professionName": "Artisan",
+      "isMaster": false
+    },
+    {
+      "skillName": "crafting_artisan_survey_02",
+      "parentSkill": "crafting_artisan_survey_01",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "crafting",
+      "xpCost": 4000,
+      "xpCap": 10000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["crafting_artisan_survey_01"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "survey": 10,
+        "sampling": 5
+      },
+      "commands": ["requestsurvey"],
+      "certifications": [],
+      "professionName": "Artisan",
+      "isMaster": false
+    },
+    {
+      "skillName": "crafting_artisan_survey_03",
+      "parentSkill": "crafting_artisan_survey_02",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "crafting",
+      "xpCost": 8000,
+      "xpCap": 20000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["crafting_artisan_survey_02"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "survey": 10,
+        "sampling": 5
+      },
+      "commands": [],
+      "certifications": ["cert_survey_tool_chemical"],
+      "professionName": "Artisan",
+      "isMaster": false
+    },
+    {
+      "skillName": "crafting_artisan_survey_04",
+      "parentSkill": "crafting_artisan_survey_03",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "crafting",
+      "xpCost": 16000,
+      "xpCap": 40000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["crafting_artisan_survey_03"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "survey": 15,
+        "sampling": 10
+      },
+      "commands": ["resourcelocator"],
+      "certifications": ["cert_personal_harvester"],
+      "professionName": "Artisan",
+      "isMaster": false
+    },
+    {
+      "skillName": "crafting_artisan_engineering_01",
+      "parentSkill": "crafting_artisan_novice",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "crafting",
+      "xpCost": 2000,
+      "xpCap": 5000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["crafting_artisan_novice"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "assembly": 10,
+        "experimentation": 5
+      },
+      "commands": [],
+      "certifications": ["cert_crafting_weapon_basic"],
+      "professionName": "Artisan",
+      "isMaster": false
+    },
+    {
+      "skillName": "crafting_artisan_engineering_02",
+      "parentSkill": "crafting_artisan_engineering_01",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "crafting",
+      "xpCost": 4000,
+      "xpCap": 10000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["crafting_artisan_engineering_01"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "assembly": 10,
+        "experimentation": 5
+      },
+      "commands": ["reverseengineer"],
+      "certifications": [],
+      "professionName": "Artisan",
+      "isMaster": false
+    },
+    {
+      "skillName": "crafting_artisan_engineering_03",
+      "parentSkill": "crafting_artisan_engineering_02",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "crafting",
+      "xpCost": 8000,
+      "xpCap": 20000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["crafting_artisan_engineering_02"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "assembly": 10,
+        "experimentation": 5
+      },
+      "commands": [],
+      "certifications": ["cert_crafting_armor_basic"],
+      "professionName": "Artisan",
+      "isMaster": false
+    },
+    {
+      "skillName": "crafting_artisan_engineering_04",
+      "parentSkill": "crafting_artisan_engineering_03",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "crafting",
+      "xpCost": 16000,
+      "xpCap": 40000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["crafting_artisan_engineering_03"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "assembly": 15,
+        "experimentation": 10,
+        "reverse_engineering": 10
+      },
+      "commands": ["schematicanalysis"],
+      "certifications": [],
+      "professionName": "Artisan",
+      "isMaster": false
+    },
+    {
+      "skillName": "crafting_artisan_domestic_01",
+      "parentSkill": "crafting_artisan_novice",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "crafting",
+      "xpCost": 2000,
+      "xpCap": 5000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["crafting_artisan_novice"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "food_assembly": 10,
+        "food_experimentation": 5
+      },
+      "commands": [],
+      "certifications": ["cert_crafting_food_basic"],
+      "professionName": "Artisan",
+      "isMaster": false
+    },
+    {
+      "skillName": "crafting_artisan_domestic_02",
+      "parentSkill": "crafting_artisan_domestic_01",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "crafting",
+      "xpCost": 4000,
+      "xpCap": 10000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["crafting_artisan_domestic_01"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "food_assembly": 10,
+        "food_experimentation": 5
+      },
+      "commands": ["preparedrink"],
+      "certifications": [],
+      "professionName": "Artisan",
+      "isMaster": false
+    },
+    {
+      "skillName": "crafting_artisan_domestic_03",
+      "parentSkill": "crafting_artisan_domestic_02",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "crafting",
+      "xpCost": 8000,
+      "xpCap": 20000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["crafting_artisan_domestic_02"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "food_assembly": 10,
+        "food_experimentation": 5,
+        "clothing_assembly": 10
+      },
+      "commands": [],
+      "certifications": ["cert_crafting_clothing_basic"],
+      "professionName": "Artisan",
+      "isMaster": false
+    },
+    {
+      "skillName": "crafting_artisan_domestic_04",
+      "parentSkill": "crafting_artisan_domestic_03",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "crafting",
+      "xpCost": 16000,
+      "xpCap": 40000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["crafting_artisan_domestic_03"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "food_assembly": 15,
+        "food_experimentation": 10,
+        "clothing_assembly": 10,
+        "clothing_experimentation": 5
+      },
+      "commands": ["homebrew"],
+      "certifications": [],
+      "professionName": "Artisan",
+      "isMaster": false
+    },
+    {
+      "skillName": "crafting_artisan_business_01",
+      "parentSkill": "crafting_artisan_novice",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "crafting",
+      "xpCost": 2000,
+      "xpCap": 5000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["crafting_artisan_novice"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "structure_assembly": 10
+      },
+      "commands": [],
+      "certifications": ["cert_personal_mineral_harvester"],
+      "professionName": "Artisan",
+      "isMaster": false
+    },
+    {
+      "skillName": "crafting_artisan_business_02",
+      "parentSkill": "crafting_artisan_business_01",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "crafting",
+      "xpCost": 4000,
+      "xpCap": 10000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["crafting_artisan_business_01"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "structure_assembly": 10
+      },
+      "commands": ["managevendor"],
+      "certifications": ["cert_vendor_basic"],
+      "professionName": "Artisan",
+      "isMaster": false
+    },
+    {
+      "skillName": "crafting_artisan_business_03",
+      "parentSkill": "crafting_artisan_business_02",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "crafting",
+      "xpCost": 8000,
+      "xpCap": 20000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["crafting_artisan_business_02"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "structure_assembly": 10,
+        "structure_experimentation": 5
+      },
+      "commands": [],
+      "certifications": ["cert_crafting_structure_basic"],
+      "professionName": "Artisan",
+      "isMaster": false
+    },
+    {
+      "skillName": "crafting_artisan_business_04",
+      "parentSkill": "crafting_artisan_business_03",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "crafting",
+      "xpCost": 16000,
+      "xpCap": 40000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["crafting_artisan_business_03"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "structure_assembly": 15,
+        "structure_experimentation": 10
+      },
+      "commands": ["createfactory"],
+      "certifications": ["cert_factory_basic"],
+      "professionName": "Artisan",
+      "isMaster": false
+    },
+    {
+      "skillName": "crafting_artisan_master",
+      "parentSkill": null,
+      "graphType": "profession",
+      "isTitle": true,
+      "xpType": "crafting",
+      "xpCost": 0,
+      "xpCap": 100000,
+      "skillPointsRequired": 5,
+      "requiredSkills": [
+        "crafting_artisan_survey_04",
+        "crafting_artisan_engineering_04",
+        "crafting_artisan_domestic_04",
+        "crafting_artisan_business_04"
+      ],
+      "requiredSpecies": [],
+      "skillMods": {
+        "assembly": 25,
+        "experimentation": 20,
+        "survey": 20,
+        "sampling": 15,
+        "reverse_engineering": 10,
+        "structure_assembly": 15
+      },
+      "commands": ["mastercrafting", "resourcequality"],
+      "certifications": ["cert_artisan_master"],
+      "professionName": "Artisan",
+      "isMaster": true
+    }
+  ]
+}

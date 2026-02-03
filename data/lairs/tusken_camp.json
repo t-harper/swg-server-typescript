@@ -1,0 +1,71 @@
+{
+  "templateName": "tusken_camp",
+  "displayName": "Tusken Raider Camp",
+  "description": "An encampment of the fearsome Tusken Raiders. They are extremely hostile to outsiders.",
+
+  "lairType": "bandit",
+
+  "appearanceTemplate": "object/tangible/lair/npc_lair/shared_lair_tusken_camp.iff",
+  "scale": 1.2,
+
+  "creatureTemplates": ["tusken_raider", "tusken_sniper"],
+  "bossTemplate": "tusken_warlord",
+  "babyTemplate": null,
+  "babySpawnChance": 0,
+
+  "minCreatures": 3,
+  "maxCreatures": 6,
+  "spawnRadius": 32,
+  "respawnDelay": 90000,
+  "spawnBehavior": "on_approach",
+  "detectionRadius": 48,
+
+  "waveCount": 4,
+  "creaturesPerWave": 4,
+  "waveTriggerDamage": 0.20,
+  "waveCooldown": 6000,
+
+  "waves": [
+    {
+      "creatureCount": 3,
+      "creatureOverride": ["tusken_raider"],
+      "spawnDelay": 0,
+      "spawnBoss": false
+    },
+    {
+      "creatureCount": 4,
+      "creatureOverride": ["tusken_raider", "tusken_sniper"],
+      "spawnDelay": 2000,
+      "spawnBoss": false
+    },
+    {
+      "creatureCount": 4,
+      "creatureOverride": ["tusken_sniper"],
+      "spawnDelay": 2000,
+      "spawnBoss": false
+    },
+    {
+      "creatureCount": 2,
+      "creatureOverride": ["tusken_elite"],
+      "spawnDelay": 3000,
+      "spawnBoss": true
+    }
+  ],
+
+  "healthMultiplier": 1.5,
+  "baseHealth": 8000,
+  "armor": 100,
+  "regeneratesHealth": true,
+  "healthRegenRate": 8,
+  "regenDelay": 45000,
+
+  "xpBonus": 800,
+  "lootTable": "loot_lair_tusken",
+  "creditRange": [100, 500],
+
+  "faction": "tusken",
+  "aggressive": true,
+  "socialGroup": "tusken_tribe",
+  "creatureRoamRadius": 24,
+  "creatureLeashDistance": 64
+}

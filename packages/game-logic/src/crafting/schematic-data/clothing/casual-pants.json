@@ -1,0 +1,116 @@
+{
+  "schematicId": "clothing_casual_pants",
+  "schematicName": "Casual Pants",
+  "category": "clothing",
+  "subcategory": "pants",
+  "complexity": 4,
+  "complexityTier": 2,
+  "craftingTool": "clothing_station",
+  "xpType": "crafting_clothing_general",
+  "xpAmount": 55,
+  "outputTemplate": "object/tangible/wearables/pants/pants_s01.iff",
+  "outputQuantity": 1,
+  "skillRequired": "crafting_tailor_novice",
+  "description": "Comfortable casual pants suitable for most occasions.",
+  "learnable": true,
+  "factoryCapable": true,
+  "manufacturingVolume": 8,
+  "dataVersion": 1,
+  "slots": [
+    {
+      "slotName": "Main Fabric",
+      "slotId": "main_fabric",
+      "slotType": "resource",
+      "resourceTypes": ["fiberplast", "hide", "synthetic_cloth"],
+      "quantityRequired": 35,
+      "optional": false,
+      "contributesToAttribute": ["condition", "sockets"],
+      "resourceWeights": {
+        "overallQuality": 55,
+        "unitToughness": 45
+      }
+    },
+    {
+      "slotName": "Lining",
+      "slotId": "lining",
+      "slotType": "resource",
+      "resourceTypes": ["fiberplast", "synthetic_cloth"],
+      "quantityRequired": 15,
+      "optional": false,
+      "contributesToAttribute": ["condition"],
+      "resourceWeights": {
+        "overallQuality": 60,
+        "malleability": 40
+      }
+    },
+    {
+      "slotName": "Fasteners",
+      "slotId": "fasteners",
+      "slotType": "resource",
+      "resourceTypes": ["metal", "copper", "steel"],
+      "quantityRequired": 3,
+      "optional": false,
+      "contributesToAttribute": ["condition"],
+      "resourceWeights": {
+        "unitToughness": 90,
+        "malleability": 10
+      }
+    },
+    {
+      "slotName": "Reinforcement",
+      "slotId": "reinforcement",
+      "slotType": "optional",
+      "resourceTypes": ["hide", "leather"],
+      "quantityRequired": 5,
+      "optional": true,
+      "contributesToAttribute": ["condition", "sockets"],
+      "resourceWeights": {
+        "unitToughness": 70,
+        "overallQuality": 30
+      }
+    }
+  ],
+  "itemAttributes": [
+    {
+      "attributeName": "condition",
+      "displayName": "Condition",
+      "baseValue": 1200,
+      "minValue": 600,
+      "maxValue": 2400,
+      "higherIsBetter": true,
+      "experimentationModifier": 1.0
+    },
+    {
+      "attributeName": "sockets",
+      "displayName": "Socket Count",
+      "baseValue": 0,
+      "minValue": 0,
+      "maxValue": 2,
+      "higherIsBetter": true,
+      "experimentationModifier": 0.6
+    }
+  ],
+  "assembly": {
+    "baseSuccessRate": 0.82,
+    "skillModifier": 0.002,
+    "criticalSuccessThreshold": 0.95,
+    "criticalFailureThreshold": 0.03
+  },
+  "experimentation": {
+    "maxPoints": 6,
+    "riskPerAttempt": 0.02,
+    "pointsPerLine": 1,
+    "groups": [
+      {
+        "groupName": "Durability",
+        "attributes": ["condition"],
+        "maxImprovement": 0.40
+      },
+      {
+        "groupName": "Sockets",
+        "attributes": ["sockets"],
+        "maxImprovement": 0.50
+      }
+    ]
+  }
+}

@@ -1,0 +1,367 @@
+{
+  "version": 1,
+  "skills": [
+    {
+      "skillName": "combat_carbineer_novice",
+      "parentSkill": null,
+      "graphType": "profession",
+      "isTitle": true,
+      "xpType": "combat_ranged_carbine",
+      "xpCost": 15000,
+      "xpCap": 50000,
+      "skillPointsRequired": 5,
+      "requiredSkills": ["combat_marksman_carbine_04"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "carbine_accuracy": 15,
+        "carbine_speed": 10,
+        "ranged_defense": 5
+      },
+      "commands": ["scattershot", "chargeshot"],
+      "certifications": ["cert_carbine_dh17"],
+      "professionName": "Carbineer",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_carbineer_accuracy_01",
+      "parentSkill": "combat_carbineer_novice",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_carbine",
+      "xpCost": 25000,
+      "xpCap": 75000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["combat_carbineer_novice"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "carbine_accuracy": 15
+      },
+      "commands": [],
+      "certifications": [],
+      "professionName": "Carbineer",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_carbineer_accuracy_02",
+      "parentSkill": "combat_carbineer_accuracy_01",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_carbine",
+      "xpCost": 50000,
+      "xpCap": 100000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["combat_carbineer_accuracy_01"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "carbine_accuracy": 15
+      },
+      "commands": ["pointblankarea"],
+      "certifications": [],
+      "professionName": "Carbineer",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_carbineer_accuracy_03",
+      "parentSkill": "combat_carbineer_accuracy_02",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_carbine",
+      "xpCost": 75000,
+      "xpCap": 150000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["combat_carbineer_accuracy_02"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "carbine_accuracy": 15,
+        "critical_chance": 5
+      },
+      "commands": [],
+      "certifications": ["cert_carbine_ee3"],
+      "professionName": "Carbineer",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_carbineer_accuracy_04",
+      "parentSkill": "combat_carbineer_accuracy_03",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_carbine",
+      "xpCost": 100000,
+      "xpCap": 200000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["combat_carbineer_accuracy_03"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "carbine_accuracy": 20,
+        "critical_chance": 5
+      },
+      "commands": ["markedtarget"],
+      "certifications": [],
+      "professionName": "Carbineer",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_carbineer_speed_01",
+      "parentSkill": "combat_carbineer_novice",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_carbine",
+      "xpCost": 25000,
+      "xpCap": 75000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["combat_carbineer_novice"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "carbine_speed": 10
+      },
+      "commands": [],
+      "certifications": [],
+      "professionName": "Carbineer",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_carbineer_speed_02",
+      "parentSkill": "combat_carbineer_speed_01",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_carbine",
+      "xpCost": 50000,
+      "xpCap": 100000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["combat_carbineer_speed_01"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "carbine_speed": 10
+      },
+      "commands": ["quickburst"],
+      "certifications": [],
+      "professionName": "Carbineer",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_carbineer_speed_03",
+      "parentSkill": "combat_carbineer_speed_02",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_carbine",
+      "xpCost": 75000,
+      "xpCap": 150000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["combat_carbineer_speed_02"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "carbine_speed": 10,
+        "ranged_speed": 5
+      },
+      "commands": [],
+      "certifications": ["cert_carbine_laser"],
+      "professionName": "Carbineer",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_carbineer_speed_04",
+      "parentSkill": "combat_carbineer_speed_03",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_carbine",
+      "xpCost": 100000,
+      "xpCap": 200000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["combat_carbineer_speed_03"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "carbine_speed": 15,
+        "ranged_speed": 10
+      },
+      "commands": ["fullautoarea"],
+      "certifications": [],
+      "professionName": "Carbineer",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_carbineer_support_01",
+      "parentSkill": "combat_carbineer_novice",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_carbine",
+      "xpCost": 25000,
+      "xpCap": 75000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["combat_carbineer_novice"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "ranged_defense": 10
+      },
+      "commands": [],
+      "certifications": [],
+      "professionName": "Carbineer",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_carbineer_support_02",
+      "parentSkill": "combat_carbineer_support_01",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_carbine",
+      "xpCost": 50000,
+      "xpCap": 100000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["combat_carbineer_support_01"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "ranged_defense": 10,
+        "stun_resistance": 5
+      },
+      "commands": ["pointdefense"],
+      "certifications": [],
+      "professionName": "Carbineer",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_carbineer_support_03",
+      "parentSkill": "combat_carbineer_support_02",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_carbine",
+      "xpCost": 75000,
+      "xpCap": 150000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["combat_carbineer_support_02"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "ranged_defense": 10,
+        "stun_resistance": 5
+      },
+      "commands": [],
+      "certifications": [],
+      "professionName": "Carbineer",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_carbineer_support_04",
+      "parentSkill": "combat_carbineer_support_03",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_carbine",
+      "xpCost": 100000,
+      "xpCap": 200000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["combat_carbineer_support_03"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "ranged_defense": 15,
+        "combat_equilibrium": 10
+      },
+      "commands": ["steadyaim"],
+      "certifications": [],
+      "professionName": "Carbineer",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_carbineer_special_01",
+      "parentSkill": "combat_carbineer_novice",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_carbine",
+      "xpCost": 25000,
+      "xpCap": 75000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["combat_carbineer_novice"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "damage_bonus": 10
+      },
+      "commands": [],
+      "certifications": [],
+      "professionName": "Carbineer",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_carbineer_special_02",
+      "parentSkill": "combat_carbineer_special_01",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_carbine",
+      "xpCost": 50000,
+      "xpCap": 100000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["combat_carbineer_special_01"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "damage_bonus": 10
+      },
+      "commands": ["cripplingshot"],
+      "certifications": [],
+      "professionName": "Carbineer",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_carbineer_special_03",
+      "parentSkill": "combat_carbineer_special_02",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_carbine",
+      "xpCost": 75000,
+      "xpCap": 150000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["combat_carbineer_special_02"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "damage_bonus": 10,
+        "armor_pierce": 5
+      },
+      "commands": [],
+      "certifications": ["cert_carbine_heavy"],
+      "professionName": "Carbineer",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_carbineer_special_04",
+      "parentSkill": "combat_carbineer_special_03",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_carbine",
+      "xpCost": 100000,
+      "xpCap": 200000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["combat_carbineer_special_03"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "damage_bonus": 15,
+        "armor_pierce": 10
+      },
+      "commands": ["devastation"],
+      "certifications": [],
+      "professionName": "Carbineer",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_carbineer_master",
+      "parentSkill": null,
+      "graphType": "profession",
+      "isTitle": true,
+      "xpType": "combat_ranged_carbine",
+      "xpCost": 0,
+      "xpCap": 300000,
+      "skillPointsRequired": 5,
+      "requiredSkills": [
+        "combat_carbineer_accuracy_04",
+        "combat_carbineer_speed_04",
+        "combat_carbineer_support_04",
+        "combat_carbineer_special_04"
+      ],
+      "requiredSpecies": [],
+      "skillMods": {
+        "carbine_accuracy": 25,
+        "carbine_speed": 20,
+        "ranged_defense": 15,
+        "damage_bonus": 10,
+        "critical_chance": 10
+      },
+      "commands": ["overkill"],
+      "certifications": ["cert_carbine_master"],
+      "professionName": "Carbineer",
+      "isMaster": true
+    }
+  ]
+}

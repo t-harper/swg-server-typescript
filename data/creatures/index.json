@@ -1,0 +1,36 @@
+{
+  "version": "1.0.0",
+  "description": "SWG Creature Template Index",
+  "templates": [
+    {
+      "name": "womp_rat",
+      "file": "womp_rat.json",
+      "category": "wildlife",
+      "planet": "tatooine"
+    },
+    {
+      "name": "tusken_raider",
+      "file": "tusken_raider.json",
+      "category": "humanoid",
+      "planet": "tatooine"
+    },
+    {
+      "name": "canyon_krayt_dragon",
+      "file": "canyon_krayt_dragon.json",
+      "category": "boss",
+      "planet": "tatooine"
+    },
+    {
+      "name": "stormtrooper",
+      "file": "stormtrooper.json",
+      "category": "faction",
+      "faction": "imperial"
+    },
+    {
+      "name": "rebel_soldier",
+      "file": "rebel_soldier.json",
+      "category": "faction",
+      "faction": "rebel"
+    }
+  ]
+}

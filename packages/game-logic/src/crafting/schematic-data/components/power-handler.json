@@ -1,0 +1,117 @@
+{
+  "schematicId": "component_power_handler",
+  "schematicName": "Weapon Power Handler",
+  "category": "component",
+  "subcategory": "weapon_components",
+  "complexity": 6,
+  "complexityTier": 2,
+  "craftingTool": "weapon_workbench",
+  "xpType": "crafting_weapons_general",
+  "xpAmount": 80,
+  "outputTemplate": "object/tangible/component/weapon/power_handler.iff",
+  "outputQuantity": 1,
+  "skillRequired": "crafting_weaponsmith_novice",
+  "description": "A power regulation component used in ranged weapon manufacturing.",
+  "learnable": true,
+  "factoryCapable": true,
+  "manufacturingVolume": 3,
+  "dataVersion": 1,
+  "slots": [
+    {
+      "slotName": "Conductive Metal",
+      "slotId": "conductive_metal",
+      "slotType": "resource",
+      "resourceTypes": ["copper", "aluminum", "gold"],
+      "quantityRequired": 12,
+      "optional": false,
+      "contributesToAttribute": ["quality", "powerEfficiency"],
+      "resourceWeights": {
+        "conductivity": 80,
+        "overallQuality": 20
+      }
+    },
+    {
+      "slotName": "Casing Metal",
+      "slotId": "casing_metal",
+      "slotType": "resource",
+      "resourceTypes": ["steel", "iron", "aluminum"],
+      "quantityRequired": 8,
+      "optional": false,
+      "contributesToAttribute": ["quality", "durability"],
+      "resourceWeights": {
+        "unitToughness": 60,
+        "shockResistance": 40
+      }
+    },
+    {
+      "slotName": "Polymer Insulation",
+      "slotId": "insulation",
+      "slotType": "resource",
+      "resourceTypes": ["polymer", "fiberplast", "petrochem_inert"],
+      "quantityRequired": 5,
+      "optional": false,
+      "contributesToAttribute": ["quality"],
+      "resourceWeights": {
+        "heatResistance": 70,
+        "overallQuality": 30
+      }
+    }
+  ],
+  "itemAttributes": [
+    {
+      "attributeName": "quality",
+      "displayName": "Quality",
+      "baseValue": 50,
+      "minValue": 1,
+      "maxValue": 100,
+      "higherIsBetter": true,
+      "experimentationModifier": 1.0
+    },
+    {
+      "attributeName": "powerEfficiency",
+      "displayName": "Power Efficiency",
+      "baseValue": 50,
+      "minValue": 20,
+      "maxValue": 100,
+      "higherIsBetter": true,
+      "experimentationModifier": 1.2
+    },
+    {
+      "attributeName": "durability",
+      "displayName": "Durability",
+      "baseValue": 50,
+      "minValue": 25,
+      "maxValue": 100,
+      "higherIsBetter": true,
+      "experimentationModifier": 0.8
+    }
+  ],
+  "assembly": {
+    "baseSuccessRate": 0.70,
+    "skillModifier": 0.001,
+    "criticalSuccessThreshold": 0.92,
+    "criticalFailureThreshold": 0.06
+  },
+  "experimentation": {
+    "maxPoints": 8,
+    "riskPerAttempt": 0.04,
+    "pointsPerLine": 1,
+    "groups": [
+      {
+        "groupName": "Overall Quality",
+        "attributes": ["quality"],
+        "maxImprovement": 0.35
+      },
+      {
+        "groupName": "Power",
+        "attributes": ["powerEfficiency"],
+        "maxImprovement": 0.40
+      },
+      {
+        "groupName": "Durability",
+        "attributes": ["durability"],
+        "maxImprovement": 0.30
+      }
+    ]
+  }
+}

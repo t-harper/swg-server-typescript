@@ -1,0 +1,34 @@
+{
+  "version": "1.0.0",
+  "description": "SWG Lair Template Index",
+  "templates": [
+    {
+      "name": "womp_rat_den",
+      "file": "womp_rat_den.json",
+      "category": "creature",
+      "planet": "tatooine",
+      "difficulty": "easy"
+    },
+    {
+      "name": "tusken_camp",
+      "file": "tusken_camp.json",
+      "category": "bandit",
+      "planet": "tatooine",
+      "difficulty": "medium"
+    },
+    {
+      "name": "bol_pack",
+      "file": "bol_pack.json",
+      "category": "creature",
+      "planet": "dantooine",
+      "difficulty": "easy"
+    },
+    {
+      "name": "imperial_camp",
+      "file": "imperial_camp.json",
+      "category": "faction",
+      "faction": "imperial",
+      "difficulty": "hard"
+    }
+  ]
+}

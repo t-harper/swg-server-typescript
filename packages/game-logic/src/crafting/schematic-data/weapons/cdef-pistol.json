@@ -1,0 +1,155 @@
+{
+  "schematicId": "weapon_pistol_cdef",
+  "schematicName": "CDEF Pistol",
+  "category": "weapon",
+  "subcategory": "pistol",
+  "complexity": 8,
+  "complexityTier": 3,
+  "craftingTool": "weapon_workbench",
+  "xpType": "crafting_weapons_general",
+  "xpAmount": 125,
+  "outputTemplate": "object/weapon/ranged/pistol/pistol_cdef.iff",
+  "outputQuantity": 1,
+  "skillRequired": "crafting_weaponsmith_novice",
+  "description": "A standard CDEF pistol, reliable sidearm for personal defense.",
+  "learnable": true,
+  "factoryCapable": true,
+  "manufacturingVolume": 1,
+  "dataVersion": 1,
+  "slots": [
+    {
+      "slotName": "Barrel",
+      "slotId": "barrel",
+      "slotType": "resource",
+      "resourceTypes": ["steel", "iron", "aluminum"],
+      "quantityRequired": 15,
+      "optional": false,
+      "contributesToAttribute": ["damage_min", "damage_max", "attackSpeed"],
+      "resourceWeights": {
+        "conductivity": 40,
+        "unitToughness": 60
+      }
+    },
+    {
+      "slotName": "Mechanism",
+      "slotId": "mechanism",
+      "slotType": "resource",
+      "resourceTypes": ["copper", "steel"],
+      "quantityRequired": 10,
+      "optional": false,
+      "contributesToAttribute": ["attackSpeed", "accuracy"],
+      "resourceWeights": {
+        "conductivity": 70,
+        "malleability": 30
+      }
+    },
+    {
+      "slotName": "Stock",
+      "slotId": "stock",
+      "slotType": "resource",
+      "resourceTypes": ["wood", "metal"],
+      "quantityRequired": 8,
+      "optional": false,
+      "contributesToAttribute": ["accuracy", "woundChance"],
+      "resourceWeights": {
+        "unitToughness": 50,
+        "shockResistance": 50
+      }
+    },
+    {
+      "slotName": "Power Handler",
+      "slotId": "power_handler",
+      "slotType": "component",
+      "resourceTypes": ["object/tangible/component/weapon/power_handler.iff"],
+      "quantityRequired": 1,
+      "optional": false,
+      "contributesToAttribute": ["damage_min", "damage_max"],
+      "resourceWeights": {}
+    }
+  ],
+  "itemAttributes": [
+    {
+      "attributeName": "damage_min",
+      "displayName": "Minimum Damage",
+      "baseValue": 35,
+      "minValue": 26,
+      "maxValue": 66,
+      "higherIsBetter": true,
+      "experimentationModifier": 1.0
+    },
+    {
+      "attributeName": "damage_max",
+      "displayName": "Maximum Damage",
+      "baseValue": 70,
+      "minValue": 52,
+      "maxValue": 132,
+      "higherIsBetter": true,
+      "experimentationModifier": 1.0
+    },
+    {
+      "attributeName": "attackSpeed",
+      "displayName": "Attack Speed",
+      "baseValue": 4.2,
+      "minValue": 3.0,
+      "maxValue": 5.5,
+      "higherIsBetter": false,
+      "experimentationModifier": 0.8
+    },
+    {
+      "attributeName": "accuracy",
+      "displayName": "Accuracy",
+      "baseValue": 0,
+      "minValue": -15,
+      "maxValue": 15,
+      "higherIsBetter": true,
+      "experimentationModifier": 1.0
+    },
+    {
+      "attributeName": "woundChance",
+      "displayName": "Wound Chance",
+      "baseValue": 5,
+      "minValue": 2,
+      "maxValue": 12,
+      "higherIsBetter": true,
+      "experimentationModifier": 0.6
+    },
+    {
+      "attributeName": "maxRange",
+      "displayName": "Maximum Range",
+      "baseValue": 35,
+      "minValue": 35,
+      "maxValue": 35,
+      "higherIsBetter": true,
+      "experimentationModifier": 0,
+      "hidden": false
+    }
+  ],
+  "assembly": {
+    "baseSuccessRate": 0.65,
+    "skillModifier": 0.001,
+    "criticalSuccessThreshold": 0.92,
+    "criticalFailureThreshold": 0.08
+  },
+  "experimentation": {
+    "maxPoints": 10,
+    "riskPerAttempt": 0.05,
+    "pointsPerLine": 1,
+    "groups": [
+      {
+        "groupName": "Damage",
+        "attributes": ["damage_min", "damage_max"],
+        "maxImprovement": 0.25
+      },
+      {
+        "groupName": "Speed",
+        "attributes": ["attackSpeed"],
+        "maxImprovement": 0.20
+      },
+      {
+        "groupName": "Accuracy",
+        "attributes": ["accuracy", "woundChance"],
+        "maxImprovement": 0.25
+      }
+    ]
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "schematicId": "component_metal_fasteners",
+  "schematicName": "Metal Fasteners",
+  "category": "component",
+  "subcategory": "general_components",
+  "complexity": 2,
+  "complexityTier": 1,
+  "craftingTool": "generic_crafting_tool",
+  "xpType": "crafting_general",
+  "xpAmount": 25,
+  "outputTemplate": "object/tangible/component/general/metal_fasteners.iff",
+  "outputQuantity": 5,
+  "skillRequired": "crafting_artisan_novice",
+  "description": "A set of metal fasteners used in various crafting projects.",
+  "learnable": true,
+  "factoryCapable": true,
+  "manufacturingVolume": 20,
+  "dataVersion": 1,
+  "slots": [
+    {
+      "slotName": "Metal",
+      "slotId": "metal",
+      "slotType": "resource",
+      "resourceTypes": ["steel", "iron", "copper", "aluminum"],
+      "quantityRequired": 8,
+      "optional": false,
+      "contributesToAttribute": ["quality"],
+      "resourceWeights": {
+        "malleability": 50,
+        "unitToughness": 50
+      }
+    }
+  ],
+  "itemAttributes": [
+    {
+      "attributeName": "quality",
+      "displayName": "Quality",
+      "baseValue": 50,
+      "minValue": 1,
+      "maxValue": 100,
+      "higherIsBetter": true,
+      "experimentationModifier": 1.0
+    }
+  ],
+  "assembly": {
+    "baseSuccessRate": 0.90,
+    "skillModifier": 0.002,
+    "criticalSuccessThreshold": 0.98,
+    "criticalFailureThreshold": 0.01
+  },
+  "experimentation": {
+    "maxPoints": 4,
+    "riskPerAttempt": 0.01,
+    "pointsPerLine": 1,
+    "groups": [
+      {
+        "groupName": "Quality",
+        "attributes": ["quality"],
+        "maxImprovement": 0.40
+      }
+    ]
+  }
+}

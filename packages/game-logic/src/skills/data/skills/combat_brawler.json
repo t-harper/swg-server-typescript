@@ -1,0 +1,375 @@
+{
+  "version": 1,
+  "skills": [
+    {
+      "skillName": "combat_brawler_novice",
+      "parentSkill": null,
+      "graphType": "profession",
+      "isTitle": true,
+      "xpType": "combat_melee_unarmed",
+      "xpCost": 0,
+      "xpCap": 1000,
+      "skillPointsRequired": 15,
+      "requiredSkills": [],
+      "requiredSpecies": [],
+      "skillMods": {
+        "melee_accuracy": 5,
+        "melee_defense": 5
+      },
+      "commands": ["berserk", "centerofbeing"],
+      "certifications": ["cert_vibroblade_basic"],
+      "professionName": "Brawler",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_brawler_unarmed_01",
+      "parentSkill": "combat_brawler_novice",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_melee_unarmed",
+      "xpCost": 2000,
+      "xpCap": 5000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["combat_brawler_novice"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "unarmed_accuracy": 10,
+        "unarmed_defense": 5
+      },
+      "commands": [],
+      "certifications": [],
+      "professionName": "Brawler",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_brawler_unarmed_02",
+      "parentSkill": "combat_brawler_unarmed_01",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_melee_unarmed",
+      "xpCost": 4000,
+      "xpCap": 10000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["combat_brawler_unarmed_01"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "unarmed_accuracy": 10,
+        "unarmed_defense": 5
+      },
+      "commands": ["flurry"],
+      "certifications": [],
+      "professionName": "Brawler",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_brawler_unarmed_03",
+      "parentSkill": "combat_brawler_unarmed_02",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_melee_unarmed",
+      "xpCost": 8000,
+      "xpCap": 20000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["combat_brawler_unarmed_02"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "unarmed_accuracy": 10,
+        "unarmed_defense": 5
+      },
+      "commands": [],
+      "certifications": ["cert_knucklers"],
+      "professionName": "Brawler",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_brawler_unarmed_04",
+      "parentSkill": "combat_brawler_unarmed_03",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_melee_unarmed",
+      "xpCost": 16000,
+      "xpCap": 40000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["combat_brawler_unarmed_03"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "unarmed_accuracy": 10,
+        "unarmed_defense": 10,
+        "unarmed_speed": 5
+      },
+      "commands": ["stunningblow"],
+      "certifications": [],
+      "professionName": "Brawler",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_brawler_onehand_01",
+      "parentSkill": "combat_brawler_novice",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_melee_onehand",
+      "xpCost": 2000,
+      "xpCap": 5000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["combat_brawler_novice"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "onehand_accuracy": 10,
+        "onehand_speed": 5
+      },
+      "commands": [],
+      "certifications": ["cert_vibroblade_advanced"],
+      "professionName": "Brawler",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_brawler_onehand_02",
+      "parentSkill": "combat_brawler_onehand_01",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_melee_onehand",
+      "xpCost": 4000,
+      "xpCap": 10000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["combat_brawler_onehand_01"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "onehand_accuracy": 10,
+        "onehand_speed": 5
+      },
+      "commands": ["slash"],
+      "certifications": [],
+      "professionName": "Brawler",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_brawler_onehand_03",
+      "parentSkill": "combat_brawler_onehand_02",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_melee_onehand",
+      "xpCost": 8000,
+      "xpCap": 20000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["combat_brawler_onehand_02"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "onehand_accuracy": 10,
+        "onehand_speed": 5
+      },
+      "commands": [],
+      "certifications": ["cert_vibroknife"],
+      "professionName": "Brawler",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_brawler_onehand_04",
+      "parentSkill": "combat_brawler_onehand_03",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_melee_onehand",
+      "xpCost": 16000,
+      "xpCap": 40000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["combat_brawler_onehand_03"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "onehand_accuracy": 10,
+        "onehand_speed": 10
+      },
+      "commands": ["disarm"],
+      "certifications": [],
+      "professionName": "Brawler",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_brawler_twohand_01",
+      "parentSkill": "combat_brawler_novice",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_melee_twohand",
+      "xpCost": 2000,
+      "xpCap": 5000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["combat_brawler_novice"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "twohand_accuracy": 10,
+        "twohand_speed": 5
+      },
+      "commands": [],
+      "certifications": ["cert_vibroaxe"],
+      "professionName": "Brawler",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_brawler_twohand_02",
+      "parentSkill": "combat_brawler_twohand_01",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_melee_twohand",
+      "xpCost": 4000,
+      "xpCap": 10000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["combat_brawler_twohand_01"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "twohand_accuracy": 10,
+        "twohand_speed": 5
+      },
+      "commands": ["sweepingblow"],
+      "certifications": [],
+      "professionName": "Brawler",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_brawler_twohand_03",
+      "parentSkill": "combat_brawler_twohand_02",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_melee_twohand",
+      "xpCost": 8000,
+      "xpCap": 20000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["combat_brawler_twohand_02"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "twohand_accuracy": 10,
+        "twohand_speed": 5
+      },
+      "commands": [],
+      "certifications": ["cert_vibrolance"],
+      "professionName": "Brawler",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_brawler_twohand_04",
+      "parentSkill": "combat_brawler_twohand_03",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_melee_twohand",
+      "xpCost": 16000,
+      "xpCap": 40000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["combat_brawler_twohand_03"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "twohand_accuracy": 10,
+        "twohand_speed": 10,
+        "damage_bonus": 5
+      },
+      "commands": ["crushingblow"],
+      "certifications": [],
+      "professionName": "Brawler",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_brawler_polearm_01",
+      "parentSkill": "combat_brawler_novice",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_melee_polearm",
+      "xpCost": 2000,
+      "xpCap": 5000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["combat_brawler_novice"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "polearm_accuracy": 10,
+        "polearm_speed": 5
+      },
+      "commands": [],
+      "certifications": ["cert_vibrospear"],
+      "professionName": "Brawler",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_brawler_polearm_02",
+      "parentSkill": "combat_brawler_polearm_01",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_melee_polearm",
+      "xpCost": 4000,
+      "xpCap": 10000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["combat_brawler_polearm_01"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "polearm_accuracy": 10,
+        "polearm_speed": 5
+      },
+      "commands": ["lunge"],
+      "certifications": [],
+      "professionName": "Brawler",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_brawler_polearm_03",
+      "parentSkill": "combat_brawler_polearm_02",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_melee_polearm",
+      "xpCost": 8000,
+      "xpCap": 20000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["combat_brawler_polearm_02"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "polearm_accuracy": 10,
+        "polearm_speed": 5
+      },
+      "commands": [],
+      "certifications": ["cert_force_pike"],
+      "professionName": "Brawler",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_brawler_polearm_04",
+      "parentSkill": "combat_brawler_polearm_03",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_melee_polearm",
+      "xpCost": 16000,
+      "xpCap": 40000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["combat_brawler_polearm_03"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "polearm_accuracy": 10,
+        "polearm_speed": 10,
+        "armor_pierce": 5
+      },
+      "commands": ["sweep"],
+      "certifications": [],
+      "professionName": "Brawler",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_brawler_master",
+      "parentSkill": null,
+      "graphType": "profession",
+      "isTitle": true,
+      "xpType": "combat_general",
+      "xpCost": 0,
+      "xpCap": 100000,
+      "skillPointsRequired": 5,
+      "requiredSkills": [
+        "combat_brawler_unarmed_04",
+        "combat_brawler_onehand_04",
+        "combat_brawler_twohand_04",
+        "combat_brawler_polearm_04"
+      ],
+      "requiredSpecies": [],
+      "skillMods": {
+        "melee_accuracy": 15,
+        "melee_defense": 15,
+        "melee_speed": 10,
+        "knockdown_recovery": 10
+      },
+      "commands": ["warcry", "intimidate"],
+      "certifications": ["cert_weapon_melee_master"],
+      "professionName": "Brawler",
+      "isMaster": true
+    }
+  ]
+}

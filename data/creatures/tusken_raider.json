@@ -1,0 +1,53 @@
+{
+  "templateName": "tusken_raider",
+  "displayName": "Tusken Raider",
+  "description": "A nomadic warrior of the Tusken tribe, hostile to all outsiders.",
+
+  "level": 18,
+  "difficulty": 1,
+
+  "healthRange": [2500, 3500],
+  "actionRange": [1500, 2000],
+  "mindRange": [800, 1200],
+
+  "damageRange": [120, 180],
+  "attackSpeed": 2.5,
+  "armor": 150,
+  "accuracy": 65,
+  "damageType": "kinetic",
+  "weaponTemplate": "object/weapon/melee/polearm/gaderffii_stick.iff",
+
+  "walkSpeed": 1.5,
+  "runSpeed": 5.5,
+  "turnRate": 1.5,
+
+  "faction": "tusken",
+  "aggressiveRadius": 45,
+  "assistRadius": 32,
+  "pvpEnabled": true,
+
+  "lootTable": "loot_tusken",
+  "xpValue": 450,
+  "creditRange": [15, 75],
+
+  "behaviorTree": "bt_aggressive",
+  "socialGroup": "tusken_tribe",
+  "leashDistance": 64,
+  "roamRadius": 20,
+
+  "appearanceTemplate": "object/mobile/tusken_raider.iff",
+  "scale": 1.0,
+
+  "equipment": [
+    {
+      "slot": "chest",
+      "template": "object/tangible/wearables/armor/tusken/armor_tusken_chest.iff",
+      "chance": 1.0
+    },
+    {
+      "slot": "head",
+      "template": "object/tangible/wearables/armor/tusken/armor_tusken_head.iff",
+      "chance": 1.0
+    }
+  ]
+}

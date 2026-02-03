@@ -1,0 +1,18 @@
+{
+  "name": "Advanced Mineral Survey Device",
+  "description": "An advanced survey tool for locating mineral resources. Improved range and accuracy.",
+  "templateId": "object/tangible/survey_tool/survey_tool_mineral_advanced.iff",
+  "surveyToolType": 0,
+  "surveyRange": 192,
+  "surveyAccuracy": 85,
+  "sampleSize": 3,
+  "cooldown": 2500,
+  "quality": 2,
+  "requiredSkill": "survey_accuracy",
+  "requiredSkillLevel": 25,
+  "maxCondition": 250,
+  "complexity": 15,
+  "volume": 1,
+  "stfFile": "survey_tool_n",
+  "stfName": "survey_tool_mineral_advanced"
+}

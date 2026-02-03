@@ -1,0 +1,72 @@
+{
+  "templateName": "imperial_camp",
+  "displayName": "Imperial Patrol Camp",
+  "description": "A temporary Imperial outpost manned by Stormtroopers. Rebel sympathizers beware.",
+
+  "lairType": "bandit",
+
+  "appearanceTemplate": "object/tangible/lair/npc_lair/shared_lair_imperial_camp.iff",
+  "scale": 1.5,
+
+  "creatureTemplates": ["stormtrooper", "imperial_scout"],
+  "bossTemplate": "stormtrooper_sergeant",
+  "babyTemplate": null,
+  "babySpawnChance": 0,
+
+  "minCreatures": 4,
+  "maxCreatures": 8,
+  "spawnRadius": 36,
+  "respawnDelay": 120000,
+  "spawnBehavior": "on_approach",
+  "detectionRadius": 64,
+
+  "waveCount": 4,
+  "creaturesPerWave": 4,
+  "waveTriggerDamage": 0.20,
+  "waveCooldown": 8000,
+
+  "waves": [
+    {
+      "creatureCount": 4,
+      "creatureOverride": ["stormtrooper"],
+      "spawnDelay": 0,
+      "spawnBoss": false
+    },
+    {
+      "creatureCount": 4,
+      "creatureOverride": ["stormtrooper", "imperial_scout"],
+      "spawnDelay": 3000,
+      "spawnBoss": false
+    },
+    {
+      "creatureCount": 3,
+      "creatureOverride": ["stormtrooper_heavy"],
+      "spawnDelay": 4000,
+      "spawnBoss": false
+    },
+    {
+      "creatureCount": 2,
+      "creatureOverride": ["stormtrooper_elite"],
+      "spawnDelay": 5000,
+      "spawnBoss": true
+    }
+  ],
+
+  "healthMultiplier": 2.0,
+  "baseHealth": 12000,
+  "armor": 200,
+  "regeneratesHealth": true,
+  "healthRegenRate": 15,
+  "regenDelay": 60000,
+
+  "xpBonus": 1500,
+  "lootTable": "loot_lair_imperial",
+  "creditRange": [200, 1000],
+  "badge": "destroy_imperial_camp",
+
+  "faction": "imperial",
+  "aggressive": true,
+  "socialGroup": "imperial_patrol",
+  "creatureRoamRadius": 32,
+  "creatureLeashDistance": 80
+}

@@ -1,0 +1,491 @@
+{
+  "version": 1,
+  "spawnConfigs": [
+    {
+      "resourceClassId": "iron",
+      "planets": ["all"],
+      "minSpawnPool": 2,
+      "maxSpawnPool": 5,
+      "minLifespanDays": 7,
+      "maxLifespanDays": 21,
+      "spawnWeight": 100
+    },
+    {
+      "resourceClassId": "steel",
+      "planets": ["all"],
+      "minSpawnPool": 1,
+      "maxSpawnPool": 4,
+      "minLifespanDays": 7,
+      "maxLifespanDays": 21,
+      "spawnWeight": 80
+    },
+    {
+      "resourceClassId": "carbonite_steel",
+      "planets": ["corellia", "talus", "naboo", "rori"],
+      "minSpawnPool": 1,
+      "maxSpawnPool": 3,
+      "minLifespanDays": 6,
+      "maxLifespanDays": 18,
+      "spawnWeight": 50
+    },
+    {
+      "resourceClassId": "duralloy_steel",
+      "planets": ["dathomir", "lok", "yavin4"],
+      "minSpawnPool": 1,
+      "maxSpawnPool": 2,
+      "minLifespanDays": 6,
+      "maxLifespanDays": 14,
+      "spawnWeight": 30
+    },
+    {
+      "resourceClassId": "copper",
+      "planets": ["all"],
+      "minSpawnPool": 2,
+      "maxSpawnPool": 5,
+      "minLifespanDays": 7,
+      "maxLifespanDays": 21,
+      "spawnWeight": 100
+    },
+    {
+      "resourceClassId": "desh_copper",
+      "planets": ["tatooine", "dantooine", "lok"],
+      "minSpawnPool": 1,
+      "maxSpawnPool": 3,
+      "minLifespanDays": 6,
+      "maxLifespanDays": 18,
+      "spawnWeight": 60
+    },
+    {
+      "resourceClassId": "platinite_copper",
+      "planets": ["naboo", "corellia", "dathomir"],
+      "minSpawnPool": 1,
+      "maxSpawnPool": 2,
+      "minLifespanDays": 5,
+      "maxLifespanDays": 14,
+      "spawnWeight": 40
+    },
+    {
+      "resourceClassId": "aluminum",
+      "planets": ["all"],
+      "minSpawnPool": 2,
+      "maxSpawnPool": 5,
+      "minLifespanDays": 7,
+      "maxLifespanDays": 21,
+      "spawnWeight": 100
+    },
+    {
+      "resourceClassId": "agrinium_aluminum",
+      "planets": ["naboo", "rori", "corellia", "talus"],
+      "minSpawnPool": 1,
+      "maxSpawnPool": 3,
+      "minLifespanDays": 6,
+      "maxLifespanDays": 18,
+      "spawnWeight": 55
+    },
+    {
+      "resourceClassId": "chromium_aluminum",
+      "planets": ["dantooine", "dathomir", "yavin4"],
+      "minSpawnPool": 1,
+      "maxSpawnPool": 2,
+      "minLifespanDays": 5,
+      "maxLifespanDays": 14,
+      "spawnWeight": 35
+    },
+    {
+      "resourceClassId": "siliclite_ore",
+      "planets": ["all"],
+      "minSpawnPool": 2,
+      "maxSpawnPool": 4,
+      "minLifespanDays": 8,
+      "maxLifespanDays": 22,
+      "spawnWeight": 90
+    },
+    {
+      "resourceClassId": "carbite_ore",
+      "planets": ["all"],
+      "minSpawnPool": 2,
+      "maxSpawnPool": 4,
+      "minLifespanDays": 8,
+      "maxLifespanDays": 22,
+      "spawnWeight": 85
+    },
+    {
+      "resourceClassId": "extrusive_ore",
+      "planets": ["tatooine", "lok", "dathomir"],
+      "minSpawnPool": 1,
+      "maxSpawnPool": 3,
+      "minLifespanDays": 7,
+      "maxLifespanDays": 18,
+      "spawnWeight": 70
+    },
+    {
+      "resourceClassId": "intrusive_ore",
+      "planets": ["dantooine", "naboo", "corellia"],
+      "minSpawnPool": 1,
+      "maxSpawnPool": 3,
+      "minLifespanDays": 7,
+      "maxLifespanDays": 18,
+      "spawnWeight": 70
+    },
+    {
+      "resourceClassId": "crystalline_gemstone",
+      "planets": ["all"],
+      "minSpawnPool": 1,
+      "maxSpawnPool": 2,
+      "minLifespanDays": 5,
+      "maxLifespanDays": 12,
+      "spawnWeight": 25
+    },
+    {
+      "resourceClassId": "amorphous_gemstone",
+      "planets": ["all"],
+      "minSpawnPool": 1,
+      "maxSpawnPool": 2,
+      "minLifespanDays": 5,
+      "maxLifespanDays": 12,
+      "spawnWeight": 20
+    },
+    {
+      "resourceClassId": "liquid_petrochem",
+      "planets": ["all"],
+      "minSpawnPool": 2,
+      "maxSpawnPool": 4,
+      "minLifespanDays": 6,
+      "maxLifespanDays": 18,
+      "spawnWeight": 85
+    },
+    {
+      "resourceClassId": "solid_petrochem",
+      "planets": ["all"],
+      "minSpawnPool": 2,
+      "maxSpawnPool": 4,
+      "minLifespanDays": 6,
+      "maxLifespanDays": 18,
+      "spawnWeight": 80
+    },
+    {
+      "resourceClassId": "polymer_inert",
+      "planets": ["all"],
+      "minSpawnPool": 2,
+      "maxSpawnPool": 5,
+      "minLifespanDays": 7,
+      "maxLifespanDays": 21,
+      "spawnWeight": 75
+    },
+    {
+      "resourceClassId": "polymer_reactive",
+      "planets": ["all"],
+      "minSpawnPool": 1,
+      "maxSpawnPool": 3,
+      "minLifespanDays": 6,
+      "maxLifespanDays": 16,
+      "spawnWeight": 55
+    },
+    {
+      "resourceClassId": "lubricant",
+      "planets": ["all"],
+      "minSpawnPool": 2,
+      "maxSpawnPool": 4,
+      "minLifespanDays": 7,
+      "maxLifespanDays": 20,
+      "spawnWeight": 70
+    },
+    {
+      "resourceClassId": "radioactive_known",
+      "planets": ["dathomir", "yavin4", "lok"],
+      "minSpawnPool": 1,
+      "maxSpawnPool": 2,
+      "minLifespanDays": 5,
+      "maxLifespanDays": 12,
+      "spawnWeight": 30
+    },
+    {
+      "resourceClassId": "radioactive_unknown",
+      "planets": ["dathomir", "yavin4"],
+      "minSpawnPool": 1,
+      "maxSpawnPool": 1,
+      "minLifespanDays": 4,
+      "maxLifespanDays": 10,
+      "spawnWeight": 10
+    },
+    {
+      "resourceClassId": "fiberplast",
+      "planets": ["all"],
+      "minSpawnPool": 2,
+      "maxSpawnPool": 4,
+      "minLifespanDays": 7,
+      "maxLifespanDays": 21,
+      "spawnWeight": 80
+    },
+    {
+      "resourceClassId": "fruit",
+      "planets": ["naboo", "rori", "corellia", "talus", "endor"],
+      "minSpawnPool": 2,
+      "maxSpawnPool": 4,
+      "minLifespanDays": 6,
+      "maxLifespanDays": 14,
+      "spawnWeight": 90
+    },
+    {
+      "resourceClassId": "vegetable",
+      "planets": ["all"],
+      "minSpawnPool": 2,
+      "maxSpawnPool": 4,
+      "minLifespanDays": 6,
+      "maxLifespanDays": 14,
+      "spawnWeight": 90
+    },
+    {
+      "resourceClassId": "grain",
+      "planets": ["naboo", "corellia", "dantooine", "tatooine"],
+      "minSpawnPool": 2,
+      "maxSpawnPool": 4,
+      "minLifespanDays": 6,
+      "maxLifespanDays": 14,
+      "spawnWeight": 85
+    },
+    {
+      "resourceClassId": "wood",
+      "planets": ["all"],
+      "minSpawnPool": 2,
+      "maxSpawnPool": 5,
+      "minLifespanDays": 8,
+      "maxLifespanDays": 22,
+      "spawnWeight": 100
+    },
+    {
+      "resourceClassId": "softwood",
+      "planets": ["naboo", "rori", "endor", "yavin4"],
+      "minSpawnPool": 2,
+      "maxSpawnPool": 4,
+      "minLifespanDays": 7,
+      "maxLifespanDays": 20,
+      "spawnWeight": 75
+    },
+    {
+      "resourceClassId": "hardwood",
+      "planets": ["dathomir", "endor", "yavin4", "kashyyyk"],
+      "minSpawnPool": 1,
+      "maxSpawnPool": 3,
+      "minLifespanDays": 7,
+      "maxLifespanDays": 18,
+      "spawnWeight": 55
+    },
+    {
+      "resourceClassId": "fiber",
+      "planets": ["all"],
+      "minSpawnPool": 2,
+      "maxSpawnPool": 4,
+      "minLifespanDays": 7,
+      "maxLifespanDays": 18,
+      "spawnWeight": 85
+    },
+    {
+      "resourceClassId": "grass",
+      "planets": ["all"],
+      "minSpawnPool": 3,
+      "maxSpawnPool": 6,
+      "minLifespanDays": 5,
+      "maxLifespanDays": 14,
+      "spawnWeight": 110
+    },
+    {
+      "resourceClassId": "bone_avian",
+      "planets": ["all"],
+      "minSpawnPool": 1,
+      "maxSpawnPool": 3,
+      "minLifespanDays": 6,
+      "maxLifespanDays": 16,
+      "spawnWeight": 65
+    },
+    {
+      "resourceClassId": "bone_mammal",
+      "planets": ["all"],
+      "minSpawnPool": 2,
+      "maxSpawnPool": 4,
+      "minLifespanDays": 6,
+      "maxLifespanDays": 18,
+      "spawnWeight": 80
+    },
+    {
+      "resourceClassId": "bone_reptilian",
+      "planets": ["tatooine", "lok", "dathomir"],
+      "minSpawnPool": 1,
+      "maxSpawnPool": 3,
+      "minLifespanDays": 6,
+      "maxLifespanDays": 16,
+      "spawnWeight": 60
+    },
+    {
+      "resourceClassId": "hide_leathery",
+      "planets": ["all"],
+      "minSpawnPool": 2,
+      "maxSpawnPool": 4,
+      "minLifespanDays": 6,
+      "maxLifespanDays": 18,
+      "spawnWeight": 80
+    },
+    {
+      "resourceClassId": "hide_scaley",
+      "planets": ["tatooine", "lok", "dathomir", "naboo"],
+      "minSpawnPool": 1,
+      "maxSpawnPool": 3,
+      "minLifespanDays": 6,
+      "maxLifespanDays": 16,
+      "spawnWeight": 55
+    },
+    {
+      "resourceClassId": "hide_wooly",
+      "planets": ["dantooine", "endor", "corellia", "talus"],
+      "minSpawnPool": 1,
+      "maxSpawnPool": 3,
+      "minLifespanDays": 6,
+      "maxLifespanDays": 16,
+      "spawnWeight": 60
+    },
+    {
+      "resourceClassId": "hide_bristley",
+      "planets": ["all"],
+      "minSpawnPool": 1,
+      "maxSpawnPool": 3,
+      "minLifespanDays": 6,
+      "maxLifespanDays": 16,
+      "spawnWeight": 50
+    },
+    {
+      "resourceClassId": "meat_avian",
+      "planets": ["all"],
+      "minSpawnPool": 2,
+      "maxSpawnPool": 4,
+      "minLifespanDays": 5,
+      "maxLifespanDays": 14,
+      "spawnWeight": 75
+    },
+    {
+      "resourceClassId": "meat_carnivore",
+      "planets": ["all"],
+      "minSpawnPool": 1,
+      "maxSpawnPool": 3,
+      "minLifespanDays": 5,
+      "maxLifespanDays": 14,
+      "spawnWeight": 55
+    },
+    {
+      "resourceClassId": "meat_domesticated",
+      "planets": ["naboo", "corellia", "talus", "rori"],
+      "minSpawnPool": 2,
+      "maxSpawnPool": 4,
+      "minLifespanDays": 5,
+      "maxLifespanDays": 14,
+      "spawnWeight": 85
+    },
+    {
+      "resourceClassId": "meat_wild",
+      "planets": ["all"],
+      "minSpawnPool": 2,
+      "maxSpawnPool": 5,
+      "minLifespanDays": 5,
+      "maxLifespanDays": 14,
+      "spawnWeight": 90
+    },
+    {
+      "resourceClassId": "meat_insect",
+      "planets": ["dathomir", "yavin4", "lok"],
+      "minSpawnPool": 1,
+      "maxSpawnPool": 3,
+      "minLifespanDays": 5,
+      "maxLifespanDays": 12,
+      "spawnWeight": 45
+    },
+    {
+      "resourceClassId": "seafood",
+      "planets": ["naboo", "rori", "corellia", "talus"],
+      "minSpawnPool": 1,
+      "maxSpawnPool": 3,
+      "minLifespanDays": 5,
+      "maxLifespanDays": 12,
+      "spawnWeight": 50
+    },
+    {
+      "resourceClassId": "milk_domesticated",
+      "planets": ["naboo", "corellia", "talus", "rori"],
+      "minSpawnPool": 1,
+      "maxSpawnPool": 2,
+      "minLifespanDays": 4,
+      "maxLifespanDays": 10,
+      "spawnWeight": 60
+    },
+    {
+      "resourceClassId": "milk_wild",
+      "planets": ["dantooine", "endor", "yavin4"],
+      "minSpawnPool": 1,
+      "maxSpawnPool": 2,
+      "minLifespanDays": 4,
+      "maxLifespanDays": 10,
+      "spawnWeight": 40
+    },
+    {
+      "resourceClassId": "egg",
+      "planets": ["all"],
+      "minSpawnPool": 1,
+      "maxSpawnPool": 3,
+      "minLifespanDays": 4,
+      "maxLifespanDays": 10,
+      "spawnWeight": 65
+    },
+    {
+      "resourceClassId": "solar_energy",
+      "planets": ["tatooine", "lok"],
+      "minSpawnPool": 2,
+      "maxSpawnPool": 4,
+      "minLifespanDays": 10,
+      "maxLifespanDays": 30,
+      "spawnWeight": 120
+    },
+    {
+      "resourceClassId": "wind_energy",
+      "planets": ["dantooine", "tatooine", "lok"],
+      "minSpawnPool": 2,
+      "maxSpawnPool": 4,
+      "minLifespanDays": 10,
+      "maxLifespanDays": 30,
+      "spawnWeight": 100
+    },
+    {
+      "resourceClassId": "geothermal_energy",
+      "planets": ["dathomir", "lok", "yavin4"],
+      "minSpawnPool": 1,
+      "maxSpawnPool": 3,
+      "minLifespanDays": 12,
+      "maxLifespanDays": 35,
+      "spawnWeight": 70
+    },
+    {
+      "resourceClassId": "water_vapor",
+      "planets": ["all"],
+      "minSpawnPool": 2,
+      "maxSpawnPool": 4,
+      "minLifespanDays": 8,
+      "maxLifespanDays": 22,
+      "spawnWeight": 90
+    },
+    {
+      "resourceClassId": "water_fresh",
+      "planets": ["naboo", "corellia", "rori", "talus", "dantooine"],
+      "minSpawnPool": 2,
+      "maxSpawnPool": 4,
+      "minLifespanDays": 8,
+      "maxLifespanDays": 22,
+      "spawnWeight": 95
+    },
+    {
+      "resourceClassId": "water_mineral",
+      "planets": ["all"],
+      "minSpawnPool": 1,
+      "maxSpawnPool": 3,
+      "minLifespanDays": 7,
+      "maxLifespanDays": 18,
+      "spawnWeight": 60
+    }
+  ]
+}

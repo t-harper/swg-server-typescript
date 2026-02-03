@@ -1,0 +1,39 @@
+{
+  "templateName": "womp_rat",
+  "displayName": "Womp Rat",
+  "description": "A small rodent native to Tatooine, known for scavenging in the deserts.",
+
+  "level": 3,
+  "difficulty": 1,
+
+  "healthRange": [120, 180],
+  "actionRange": [60, 90],
+  "mindRange": [40, 60],
+
+  "damageRange": [15, 25],
+  "attackSpeed": 2.0,
+  "armor": 0,
+  "accuracy": 35,
+  "damageType": "kinetic",
+
+  "walkSpeed": 1.2,
+  "runSpeed": 4.5,
+  "turnRate": 2.0,
+
+  "faction": "creature",
+  "aggressiveRadius": 0,
+  "assistRadius": 8,
+  "pvpEnabled": false,
+
+  "lootTable": "loot_womp_rat",
+  "xpValue": 25,
+  "creditRange": [0, 5],
+
+  "behaviorTree": "bt_passive",
+  "socialGroup": "womp_rat",
+  "leashDistance": 48,
+  "roamRadius": 12,
+
+  "appearanceTemplate": "object/mobile/womp_rat.iff",
+  "scale": 1.0
+}

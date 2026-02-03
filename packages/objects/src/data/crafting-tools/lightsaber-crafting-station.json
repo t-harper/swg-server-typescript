@@ -1,0 +1,27 @@
+{
+  "name": "Lightsaber Crafting Station",
+  "description": "A Force-attuned workbench for constructing lightsabers. Only usable by trained Jedi.",
+  "templateId": "object/tangible/crafting/station/lightsaber_station.iff",
+  "craftingToolType": 8,
+  "stationType": 9,
+  "isStation": true,
+  "toolQuality": 4,
+  "effectiveness": 75,
+  "complexityLimit": 55,
+  "assemblyBonus": 20,
+  "experimentationBonus": 15,
+  "maxUses": -1,
+  "requiredSkill": "jedi_saber_crafting",
+  "maxCondition": 2000,
+  "complexity": 25,
+  "volume": 40,
+  "stfFile": "crafting_tool_n",
+  "stfName": "lightsaber_station",
+  "placementRules": {
+    "allowOutdoor": false,
+    "allowIndoor": true,
+    "minDistanceFromStations": 5.0,
+    "maxPerBuilding": 1,
+    "requiredLotSize": 0
+  }
+}

@@ -1,0 +1,195 @@
+{
+  "version": 1,
+  "planets": [
+    {
+      "planetId": "corellia",
+      "displayName": "Corellia",
+      "spawnWeightMultipliers": {
+        "iron": 1.2,
+        "steel": 1.3,
+        "copper": 1.1,
+        "aluminum": 1.2,
+        "fruit": 1.0,
+        "meat_domesticated": 1.3,
+        "seafood": 1.2,
+        "milk_domesticated": 1.2,
+        "water_fresh": 1.1
+      },
+      "exclusiveResources": [],
+      "blacklistedResources": ["radioactive_unknown", "geothermal_energy"],
+      "globalSpawnRateModifier": 1.0,
+      "maxTotalSpawns": 200
+    },
+    {
+      "planetId": "dantooine",
+      "displayName": "Dantooine",
+      "spawnWeightMultipliers": {
+        "iron": 1.1,
+        "copper": 1.0,
+        "aluminum": 0.9,
+        "desh_copper": 1.3,
+        "chromium_aluminum": 1.2,
+        "grain": 1.4,
+        "grass": 1.5,
+        "hide_wooly": 1.4,
+        "milk_wild": 1.3,
+        "wind_energy": 1.3,
+        "water_fresh": 1.2
+      },
+      "exclusiveResources": [],
+      "blacklistedResources": ["radioactive_unknown", "seafood"],
+      "globalSpawnRateModifier": 1.0,
+      "maxTotalSpawns": 180
+    },
+    {
+      "planetId": "dathomir",
+      "displayName": "Dathomir",
+      "spawnWeightMultipliers": {
+        "duralloy_steel": 1.4,
+        "platinite_copper": 1.3,
+        "chromium_aluminum": 1.3,
+        "extrusive_ore": 1.2,
+        "radioactive_known": 1.5,
+        "radioactive_unknown": 1.3,
+        "hardwood": 1.4,
+        "bone_reptilian": 1.3,
+        "hide_scaley": 1.2,
+        "meat_insect": 1.4,
+        "geothermal_energy": 1.5
+      },
+      "exclusiveResources": [],
+      "blacklistedResources": ["meat_domesticated", "milk_domesticated", "water_fresh"],
+      "globalSpawnRateModifier": 0.9,
+      "maxTotalSpawns": 150
+    },
+    {
+      "planetId": "endor",
+      "displayName": "Endor",
+      "spawnWeightMultipliers": {
+        "wood": 1.5,
+        "softwood": 1.4,
+        "hardwood": 1.5,
+        "fiber": 1.3,
+        "fruit": 1.2,
+        "hide_wooly": 1.3,
+        "milk_wild": 1.2
+      },
+      "exclusiveResources": [],
+      "blacklistedResources": ["radioactive_unknown", "radioactive_known", "solar_energy", "seafood"],
+      "globalSpawnRateModifier": 0.95,
+      "maxTotalSpawns": 160
+    },
+    {
+      "planetId": "lok",
+      "displayName": "Lok",
+      "spawnWeightMultipliers": {
+        "duralloy_steel": 1.2,
+        "desh_copper": 1.3,
+        "extrusive_ore": 1.4,
+        "radioactive_known": 1.3,
+        "bone_reptilian": 1.2,
+        "meat_insect": 1.3,
+        "solar_energy": 1.4,
+        "wind_energy": 1.3,
+        "geothermal_energy": 1.3
+      },
+      "exclusiveResources": [],
+      "blacklistedResources": ["fruit", "water_fresh", "milk_domesticated"],
+      "globalSpawnRateModifier": 0.85,
+      "maxTotalSpawns": 140
+    },
+    {
+      "planetId": "naboo",
+      "displayName": "Naboo",
+      "spawnWeightMultipliers": {
+        "carbonite_steel": 1.2,
+        "platinite_copper": 1.3,
+        "agrinium_aluminum": 1.3,
+        "intrusive_ore": 1.2,
+        "fruit": 1.4,
+        "vegetable": 1.3,
+        "grain": 1.3,
+        "softwood": 1.2,
+        "hide_scaley": 1.1,
+        "meat_domesticated": 1.3,
+        "seafood": 1.4,
+        "milk_domesticated": 1.3,
+        "water_fresh": 1.4
+      },
+      "exclusiveResources": [],
+      "blacklistedResources": ["radioactive_unknown", "geothermal_energy"],
+      "globalSpawnRateModifier": 1.1,
+      "maxTotalSpawns": 220
+    },
+    {
+      "planetId": "rori",
+      "displayName": "Rori",
+      "spawnWeightMultipliers": {
+        "carbonite_steel": 1.1,
+        "agrinium_aluminum": 1.2,
+        "fruit": 1.3,
+        "softwood": 1.2,
+        "meat_domesticated": 1.2,
+        "seafood": 1.3,
+        "milk_domesticated": 1.1,
+        "water_fresh": 1.2
+      },
+      "exclusiveResources": [],
+      "blacklistedResources": ["radioactive_unknown", "radioactive_known", "geothermal_energy"],
+      "globalSpawnRateModifier": 1.0,
+      "maxTotalSpawns": 180
+    },
+    {
+      "planetId": "talus",
+      "displayName": "Talus",
+      "spawnWeightMultipliers": {
+        "carbonite_steel": 1.1,
+        "agrinium_aluminum": 1.1,
+        "hide_wooly": 1.2,
+        "meat_domesticated": 1.2,
+        "seafood": 1.2,
+        "milk_domesticated": 1.1
+      },
+      "exclusiveResources": [],
+      "blacklistedResources": ["radioactive_unknown", "radioactive_known", "geothermal_energy"],
+      "globalSpawnRateModifier": 1.0,
+      "maxTotalSpawns": 180
+    },
+    {
+      "planetId": "tatooine",
+      "displayName": "Tatooine",
+      "spawnWeightMultipliers": {
+        "desh_copper": 1.4,
+        "extrusive_ore": 1.3,
+        "bone_reptilian": 1.3,
+        "hide_scaley": 1.2,
+        "solar_energy": 1.6,
+        "wind_energy": 1.4,
+        "water_vapor": 1.3
+      },
+      "exclusiveResources": [],
+      "blacklistedResources": ["water_fresh", "fruit", "hardwood", "seafood", "milk_domesticated", "geothermal_energy"],
+      "globalSpawnRateModifier": 0.85,
+      "maxTotalSpawns": 150
+    },
+    {
+      "planetId": "yavin4",
+      "displayName": "Yavin IV",
+      "spawnWeightMultipliers": {
+        "duralloy_steel": 1.3,
+        "chromium_aluminum": 1.2,
+        "radioactive_known": 1.4,
+        "radioactive_unknown": 1.2,
+        "hardwood": 1.4,
+        "softwood": 1.3,
+        "meat_insect": 1.3,
+        "milk_wild": 1.2,
+        "geothermal_energy": 1.2
+      },
+      "exclusiveResources": [],
+      "blacklistedResources": ["meat_domesticated", "milk_domesticated", "seafood", "solar_energy"],
+      "globalSpawnRateModifier": 0.9,
+      "maxTotalSpawns": 160
+    }
+  ]
+}

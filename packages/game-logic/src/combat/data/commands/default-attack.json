@@ -1,0 +1,69 @@
+{
+  "commandName": "defaultAttack",
+  "commandCrc": 3640049750,
+  "displayName": "Attack",
+  "description": "A basic attack with your equipped weapon.",
+
+  "targetType": 1,
+  "maxRange": 5,
+  "minRange": 0,
+
+  "healthCost": 0,
+  "actionCost": 0,
+  "mindCost": 0,
+  "forceCost": 0,
+
+  "warmupTime": 0,
+  "cooldownTime": 0,
+  "animationTime": 1000,
+  "globalCooldown": 1000,
+
+  "requiredWeaponType": [],
+  "requiredStance": [0],
+  "requiredSkill": "",
+  "requiredSkillLevel": 0,
+  "requiredCombatLevel": 0,
+
+  "damageMultiplier": 1.0,
+  "accuracyBonus": 0,
+  "stateChance": 0,
+  "stateToApply": 0,
+  "stateDuration": 0,
+  "damageType": 0,
+  "primaryTarget": 0,
+  "secondaryTarget": null,
+  "secondaryRatio": 0,
+
+  "aoeRadius": 0,
+  "coneAngle": 0,
+  "maxTargets": 1,
+  "chainToCommand": null,
+  "chainWindow": 0,
+  "chainFromCommands": [],
+
+  "flags": {
+    "stationaryOnly": false,
+    "mobileOk": true,
+    "requiresCombat": false,
+    "outOfCombatOnly": false,
+    "canTargetSelf": false,
+    "canTargetFriendly": false,
+    "canTargetEnemy": true,
+    "canTargetDead": false,
+    "alwaysHits": false,
+    "cannotMiss": false,
+    "cannotBlock": false,
+    "cannotDodge": false,
+    "cannotParry": false,
+    "isHeal": false,
+    "isBuff": false,
+    "isDebuff": false,
+    "requiresLineOfSight": true,
+    "canCrit": true,
+    "breaksOnDamage": false
+  },
+
+  "animationCrc": 0,
+  "clientEffectCrc": 0,
+  "hitEffectCrc": 0
+}

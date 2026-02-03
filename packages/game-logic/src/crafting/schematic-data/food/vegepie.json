@@ -1,0 +1,138 @@
+{
+  "schematicId": "food_vegepie",
+  "schematicName": "Vege-Pie",
+  "category": "food",
+  "subcategory": "meals",
+  "complexity": 4,
+  "complexityTier": 2,
+  "craftingTool": "food_station",
+  "xpType": "crafting_food_general",
+  "xpAmount": 50,
+  "outputTemplate": "object/tangible/food/crafted/dish_vegepie.iff",
+  "outputQuantity": 1,
+  "skillRequired": "crafting_chef_novice",
+  "description": "A hearty vegetable pie that provides sustained nourishment.",
+  "learnable": true,
+  "factoryCapable": true,
+  "manufacturingVolume": 5,
+  "dataVersion": 1,
+  "slots": [
+    {
+      "slotName": "Vegetables",
+      "slotId": "vegetables",
+      "slotType": "resource",
+      "resourceTypes": ["vegetable", "vegetable_greens", "vegetable_tubers"],
+      "quantityRequired": 20,
+      "optional": false,
+      "contributesToAttribute": ["filling", "nutrition"],
+      "resourceWeights": {
+        "flavor": 50,
+        "overallQuality": 50
+      }
+    },
+    {
+      "slotName": "Flour",
+      "slotId": "flour",
+      "slotType": "resource",
+      "resourceTypes": ["cereal", "wheat", "corn"],
+      "quantityRequired": 15,
+      "optional": false,
+      "contributesToAttribute": ["filling", "duration"],
+      "resourceWeights": {
+        "overallQuality": 70,
+        "decayResistance": 30
+      }
+    },
+    {
+      "slotName": "Butter",
+      "slotId": "butter",
+      "slotType": "resource",
+      "resourceTypes": ["milk", "animal_fat"],
+      "quantityRequired": 8,
+      "optional": false,
+      "contributesToAttribute": ["nutrition", "flavor_bonus"],
+      "resourceWeights": {
+        "flavor": 80,
+        "overallQuality": 20
+      }
+    },
+    {
+      "slotName": "Additive",
+      "slotId": "additive",
+      "slotType": "optional",
+      "resourceTypes": ["spice", "herb"],
+      "quantityRequired": 3,
+      "optional": true,
+      "contributesToAttribute": ["flavor_bonus"],
+      "resourceWeights": {
+        "flavor": 100
+      }
+    }
+  ],
+  "itemAttributes": [
+    {
+      "attributeName": "filling",
+      "displayName": "Filling",
+      "baseValue": 50,
+      "minValue": 35,
+      "maxValue": 80,
+      "higherIsBetter": true,
+      "experimentationModifier": 1.0
+    },
+    {
+      "attributeName": "nutrition",
+      "displayName": "Nutrition",
+      "baseValue": 30,
+      "minValue": 20,
+      "maxValue": 55,
+      "higherIsBetter": true,
+      "experimentationModifier": 1.0
+    },
+    {
+      "attributeName": "duration",
+      "displayName": "Effect Duration",
+      "baseValue": 300,
+      "minValue": 180,
+      "maxValue": 600,
+      "higherIsBetter": true,
+      "experimentationModifier": 0.8
+    },
+    {
+      "attributeName": "flavor_bonus",
+      "displayName": "Flavor Bonus",
+      "baseValue": 5,
+      "minValue": 0,
+      "maxValue": 20,
+      "higherIsBetter": true,
+      "experimentationModifier": 1.2
+    }
+  ],
+  "assembly": {
+    "baseSuccessRate": 0.80,
+    "skillModifier": 0.002,
+    "criticalSuccessThreshold": 0.95,
+    "criticalFailureThreshold": 0.03
+  },
+  "experimentation": {
+    "maxPoints": 8,
+    "riskPerAttempt": 0.03,
+    "pointsPerLine": 1,
+    "groups": [
+      {
+        "groupName": "Sustenance",
+        "attributes": ["filling", "nutrition"],
+        "maxImprovement": 0.30
+      },
+      {
+        "groupName": "Duration",
+        "attributes": ["duration"],
+        "maxImprovement": 0.40
+      },
+      {
+        "groupName": "Flavor",
+        "attributes": ["flavor_bonus"],
+        "maxImprovement": 0.50
+      }
+    ]
+  }
+}

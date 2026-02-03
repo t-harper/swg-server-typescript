@@ -1,0 +1,62 @@
+{
+  "templateName": "bol_pack",
+  "displayName": "Bol Pack",
+  "description": "A gathering place for a pack of bols, large herbivorous creatures native to Dantooine.",
+
+  "lairType": "creature",
+
+  "appearanceTemplate": "object/tangible/lair/creature_lair/shared_lair_bol.iff",
+  "scale": 1.0,
+
+  "creatureTemplates": ["bol"],
+  "bossTemplate": "alpha_bol",
+  "babyTemplate": "bol_calf",
+  "babySpawnChance": 0.20,
+
+  "minCreatures": 2,
+  "maxCreatures": 4,
+  "spawnRadius": 28,
+  "respawnDelay": 60000,
+  "spawnBehavior": "on_damage",
+  "detectionRadius": 36,
+
+  "waveCount": 3,
+  "creaturesPerWave": 2,
+  "waveTriggerDamage": 0.30,
+  "waveCooldown": 5000,
+
+  "waves": [
+    {
+      "creatureCount": 2,
+      "spawnDelay": 0,
+      "spawnBoss": false
+    },
+    {
+      "creatureCount": 3,
+      "spawnDelay": 1500,
+      "spawnBoss": false
+    },
+    {
+      "creatureCount": 2,
+      "spawnDelay": 2000,
+      "spawnBoss": true
+    }
+  ],
+
+  "healthMultiplier": 1.2,
+  "baseHealth": 5000,
+  "armor": 50,
+  "regeneratesHealth": true,
+  "healthRegenRate": 10,
+  "regenDelay": 25000,
+
+  "xpBonus": 350,
+  "lootTable": "loot_lair_bol",
+  "creditRange": [25, 150],
+
+  "faction": "creature",
+  "aggressive": false,
+  "socialGroup": "bol_herd",
+  "creatureRoamRadius": 20,
+  "creatureLeashDistance": 56
+}

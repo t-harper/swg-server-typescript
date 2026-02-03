@@ -1,0 +1,27 @@
+{
+  "name": "Ship Component Station",
+  "description": "A shipwright's workstation for crafting starship components and modifications.",
+  "templateId": "object/tangible/crafting/station/ship_station.iff",
+  "craftingToolType": 7,
+  "stationType": 8,
+  "isStation": true,
+  "toolQuality": 3,
+  "effectiveness": 50,
+  "complexityLimit": 45,
+  "assemblyBonus": 15,
+  "experimentationBonus": 10,
+  "maxUses": -1,
+  "requiredSkill": "crafting_ship_general",
+  "maxCondition": 1500,
+  "complexity": 22,
+  "volume": 80,
+  "stfFile": "crafting_tool_n",
+  "stfName": "ship_station",
+  "placementRules": {
+    "allowOutdoor": true,
+    "allowIndoor": true,
+    "minDistanceFromStations": 5.0,
+    "maxPerBuilding": 2,
+    "requiredLotSize": 0
+  }
+}

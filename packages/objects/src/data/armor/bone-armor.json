@@ -1,0 +1,99 @@
+{
+  "$schema": "./armor-template.schema.json",
+  "name": "Bone Armor",
+  "description": "Medium bone armor crafted from creature bones, offering good protection with tribal aesthetics",
+  "armorRating": 2,
+  "armorLayer": 0,
+  "effectiveness": {
+    "kinetic": 0.50,
+    "energy": 0.35,
+    "blast": 0.45,
+    "stun": 0.40,
+    "heat": 0.30,
+    "cold": 0.25,
+    "acid": 0.35,
+    "electricity": 0.20
+  },
+  "lightsaberResist": 0.02,
+  "encumbrance": {
+    "health": 40,
+    "action": 50,
+    "mind": 25
+  },
+  "coverageSlots": [1],
+  "socketSlots": 1,
+  "specialProtection": 0,
+  "protectionType": "",
+  "requiredCertification": "cert_armor_bone",
+  "condition": {
+    "max": 800,
+    "current": 800
+  },
+  "volume": 20,
+  "complexity": 20,
+  "variants": [
+    {
+      "id": "bone_chest",
+      "name": "Bone Chestplate",
+      "armorLayer": 0,
+      "coverageSlots": [1],
+      "templateCrc": "object/tangible/wearables/armor/bone/armor_bone_s01_chest.iff"
+    },
+    {
+      "id": "bone_helmet",
+      "name": "Bone Helmet",
+      "armorLayer": 2,
+      "coverageSlots": [0],
+      "templateCrc": "object/tangible/wearables/armor/bone/armor_bone_s01_helmet.iff"
+    },
+    {
+      "id": "bone_bracer_left",
+      "name": "Bone Left Bracer",
+      "armorLayer": 3,
+      "coverageSlots": [13],
+      "templateCrc": "object/tangible/wearables/armor/bone/armor_bone_s01_bracer_l.iff"
+    },
+    {
+      "id": "bone_bracer_right",
+      "name": "Bone Right Bracer",
+      "armorLayer": 4,
+      "coverageSlots": [14],
+      "templateCrc": "object/tangible/wearables/armor/bone/armor_bone_s01_bracer_r.iff"
+    },
+    {
+      "id": "bone_bicep_left",
+      "name": "Bone Left Bicep",
+      "armorLayer": 10,
+      "coverageSlots": [15],
+      "templateCrc": "object/tangible/wearables/armor/bone/armor_bone_s01_bicep_l.iff"
+    },
+    {
+      "id": "bone_bicep_right",
+      "name": "Bone Right Bicep",
+      "armorLayer": 11,
+      "coverageSlots": [16],
+      "templateCrc": "object/tangible/wearables/armor/bone/armor_bone_s01_bicep_r.iff"
+    },
+    {
+      "id": "bone_leggings",
+      "name": "Bone Leggings",
+      "armorLayer": 6,
+      "coverageSlots": [2],
+      "templateCrc": "object/tangible/wearables/armor/bone/armor_bone_s01_leggings.iff"
+    },
+    {
+      "id": "bone_boots",
+      "name": "Bone Boots",
+      "armorLayer": 8,
+      "coverageSlots": [3],
+      "templateCrc": "object/tangible/wearables/armor/bone/armor_bone_s01_boots.iff"
+    },
+    {
+      "id": "bone_gloves",
+      "name": "Bone Gloves",
+      "armorLayer": 5,
+      "coverageSlots": [4],
+      "templateCrc": "object/tangible/wearables/armor/bone/armor_bone_s01_gloves.iff"
+    }
+  ]
+}

@@ -1,0 +1,368 @@
+{
+  "version": 1,
+  "skills": [
+    {
+      "skillName": "combat_rifleman_novice",
+      "parentSkill": null,
+      "graphType": "profession",
+      "isTitle": true,
+      "xpType": "combat_ranged_rifle",
+      "xpCost": 15000,
+      "xpCap": 50000,
+      "skillPointsRequired": 5,
+      "requiredSkills": ["combat_marksman_rifle_04"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "rifle_accuracy": 15,
+        "rifle_speed": 10,
+        "ranged_defense": 5
+      },
+      "commands": ["concealshot", "strafeshot"],
+      "certifications": ["cert_rifle_lightning"],
+      "professionName": "Rifleman",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_rifleman_accuracy_01",
+      "parentSkill": "combat_rifleman_novice",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_rifle",
+      "xpCost": 25000,
+      "xpCap": 75000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["combat_rifleman_novice"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "rifle_accuracy": 15
+      },
+      "commands": [],
+      "certifications": [],
+      "professionName": "Rifleman",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_rifleman_accuracy_02",
+      "parentSkill": "combat_rifleman_accuracy_01",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_rifle",
+      "xpCost": 50000,
+      "xpCap": 100000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["combat_rifleman_accuracy_01"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "rifle_accuracy": 15
+      },
+      "commands": ["aimedshot"],
+      "certifications": [],
+      "professionName": "Rifleman",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_rifleman_accuracy_03",
+      "parentSkill": "combat_rifleman_accuracy_02",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_rifle",
+      "xpCost": 75000,
+      "xpCap": 150000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["combat_rifleman_accuracy_02"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "rifle_accuracy": 15,
+        "critical_chance": 5
+      },
+      "commands": [],
+      "certifications": ["cert_rifle_berserker"],
+      "professionName": "Rifleman",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_rifleman_accuracy_04",
+      "parentSkill": "combat_rifleman_accuracy_03",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_rifle",
+      "xpCost": 100000,
+      "xpCap": 200000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["combat_rifleman_accuracy_03"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "rifle_accuracy": 20,
+        "critical_chance": 5
+      },
+      "commands": ["deadlyaim"],
+      "certifications": [],
+      "professionName": "Rifleman",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_rifleman_speed_01",
+      "parentSkill": "combat_rifleman_novice",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_rifle",
+      "xpCost": 25000,
+      "xpCap": 75000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["combat_rifleman_novice"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "rifle_speed": 10
+      },
+      "commands": [],
+      "certifications": [],
+      "professionName": "Rifleman",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_rifleman_speed_02",
+      "parentSkill": "combat_rifleman_speed_01",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_rifle",
+      "xpCost": 50000,
+      "xpCap": 100000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["combat_rifleman_speed_01"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "rifle_speed": 10
+      },
+      "commands": ["rapidfire"],
+      "certifications": [],
+      "professionName": "Rifleman",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_rifleman_speed_03",
+      "parentSkill": "combat_rifleman_speed_02",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_rifle",
+      "xpCost": 75000,
+      "xpCap": 150000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["combat_rifleman_speed_02"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "rifle_speed": 10,
+        "ranged_speed": 5
+      },
+      "commands": [],
+      "certifications": ["cert_rifle_sg82"],
+      "professionName": "Rifleman",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_rifleman_speed_04",
+      "parentSkill": "combat_rifleman_speed_03",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_rifle",
+      "xpCost": 100000,
+      "xpCap": 200000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["combat_rifleman_speed_03"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "rifle_speed": 15,
+        "ranged_speed": 5
+      },
+      "commands": ["volley"],
+      "certifications": [],
+      "professionName": "Rifleman",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_rifleman_support_01",
+      "parentSkill": "combat_rifleman_novice",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_rifle",
+      "xpCost": 25000,
+      "xpCap": 75000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["combat_rifleman_novice"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "ranged_defense": 10
+      },
+      "commands": [],
+      "certifications": [],
+      "professionName": "Rifleman",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_rifleman_support_02",
+      "parentSkill": "combat_rifleman_support_01",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_rifle",
+      "xpCost": 50000,
+      "xpCap": 100000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["combat_rifleman_support_01"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "ranged_defense": 10,
+        "posture_change_down_defense": 5
+      },
+      "commands": ["suppression"],
+      "certifications": [],
+      "professionName": "Rifleman",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_rifleman_support_03",
+      "parentSkill": "combat_rifleman_support_02",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_rifle",
+      "xpCost": 75000,
+      "xpCap": 150000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["combat_rifleman_support_02"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "ranged_defense": 10,
+        "posture_change_down_defense": 5
+      },
+      "commands": [],
+      "certifications": [],
+      "professionName": "Rifleman",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_rifleman_support_04",
+      "parentSkill": "combat_rifleman_support_03",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_rifle",
+      "xpCost": 100000,
+      "xpCap": 200000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["combat_rifleman_support_03"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "ranged_defense": 15,
+        "knockdown_recovery": 10
+      },
+      "commands": ["rallying_shot"],
+      "certifications": [],
+      "professionName": "Rifleman",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_rifleman_special_01",
+      "parentSkill": "combat_rifleman_novice",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_rifle",
+      "xpCost": 25000,
+      "xpCap": 75000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["combat_rifleman_novice"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "damage_bonus": 10
+      },
+      "commands": [],
+      "certifications": [],
+      "professionName": "Rifleman",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_rifleman_special_02",
+      "parentSkill": "combat_rifleman_special_01",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_rifle",
+      "xpCost": 50000,
+      "xpCap": 100000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["combat_rifleman_special_01"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "damage_bonus": 10,
+        "armor_pierce": 5
+      },
+      "commands": ["disablingshot"],
+      "certifications": [],
+      "professionName": "Rifleman",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_rifleman_special_03",
+      "parentSkill": "combat_rifleman_special_02",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_rifle",
+      "xpCost": 75000,
+      "xpCap": 150000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["combat_rifleman_special_02"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "damage_bonus": 10,
+        "armor_pierce": 5
+      },
+      "commands": [],
+      "certifications": ["cert_rifle_tusken"],
+      "professionName": "Rifleman",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_rifleman_special_04",
+      "parentSkill": "combat_rifleman_special_03",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_rifle",
+      "xpCost": 100000,
+      "xpCap": 200000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["combat_rifleman_special_03"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "damage_bonus": 15,
+        "critical_damage": 10
+      },
+      "commands": ["executioner"],
+      "certifications": [],
+      "professionName": "Rifleman",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_rifleman_master",
+      "parentSkill": null,
+      "graphType": "profession",
+      "isTitle": true,
+      "xpType": "combat_ranged_rifle",
+      "xpCost": 0,
+      "xpCap": 300000,
+      "skillPointsRequired": 5,
+      "requiredSkills": [
+        "combat_rifleman_accuracy_04",
+        "combat_rifleman_speed_04",
+        "combat_rifleman_support_04",
+        "combat_rifleman_special_04"
+      ],
+      "requiredSpecies": [],
+      "skillMods": {
+        "rifle_accuracy": 25,
+        "rifle_speed": 20,
+        "ranged_defense": 15,
+        "damage_bonus": 10,
+        "critical_chance": 10
+      },
+      "commands": ["sniperkill"],
+      "certifications": ["cert_rifle_master"],
+      "professionName": "Rifleman",
+      "isMaster": true
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "templateName": "canyon_krayt_dragon",
+  "displayName": "Canyon Krayt Dragon",
+  "description": "A massive predatory reptile and apex predator of Tatooine. Extremely dangerous.",
+
+  "level": 65,
+  "difficulty": 3,
+
+  "healthRange": [150000, 200000],
+  "actionRange": [50000, 75000],
+  "mindRange": [25000, 35000],
+
+  "damageRange": [3500, 5500],
+  "attackSpeed": 4.0,
+  "armor": 5000,
+  "accuracy": 85,
+  "damageType": "kinetic",
+
+  "walkSpeed": 2.5,
+  "runSpeed": 8.0,
+  "turnRate": 0.8,
+
+  "faction": "creature",
+  "aggressiveRadius": 64,
+  "assistRadius": 0,
+  "pvpEnabled": true,
+
+  "lootTable": "loot_krayt_dragon",
+  "xpValue": 25000,
+  "creditRange": [0, 0],
+
+  "behaviorTree": "bt_boss",
+  "socialGroup": "krayt_dragon",
+  "leashDistance": 128,
+  "roamRadius": 32,
+
+  "appearanceTemplate": "object/mobile/canyon_krayt_dragon.iff",
+  "scale": 3.5,
+
+  "specialAbilities": [
+    {
+      "name": "tail_sweep",
+      "cooldown": 15000,
+      "magnitude": 2500,
+      "chance": 0.8
+    },
+    {
+      "name": "devastating_bite",
+      "cooldown": 25000,
+      "magnitude": 6000,
+      "chance": 0.6
+    },
+    {
+      "name": "terrifying_roar",
+      "cooldown": 45000,
+      "magnitude": 0,
+      "chance": 1.0
+    },
+    {
+      "name": "enrage",
+      "cooldown": 120000,
+      "magnitude": 50,
+      "chance": 1.0
+    }
+  ]
+}

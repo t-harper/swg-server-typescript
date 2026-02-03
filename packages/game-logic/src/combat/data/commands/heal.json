@@ -1,0 +1,74 @@
+{
+  "commandName": "heal",
+  "commandCrc": 862902615,
+  "displayName": "Heal",
+  "description": "Heal a target, restoring their health. Medic ability.",
+
+  "targetType": 1,
+  "maxRange": 6,
+  "minRange": 0,
+
+  "healthCost": 0,
+  "actionCost": 75,
+  "mindCost": 25,
+  "forceCost": 0,
+
+  "warmupTime": 2000,
+  "cooldownTime": 8000,
+  "animationTime": 1500,
+  "globalCooldown": 1000,
+
+  "requiredWeaponType": [],
+  "requiredStance": [0],
+  "requiredSkill": "medic_novice",
+  "requiredSkillLevel": 1,
+  "requiredCombatLevel": 0,
+
+  "damageMultiplier": -1.0,
+  "accuracyBonus": 0,
+  "stateChance": 0,
+  "stateToApply": 0,
+  "stateDuration": 0,
+  "damageType": 0,
+  "primaryTarget": 0,
+  "secondaryTarget": null,
+  "secondaryRatio": 0,
+
+  "aoeRadius": 0,
+  "coneAngle": 0,
+  "maxTargets": 1,
+  "chainToCommand": null,
+  "chainWindow": 0,
+  "chainFromCommands": [],
+
+  "flags": {
+    "stationaryOnly": true,
+    "mobileOk": false,
+    "requiresCombat": false,
+    "outOfCombatOnly": false,
+    "canTargetSelf": true,
+    "canTargetFriendly": true,
+    "canTargetEnemy": false,
+    "canTargetDead": false,
+    "alwaysHits": true,
+    "cannotMiss": true,
+    "cannotBlock": true,
+    "cannotDodge": true,
+    "cannotParry": true,
+    "isHeal": true,
+    "isBuff": false,
+    "isDebuff": false,
+    "requiresLineOfSight": true,
+    "canCrit": true,
+    "breaksOnDamage": true
+  },
+
+  "animationCrc": 0,
+  "clientEffectCrc": 0,
+  "hitEffectCrc": 0,
+
+  "_comment": {
+    "requiredStance": "0=Standing",
+    "damageMultiplier": "Negative value indicates healing"
+  }
+}

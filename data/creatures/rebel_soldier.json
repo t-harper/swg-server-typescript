@@ -1,0 +1,63 @@
+{
+  "templateName": "rebel_soldier",
+  "displayName": "Rebel Soldier",
+  "description": "A dedicated fighter of the Rebel Alliance, committed to restoring freedom to the galaxy.",
+
+  "level": 32,
+  "difficulty": 1,
+
+  "healthRange": [7000, 10000],
+  "actionRange": [3500, 5000],
+  "mindRange": [1800, 2500],
+
+  "damageRange": [300, 480],
+  "attackSpeed": 1.6,
+  "armor": 500,
+  "accuracy": 72,
+  "damageType": "energy",
+  "weaponTemplate": "object/weapon/ranged/rifle/rifle_dlt20.iff",
+
+  "walkSpeed": 1.5,
+  "runSpeed": 5.376,
+  "turnRate": 1.5,
+
+  "faction": "rebel",
+  "aggressiveRadius": 32,
+  "assistRadius": 45,
+  "pvpEnabled": true,
+
+  "lootTable": "loot_rebel_soldier",
+  "xpValue": 1100,
+  "creditRange": [40, 180],
+
+  "behaviorTree": "bt_guard",
+  "socialGroup": "rebel_alliance",
+  "leashDistance": 80,
+  "roamRadius": 10,
+
+  "appearanceTemplate": "object/mobile/dressed_rebel_soldier.iff",
+  "scale": 1.0,
+
+  "equipment": [
+    {
+      "slot": "chest",
+      "template": "object/tangible/wearables/armor/rebel/rebel_assault_chest.iff",
+      "chance": 0.8
+    },
+    {
+      "slot": "legs",
+      "template": "object/tangible/wearables/armor/rebel/rebel_assault_leggings.iff",
+      "chance": 0.8
+    },
+    {
+      "slot": "head",
+      "template": "object/tangible/wearables/armor/rebel/rebel_assault_helmet.iff",
+      "chance": 0.6
+    },
+    {
+      "slot": "right_hand",
+      "template": "object/weapon/ranged/rifle/rifle_dlt20.iff",
+      "chance": 1.0
+    }
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "commandName": "knockdownAttack",
+  "commandCrc": 1478529367,
+  "displayName": "Knockdown Attack",
+  "description": "A powerful melee attack with a high chance to knock down your opponent.",
+
+  "targetType": 1,
+  "maxRange": 5,
+  "minRange": 0,
+
+  "healthCost": 0,
+  "actionCost": 80,
+  "mindCost": 0,
+  "forceCost": 0,
+
+  "warmupTime": 500,
+  "cooldownTime": 15000,
+  "animationTime": 1200,
+  "globalCooldown": 1000,
+
+  "requiredWeaponType": [0, 1, 2, 3],
+  "requiredStance": [0],
+  "requiredSkill": "brawler_novice",
+  "requiredSkillLevel": 1,
+  "requiredCombatLevel": 3,
+
+  "damageMultiplier": 1.25,
+  "accuracyBonus": -10,
+  "stateChance": 65,
+  "stateToApply": 2,
+  "stateDuration": 4000,
+  "damageType": 0,
+  "primaryTarget": 0,
+  "secondaryTarget": null,
+  "secondaryRatio": 0,
+
+  "aoeRadius": 0,
+  "coneAngle": 0,
+  "maxTargets": 1,
+  "chainToCommand": null,
+  "chainWindow": 0,
+  "chainFromCommands": [],
+
+  "flags": {
+    "stationaryOnly": false,
+    "mobileOk": true,
+    "requiresCombat": false,
+    "outOfCombatOnly": false,
+    "canTargetSelf": false,
+    "canTargetFriendly": false,
+    "canTargetEnemy": true,
+    "canTargetDead": false,
+    "alwaysHits": false,
+    "cannotMiss": false,
+    "cannotBlock": false,
+    "cannotDodge": true,
+    "cannotParry": false,
+    "isHeal": false,
+    "isBuff": false,
+    "isDebuff": true,
+    "requiresLineOfSight": true,
+    "canCrit": true,
+    "breaksOnDamage": false
+  },
+
+  "animationCrc": 0,
+  "clientEffectCrc": 0,
+  "hitEffectCrc": 0,
+
+  "_comment": {
+    "requiredWeaponType": "0=Unarmed, 1=OneHandedMelee, 2=TwoHandedMelee, 3=Polearm",
+    "requiredStance": "0=Standing",
+    "stateToApply": "2=KnockedDown"
+  }
+}

@@ -1,0 +1,717 @@
+{
+  "version": 1,
+  "resourceClasses": [
+    {
+      "classId": "mineral",
+      "displayName": "Mineral",
+      "parentClassId": null,
+      "isSpawnable": false,
+      "attributes": [
+        { "name": "cold_resistance", "minValue": 1, "maxValue": 1000 },
+        { "name": "conductivity", "minValue": 1, "maxValue": 1000 },
+        { "name": "decay_resistance", "minValue": 1, "maxValue": 1000 },
+        { "name": "heat_resistance", "minValue": 1, "maxValue": 1000 },
+        { "name": "malleability", "minValue": 1, "maxValue": 1000 },
+        { "name": "shock_resistance", "minValue": 1, "maxValue": 1000 },
+        { "name": "unit_toughness", "minValue": 1, "maxValue": 1000 },
+        { "name": "overall_quality", "minValue": 1, "maxValue": 1000 }
+      ],
+      "description": "Base class for all mineral resources",
+      "category": "mineral"
+    },
+    {
+      "classId": "metal",
+      "displayName": "Metal",
+      "parentClassId": "mineral",
+      "isSpawnable": false,
+      "attributes": [],
+      "description": "Metallic mineral resources",
+      "category": "mineral"
+    },
+    {
+      "classId": "ferrous_metal",
+      "displayName": "Ferrous Metal",
+      "parentClassId": "metal",
+      "isSpawnable": false,
+      "attributes": [],
+      "description": "Iron-based metallic resources",
+      "category": "mineral"
+    },
+    {
+      "classId": "iron",
+      "displayName": "Iron",
+      "parentClassId": "ferrous_metal",
+      "isSpawnable": true,
+      "attributes": [],
+      "description": "Basic iron ore used in construction and crafting",
+      "category": "mineral"
+    },
+    {
+      "classId": "steel",
+      "displayName": "Steel",
+      "parentClassId": "ferrous_metal",
+      "isSpawnable": true,
+      "attributes": [],
+      "description": "Refined iron alloy with improved properties",
+      "category": "mineral"
+    },
+    {
+      "classId": "carbonite_steel",
+      "displayName": "Carbonite Steel",
+      "parentClassId": "steel",
+      "isSpawnable": true,
+      "attributes": [],
+      "description": "High-carbon steel alloy",
+      "category": "mineral"
+    },
+    {
+      "classId": "duralloy_steel",
+      "displayName": "Duralloy Steel",
+      "parentClassId": "steel",
+      "isSpawnable": true,
+      "attributes": [],
+      "description": "Extremely durable steel alloy",
+      "category": "mineral"
+    },
+    {
+      "classId": "nonferrous_metal",
+      "displayName": "Non-Ferrous Metal",
+      "parentClassId": "metal",
+      "isSpawnable": false,
+      "attributes": [],
+      "description": "Non-iron based metallic resources",
+      "category": "mineral"
+    },
+    {
+      "classId": "copper",
+      "displayName": "Copper",
+      "parentClassId": "nonferrous_metal",
+      "isSpawnable": true,
+      "attributes": [],
+      "description": "Conductive metal used in electronics",
+      "category": "mineral"
+    },
+    {
+      "classId": "desh_copper",
+      "displayName": "Desh Copper",
+      "parentClassId": "copper",
+      "isSpawnable": true,
+      "attributes": [],
+      "description": "High-purity copper variant",
+      "category": "mineral"
+    },
+    {
+      "classId": "platinite_copper",
+      "displayName": "Platinite Copper",
+      "parentClassId": "copper",
+      "isSpawnable": true,
+      "attributes": [],
+      "description": "Platinum-infused copper alloy",
+      "category": "mineral"
+    },
+    {
+      "classId": "aluminum",
+      "displayName": "Aluminum",
+      "parentClassId": "nonferrous_metal",
+      "isSpawnable": true,
+      "attributes": [],
+      "description": "Lightweight metal used in construction",
+      "category": "mineral"
+    },
+    {
+      "classId": "agrinium_aluminum",
+      "displayName": "Agrinium Aluminum",
+      "parentClassId": "aluminum",
+      "isSpawnable": true,
+      "attributes": [],
+      "description": "Agricultural-grade aluminum alloy",
+      "category": "mineral"
+    },
+    {
+      "classId": "chromium_aluminum",
+      "displayName": "Chromium Aluminum",
+      "parentClassId": "aluminum",
+      "isSpawnable": true,
+      "attributes": [],
+      "description": "Chromium-enhanced aluminum alloy",
+      "category": "mineral"
+    },
+    {
+      "classId": "ore",
+      "displayName": "Ore",
+      "parentClassId": "mineral",
+      "isSpawnable": false,
+      "attributes": [],
+      "description": "Raw mineral ore deposits",
+      "category": "mineral"
+    },
+    {
+      "classId": "siliclite_ore",
+      "displayName": "Siliclite Ore",
+      "parentClassId": "ore",
+      "isSpawnable": true,
+      "attributes": [],
+      "description": "Silicon-rich mineral ore",
+      "category": "mineral"
+    },
+    {
+      "classId": "carbite_ore",
+      "displayName": "Carbite Ore",
+      "parentClassId": "ore",
+      "isSpawnable": true,
+      "attributes": [],
+      "description": "Carbon-based mineral ore",
+      "category": "mineral"
+    },
+    {
+      "classId": "extrusive_ore",
+      "displayName": "Extrusive Ore",
+      "parentClassId": "ore",
+      "isSpawnable": true,
+      "attributes": [],
+      "description": "Volcanic extrusive mineral deposits",
+      "category": "mineral"
+    },
+    {
+      "classId": "intrusive_ore",
+      "displayName": "Intrusive Ore",
+      "parentClassId": "ore",
+      "isSpawnable": true,
+      "attributes": [],
+      "description": "Deep intrusive mineral deposits",
+      "category": "mineral"
+    },
+    {
+      "classId": "gemstone",
+      "displayName": "Gemstone",
+      "parentClassId": "mineral",
+      "isSpawnable": false,
+      "attributes": [],
+      "description": "Precious gemstone minerals",
+      "category": "mineral"
+    },
+    {
+      "classId": "crystalline_gemstone",
+      "displayName": "Crystalline Gemstone",
+      "parentClassId": "gemstone",
+      "isSpawnable": true,
+      "attributes": [],
+      "description": "Crystal-structured precious stones",
+      "category": "mineral"
+    },
+    {
+      "classId": "amorphous_gemstone",
+      "displayName": "Amorphous Gemstone",
+      "parentClassId": "gemstone",
+      "isSpawnable": true,
+      "attributes": [],
+      "description": "Non-crystalline precious stones",
+      "category": "mineral"
+    },
+    {
+      "classId": "chemical",
+      "displayName": "Chemical",
+      "parentClassId": null,
+      "isSpawnable": false,
+      "attributes": [
+        { "name": "decay_resistance", "minValue": 1, "maxValue": 1000 },
+        { "name": "overall_quality", "minValue": 1, "maxValue": 1000 },
+        { "name": "potential_energy", "minValue": 1, "maxValue": 1000 }
+      ],
+      "description": "Base class for all chemical resources",
+      "category": "chemical"
+    },
+    {
+      "classId": "fuel_petrochem",
+      "displayName": "Petrochem Fuel",
+      "parentClassId": "chemical",
+      "isSpawnable": false,
+      "attributes": [],
+      "description": "Petroleum-based chemical fuels",
+      "category": "chemical"
+    },
+    {
+      "classId": "liquid_petrochem",
+      "displayName": "Liquid Petrochem",
+      "parentClassId": "fuel_petrochem",
+      "isSpawnable": true,
+      "attributes": [],
+      "description": "Liquid petroleum-based fuel",
+      "category": "chemical"
+    },
+    {
+      "classId": "solid_petrochem",
+      "displayName": "Solid Petrochem",
+      "parentClassId": "fuel_petrochem",
+      "isSpawnable": true,
+      "attributes": [],
+      "description": "Solid petroleum-based fuel",
+      "category": "chemical"
+    },
+    {
+      "classId": "polymer",
+      "displayName": "Polymer",
+      "parentClassId": "chemical",
+      "isSpawnable": false,
+      "attributes": [],
+      "description": "Synthetic polymer compounds",
+      "category": "chemical"
+    },
+    {
+      "classId": "polymer_inert",
+      "displayName": "Inert Polymer",
+      "parentClassId": "polymer",
+      "isSpawnable": true,
+      "attributes": [],
+      "description": "Chemically inert polymer compounds",
+      "category": "chemical"
+    },
+    {
+      "classId": "polymer_reactive",
+      "displayName": "Reactive Polymer",
+      "parentClassId": "polymer",
+      "isSpawnable": true,
+      "attributes": [],
+      "description": "Chemically reactive polymer compounds",
+      "category": "chemical"
+    },
+    {
+      "classId": "lubricant",
+      "displayName": "Lubricant",
+      "parentClassId": "chemical",
+      "isSpawnable": true,
+      "attributes": [],
+      "description": "Mechanical lubricant compounds",
+      "category": "chemical"
+    },
+    {
+      "classId": "radioactive",
+      "displayName": "Radioactive",
+      "parentClassId": "chemical",
+      "isSpawnable": false,
+      "attributes": [],
+      "description": "Radioactive chemical elements",
+      "category": "chemical"
+    },
+    {
+      "classId": "radioactive_known",
+      "displayName": "Known Radioactive",
+      "parentClassId": "radioactive",
+      "isSpawnable": true,
+      "attributes": [],
+      "description": "Commonly known radioactive elements",
+      "category": "chemical"
+    },
+    {
+      "classId": "radioactive_unknown",
+      "displayName": "Unknown Radioactive",
+      "parentClassId": "radioactive",
+      "isSpawnable": true,
+      "attributes": [],
+      "description": "Rare unknown radioactive elements",
+      "category": "chemical"
+    },
+    {
+      "classId": "fiberplast",
+      "displayName": "Fiberplast",
+      "parentClassId": "chemical",
+      "isSpawnable": true,
+      "attributes": [],
+      "description": "Synthetic fiber-plastic composite",
+      "category": "chemical"
+    },
+    {
+      "classId": "flora",
+      "displayName": "Flora",
+      "parentClassId": null,
+      "isSpawnable": false,
+      "attributes": [
+        { "name": "decay_resistance", "minValue": 1, "maxValue": 1000 },
+        { "name": "overall_quality", "minValue": 1, "maxValue": 1000 },
+        { "name": "potential_energy", "minValue": 1, "maxValue": 1000 }
+      ],
+      "description": "Base class for all plant-based resources",
+      "category": "flora"
+    },
+    {
+      "classId": "flora_food",
+      "displayName": "Flora Food",
+      "parentClassId": "flora",
+      "isSpawnable": false,
+      "attributes": [],
+      "description": "Edible plant resources",
+      "category": "flora"
+    },
+    {
+      "classId": "fruit",
+      "displayName": "Fruit",
+      "parentClassId": "flora_food",
+      "isSpawnable": true,
+      "attributes": [],
+      "description": "Edible fruit plants",
+      "category": "flora"
+    },
+    {
+      "classId": "vegetable",
+      "displayName": "Vegetable",
+      "parentClassId": "flora_food",
+      "isSpawnable": true,
+      "attributes": [],
+      "description": "Edible vegetable plants",
+      "category": "flora"
+    },
+    {
+      "classId": "grain",
+      "displayName": "Grain",
+      "parentClassId": "flora_food",
+      "isSpawnable": true,
+      "attributes": [],
+      "description": "Edible grain plants",
+      "category": "flora"
+    },
+    {
+      "classId": "flora_structural",
+      "displayName": "Structural Flora",
+      "parentClassId": "flora",
+      "isSpawnable": false,
+      "attributes": [],
+      "description": "Plant resources used for structural purposes",
+      "category": "flora"
+    },
+    {
+      "classId": "wood",
+      "displayName": "Wood",
+      "parentClassId": "flora_structural",
+      "isSpawnable": true,
+      "attributes": [],
+      "description": "Lumber and wood resources",
+      "category": "flora"
+    },
+    {
+      "classId": "softwood",
+      "displayName": "Softwood",
+      "parentClassId": "wood",
+      "isSpawnable": true,
+      "attributes": [],
+      "description": "Softwood lumber",
+      "category": "flora"
+    },
+    {
+      "classId": "hardwood",
+      "displayName": "Hardwood",
+      "parentClassId": "wood",
+      "isSpawnable": true,
+      "attributes": [],
+      "description": "Hardwood lumber",
+      "category": "flora"
+    },
+    {
+      "classId": "fiber",
+      "displayName": "Fiber",
+      "parentClassId": "flora_structural",
+      "isSpawnable": true,
+      "attributes": [],
+      "description": "Plant-based fiber resources",
+      "category": "flora"
+    },
+    {
+      "classId": "grass",
+      "displayName": "Grass",
+      "parentClassId": "flora",
+      "isSpawnable": true,
+      "attributes": [],
+      "description": "Grass-type flora resources",
+      "category": "flora"
+    },
+    {
+      "classId": "creature_resource",
+      "displayName": "Creature Resource",
+      "parentClassId": null,
+      "isSpawnable": false,
+      "attributes": [
+        { "name": "decay_resistance", "minValue": 1, "maxValue": 1000 },
+        { "name": "overall_quality", "minValue": 1, "maxValue": 1000 }
+      ],
+      "description": "Base class for creature-derived resources",
+      "category": "creature"
+    },
+    {
+      "classId": "bone",
+      "displayName": "Bone",
+      "parentClassId": "creature_resource",
+      "isSpawnable": false,
+      "attributes": [
+        { "name": "shock_resistance", "minValue": 1, "maxValue": 1000 },
+        { "name": "unit_toughness", "minValue": 1, "maxValue": 1000 }
+      ],
+      "description": "Creature bone resources",
+      "category": "creature"
+    },
+    {
+      "classId": "bone_avian",
+      "displayName": "Avian Bone",
+      "parentClassId": "bone",
+      "isSpawnable": true,
+      "attributes": [],
+      "description": "Bone from avian creatures",
+      "category": "creature"
+    },
+    {
+      "classId": "bone_mammal",
+      "displayName": "Mammal Bone",
+      "parentClassId": "bone",
+      "isSpawnable": true,
+      "attributes": [],
+      "description": "Bone from mammalian creatures",
+      "category": "creature"
+    },
+    {
+      "classId": "bone_reptilian",
+      "displayName": "Reptilian Bone",
+      "parentClassId": "bone",
+      "isSpawnable": true,
+      "attributes": [],
+      "description": "Bone from reptilian creatures",
+      "category": "creature"
+    },
+    {
+      "classId": "hide",
+      "displayName": "Hide",
+      "parentClassId": "creature_resource",
+      "isSpawnable": false,
+      "attributes": [
+        { "name": "cold_resistance", "minValue": 1, "maxValue": 1000 },
+        { "name": "heat_resistance", "minValue": 1, "maxValue": 1000 }
+      ],
+      "description": "Creature hide resources",
+      "category": "creature"
+    },
+    {
+      "classId": "hide_leathery",
+      "displayName": "Leathery Hide",
+      "parentClassId": "hide",
+      "isSpawnable": true,
+      "attributes": [],
+      "description": "Thick leathery creature hide",
+      "category": "creature"
+    },
+    {
+      "classId": "hide_scaley",
+      "displayName": "Scaley Hide",
+      "parentClassId": "hide",
+      "isSpawnable": true,
+      "attributes": [],
+      "description": "Scaled creature hide",
+      "category": "creature"
+    },
+    {
+      "classId": "hide_wooly",
+      "displayName": "Wooly Hide",
+      "parentClassId": "hide",
+      "isSpawnable": true,
+      "attributes": [],
+      "description": "Woolly creature hide",
+      "category": "creature"
+    },
+    {
+      "classId": "hide_bristley",
+      "displayName": "Bristley Hide",
+      "parentClassId": "hide",
+      "isSpawnable": true,
+      "attributes": [],
+      "description": "Bristle-covered creature hide",
+      "category": "creature"
+    },
+    {
+      "classId": "meat",
+      "displayName": "Meat",
+      "parentClassId": "creature_resource",
+      "isSpawnable": false,
+      "attributes": [
+        { "name": "flavor", "minValue": 1, "maxValue": 1000 }
+      ],
+      "description": "Creature meat resources",
+      "category": "creature"
+    },
+    {
+      "classId": "meat_avian",
+      "displayName": "Avian Meat",
+      "parentClassId": "meat",
+      "isSpawnable": true,
+      "attributes": [],
+      "description": "Meat from avian creatures",
+      "category": "creature"
+    },
+    {
+      "classId": "meat_carnivore",
+      "displayName": "Carnivore Meat",
+      "parentClassId": "meat",
+      "isSpawnable": true,
+      "attributes": [],
+      "description": "Meat from carnivorous creatures",
+      "category": "creature"
+    },
+    {
+      "classId": "meat_domesticated",
+      "displayName": "Domesticated Meat",
+      "parentClassId": "meat",
+      "isSpawnable": true,
+      "attributes": [],
+      "description": "Meat from domesticated creatures",
+      "category": "creature"
+    },
+    {
+      "classId": "meat_wild",
+      "displayName": "Wild Meat",
+      "parentClassId": "meat",
+      "isSpawnable": true,
+      "attributes": [],
+      "description": "Meat from wild creatures",
+      "category": "creature"
+    },
+    {
+      "classId": "meat_insect",
+      "displayName": "Insect Meat",
+      "parentClassId": "meat",
+      "isSpawnable": true,
+      "attributes": [],
+      "description": "Meat from insect creatures",
+      "category": "creature"
+    },
+    {
+      "classId": "seafood",
+      "displayName": "Seafood",
+      "parentClassId": "meat",
+      "isSpawnable": true,
+      "attributes": [],
+      "description": "Seafood and fish meat",
+      "category": "creature"
+    },
+    {
+      "classId": "milk",
+      "displayName": "Milk",
+      "parentClassId": "creature_resource",
+      "isSpawnable": false,
+      "attributes": [
+        { "name": "flavor", "minValue": 1, "maxValue": 1000 }
+      ],
+      "description": "Creature milk resources",
+      "category": "creature"
+    },
+    {
+      "classId": "milk_domesticated",
+      "displayName": "Domesticated Milk",
+      "parentClassId": "milk",
+      "isSpawnable": true,
+      "attributes": [],
+      "description": "Milk from domesticated creatures",
+      "category": "creature"
+    },
+    {
+      "classId": "milk_wild",
+      "displayName": "Wild Milk",
+      "parentClassId": "milk",
+      "isSpawnable": true,
+      "attributes": [],
+      "description": "Milk from wild creatures",
+      "category": "creature"
+    },
+    {
+      "classId": "egg",
+      "displayName": "Egg",
+      "parentClassId": "creature_resource",
+      "isSpawnable": true,
+      "attributes": [
+        { "name": "flavor", "minValue": 1, "maxValue": 1000 }
+      ],
+      "description": "Creature egg resources",
+      "category": "creature"
+    },
+    {
+      "classId": "energy",
+      "displayName": "Energy",
+      "parentClassId": null,
+      "isSpawnable": false,
+      "attributes": [
+        { "name": "potential_energy", "minValue": 1, "maxValue": 1000 },
+        { "name": "overall_quality", "minValue": 1, "maxValue": 1000 }
+      ],
+      "description": "Base class for energy resources",
+      "category": "energy"
+    },
+    {
+      "classId": "energy_renewable",
+      "displayName": "Renewable Energy",
+      "parentClassId": "energy",
+      "isSpawnable": false,
+      "attributes": [],
+      "description": "Renewable energy sources",
+      "category": "energy"
+    },
+    {
+      "classId": "solar_energy",
+      "displayName": "Solar Energy",
+      "parentClassId": "energy_renewable",
+      "isSpawnable": true,
+      "attributes": [],
+      "description": "Solar-based energy",
+      "category": "energy"
+    },
+    {
+      "classId": "wind_energy",
+      "displayName": "Wind Energy",
+      "parentClassId": "energy_renewable",
+      "isSpawnable": true,
+      "attributes": [],
+      "description": "Wind-based energy",
+      "category": "energy"
+    },
+    {
+      "classId": "geothermal_energy",
+      "displayName": "Geothermal Energy",
+      "parentClassId": "energy_renewable",
+      "isSpawnable": true,
+      "attributes": [],
+      "description": "Geothermal energy",
+      "category": "energy"
+    },
+    {
+      "classId": "water",
+      "displayName": "Water",
+      "parentClassId": null,
+      "isSpawnable": false,
+      "attributes": [
+        { "name": "overall_quality", "minValue": 1, "maxValue": 1000 }
+      ],
+      "description": "Base class for water resources",
+      "category": "water"
+    },
+    {
+      "classId": "water_vapor",
+      "displayName": "Water Vapor",
+      "parentClassId": "water",
+      "isSpawnable": true,
+      "attributes": [],
+      "description": "Atmospheric water vapor",
+      "category": "water"
+    },
+    {
+      "classId": "water_fresh",
+      "displayName": "Fresh Water",
+      "parentClassId": "water",
+      "isSpawnable": true,
+      "attributes": [],
+      "description": "Fresh drinking water",
+      "category": "water"
+    },
+    {
+      "classId": "water_mineral",
+      "displayName": "Mineral Water",
+      "parentClassId": "water",
+      "isSpawnable": true,
+      "attributes": [],
+      "description": "Mineral-rich water",
+      "category": "water"
+    }
+  ]
+}

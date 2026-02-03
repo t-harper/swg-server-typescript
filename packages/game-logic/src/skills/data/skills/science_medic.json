@@ -1,0 +1,377 @@
+{
+  "version": 1,
+  "skills": [
+    {
+      "skillName": "science_medic_novice",
+      "parentSkill": null,
+      "graphType": "profession",
+      "isTitle": true,
+      "xpType": "medical",
+      "xpCost": 0,
+      "xpCap": 1000,
+      "skillPointsRequired": 15,
+      "requiredSkills": [],
+      "requiredSpecies": [],
+      "skillMods": {
+        "healing_ability": 10,
+        "medical_use_speed": 5
+      },
+      "commands": ["healdamage", "diagnose"],
+      "certifications": ["cert_stimpak_a", "cert_medpack_basic"],
+      "professionName": "Medic",
+      "isMaster": false
+    },
+    {
+      "skillName": "science_medic_injury_01",
+      "parentSkill": "science_medic_novice",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "medical",
+      "xpCost": 2000,
+      "xpCap": 5000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["science_medic_novice"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "healing_wound": 10,
+        "injury_treatment_speed": 5
+      },
+      "commands": [],
+      "certifications": ["cert_stimpak_b"],
+      "professionName": "Medic",
+      "isMaster": false
+    },
+    {
+      "skillName": "science_medic_injury_02",
+      "parentSkill": "science_medic_injury_01",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "medical",
+      "xpCost": 4000,
+      "xpCap": 10000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["science_medic_injury_01"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "healing_wound": 10,
+        "injury_treatment_speed": 5
+      },
+      "commands": ["healwound"],
+      "certifications": [],
+      "professionName": "Medic",
+      "isMaster": false
+    },
+    {
+      "skillName": "science_medic_injury_03",
+      "parentSkill": "science_medic_injury_02",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "medical",
+      "xpCost": 8000,
+      "xpCap": 20000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["science_medic_injury_02"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "healing_wound": 10,
+        "injury_treatment_speed": 5
+      },
+      "commands": [],
+      "certifications": ["cert_stimpak_c"],
+      "professionName": "Medic",
+      "isMaster": false
+    },
+    {
+      "skillName": "science_medic_injury_04",
+      "parentSkill": "science_medic_injury_03",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "medical",
+      "xpCost": 16000,
+      "xpCap": 40000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["science_medic_injury_03"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "healing_wound": 15,
+        "injury_treatment_speed": 10
+      },
+      "commands": ["curestates"],
+      "certifications": [],
+      "professionName": "Medic",
+      "isMaster": false
+    },
+    {
+      "skillName": "science_medic_firstaid_01",
+      "parentSkill": "science_medic_novice",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "medical",
+      "xpCost": 2000,
+      "xpCap": 5000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["science_medic_novice"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "healing_ability": 10,
+        "healing_speed": 5
+      },
+      "commands": [],
+      "certifications": ["cert_medpack_enhanced"],
+      "professionName": "Medic",
+      "isMaster": false
+    },
+    {
+      "skillName": "science_medic_firstaid_02",
+      "parentSkill": "science_medic_firstaid_01",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "medical",
+      "xpCost": 4000,
+      "xpCap": 10000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["science_medic_firstaid_01"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "healing_ability": 10,
+        "healing_speed": 5
+      },
+      "commands": ["quickheal"],
+      "certifications": [],
+      "professionName": "Medic",
+      "isMaster": false
+    },
+    {
+      "skillName": "science_medic_firstaid_03",
+      "parentSkill": "science_medic_firstaid_02",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "medical",
+      "xpCost": 8000,
+      "xpCap": 20000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["science_medic_firstaid_02"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "healing_ability": 10,
+        "healing_speed": 5
+      },
+      "commands": [],
+      "certifications": ["cert_medpack_advanced"],
+      "professionName": "Medic",
+      "isMaster": false
+    },
+    {
+      "skillName": "science_medic_firstaid_04",
+      "parentSkill": "science_medic_firstaid_03",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "medical",
+      "xpCost": 16000,
+      "xpCap": 40000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["science_medic_firstaid_03"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "healing_ability": 15,
+        "healing_speed": 10
+      },
+      "commands": ["rangedheal"],
+      "certifications": [],
+      "professionName": "Medic",
+      "isMaster": false
+    },
+    {
+      "skillName": "science_medic_organic_01",
+      "parentSkill": "science_medic_novice",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "medical",
+      "xpCost": 2000,
+      "xpCap": 5000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["science_medic_novice"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "medicine_assembly": 10,
+        "medicine_experimentation": 5
+      },
+      "commands": [],
+      "certifications": ["cert_crafting_medicine_basic"],
+      "professionName": "Medic",
+      "isMaster": false
+    },
+    {
+      "skillName": "science_medic_organic_02",
+      "parentSkill": "science_medic_organic_01",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "medical",
+      "xpCost": 4000,
+      "xpCap": 10000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["science_medic_organic_01"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "medicine_assembly": 10,
+        "medicine_experimentation": 5
+      },
+      "commands": ["craftmedicine"],
+      "certifications": [],
+      "professionName": "Medic",
+      "isMaster": false
+    },
+    {
+      "skillName": "science_medic_organic_03",
+      "parentSkill": "science_medic_organic_02",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "medical",
+      "xpCost": 8000,
+      "xpCap": 20000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["science_medic_organic_02"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "medicine_assembly": 10,
+        "medicine_experimentation": 5
+      },
+      "commands": [],
+      "certifications": ["cert_crafting_medicine_enhanced"],
+      "professionName": "Medic",
+      "isMaster": false
+    },
+    {
+      "skillName": "science_medic_organic_04",
+      "parentSkill": "science_medic_organic_03",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "medical",
+      "xpCost": 16000,
+      "xpCap": 40000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["science_medic_organic_03"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "medicine_assembly": 15,
+        "medicine_experimentation": 10
+      },
+      "commands": ["synthesize"],
+      "certifications": [],
+      "professionName": "Medic",
+      "isMaster": false
+    },
+    {
+      "skillName": "science_medic_pharmacology_01",
+      "parentSkill": "science_medic_novice",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "medical",
+      "xpCost": 2000,
+      "xpCap": 5000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["science_medic_novice"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "buff_health": 25,
+        "buff_action": 25
+      },
+      "commands": [],
+      "certifications": [],
+      "professionName": "Medic",
+      "isMaster": false
+    },
+    {
+      "skillName": "science_medic_pharmacology_02",
+      "parentSkill": "science_medic_pharmacology_01",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "medical",
+      "xpCost": 4000,
+      "xpCap": 10000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["science_medic_pharmacology_01"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "buff_health": 25,
+        "buff_action": 25
+      },
+      "commands": ["applypoison"],
+      "certifications": [],
+      "professionName": "Medic",
+      "isMaster": false
+    },
+    {
+      "skillName": "science_medic_pharmacology_03",
+      "parentSkill": "science_medic_pharmacology_02",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "medical",
+      "xpCost": 8000,
+      "xpCap": 20000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["science_medic_pharmacology_02"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "buff_health": 25,
+        "buff_action": 25,
+        "buff_mind": 25
+      },
+      "commands": [],
+      "certifications": ["cert_medicine_buff"],
+      "professionName": "Medic",
+      "isMaster": false
+    },
+    {
+      "skillName": "science_medic_pharmacology_04",
+      "parentSkill": "science_medic_pharmacology_03",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "medical",
+      "xpCost": 16000,
+      "xpCap": 40000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["science_medic_pharmacology_03"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "buff_health": 50,
+        "buff_action": 50,
+        "buff_mind": 50
+      },
+      "commands": ["applybuff"],
+      "certifications": [],
+      "professionName": "Medic",
+      "isMaster": false
+    },
+    {
+      "skillName": "science_medic_master",
+      "parentSkill": null,
+      "graphType": "profession",
+      "isTitle": true,
+      "xpType": "medical",
+      "xpCost": 0,
+      "xpCap": 100000,
+      "skillPointsRequired": 5,
+      "requiredSkills": [
+        "science_medic_injury_04",
+        "science_medic_firstaid_04",
+        "science_medic_organic_04",
+        "science_medic_pharmacology_04"
+      ],
+      "requiredSpecies": [],
+      "skillMods": {
+        "healing_ability": 25,
+        "healing_wound": 20,
+        "healing_speed": 15,
+        "medicine_assembly": 20,
+        "buff_health": 50,
+        "buff_action": 50,
+        "buff_mind": 50
+      },
+      "commands": ["revive", "masterhealing"],
+      "certifications": ["cert_medic_master"],
+      "professionName": "Medic",
+      "isMaster": true
+    }
+  ]
+}

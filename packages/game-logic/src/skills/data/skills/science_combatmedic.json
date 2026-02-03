@@ -1,0 +1,376 @@
+{
+  "version": 1,
+  "skills": [
+    {
+      "skillName": "science_combatmedic_novice",
+      "parentSkill": null,
+      "graphType": "profession",
+      "isTitle": true,
+      "xpType": "combat_medicine",
+      "xpCost": 15000,
+      "xpCap": 50000,
+      "skillPointsRequired": 5,
+      "requiredSkills": ["science_medic_pharmacology_04", "combat_marksman_novice"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "healing_ability": 15,
+        "healing_speed": 10,
+        "ranged_defense": 5
+      },
+      "commands": ["combatheal", "throwstim"],
+      "certifications": ["cert_stimpak_combat", "cert_medpack_field"],
+      "professionName": "Combat Medic",
+      "isMaster": false
+    },
+    {
+      "skillName": "science_combatmedic_field_01",
+      "parentSkill": "science_combatmedic_novice",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_medicine",
+      "xpCost": 25000,
+      "xpCap": 75000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["science_combatmedic_novice"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "healing_ability": 15,
+        "healing_range": 10
+      },
+      "commands": [],
+      "certifications": [],
+      "professionName": "Combat Medic",
+      "isMaster": false
+    },
+    {
+      "skillName": "science_combatmedic_field_02",
+      "parentSkill": "science_combatmedic_field_01",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_medicine",
+      "xpCost": 50000,
+      "xpCap": 100000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["science_combatmedic_field_01"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "healing_ability": 15,
+        "healing_range": 10
+      },
+      "commands": ["areaheal"],
+      "certifications": [],
+      "professionName": "Combat Medic",
+      "isMaster": false
+    },
+    {
+      "skillName": "science_combatmedic_field_03",
+      "parentSkill": "science_combatmedic_field_02",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_medicine",
+      "xpCost": 75000,
+      "xpCap": 150000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["science_combatmedic_field_02"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "healing_ability": 15,
+        "healing_range": 10
+      },
+      "commands": [],
+      "certifications": ["cert_medpack_combat"],
+      "professionName": "Combat Medic",
+      "isMaster": false
+    },
+    {
+      "skillName": "science_combatmedic_field_04",
+      "parentSkill": "science_combatmedic_field_03",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_medicine",
+      "xpCost": 100000,
+      "xpCap": 200000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["science_combatmedic_field_03"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "healing_ability": 20,
+        "healing_range": 15
+      },
+      "commands": ["battlefieldtriage"],
+      "certifications": [],
+      "professionName": "Combat Medic",
+      "isMaster": false
+    },
+    {
+      "skillName": "science_combatmedic_support_01",
+      "parentSkill": "science_combatmedic_novice",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_medicine",
+      "xpCost": 25000,
+      "xpCap": 75000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["science_combatmedic_novice"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "buff_health": 50,
+        "buff_action": 50
+      },
+      "commands": [],
+      "certifications": [],
+      "professionName": "Combat Medic",
+      "isMaster": false
+    },
+    {
+      "skillName": "science_combatmedic_support_02",
+      "parentSkill": "science_combatmedic_support_01",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_medicine",
+      "xpCost": 50000,
+      "xpCap": 100000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["science_combatmedic_support_01"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "buff_health": 50,
+        "buff_action": 50
+      },
+      "commands": ["combatbuff"],
+      "certifications": [],
+      "professionName": "Combat Medic",
+      "isMaster": false
+    },
+    {
+      "skillName": "science_combatmedic_support_03",
+      "parentSkill": "science_combatmedic_support_02",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_medicine",
+      "xpCost": 75000,
+      "xpCap": 150000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["science_combatmedic_support_02"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "buff_health": 75,
+        "buff_action": 75
+      },
+      "commands": [],
+      "certifications": ["cert_stim_combat_enhanced"],
+      "professionName": "Combat Medic",
+      "isMaster": false
+    },
+    {
+      "skillName": "science_combatmedic_support_04",
+      "parentSkill": "science_combatmedic_support_03",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_medicine",
+      "xpCost": 100000,
+      "xpCap": 200000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["science_combatmedic_support_03"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "buff_health": 100,
+        "buff_action": 100
+      },
+      "commands": ["squadbuff"],
+      "certifications": [],
+      "professionName": "Combat Medic",
+      "isMaster": false
+    },
+    {
+      "skillName": "science_combatmedic_warfare_01",
+      "parentSkill": "science_combatmedic_novice",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_medicine",
+      "xpCost": 25000,
+      "xpCap": 75000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["science_combatmedic_novice"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "damage_bonus": 5,
+        "ranged_defense": 5
+      },
+      "commands": [],
+      "certifications": [],
+      "professionName": "Combat Medic",
+      "isMaster": false
+    },
+    {
+      "skillName": "science_combatmedic_warfare_02",
+      "parentSkill": "science_combatmedic_warfare_01",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_medicine",
+      "xpCost": 50000,
+      "xpCap": 100000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["science_combatmedic_warfare_01"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "damage_bonus": 5,
+        "ranged_defense": 5
+      },
+      "commands": ["poisondart"],
+      "certifications": [],
+      "professionName": "Combat Medic",
+      "isMaster": false
+    },
+    {
+      "skillName": "science_combatmedic_warfare_03",
+      "parentSkill": "science_combatmedic_warfare_02",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_medicine",
+      "xpCost": 75000,
+      "xpCap": 150000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["science_combatmedic_warfare_02"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "damage_bonus": 10,
+        "ranged_defense": 10
+      },
+      "commands": [],
+      "certifications": ["cert_chemical_weapons"],
+      "professionName": "Combat Medic",
+      "isMaster": false
+    },
+    {
+      "skillName": "science_combatmedic_warfare_04",
+      "parentSkill": "science_combatmedic_warfare_03",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_medicine",
+      "xpCost": 100000,
+      "xpCap": 200000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["science_combatmedic_warfare_03"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "damage_bonus": 15,
+        "ranged_defense": 10
+      },
+      "commands": ["neurotoxin"],
+      "certifications": [],
+      "professionName": "Combat Medic",
+      "isMaster": false
+    },
+    {
+      "skillName": "science_combatmedic_survival_01",
+      "parentSkill": "science_combatmedic_novice",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_medicine",
+      "xpCost": 25000,
+      "xpCap": 75000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["science_combatmedic_novice"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "healing_speed": 10,
+        "stun_resistance": 5
+      },
+      "commands": [],
+      "certifications": [],
+      "professionName": "Combat Medic",
+      "isMaster": false
+    },
+    {
+      "skillName": "science_combatmedic_survival_02",
+      "parentSkill": "science_combatmedic_survival_01",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_medicine",
+      "xpCost": 50000,
+      "xpCap": 100000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["science_combatmedic_survival_01"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "healing_speed": 10,
+        "stun_resistance": 5
+      },
+      "commands": ["quickrevive"],
+      "certifications": [],
+      "professionName": "Combat Medic",
+      "isMaster": false
+    },
+    {
+      "skillName": "science_combatmedic_survival_03",
+      "parentSkill": "science_combatmedic_survival_02",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_medicine",
+      "xpCost": 75000,
+      "xpCap": 150000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["science_combatmedic_survival_02"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "healing_speed": 15,
+        "knockdown_recovery": 10
+      },
+      "commands": [],
+      "certifications": ["cert_stim_resuscitation"],
+      "professionName": "Combat Medic",
+      "isMaster": false
+    },
+    {
+      "skillName": "science_combatmedic_survival_04",
+      "parentSkill": "science_combatmedic_survival_03",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_medicine",
+      "xpCost": 100000,
+      "xpCap": 200000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["science_combatmedic_survival_03"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "healing_speed": 20,
+        "knockdown_recovery": 15
+      },
+      "commands": ["defib"],
+      "certifications": [],
+      "professionName": "Combat Medic",
+      "isMaster": false
+    },
+    {
+      "skillName": "science_combatmedic_master",
+      "parentSkill": null,
+      "graphType": "profession",
+      "isTitle": true,
+      "xpType": "combat_medicine",
+      "xpCost": 0,
+      "xpCap": 300000,
+      "skillPointsRequired": 5,
+      "requiredSkills": [
+        "science_combatmedic_field_04",
+        "science_combatmedic_support_04",
+        "science_combatmedic_warfare_04",
+        "science_combatmedic_survival_04"
+      ],
+      "requiredSpecies": [],
+      "skillMods": {
+        "healing_ability": 30,
+        "healing_speed": 25,
+        "healing_range": 25,
+        "buff_health": 125,
+        "buff_action": 125,
+        "ranged_defense": 15,
+        "damage_bonus": 10
+      },
+      "commands": ["massrevive", "combatprotocol"],
+      "certifications": ["cert_combatmedic_master"],
+      "professionName": "Combat Medic",
+      "isMaster": true
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "name": "Structure Crafting Tool",
+  "description": "Architectural drafting tools for designing structures and furniture.",
+  "templateId": "object/tangible/crafting/station/structure_tool.iff",
+  "craftingToolType": 5,
+  "stationType": null,
+  "isStation": false,
+  "toolQuality": 1,
+  "effectiveness": 15,
+  "complexityLimit": 25,
+  "assemblyBonus": 0,
+  "experimentationBonus": 0,
+  "maxUses": -1,
+  "requiredSkill": "crafting_structure_general",
+  "maxCondition": 750,
+  "complexity": 10,
+  "volume": 3,
+  "stfFile": "crafting_tool_n",
+  "stfName": "structure_tool",
+  "placementRules": null
+}

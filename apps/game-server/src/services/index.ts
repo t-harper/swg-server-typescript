@@ -24,3 +24,23 @@ export {
   type SpawnConfig,
   type SpawnManagerOptions,
 } from './spawn-manager.js';
+
+// Creature Spawner
+export {
+  CreatureSpawner,
+  createCreatureSpawner,
+  FactionCrcs,
+  type ActiveCreatureInfo,
+  type CreatureSpawnerOptions,
+  type CreatureAIState,
+} from './creature-spawner.js';
+
+// Lair Manager
+export {
+  LairManager,
+  createLairManager,
+  type ActiveLairInfo,
+  type LairDestructionEvent,
+  type LairManagerOptions,
+  type LairDestructionCallback,
+} from './lair-manager.js';

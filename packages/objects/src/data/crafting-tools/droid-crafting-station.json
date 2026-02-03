@@ -1,0 +1,27 @@
+{
+  "name": "Droid Assembly Station",
+  "description": "A sophisticated droid assembly station with precision tools for droid engineers.",
+  "templateId": "object/tangible/crafting/station/droid_station.iff",
+  "craftingToolType": 6,
+  "stationType": 7,
+  "isStation": true,
+  "toolQuality": 3,
+  "effectiveness": 50,
+  "complexityLimit": 45,
+  "assemblyBonus": 15,
+  "experimentationBonus": 10,
+  "maxUses": -1,
+  "requiredSkill": "crafting_droid_general",
+  "maxCondition": 1250,
+  "complexity": 18,
+  "volume": 60,
+  "stfFile": "crafting_tool_n",
+  "stfName": "droid_station",
+  "placementRules": {
+    "allowOutdoor": false,
+    "allowIndoor": true,
+    "minDistanceFromStations": 3.5,
+    "maxPerBuilding": 4,
+    "requiredLotSize": 0
+  }
+}

@@ -1,0 +1,371 @@
+{
+  "version": 1,
+  "skills": [
+    {
+      "skillName": "combat_marksman_novice",
+      "parentSkill": null,
+      "graphType": "profession",
+      "isTitle": true,
+      "xpType": "combat_ranged_rifle",
+      "xpCost": 0,
+      "xpCap": 1000,
+      "skillPointsRequired": 15,
+      "requiredSkills": [],
+      "requiredSpecies": [],
+      "skillMods": {
+        "ranged_accuracy": 5,
+        "ranged_speed": 5
+      },
+      "commands": ["aim", "pointblankshot"],
+      "certifications": ["cert_cdef_pistol", "cert_cdef_rifle"],
+      "professionName": "Marksman",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_marksman_rifle_01",
+      "parentSkill": "combat_marksman_novice",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_rifle",
+      "xpCost": 2000,
+      "xpCap": 5000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["combat_marksman_novice"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "rifle_accuracy": 10,
+        "rifle_speed": 5
+      },
+      "commands": [],
+      "certifications": ["cert_rifle_t21"],
+      "professionName": "Marksman",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_marksman_rifle_02",
+      "parentSkill": "combat_marksman_rifle_01",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_rifle",
+      "xpCost": 4000,
+      "xpCap": 10000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["combat_marksman_rifle_01"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "rifle_accuracy": 10,
+        "rifle_speed": 5
+      },
+      "commands": ["snipershot"],
+      "certifications": [],
+      "professionName": "Marksman",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_marksman_rifle_03",
+      "parentSkill": "combat_marksman_rifle_02",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_rifle",
+      "xpCost": 8000,
+      "xpCap": 20000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["combat_marksman_rifle_02"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "rifle_accuracy": 10,
+        "rifle_speed": 5
+      },
+      "commands": [],
+      "certifications": ["cert_rifle_dlt20a"],
+      "professionName": "Marksman",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_marksman_rifle_04",
+      "parentSkill": "combat_marksman_rifle_03",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_rifle",
+      "xpCost": 16000,
+      "xpCap": 40000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["combat_marksman_rifle_03"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "rifle_accuracy": 10,
+        "rifle_speed": 10
+      },
+      "commands": ["headshot"],
+      "certifications": [],
+      "professionName": "Marksman",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_marksman_pistol_01",
+      "parentSkill": "combat_marksman_novice",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_pistol",
+      "xpCost": 2000,
+      "xpCap": 5000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["combat_marksman_novice"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "pistol_accuracy": 10,
+        "pistol_speed": 5
+      },
+      "commands": [],
+      "certifications": ["cert_pistol_scout"],
+      "professionName": "Marksman",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_marksman_pistol_02",
+      "parentSkill": "combat_marksman_pistol_01",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_pistol",
+      "xpCost": 4000,
+      "xpCap": 10000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["combat_marksman_pistol_01"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "pistol_accuracy": 10,
+        "pistol_speed": 5
+      },
+      "commands": ["quickdraw"],
+      "certifications": [],
+      "professionName": "Marksman",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_marksman_pistol_03",
+      "parentSkill": "combat_marksman_pistol_02",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_pistol",
+      "xpCost": 8000,
+      "xpCap": 20000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["combat_marksman_pistol_02"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "pistol_accuracy": 10,
+        "pistol_speed": 5
+      },
+      "commands": [],
+      "certifications": ["cert_pistol_dl44"],
+      "professionName": "Marksman",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_marksman_pistol_04",
+      "parentSkill": "combat_marksman_pistol_03",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_pistol",
+      "xpCost": 16000,
+      "xpCap": 40000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["combat_marksman_pistol_03"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "pistol_accuracy": 10,
+        "pistol_speed": 10
+      },
+      "commands": ["doubletap"],
+      "certifications": [],
+      "professionName": "Marksman",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_marksman_carbine_01",
+      "parentSkill": "combat_marksman_novice",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_carbine",
+      "xpCost": 2000,
+      "xpCap": 5000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["combat_marksman_novice"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "carbine_accuracy": 10,
+        "carbine_speed": 5
+      },
+      "commands": [],
+      "certifications": ["cert_carbine_cdef"],
+      "professionName": "Marksman",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_marksman_carbine_02",
+      "parentSkill": "combat_marksman_carbine_01",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_carbine",
+      "xpCost": 4000,
+      "xpCap": 10000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["combat_marksman_carbine_01"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "carbine_accuracy": 10,
+        "carbine_speed": 5
+      },
+      "commands": ["burstshot"],
+      "certifications": [],
+      "professionName": "Marksman",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_marksman_carbine_03",
+      "parentSkill": "combat_marksman_carbine_02",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_carbine",
+      "xpCost": 8000,
+      "xpCap": 20000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["combat_marksman_carbine_02"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "carbine_accuracy": 10,
+        "carbine_speed": 5
+      },
+      "commands": [],
+      "certifications": ["cert_carbine_e11"],
+      "professionName": "Marksman",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_marksman_carbine_04",
+      "parentSkill": "combat_marksman_carbine_03",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_carbine",
+      "xpCost": 16000,
+      "xpCap": 40000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["combat_marksman_carbine_03"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "carbine_accuracy": 10,
+        "carbine_speed": 10
+      },
+      "commands": ["suppressivefire"],
+      "certifications": [],
+      "professionName": "Marksman",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_marksman_support_01",
+      "parentSkill": "combat_marksman_novice",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_general",
+      "xpCost": 2000,
+      "xpCap": 5000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["combat_marksman_novice"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "ranged_defense": 5,
+        "ranged_accuracy": 5
+      },
+      "commands": [],
+      "certifications": [],
+      "professionName": "Marksman",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_marksman_support_02",
+      "parentSkill": "combat_marksman_support_01",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_general",
+      "xpCost": 4000,
+      "xpCap": 10000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["combat_marksman_support_01"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "ranged_defense": 5,
+        "ranged_accuracy": 5
+      },
+      "commands": ["coverfire"],
+      "certifications": [],
+      "professionName": "Marksman",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_marksman_support_03",
+      "parentSkill": "combat_marksman_support_02",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_general",
+      "xpCost": 8000,
+      "xpCap": 20000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["combat_marksman_support_02"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "ranged_defense": 5,
+        "ranged_accuracy": 5
+      },
+      "commands": [],
+      "certifications": [],
+      "professionName": "Marksman",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_marksman_support_04",
+      "parentSkill": "combat_marksman_support_03",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_general",
+      "xpCost": 16000,
+      "xpCap": 40000,
+      "skillPointsRequired": 2,
+      "requiredSkills": ["combat_marksman_support_03"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "ranged_defense": 10,
+        "ranged_accuracy": 10
+      },
+      "commands": ["takecover"],
+      "certifications": [],
+      "professionName": "Marksman",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_marksman_master",
+      "parentSkill": null,
+      "graphType": "profession",
+      "isTitle": true,
+      "xpType": "combat_general",
+      "xpCost": 0,
+      "xpCap": 100000,
+      "skillPointsRequired": 5,
+      "requiredSkills": [
+        "combat_marksman_rifle_04",
+        "combat_marksman_pistol_04",
+        "combat_marksman_carbine_04",
+        "combat_marksman_support_04"
+      ],
+      "requiredSpecies": [],
+      "skillMods": {
+        "ranged_accuracy": 15,
+        "ranged_defense": 10,
+        "ranged_speed": 10
+      },
+      "commands": ["lethalshot"],
+      "certifications": ["cert_weapon_ranged_master"],
+      "professionName": "Marksman",
+      "isMaster": true
+    }
+  ]
+}

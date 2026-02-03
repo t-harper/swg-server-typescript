@@ -1,0 +1,73 @@
+{
+  "templateName": "stormtrooper",
+  "displayName": "Stormtrooper",
+  "description": "An elite soldier of the Galactic Empire, equipped with standard issue armor and weapons.",
+
+  "level": 35,
+  "difficulty": 1,
+
+  "healthRange": [8000, 12000],
+  "actionRange": [4000, 6000],
+  "mindRange": [2000, 3000],
+
+  "damageRange": [350, 550],
+  "attackSpeed": 1.5,
+  "armor": 800,
+  "accuracy": 75,
+  "damageType": "energy",
+  "weaponTemplate": "object/weapon/ranged/rifle/rifle_e11.iff",
+
+  "walkSpeed": 1.5,
+  "runSpeed": 5.376,
+  "turnRate": 1.5,
+
+  "faction": "imperial",
+  "aggressiveRadius": 32,
+  "assistRadius": 45,
+  "pvpEnabled": true,
+
+  "lootTable": "loot_stormtrooper",
+  "xpValue": 1200,
+  "creditRange": [50, 200],
+
+  "behaviorTree": "bt_guard",
+  "socialGroup": "imperial_military",
+  "leashDistance": 80,
+  "roamRadius": 8,
+
+  "appearanceTemplate": "object/mobile/dressed_stormtrooper.iff",
+  "scale": 1.0,
+
+  "equipment": [
+    {
+      "slot": "chest",
+      "template": "object/tangible/wearables/armor/stormtrooper/armor_stormtrooper_chest_plate.iff",
+      "chance": 1.0
+    },
+    {
+      "slot": "legs",
+      "template": "object/tangible/wearables/armor/stormtrooper/armor_stormtrooper_leggings.iff",
+      "chance": 1.0
+    },
+    {
+      "slot": "head",
+      "template": "object/tangible/wearables/armor/stormtrooper/armor_stormtrooper_helmet.iff",
+      "chance": 1.0
+    },
+    {
+      "slot": "feet",
+      "template": "object/tangible/wearables/armor/stormtrooper/armor_stormtrooper_boots.iff",
+      "chance": 1.0
+    },
+    {
+      "slot": "hands",
+      "template": "object/tangible/wearables/armor/stormtrooper/armor_stormtrooper_gloves.iff",
+      "chance": 1.0
+    },
+    {
+      "slot": "right_hand",
+      "template": "object/weapon/ranged/rifle/rifle_e11.iff",
+      "chance": 1.0
+    }
+  ]
+}

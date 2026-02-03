@@ -1,0 +1,99 @@
+{
+  "$schema": "./armor-template.schema.json",
+  "name": "Composite Armor",
+  "description": "Light composite armor offering balanced protection with moderate mobility",
+  "armorRating": 1,
+  "armorLayer": 0,
+  "effectiveness": {
+    "kinetic": 0.40,
+    "energy": 0.45,
+    "blast": 0.35,
+    "stun": 0.30,
+    "heat": 0.35,
+    "cold": 0.35,
+    "acid": 0.25,
+    "electricity": 0.30
+  },
+  "lightsaberResist": 0.05,
+  "encumbrance": {
+    "health": 25,
+    "action": 30,
+    "mind": 15
+  },
+  "coverageSlots": [1],
+  "socketSlots": 2,
+  "specialProtection": 0,
+  "protectionType": "",
+  "requiredCertification": "cert_armor_composite",
+  "condition": {
+    "max": 1000,
+    "current": 1000
+  },
+  "volume": 15,
+  "complexity": 25,
+  "variants": [
+    {
+      "id": "composite_chest",
+      "name": "Composite Chestplate",
+      "armorLayer": 0,
+      "coverageSlots": [1],
+      "templateCrc": "object/tangible/wearables/armor/composite/armor_composite_chest.iff"
+    },
+    {
+      "id": "composite_helmet",
+      "name": "Composite Helmet",
+      "armorLayer": 2,
+      "coverageSlots": [0],
+      "templateCrc": "object/tangible/wearables/armor/composite/armor_composite_helmet.iff"
+    },
+    {
+      "id": "composite_bracer_left",
+      "name": "Composite Left Bracer",
+      "armorLayer": 3,
+      "coverageSlots": [13],
+      "templateCrc": "object/tangible/wearables/armor/composite/armor_composite_bracer_l.iff"
+    },
+    {
+      "id": "composite_bracer_right",
+      "name": "Composite Right Bracer",
+      "armorLayer": 4,
+      "coverageSlots": [14],
+      "templateCrc": "object/tangible/wearables/armor/composite/armor_composite_bracer_r.iff"
+    },
+    {
+      "id": "composite_bicep_left",
+      "name": "Composite Left Bicep",
+      "armorLayer": 10,
+      "coverageSlots": [15],
+      "templateCrc": "object/tangible/wearables/armor/composite/armor_composite_bicep_l.iff"
+    },
+    {
+      "id": "composite_bicep_right",
+      "name": "Composite Right Bicep",
+      "armorLayer": 11,
+      "coverageSlots": [16],
+      "templateCrc": "object/tangible/wearables/armor/composite/armor_composite_bicep_r.iff"
+    },
+    {
+      "id": "composite_leggings",
+      "name": "Composite Leggings",
+      "armorLayer": 6,
+      "coverageSlots": [2],
+      "templateCrc": "object/tangible/wearables/armor/composite/armor_composite_leggings.iff"
+    },
+    {
+      "id": "composite_boots",
+      "name": "Composite Boots",
+      "armorLayer": 8,
+      "coverageSlots": [3],
+      "templateCrc": "object/tangible/wearables/armor/composite/armor_composite_boots.iff"
+    },
+    {
+      "id": "composite_gloves",
+      "name": "Composite Gloves",
+      "armorLayer": 5,
+      "coverageSlots": [4],
+      "templateCrc": "object/tangible/wearables/armor/composite/armor_composite_gloves.iff"
+    }
+  ]
+}

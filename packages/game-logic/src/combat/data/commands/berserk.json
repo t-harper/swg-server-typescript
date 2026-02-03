@@ -1,0 +1,74 @@
+{
+  "commandName": "berserk",
+  "commandCrc": 2859735891,
+  "displayName": "Berserk",
+  "description": "Enter a berserk rage, dealing massive damage but leaving yourself vulnerable. Brawler ability.",
+
+  "targetType": 0,
+  "maxRange": 0,
+  "minRange": 0,
+
+  "healthCost": 50,
+  "actionCost": 100,
+  "mindCost": 0,
+  "forceCost": 0,
+
+  "warmupTime": 500,
+  "cooldownTime": 30000,
+  "animationTime": 800,
+  "globalCooldown": 1500,
+
+  "requiredWeaponType": [0, 1, 2, 3],
+  "requiredStance": [0],
+  "requiredSkill": "brawler_novice",
+  "requiredSkillLevel": 1,
+  "requiredCombatLevel": 5,
+
+  "damageMultiplier": 2.5,
+  "accuracyBonus": -20,
+  "stateChance": 0,
+  "stateToApply": 0,
+  "stateDuration": 0,
+  "damageType": 0,
+  "primaryTarget": 0,
+  "secondaryTarget": null,
+  "secondaryRatio": 0,
+
+  "aoeRadius": 0,
+  "coneAngle": 0,
+  "maxTargets": 1,
+  "chainToCommand": null,
+  "chainWindow": 0,
+  "chainFromCommands": [],
+
+  "flags": {
+    "stationaryOnly": false,
+    "mobileOk": true,
+    "requiresCombat": true,
+    "outOfCombatOnly": false,
+    "canTargetSelf": true,
+    "canTargetFriendly": false,
+    "canTargetEnemy": false,
+    "canTargetDead": false,
+    "alwaysHits": false,
+    "cannotMiss": false,
+    "cannotBlock": false,
+    "cannotDodge": false,
+    "cannotParry": false,
+    "isHeal": false,
+    "isBuff": true,
+    "isDebuff": false,
+    "requiresLineOfSight": false,
+    "canCrit": false,
+    "breaksOnDamage": false
+  },
+
+  "animationCrc": 0,
+  "clientEffectCrc": 0,
+  "hitEffectCrc": 0,
+
+  "_comment": {
+    "requiredWeaponType": "0=Unarmed, 1=OneHandedMelee, 2=TwoHandedMelee, 3=Polearm",
+    "requiredStance": "0=Standing"
+  }
+}

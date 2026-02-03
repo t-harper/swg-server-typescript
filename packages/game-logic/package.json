@@ -13,6 +13,18 @@
     "./movement": {
       "types": "./dist/movement/index.d.ts",
       "import": "./dist/movement/index.js"
+    },
+    "./progression": {
+      "types": "./dist/progression/index.d.ts",
+      "import": "./dist/progression/index.js"
+    },
+    "./combat": {
+      "types": "./dist/combat/index.d.ts",
+      "import": "./dist/combat/index.js"
+    },
+    "./skills": {
+      "types": "./dist/skills/index.d.ts",
+      "import": "./dist/skills/index.js"
     }
   },
   "scripts": {
@@ -24,6 +36,7 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
+    "@swg/objects": "workspace:*",
     "@swg/protocol": "workspace:*",
     "@swg/shared-types": "workspace:*"
   },

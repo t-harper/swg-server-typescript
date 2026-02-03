@@ -1,0 +1,21 @@
+{
+  "name": "Clothing Crafting Tool",
+  "description": "A portable sewing kit for tailors. Used for crafting clothing and light armor.",
+  "templateId": "object/tangible/crafting/station/clothing_tool.iff",
+  "craftingToolType": 2,
+  "stationType": null,
+  "isStation": false,
+  "toolQuality": 1,
+  "effectiveness": 15,
+  "complexityLimit": 25,
+  "assemblyBonus": 0,
+  "experimentationBonus": 0,
+  "maxUses": -1,
+  "requiredSkill": "crafting_clothing_general",
+  "maxCondition": 750,
+  "complexity": 8,
+  "volume": 2,
+  "stfFile": "crafting_tool_n",
+  "stfName": "clothing_tool",
+  "placementRules": null
+}

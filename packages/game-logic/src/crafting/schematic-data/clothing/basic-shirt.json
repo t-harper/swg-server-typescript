@@ -1,0 +1,103 @@
+{
+  "schematicId": "clothing_basic_shirt",
+  "schematicName": "Basic Shirt",
+  "category": "clothing",
+  "subcategory": "shirts",
+  "complexity": 3,
+  "complexityTier": 1,
+  "craftingTool": "clothing_station",
+  "xpType": "crafting_clothing_general",
+  "xpAmount": 40,
+  "outputTemplate": "object/tangible/wearables/shirt/shirt_s01.iff",
+  "outputQuantity": 1,
+  "skillRequired": "crafting_tailor_novice",
+  "description": "A basic casual shirt suitable for everyday wear.",
+  "learnable": true,
+  "factoryCapable": true,
+  "manufacturingVolume": 10,
+  "dataVersion": 1,
+  "slots": [
+    {
+      "slotName": "Body Fabric",
+      "slotId": "body_fabric",
+      "slotType": "resource",
+      "resourceTypes": ["fiberplast", "hide", "synthetic_cloth"],
+      "quantityRequired": 25,
+      "optional": false,
+      "contributesToAttribute": ["condition", "sockets"],
+      "resourceWeights": {
+        "overallQuality": 60,
+        "unitToughness": 40
+      }
+    },
+    {
+      "slotName": "Trim Material",
+      "slotId": "trim_material",
+      "slotType": "resource",
+      "resourceTypes": ["fiberplast", "hide"],
+      "quantityRequired": 8,
+      "optional": false,
+      "contributesToAttribute": ["condition"],
+      "resourceWeights": {
+        "overallQuality": 70,
+        "malleability": 30
+      }
+    },
+    {
+      "slotName": "Thread",
+      "slotId": "thread",
+      "slotType": "resource",
+      "resourceTypes": ["fiberplast", "synthetic_cloth"],
+      "quantityRequired": 5,
+      "optional": false,
+      "contributesToAttribute": ["condition"],
+      "resourceWeights": {
+        "unitToughness": 80,
+        "overallQuality": 20
+      }
+    }
+  ],
+  "itemAttributes": [
+    {
+      "attributeName": "condition",
+      "displayName": "Condition",
+      "baseValue": 1000,
+      "minValue": 500,
+      "maxValue": 2000,
+      "higherIsBetter": true,
+      "experimentationModifier": 1.0
+    },
+    {
+      "attributeName": "sockets",
+      "displayName": "Socket Count",
+      "baseValue": 0,
+      "minValue": 0,
+      "maxValue": 2,
+      "higherIsBetter": true,
+      "experimentationModifier": 0.5
+    }
+  ],
+  "assembly": {
+    "baseSuccessRate": 0.85,
+    "skillModifier": 0.002,
+    "criticalSuccessThreshold": 0.96,
+    "criticalFailureThreshold": 0.02
+  },
+  "experimentation": {
+    "maxPoints": 6,
+    "riskPerAttempt": 0.02,
+    "pointsPerLine": 1,
+    "groups": [
+      {
+        "groupName": "Durability",
+        "attributes": ["condition"],
+        "maxImprovement": 0.40
+      },
+      {
+        "groupName": "Sockets",
+        "attributes": ["sockets"],
+        "maxImprovement": 0.50
+      }
+    ]
+  }
+}

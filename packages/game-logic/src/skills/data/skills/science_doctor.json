@@ -1,0 +1,371 @@
+{
+  "version": 1,
+  "skills": [
+    {
+      "skillName": "science_doctor_novice",
+      "parentSkill": null,
+      "graphType": "profession",
+      "isTitle": true,
+      "xpType": "medical",
+      "xpCost": 15000,
+      "xpCap": 50000,
+      "skillPointsRequired": 5,
+      "requiredSkills": ["science_medic_injury_04", "science_medic_firstaid_04"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "healing_ability": 20,
+        "healing_wound": 20,
+        "healing_range": 10
+      },
+      "commands": ["healstate", "extendeddiagnosis"],
+      "certifications": ["cert_stimpak_d", "cert_medpack_doctor"],
+      "professionName": "Doctor",
+      "isMaster": false
+    },
+    {
+      "skillName": "science_doctor_wound_01",
+      "parentSkill": "science_doctor_novice",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "medical",
+      "xpCost": 25000,
+      "xpCap": 75000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["science_doctor_novice"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "healing_wound": 20
+      },
+      "commands": [],
+      "certifications": [],
+      "professionName": "Doctor",
+      "isMaster": false
+    },
+    {
+      "skillName": "science_doctor_wound_02",
+      "parentSkill": "science_doctor_wound_01",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "medical",
+      "xpCost": 50000,
+      "xpCap": 100000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["science_doctor_wound_01"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "healing_wound": 20
+      },
+      "commands": ["healallwounds"],
+      "certifications": [],
+      "professionName": "Doctor",
+      "isMaster": false
+    },
+    {
+      "skillName": "science_doctor_wound_03",
+      "parentSkill": "science_doctor_wound_02",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "medical",
+      "xpCost": 75000,
+      "xpCap": 150000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["science_doctor_wound_02"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "healing_wound": 20
+      },
+      "commands": [],
+      "certifications": ["cert_stimpak_e"],
+      "professionName": "Doctor",
+      "isMaster": false
+    },
+    {
+      "skillName": "science_doctor_wound_04",
+      "parentSkill": "science_doctor_wound_03",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "medical",
+      "xpCost": 100000,
+      "xpCap": 200000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["science_doctor_wound_03"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "healing_wound": 30
+      },
+      "commands": ["areawoundheal"],
+      "certifications": [],
+      "professionName": "Doctor",
+      "isMaster": false
+    },
+    {
+      "skillName": "science_doctor_healing_01",
+      "parentSkill": "science_doctor_novice",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "medical",
+      "xpCost": 25000,
+      "xpCap": 75000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["science_doctor_novice"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "healing_ability": 20,
+        "healing_speed": 10
+      },
+      "commands": [],
+      "certifications": [],
+      "professionName": "Doctor",
+      "isMaster": false
+    },
+    {
+      "skillName": "science_doctor_healing_02",
+      "parentSkill": "science_doctor_healing_01",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "medical",
+      "xpCost": 50000,
+      "xpCap": 100000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["science_doctor_healing_01"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "healing_ability": 20,
+        "healing_speed": 10
+      },
+      "commands": ["masshealing"],
+      "certifications": [],
+      "professionName": "Doctor",
+      "isMaster": false
+    },
+    {
+      "skillName": "science_doctor_healing_03",
+      "parentSkill": "science_doctor_healing_02",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "medical",
+      "xpCost": 75000,
+      "xpCap": 150000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["science_doctor_healing_02"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "healing_ability": 20,
+        "healing_speed": 10
+      },
+      "commands": [],
+      "certifications": ["cert_medpack_elite"],
+      "professionName": "Doctor",
+      "isMaster": false
+    },
+    {
+      "skillName": "science_doctor_healing_04",
+      "parentSkill": "science_doctor_healing_03",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "medical",
+      "xpCost": 100000,
+      "xpCap": 200000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["science_doctor_healing_03"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "healing_ability": 30,
+        "healing_speed": 15
+      },
+      "commands": ["fulltriage"],
+      "certifications": [],
+      "professionName": "Doctor",
+      "isMaster": false
+    },
+    {
+      "skillName": "science_doctor_buff_01",
+      "parentSkill": "science_doctor_novice",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "medical",
+      "xpCost": 25000,
+      "xpCap": 75000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["science_doctor_novice"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "buff_health": 75,
+        "buff_action": 75
+      },
+      "commands": [],
+      "certifications": [],
+      "professionName": "Doctor",
+      "isMaster": false
+    },
+    {
+      "skillName": "science_doctor_buff_02",
+      "parentSkill": "science_doctor_buff_01",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "medical",
+      "xpCost": 50000,
+      "xpCap": 100000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["science_doctor_buff_01"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "buff_health": 75,
+        "buff_action": 75,
+        "buff_mind": 50
+      },
+      "commands": ["enhancebuff"],
+      "certifications": [],
+      "professionName": "Doctor",
+      "isMaster": false
+    },
+    {
+      "skillName": "science_doctor_buff_03",
+      "parentSkill": "science_doctor_buff_02",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "medical",
+      "xpCost": 75000,
+      "xpCap": 150000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["science_doctor_buff_02"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "buff_health": 100,
+        "buff_action": 100,
+        "buff_mind": 75
+      },
+      "commands": [],
+      "certifications": ["cert_buff_advanced"],
+      "professionName": "Doctor",
+      "isMaster": false
+    },
+    {
+      "skillName": "science_doctor_buff_04",
+      "parentSkill": "science_doctor_buff_03",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "medical",
+      "xpCost": 100000,
+      "xpCap": 200000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["science_doctor_buff_03"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "buff_health": 150,
+        "buff_action": 150,
+        "buff_mind": 100
+      },
+      "commands": ["masterbuff"],
+      "certifications": [],
+      "professionName": "Doctor",
+      "isMaster": false
+    },
+    {
+      "skillName": "science_doctor_cure_01",
+      "parentSkill": "science_doctor_novice",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "medical",
+      "xpCost": 25000,
+      "xpCap": 75000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["science_doctor_novice"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "healing_ability": 10
+      },
+      "commands": ["curepoison"],
+      "certifications": [],
+      "professionName": "Doctor",
+      "isMaster": false
+    },
+    {
+      "skillName": "science_doctor_cure_02",
+      "parentSkill": "science_doctor_cure_01",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "medical",
+      "xpCost": 50000,
+      "xpCap": 100000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["science_doctor_cure_01"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "healing_ability": 10
+      },
+      "commands": ["curedisease"],
+      "certifications": [],
+      "professionName": "Doctor",
+      "isMaster": false
+    },
+    {
+      "skillName": "science_doctor_cure_03",
+      "parentSkill": "science_doctor_cure_02",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "medical",
+      "xpCost": 75000,
+      "xpCap": 150000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["science_doctor_cure_02"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "healing_ability": 10
+      },
+      "commands": ["cureaffliction"],
+      "certifications": ["cert_antidote"],
+      "professionName": "Doctor",
+      "isMaster": false
+    },
+    {
+      "skillName": "science_doctor_cure_04",
+      "parentSkill": "science_doctor_cure_03",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "medical",
+      "xpCost": 100000,
+      "xpCap": 200000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["science_doctor_cure_03"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "healing_ability": 20
+      },
+      "commands": ["purify"],
+      "certifications": [],
+      "professionName": "Doctor",
+      "isMaster": false
+    },
+    {
+      "skillName": "science_doctor_master",
+      "parentSkill": null,
+      "graphType": "profession",
+      "isTitle": true,
+      "xpType": "medical",
+      "xpCost": 0,
+      "xpCap": 300000,
+      "skillPointsRequired": 5,
+      "requiredSkills": [
+        "science_doctor_wound_04",
+        "science_doctor_healing_04",
+        "science_doctor_buff_04",
+        "science_doctor_cure_04"
+      ],
+      "requiredSpecies": [],
+      "skillMods": {
+        "healing_ability": 40,
+        "healing_wound": 40,
+        "healing_speed": 25,
+        "healing_range": 20,
+        "buff_health": 200,
+        "buff_action": 200,
+        "buff_mind": 150
+      },
+      "commands": ["masterrevive", "medicalprotocol"],
+      "certifications": ["cert_doctor_master"],
+      "professionName": "Doctor",
+      "isMaster": true
+    }
+  ]
+}

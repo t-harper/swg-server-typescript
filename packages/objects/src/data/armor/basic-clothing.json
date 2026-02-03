@@ -1,0 +1,106 @@
+{
+  "$schema": "./armor-template.schema.json",
+  "name": "Basic Clothing",
+  "description": "Standard clothing with no armor protection, worn for fashion or social situations",
+  "armorRating": 0,
+  "armorLayer": 0,
+  "effectiveness": {
+    "kinetic": 0,
+    "energy": 0,
+    "blast": 0,
+    "stun": 0,
+    "heat": 0,
+    "cold": 0,
+    "acid": 0,
+    "electricity": 0
+  },
+  "lightsaberResist": 0,
+  "encumbrance": {
+    "health": 0,
+    "action": 0,
+    "mind": 0
+  },
+  "coverageSlots": [1],
+  "socketSlots": 0,
+  "specialProtection": 0,
+  "protectionType": "",
+  "requiredCertification": "",
+  "condition": {
+    "max": 500,
+    "current": 500
+  },
+  "volume": 5,
+  "complexity": 5,
+  "variants": [
+    {
+      "id": "shirt_basic",
+      "name": "Basic Shirt",
+      "armorLayer": 0,
+      "coverageSlots": [1],
+      "templateCrc": "object/tangible/wearables/shirt/shirt_s01.iff"
+    },
+    {
+      "id": "pants_basic",
+      "name": "Basic Pants",
+      "armorLayer": 6,
+      "coverageSlots": [2],
+      "templateCrc": "object/tangible/wearables/pants/pants_s01.iff"
+    },
+    {
+      "id": "shoes_basic",
+      "name": "Basic Shoes",
+      "armorLayer": 8,
+      "coverageSlots": [3],
+      "templateCrc": "object/tangible/wearables/shoes/shoes_s01.iff"
+    },
+    {
+      "id": "hat_basic",
+      "name": "Basic Hat",
+      "armorLayer": 2,
+      "coverageSlots": [0],
+      "templateCrc": "object/tangible/wearables/hat/hat_s01.iff"
+    },
+    {
+      "id": "gloves_basic",
+      "name": "Basic Gloves",
+      "armorLayer": 5,
+      "coverageSlots": [4],
+      "templateCrc": "object/tangible/wearables/gloves/gloves_s01.iff"
+    },
+    {
+      "id": "jacket_basic",
+      "name": "Basic Jacket",
+      "armorLayer": 0,
+      "coverageSlots": [1],
+      "templateCrc": "object/tangible/wearables/jacket/jacket_s01.iff"
+    },
+    {
+      "id": "robe_basic",
+      "name": "Basic Robe",
+      "armorLayer": 0,
+      "coverageSlots": [1, 2],
+      "templateCrc": "object/tangible/wearables/robe/robe_s01.iff"
+    },
+    {
+      "id": "dress_basic",
+      "name": "Basic Dress",
+      "armorLayer": 0,
+      "coverageSlots": [1, 2],
+      "templateCrc": "object/tangible/wearables/dress/dress_s01.iff"
+    },
+    {
+      "id": "vest_basic",
+      "name": "Basic Vest",
+      "armorLayer": 0,
+      "coverageSlots": [1],
+      "templateCrc": "object/tangible/wearables/vest/vest_s01.iff"
+    },
+    {
+      "id": "cloak_basic",
+      "name": "Basic Cloak",
+      "armorLayer": 1,
+      "coverageSlots": [18],
+      "templateCrc": "object/tangible/wearables/cloak/cloak_s01.iff"
+    }
+  ]
+}

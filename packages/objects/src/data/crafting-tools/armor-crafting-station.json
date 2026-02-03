@@ -1,0 +1,27 @@
+{
+  "name": "Armor Crafting Station",
+  "description": "A professional armorsmith's workbench. Required for crafting heavy armor pieces.",
+  "templateId": "object/tangible/crafting/station/armor_station.iff",
+  "craftingToolType": 4,
+  "stationType": 5,
+  "isStation": true,
+  "toolQuality": 3,
+  "effectiveness": 50,
+  "complexityLimit": 45,
+  "assemblyBonus": 15,
+  "experimentationBonus": 10,
+  "maxUses": -1,
+  "requiredSkill": "crafting_armor_general",
+  "maxCondition": 1500,
+  "complexity": 20,
+  "volume": 75,
+  "stfFile": "crafting_tool_n",
+  "stfName": "armor_station",
+  "placementRules": {
+    "allowOutdoor": false,
+    "allowIndoor": true,
+    "minDistanceFromStations": 4.0,
+    "maxPerBuilding": 3,
+    "requiredLotSize": 0
+  }
+}

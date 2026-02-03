@@ -1,0 +1,18 @@
+{
+  "name": "Master Mineral Survey Device",
+  "description": "A master-quality survey tool for locating mineral resources. Maximum range and precision.",
+  "templateId": "object/tangible/survey_tool/survey_tool_mineral_master.iff",
+  "surveyToolType": 0,
+  "surveyRange": 320,
+  "surveyAccuracy": 100,
+  "sampleSize": 5,
+  "cooldown": 2000,
+  "quality": 3,
+  "requiredSkill": "survey_accuracy",
+  "requiredSkillLevel": 50,
+  "maxCondition": 500,
+  "complexity": 25,
+  "volume": 1,
+  "stfFile": "survey_tool_n",
+  "stfName": "survey_tool_mineral_master"
+}

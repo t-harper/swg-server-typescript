@@ -1,0 +1,145 @@
+{
+  "schematicId": "weapon_melee_vibroblade",
+  "schematicName": "Vibroblade",
+  "category": "weapon",
+  "subcategory": "one_handed_melee",
+  "complexity": 10,
+  "complexityTier": 3,
+  "craftingTool": "weapon_workbench",
+  "xpType": "crafting_weapons_general",
+  "xpAmount": 150,
+  "outputTemplate": "object/weapon/melee/sword/sword_vibroblade.iff",
+  "outputQuantity": 1,
+  "skillRequired": "crafting_weaponsmith_novice",
+  "description": "A vibrating blade weapon that delivers devastating cuts through molecular disruption.",
+  "learnable": true,
+  "factoryCapable": true,
+  "manufacturingVolume": 1,
+  "dataVersion": 1,
+  "slots": [
+    {
+      "slotName": "Blade",
+      "slotId": "blade",
+      "slotType": "resource",
+      "resourceTypes": ["steel", "iron", "carbonite_steel"],
+      "quantityRequired": 20,
+      "optional": false,
+      "contributesToAttribute": ["damage_min", "damage_max", "woundChance"],
+      "resourceWeights": {
+        "unitToughness": 70,
+        "conductivity": 30
+      }
+    },
+    {
+      "slotName": "Hilt",
+      "slotId": "hilt",
+      "slotType": "resource",
+      "resourceTypes": ["wood", "bone", "metal"],
+      "quantityRequired": 10,
+      "optional": false,
+      "contributesToAttribute": ["accuracy", "attackSpeed"],
+      "resourceWeights": {
+        "shockResistance": 60,
+        "unitToughness": 40
+      }
+    },
+    {
+      "slotName": "Vibration Motor",
+      "slotId": "vibration_motor",
+      "slotType": "component",
+      "resourceTypes": ["object/tangible/component/weapon/vibro_motor.iff"],
+      "quantityRequired": 1,
+      "optional": false,
+      "contributesToAttribute": ["damage_min", "damage_max", "attackSpeed"],
+      "resourceWeights": {}
+    },
+    {
+      "slotName": "Power Cell Socket",
+      "slotId": "power_socket",
+      "slotType": "resource",
+      "resourceTypes": ["copper", "aluminum"],
+      "quantityRequired": 5,
+      "optional": false,
+      "contributesToAttribute": ["attackSpeed"],
+      "resourceWeights": {
+        "conductivity": 80,
+        "malleability": 20
+      }
+    }
+  ],
+  "itemAttributes": [
+    {
+      "attributeName": "damage_min",
+      "displayName": "Minimum Damage",
+      "baseValue": 55,
+      "minValue": 40,
+      "maxValue": 95,
+      "higherIsBetter": true,
+      "experimentationModifier": 1.0
+    },
+    {
+      "attributeName": "damage_max",
+      "displayName": "Maximum Damage",
+      "baseValue": 110,
+      "minValue": 80,
+      "maxValue": 190,
+      "higherIsBetter": true,
+      "experimentationModifier": 1.0
+    },
+    {
+      "attributeName": "attackSpeed",
+      "displayName": "Attack Speed",
+      "baseValue": 3.8,
+      "minValue": 2.8,
+      "maxValue": 5.0,
+      "higherIsBetter": false,
+      "experimentationModifier": 0.8
+    },
+    {
+      "attributeName": "accuracy",
+      "displayName": "Accuracy",
+      "baseValue": 0,
+      "minValue": -10,
+      "maxValue": 20,
+      "higherIsBetter": true,
+      "experimentationModifier": 1.0
+    },
+    {
+      "attributeName": "woundChance",
+      "displayName": "Wound Chance",
+      "baseValue": 8,
+      "minValue": 4,
+      "maxValue": 18,
+      "higherIsBetter": true,
+      "experimentationModifier": 0.7
+    }
+  ],
+  "assembly": {
+    "baseSuccessRate": 0.60,
+    "skillModifier": 0.001,
+    "criticalSuccessThreshold": 0.90,
+    "criticalFailureThreshold": 0.10
+  },
+  "experimentation": {
+    "maxPoints": 10,
+    "riskPerAttempt": 0.06,
+    "pointsPerLine": 1,
+    "groups": [
+      {
+        "groupName": "Damage",
+        "attributes": ["damage_min", "damage_max"],
+        "maxImprovement": 0.30
+      },
+      {
+        "groupName": "Speed",
+        "attributes": ["attackSpeed"],
+        "maxImprovement": 0.20
+      },
+      {
+        "groupName": "Accuracy",
+        "attributes": ["accuracy", "woundChance"],
+        "maxImprovement": 0.25
+      }
+    ]
+  }
+}

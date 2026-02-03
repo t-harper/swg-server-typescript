@@ -1,0 +1,367 @@
+{
+  "version": 1,
+  "skills": [
+    {
+      "skillName": "combat_pistoleer_novice",
+      "parentSkill": null,
+      "graphType": "profession",
+      "isTitle": true,
+      "xpType": "combat_ranged_pistol",
+      "xpCost": 15000,
+      "xpCap": 50000,
+      "skillPointsRequired": 5,
+      "requiredSkills": ["combat_marksman_pistol_04"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "pistol_accuracy": 15,
+        "pistol_speed": 15,
+        "ranged_defense": 5
+      },
+      "commands": ["fanshot", "pistolwhip"],
+      "certifications": ["cert_pistol_republic"],
+      "professionName": "Pistoleer",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_pistoleer_accuracy_01",
+      "parentSkill": "combat_pistoleer_novice",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_pistol",
+      "xpCost": 25000,
+      "xpCap": 75000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["combat_pistoleer_novice"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "pistol_accuracy": 15
+      },
+      "commands": [],
+      "certifications": [],
+      "professionName": "Pistoleer",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_pistoleer_accuracy_02",
+      "parentSkill": "combat_pistoleer_accuracy_01",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_pistol",
+      "xpCost": 50000,
+      "xpCap": 100000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["combat_pistoleer_accuracy_01"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "pistol_accuracy": 15
+      },
+      "commands": ["targetedbodyshot"],
+      "certifications": [],
+      "professionName": "Pistoleer",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_pistoleer_accuracy_03",
+      "parentSkill": "combat_pistoleer_accuracy_02",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_pistol",
+      "xpCost": 75000,
+      "xpCap": 150000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["combat_pistoleer_accuracy_02"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "pistol_accuracy": 15,
+        "critical_chance": 5
+      },
+      "commands": [],
+      "certifications": ["cert_pistol_geonosian"],
+      "professionName": "Pistoleer",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_pistoleer_accuracy_04",
+      "parentSkill": "combat_pistoleer_accuracy_03",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_pistol",
+      "xpCost": 100000,
+      "xpCap": 200000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["combat_pistoleer_accuracy_03"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "pistol_accuracy": 20,
+        "critical_chance": 5
+      },
+      "commands": ["precisionshot"],
+      "certifications": [],
+      "professionName": "Pistoleer",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_pistoleer_speed_01",
+      "parentSkill": "combat_pistoleer_novice",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_pistol",
+      "xpCost": 25000,
+      "xpCap": 75000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["combat_pistoleer_novice"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "pistol_speed": 15
+      },
+      "commands": [],
+      "certifications": [],
+      "professionName": "Pistoleer",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_pistoleer_speed_02",
+      "parentSkill": "combat_pistoleer_speed_01",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_pistol",
+      "xpCost": 50000,
+      "xpCap": 100000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["combat_pistoleer_speed_01"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "pistol_speed": 15
+      },
+      "commands": ["doubletap2"],
+      "certifications": [],
+      "professionName": "Pistoleer",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_pistoleer_speed_03",
+      "parentSkill": "combat_pistoleer_speed_02",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_pistol",
+      "xpCost": 75000,
+      "xpCap": 150000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["combat_pistoleer_speed_02"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "pistol_speed": 15,
+        "ranged_speed": 5
+      },
+      "commands": [],
+      "certifications": ["cert_pistol_power5"],
+      "professionName": "Pistoleer",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_pistoleer_speed_04",
+      "parentSkill": "combat_pistoleer_speed_03",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_pistol",
+      "xpCost": 100000,
+      "xpCap": 200000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["combat_pistoleer_speed_03"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "pistol_speed": 20,
+        "ranged_speed": 10
+      },
+      "commands": ["rapidblast"],
+      "certifications": [],
+      "professionName": "Pistoleer",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_pistoleer_support_01",
+      "parentSkill": "combat_pistoleer_novice",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_pistol",
+      "xpCost": 25000,
+      "xpCap": 75000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["combat_pistoleer_novice"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "ranged_defense": 10
+      },
+      "commands": [],
+      "certifications": [],
+      "professionName": "Pistoleer",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_pistoleer_support_02",
+      "parentSkill": "combat_pistoleer_support_01",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_pistol",
+      "xpCost": 50000,
+      "xpCap": 100000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["combat_pistoleer_support_01"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "ranged_defense": 10,
+        "dodge": 5
+      },
+      "commands": ["duckanddive"],
+      "certifications": [],
+      "professionName": "Pistoleer",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_pistoleer_support_03",
+      "parentSkill": "combat_pistoleer_support_02",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_pistol",
+      "xpCost": 75000,
+      "xpCap": 150000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["combat_pistoleer_support_02"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "ranged_defense": 10,
+        "dodge": 5
+      },
+      "commands": [],
+      "certifications": [],
+      "professionName": "Pistoleer",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_pistoleer_support_04",
+      "parentSkill": "combat_pistoleer_support_03",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_pistol",
+      "xpCost": 100000,
+      "xpCap": 200000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["combat_pistoleer_support_03"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "ranged_defense": 15,
+        "dodge": 10
+      },
+      "commands": ["evasion"],
+      "certifications": [],
+      "professionName": "Pistoleer",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_pistoleer_special_01",
+      "parentSkill": "combat_pistoleer_novice",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_pistol",
+      "xpCost": 25000,
+      "xpCap": 75000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["combat_pistoleer_novice"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "damage_bonus": 10
+      },
+      "commands": [],
+      "certifications": [],
+      "professionName": "Pistoleer",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_pistoleer_special_02",
+      "parentSkill": "combat_pistoleer_special_01",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_pistol",
+      "xpCost": 50000,
+      "xpCap": 100000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["combat_pistoleer_special_01"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "damage_bonus": 10
+      },
+      "commands": ["legshot"],
+      "certifications": [],
+      "professionName": "Pistoleer",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_pistoleer_special_03",
+      "parentSkill": "combat_pistoleer_special_02",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_pistol",
+      "xpCost": 75000,
+      "xpCap": 150000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["combat_pistoleer_special_02"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "damage_bonus": 10,
+        "armor_pierce": 5
+      },
+      "commands": [],
+      "certifications": ["cert_pistol_fwg5"],
+      "professionName": "Pistoleer",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_pistoleer_special_04",
+      "parentSkill": "combat_pistoleer_special_03",
+      "graphType": "profession",
+      "isTitle": false,
+      "xpType": "combat_ranged_pistol",
+      "xpCost": 100000,
+      "xpCap": 200000,
+      "skillPointsRequired": 3,
+      "requiredSkills": ["combat_pistoleer_special_03"],
+      "requiredSpecies": [],
+      "skillMods": {
+        "damage_bonus": 15,
+        "armor_pierce": 10
+      },
+      "commands": ["stoppingshot"],
+      "certifications": [],
+      "professionName": "Pistoleer",
+      "isMaster": false
+    },
+    {
+      "skillName": "combat_pistoleer_master",
+      "parentSkill": null,
+      "graphType": "profession",
+      "isTitle": true,
+      "xpType": "combat_ranged_pistol",
+      "xpCost": 0,
+      "xpCap": 300000,
+      "skillPointsRequired": 5,
+      "requiredSkills": [
+        "combat_pistoleer_accuracy_04",
+        "combat_pistoleer_speed_04",
+        "combat_pistoleer_support_04",
+        "combat_pistoleer_special_04"
+      ],
+      "requiredSpecies": [],
+      "skillMods": {
+        "pistol_accuracy": 25,
+        "pistol_speed": 25,
+        "ranged_defense": 15,
+        "damage_bonus": 10,
+        "critical_chance": 10
+      },
+      "commands": ["lastditch"],
+      "certifications": ["cert_pistol_master"],
+      "professionName": "Pistoleer",
+      "isMaster": true
+    }
+  ]
+}

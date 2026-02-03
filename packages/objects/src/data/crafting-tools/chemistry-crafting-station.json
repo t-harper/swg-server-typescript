@@ -1,0 +1,27 @@
+{
+  "name": "Chemistry Crafting Station",
+  "description": "A chemistry lab station for doctors and medics. Used for crafting medicines and stimpacks.",
+  "templateId": "object/tangible/crafting/station/chemistry_station.iff",
+  "craftingToolType": 1,
+  "stationType": 2,
+  "isStation": true,
+  "toolQuality": 2,
+  "effectiveness": 35,
+  "complexityLimit": 35,
+  "assemblyBonus": 15,
+  "experimentationBonus": 10,
+  "maxUses": -1,
+  "requiredSkill": "crafting_food_general",
+  "maxCondition": 1000,
+  "complexity": 15,
+  "volume": 45,
+  "stfFile": "crafting_tool_n",
+  "stfName": "chemistry_station",
+  "placementRules": {
+    "allowOutdoor": false,
+    "allowIndoor": true,
+    "minDistanceFromStations": 3.0,
+    "maxPerBuilding": 5,
+    "requiredLotSize": 0
+  }
+}

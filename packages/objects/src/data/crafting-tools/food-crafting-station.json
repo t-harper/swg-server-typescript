@@ -1,0 +1,27 @@
+{
+  "name": "Food Preparation Station",
+  "description": "A professional food preparation station for chefs. Provides bonuses to food crafting.",
+  "templateId": "object/tangible/crafting/station/food_station.iff",
+  "craftingToolType": 1,
+  "stationType": 1,
+  "isStation": true,
+  "toolQuality": 2,
+  "effectiveness": 35,
+  "complexityLimit": 35,
+  "assemblyBonus": 15,
+  "experimentationBonus": 10,
+  "maxUses": -1,
+  "requiredSkill": "crafting_food_general",
+  "maxCondition": 1000,
+  "complexity": 15,
+  "volume": 50,
+  "stfFile": "crafting_tool_n",
+  "stfName": "food_station",
+  "placementRules": {
+    "allowOutdoor": false,
+    "allowIndoor": true,
+    "minDistanceFromStations": 3.0,
+    "maxPerBuilding": 5,
+    "requiredLotSize": 0
+  }
+}
