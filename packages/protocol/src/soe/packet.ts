@@ -33,14 +33,15 @@ export interface SessionRequestPacket extends SoePacketBase {
 /**
  * Session Response packet (0x02)
  * Server response to session request
+ * C++ format: [opcode:2][connectionId:4][crcSeed:4][crcBytes:1][encryptMethod[0]:1][encryptMethod[1]:1][maxRawPacketSize:4][protocolVersion:4]
  */
 export interface SessionResponsePacket extends SoePacketBase {
   opcode: typeof SoeOpcode.SessionResponse;
   connectionId: number;
   crcSeed: number;
-  crcLength: number;
-  useCompression: boolean;
-  encryptionFlag: number;
+  crcBytes: number;
+  encryptMethod0: number;
+  encryptMethod1: number;
   serverUdpBufferSize: number;
   protocolVersion: number;
 }
@@ -214,9 +215,9 @@ function serializeSessionResponse(packet: SessionResponsePacket): Uint8Array {
   writer.writeUInt16BE(SoeOpcode.SessionResponse);
   writer.writeUInt32BE(packet.connectionId);
   writer.writeUInt32BE(packet.crcSeed);
-  writer.writeUInt8(packet.crcLength);
-  writer.writeUInt8(packet.useCompression ? 1 : 0);
-  writer.writeUInt8(packet.encryptionFlag);
+  writer.writeUInt8(packet.crcBytes);
+  writer.writeUInt8(packet.encryptMethod0);
+  writer.writeUInt8(packet.encryptMethod1);
   writer.writeUInt32BE(packet.serverUdpBufferSize);
   writer.writeUInt32BE(packet.protocolVersion);
   return writer.toBuffer();
@@ -228,9 +229,9 @@ function serializeSessionResponse(packet: SessionResponsePacket): Uint8Array {
 function deserializeSessionResponse(reader: BufferReader): SessionResponsePacket {
   const connectionId = reader.readUInt32BE();
   const crcSeed = reader.readUInt32BE();
-  const crcLength = reader.readUInt8();
-  const useCompression = reader.readUInt8() !== 0;
-  const encryptionFlag = reader.readUInt8();
+  const crcBytes = reader.readUInt8();
+  const encryptMethod0 = reader.readUInt8();
+  const encryptMethod1 = reader.readUInt8();
   const serverUdpBufferSize = reader.readUInt32BE();
   const protocolVersion = reader.readUInt32BE();
 
@@ -238,9 +239,9 @@ function deserializeSessionResponse(reader: BufferReader): SessionResponsePacket
     opcode: SoeOpcode.SessionResponse,
     connectionId,
     crcSeed,
-    crcLength,
-    useCompression,
-    encryptionFlag,
+    crcBytes,
+    encryptMethod0,
+    encryptMethod1,
     serverUdpBufferSize,
     protocolVersion,
   };
@@ -628,9 +629,9 @@ export function createSessionResponse(
   crcSeed: number,
   serverUdpBufferSize: number,
   options: {
-    crcLength?: number;
-    useCompression?: boolean;
-    encryptionFlag?: number;
+    crcBytes?: number;
+    encryptMethod0?: number;
+    encryptMethod1?: number;
     protocolVersion?: number;
   } = {}
 ): SessionResponsePacket {
@@ -638,9 +639,9 @@ export function createSessionResponse(
     opcode: SoeOpcode.SessionResponse,
     connectionId,
     crcSeed,
-    crcLength: options.crcLength ?? 2,
-    useCompression: options.useCompression ?? true,
-    encryptionFlag: options.encryptionFlag ?? 0,
+    crcBytes: options.crcBytes ?? 2,
+    encryptMethod0: options.encryptMethod0 ?? 1, // UserSupplied (compression)
+    encryptMethod1: options.encryptMethod1 ?? 0, // None
     serverUdpBufferSize,
     protocolVersion: options.protocolVersion ?? 2,
   };

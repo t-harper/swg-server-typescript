@@ -259,7 +259,7 @@ export class MockClient extends EventEmitter {
     const sessionResponse = deserialize(response) as SessionResponsePacket;
 
     this.crcSeed = sessionResponse.crcSeed;
-    this.useCompression = sessionResponse.useCompression;
+    this.useCompression = sessionResponse.encryptMethod0 === 1; // UserSupplied = compression
     this.state = 'connected';
 
     this.debug('Connected with CRC seed:', this.crcSeed);

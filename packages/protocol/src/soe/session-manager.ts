@@ -14,8 +14,8 @@ import {
   getOpcodeName,
 } from './constants.js';
 import { appendCrc, validateCrc, stripCrc } from './crc32.js';
-import { SoeEncryption, generateRandomSeed } from './encryption.js';
-import { compress, decompress } from './compression.js';
+import { generateRandomSeed } from './encryption.js';
+import { compressData, decompressData } from './compression.js';
 import { BufferReader, BufferWriter, concatBytes } from './buffer-utils.js';
 import * as Packet from './packet.js';
 
@@ -97,11 +97,8 @@ export class Session {
   /** Timestamp of last activity (for timeout detection) */
   public lastActivity: number;
 
-  /** Whether compression is enabled for this session */
+  /** Whether SOE-level encryption (compression) is enabled for this session */
   public useCompression: boolean;
-
-  /** Encryption handler for this session */
-  public readonly encryption: SoeEncryption;
 
   /** Buffer for reordering out-of-order packets */
   public outOfOrderQueue: Map<number, Uint8Array>;
@@ -140,7 +137,6 @@ export class Session {
     this.receiveSequence = 0;
     this.lastActivity = Date.now();
     this.useCompression = options.useCompression ?? true;
-    this.encryption = new SoeEncryption(crcSeed);
     this.outOfOrderQueue = new Map();
     this.pendingAcks = new Map();
     this.fragmentBuffer = null;
@@ -304,6 +300,12 @@ export class SessionManager extends EventEmitter {
     // Get opcode from packet
     const opcode = Packet.getPacketOpcode(data);
 
+    // Debug logging for packet analysis
+    const hexDump = Array.from(data.slice(0, Math.min(32, data.length)))
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join(' ');
+    console.log(`[SOE] Recv ${rinfo.address}:${rinfo.port} opcode=0x${opcode.toString(16).padStart(4, '0')} len=${data.length} hex=[${hexDump}]`);
+
     try {
       // Handle packets that don't require an existing session
       if (opcode === SoeOpcode.SessionRequest) {
@@ -322,6 +324,7 @@ export class SessionManager extends EventEmitter {
       session.packetsReceived++;
 
       // Validate CRC for packets that have it (post-negotiation)
+      // C++ flow: SessionRequest/SessionResponse have no CRC; all others do
       if (session.state === SessionState.Connected && this.packetHasCrc(opcode)) {
         if (!validateCrc(data, session.crcSeed)) {
           this.emitError(new Error('CRC validation failed'), session);
@@ -331,9 +334,10 @@ export class SessionManager extends EventEmitter {
         data = stripCrc(data);
       }
 
-      // Decrypt if needed (after stripping CRC)
-      if (session.state === SessionState.Connected && this.packetNeedsDecryption(opcode)) {
-        data = this.decryptPacket(session, data);
+      // SOE decrypt (compression-based) for all non-session packets
+      // C++ ProcessRawPacket applies decrypt passes after CRC strip
+      if (session.state === SessionState.Connected && this.packetHasCrc(opcode)) {
+        data = this.soeDecrypt(data);
       }
 
       // Route to appropriate handler
@@ -395,13 +399,14 @@ export class SessionManager extends EventEmitter {
     );
 
     // Send session response
+    // C++ encryptMethod: 0=None, 1=UserSupplied (compression)
     const response = Packet.createSessionResponse(
       packet.connectionId,
       crcSeed,
       this.options.udpBufferSize,
       {
-        useCompression: this.options.enableCompression,
-        encryptionFlag: this.options.enableEncryption ? 1 : 0,
+        encryptMethod0: this.options.enableCompression ? 1 : 0, // UserSupplied = compression
+        encryptMethod1: 0, // None - only 1 pass needed
       }
     );
 
@@ -423,9 +428,7 @@ export class SessionManager extends EventEmitter {
     const packet = Packet.deserialize(data) as Packet.SessionResponsePacket;
 
     // Update session with negotiated parameters
-    session.useCompression = packet.useCompression;
-    session.encryption.setSeed(packet.crcSeed);
-    session.encryption.setEnabled(packet.encryptionFlag !== 0);
+    session.useCompression = packet.encryptMethod0 === 1; // UserSupplied = compression
     session.state = SessionState.Connected;
 
     this.emit('session:connected', session);
@@ -482,18 +485,8 @@ export class SessionManager extends EventEmitter {
       // Expected packet - process it
       session.receiveSequence = (session.receiveSequence + 1) & 0xffff;
 
-      // Decompress if needed
-      let payload = packet.data;
-      if (session.useCompression && payload.length > 0) {
-        try {
-          payload = decompress(payload);
-        } catch {
-          // Data may not be compressed, use as-is
-        }
-      }
-
-      // Emit the data event
-      this.emit('data', session, payload);
+      // Emit the data event (SOE-level decompression already applied in handlePacket)
+      this.emit('data', session, packet.data);
 
       // Send acknowledgement
       this.sendAck(session, packet.sequence);
@@ -575,18 +568,8 @@ export class SessionManager extends EventEmitter {
       const completeData = this.reassembleFragments(session.fragmentBuffer);
       session.fragmentBuffer = null;
 
-      // Decompress if needed
-      let payload = completeData;
-      if (session.useCompression && payload.length > 0) {
-        try {
-          payload = decompress(payload);
-        } catch {
-          // Data may not be compressed
-        }
-      }
-
-      // Emit the data event
-      this.emit('data', session, payload);
+      // Emit the data event (SOE-level decompression already applied in handlePacket)
+      this.emit('data', session, completeData);
     }
 
     // Process any queued out-of-order packets
@@ -663,18 +646,15 @@ export class SessionManager extends EventEmitter {
   }
 
   /**
-   * Send a packet to a session with CRC and encryption
+   * Send a packet to a session with SOE encryption (compression) and CRC
    */
   sendPacket(session: Session, packet: Uint8Array): void {
     let data = packet;
+    const opcode = Packet.getPacketOpcode(packet);
 
-    // Encrypt if needed
-    if (session.state === SessionState.Connected && this.packetNeedsEncryption(Packet.getPacketOpcode(packet))) {
-      data = this.encryptPacket(session, data);
-    }
-
-    // Append CRC
-    if (session.state === SessionState.Connected) {
+    // SOE encrypt (compression) + CRC for all non-session packets
+    if (session.state === SessionState.Connected && this.packetHasCrc(opcode)) {
+      data = this.soeEncrypt(data);
       data = appendCrc(data, session.crcSeed);
     }
 
@@ -690,25 +670,18 @@ export class SessionManager extends EventEmitter {
       return;
     }
 
-    // Compress if enabled and beneficial
-    let payload = data;
-    if (session.useCompression) {
-      const compressed = compress(data);
-      payload = compressed.data;
-    }
-
     // Calculate max data size per packet
-    // Account for: opcode (2) + sequence (2) + CRC (2) = 6 bytes overhead
-    const maxDataSize = session.maxPacketSize - 6;
+    // Account for: opcode (2) + sequence (2) + compress flag (1) + CRC (2) = 7 bytes overhead
+    const maxDataSize = session.maxPacketSize - 7;
 
-    if (payload.length <= maxDataSize) {
+    if (data.length <= maxDataSize) {
       // Send as single Data packet
       const sequence = session.getNextSendSequence();
-      const packet = Packet.createData(sequence, payload);
+      const packet = Packet.createData(sequence, data);
       const serialized = Packet.serialize(packet);
 
-      // Track for acknowledgement
-      const encrypted = this.encryptPacket(session, serialized);
+      // Apply SOE encryption (compression) and CRC
+      const encrypted = this.soeEncrypt(serialized);
       const withCrc = appendCrc(encrypted, session.crcSeed);
 
       session.pendingAcks.set(sequence, {
@@ -721,7 +694,7 @@ export class SessionManager extends EventEmitter {
       this.transmitPacket(session, withCrc);
     } else {
       // Fragment the data
-      this.sendFragmented(session, payload);
+      this.sendFragmented(session, data);
     }
   }
 
@@ -730,8 +703,8 @@ export class SessionManager extends EventEmitter {
    */
   private sendFragmented(session: Session, data: Uint8Array): void {
     // First fragment includes 4-byte size header
-    // Calculate fragment size: max packet size - opcode (2) - sequence (2) - CRC (2) = -6
-    const maxFragmentSize = session.maxPacketSize - 6;
+    // Calculate fragment size: max packet size - opcode (2) - sequence (2) - compress flag (1) - CRC (2) = -7
+    const maxFragmentSize = session.maxPacketSize - 7;
     const firstFragmentDataSize = maxFragmentSize - 4; // Account for size header
 
     const fragments: Uint8Array[] = [];
@@ -756,7 +729,8 @@ export class SessionManager extends EventEmitter {
       const packet = Packet.createDataFragment(sequence, fragment);
       const serialized = Packet.serialize(packet);
 
-      const encrypted = this.encryptPacket(session, serialized);
+      // Apply SOE encryption (compression) and CRC
+      const encrypted = this.soeEncrypt(serialized);
       const withCrc = appendCrc(encrypted, session.crcSeed);
 
       session.pendingAcks.set(sequence, {
@@ -921,20 +895,11 @@ export class SessionManager extends EventEmitter {
         const opcode = Packet.getPacketOpcode(data);
 
         if (opcode === SoeOpcode.Data) {
-          // Process as data packet
+          // Process as data packet (already decompressed at SOE level)
           const packet = Packet.deserialize(data) as Packet.DataPacket;
           session.receiveSequence = (session.receiveSequence + 1) & 0xffff;
 
-          let payload = packet.data;
-          if (session.useCompression && payload.length > 0) {
-            try {
-              payload = decompress(payload);
-            } catch {
-              // Not compressed
-            }
-          }
-
-          this.emit('data', session, payload);
+          this.emit('data', session, packet.data);
           processed = true;
         } else if (opcode === SoeOpcode.DataFragment) {
           // Re-process as fragment (it's the raw packet data)
@@ -976,27 +941,83 @@ export class SessionManager extends EventEmitter {
   }
 
   /**
-   * Encrypt packet data for transmission
+   * SOE user-supplied encrypt (compression with trailing flag byte)
+   * Matches C++ OnUserSuppliedEncrypt in ManagerHandler.cpp
+   * Operates on payload after opcode (first 2 bytes), appends flag byte at end
    */
-  private encryptPacket(session: Session, data: Uint8Array): Uint8Array {
-    if (!session.encryption.isEnabled()) {
-      return data;
+  private soeEncrypt(data: Uint8Array): Uint8Array {
+    if (data.length <= 2) {
+      // No payload to compress, just add flag byte (not compressed)
+      const result = new Uint8Array(data.length + 1);
+      result.set(data);
+      result[data.length] = 0x00;
+      return result;
     }
 
-    // Encrypt everything after the opcode (first 2 bytes)
-    return session.encryption.encrypt(data, 2);
+    const opcode = data.subarray(0, 2);
+    const payload = data.subarray(2);
+
+    try {
+      const compressed = compressData(payload);
+      if (compressed.length < payload.length) {
+        // Compression helped — use compressed data + flag 0x01
+        const result = new Uint8Array(2 + compressed.length + 1);
+        result.set(opcode);
+        result.set(compressed, 2);
+        result[2 + compressed.length] = 0x01;
+        return result;
+      }
+    } catch {
+      // Compression failed, fall through to uncompressed
+    }
+
+    // Not compressed — original payload + flag 0x00
+    const result = new Uint8Array(data.length + 1);
+    result.set(data);
+    result[data.length] = 0x00;
+    return result;
   }
 
   /**
-   * Decrypt received packet data
+   * SOE user-supplied decrypt (decompression based on trailing flag byte)
+   * Matches C++ OnUserSuppliedDecrypt in ManagerHandler.cpp
+   * Checks last byte: 0x01 = compressed (decompress), 0x00 = not compressed (strip flag)
    */
-  private decryptPacket(session: Session, data: Uint8Array): Uint8Array {
-    if (!session.encryption.isEnabled()) {
+  private soeDecrypt(data: Uint8Array): Uint8Array {
+    if (data.length <= 2) {
+      // No payload + flag to process
       return data;
     }
 
-    // Decrypt everything after the opcode (first 2 bytes)
-    return session.encryption.decrypt(data, 2);
+    const opcode = data.subarray(0, 2);
+    const payloadWithFlag = data.subarray(2);
+
+    if (payloadWithFlag.length === 0) {
+      return data;
+    }
+
+    const flag = payloadWithFlag[payloadWithFlag.length - 1];
+    const payload = payloadWithFlag.subarray(0, payloadWithFlag.length - 1);
+
+    if (flag === 0x01 && payload.length > 0) {
+      // Compressed — decompress
+      try {
+        const decompressed = decompressData(payload);
+        const result = new Uint8Array(2 + decompressed.length);
+        result.set(opcode);
+        result.set(decompressed, 2);
+        return result;
+      } catch (err) {
+        console.error('[SOE] Decompression failed:', err);
+        // Fall through to return without flag
+      }
+    }
+
+    // Not compressed — return opcode + payload (without flag byte)
+    const result = new Uint8Array(2 + payload.length);
+    result.set(opcode);
+    result.set(payload, 2);
+    return result;
   }
 
   /**
@@ -1027,24 +1048,6 @@ export class SessionManager extends EventEmitter {
     return opcode !== SoeOpcode.SessionRequest && opcode !== SoeOpcode.SessionResponse;
   }
 
-  /**
-   * Check if a packet type needs encryption
-   */
-  private packetNeedsEncryption(opcode: number): boolean {
-    // Only data packets are encrypted
-    return (
-      opcode === SoeOpcode.Data ||
-      opcode === SoeOpcode.DataFragment ||
-      opcode === SoeOpcode.MultiPacket
-    );
-  }
-
-  /**
-   * Check if a packet type needs decryption
-   */
-  private packetNeedsDecryption(opcode: number): boolean {
-    return this.packetNeedsEncryption(opcode);
-  }
 
   /**
    * Emit an error event

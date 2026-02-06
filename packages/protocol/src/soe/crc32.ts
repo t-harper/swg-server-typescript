@@ -44,7 +44,7 @@ export function calculateCrc32(data: Uint8Array, seed: number = 0): number {
   if (seed !== 0) {
     const seedBytes = new Uint8Array(4);
     const view = new DataView(seedBytes.buffer);
-    view.setUint32(0, seed, false); // Big-endian
+    view.setUint32(0, seed, true); // Little-endian (matches C++ native byte order on x86)
     for (const byte of seedBytes) {
       const tableIndex = (crc ^ byte) & 0xff;
       const tableValue = crcTable[tableIndex];
