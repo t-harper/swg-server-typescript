@@ -152,11 +152,17 @@ export function createGuardTree(options: GuardOptions = {}): BehaviorTree {
   ], 'CombatBehavior');
 
   // Patrol behavior
-  const patrolOptions = {
-    waypoints: patrolWaypoints,
+  const patrolOptions: {
+    waypoints?: Vector3[];
+    loop: boolean;
+    stopDistance: number;
+  } = {
     loop: loopPatrol,
     stopDistance: 1.5,
   };
+  if (patrolWaypoints) {
+    patrolOptions.waypoints = patrolWaypoints;
+  }
 
   const patrolBehavior = new Sequence([
     new CanMove(),

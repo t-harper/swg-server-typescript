@@ -367,7 +367,7 @@ export class CraftingTool extends TangibleObject {
   /**
    * Check if this tool has uses remaining
    */
-  hasUsesRemaining(): boolean {
+  override hasUsesRemaining(): boolean {
     return this.usesRemaining === -1 || this.usesRemaining > 0;
   }
 

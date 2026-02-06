@@ -2,921 +2,28 @@
  * PLAY Baseline Serialization
  * Handles serialization of PlayerObject data for client synchronization
  *
- * SWG baselines are packets that synchronize object state between server and client.
- * Player objects (PLAY) use baselines 3, 6, 8, and 9 for their specific data.
- *
- * Baseline 3: Station ID, flags, biography, born date, title
- * Baseline 6: Admin level, XP types, waypoints, crafting stage, quests
- * Baseline 8: Food/drink fill, GCW points, home region
- * Baseline 9: Played time, profession, friends, ignore
+ * Variable lists derived from C++ Packager.cpp (swg-source-docker):
+ *   PLAY3 (shared, 20 vars): SO(4) + IO(1) + PO(15)
+ *   PLAY6 (shared_np, 17 vars): SO(2) + PO(15) — NO IntangibleObject vars!
+ *   PLAY8 (firstParentAuthClientServer, 9 vars): PO only
+ *   PLAY9 (firstParentAuthClientServer_np, 29 vars): PO only
  */
 
-import { BufferWriter, BufferReader } from '@swg/protocol';
-import type { ObjectId, CrcValue } from '@swg/shared-types';
+import { BufferWriter } from '@swg/protocol';
+import type { ObjectId } from '@swg/shared-types';
 import {
   PlayerObject,
-  PlayProperty,
   type Waypoint,
-  type QuestState,
-  type AdminLevelType,
-  type CraftingStageType,
 } from '../player-object.js';
 
 /** PLAY type identifier (CRC of "PLAY") */
 export const PLAY_TYPE_CRC = 0x504c4159; // "PLAY" in ASCII
 
-/**
- * Serialize PLAY Baseline 3 (station ID, flags, biography, born date)
- */
-export function serializePlayBaseline3(obj: PlayerObject): Uint8Array {
-  const writer = new BufferWriter(512);
-
-  // Baseline header
-  writer.writeUInt32LE(PLAY_TYPE_CRC);
-  writer.writeUInt8(3);
-
-  // Variable count placeholder
-  const variableCountPos = writer.getPosition();
-  writer.writeUInt16LE(0);
-
-  let variableCount = 0;
-
-  // 0: Station ID (ASCII string)
-  writeAsciiString(writer, obj.stationId);
-  variableCount++;
-
-  // 1: Player flags (64-bit)
-  writer.writeUInt64LE(obj.playerFlags);
-  variableCount++;
-
-  // 2: Biography (Unicode string)
-  writeUnicodeString(writer, obj.biography);
-  variableCount++;
-
-  // 3: Born date (timestamp)
-  writer.writeUInt32LE(Math.floor(obj.birthDate / 1000)); // Convert to seconds
-  variableCount++;
-
-  // 4: Current title (ASCII string)
-  writeAsciiString(writer, obj.title);
-  variableCount++;
-
-  // Update variable count
-  const endPos = writer.getPosition();
-  writer.setPosition(variableCountPos);
-  writer.writeUInt16LE(variableCount);
-  writer.setPosition(endPos);
-
-  return writer.toBuffer();
-}
-
-/**
- * Serialize PLAY Baseline 6 (admin level, XP, waypoints, crafting, quests)
- */
-export function serializePlayBaseline6(obj: PlayerObject): Uint8Array {
-  const writer = new BufferWriter(2048);
-
-  // Baseline header
-  writer.writeUInt32LE(PLAY_TYPE_CRC);
-  writer.writeUInt8(6);
-
-  // Variable count placeholder
-  const variableCountPos = writer.getPosition();
-  writer.writeUInt16LE(0);
-
-  let variableCount = 0;
-
-  // 0: Admin level
-  writer.writeUInt8(obj.adminLevel);
-  variableCount++;
-
-  // 1: Experience map
-  writer.writeUInt32LE(obj.experience.size);
-  writer.writeUInt32LE(obj.getPlayListUpdateCounter('experience'));
-  for (const [type, amount] of obj.experience) {
-    writer.writeUInt8(0); // Flag for add operation
-    writeAsciiString(writer, type);
-    writer.writeInt32LE(amount);
-  }
-  variableCount++;
-
-  // 2: Waypoints map
-  writer.writeUInt32LE(obj.waypoints.size);
-  writer.writeUInt32LE(obj.getPlayListUpdateCounter('waypoints'));
-  for (const [id, waypoint] of obj.waypoints) {
-    writer.writeUInt8(0); // Flag for add operation
-    writeWaypointEntry(writer, waypoint);
-  }
-  variableCount++;
-
-  // 3: Crafting stage
-  writer.writeUInt32LE(obj.craftingStage);
-  variableCount++;
-
-  // 4: Crafting schematic CRC
-  writer.writeUInt32LE(obj.craftingSchematic);
-  variableCount++;
-
-  // 5: Nearest crafting station ID
-  writer.writeUInt64LE(obj.nearestCraftingStation);
-  variableCount++;
-
-  // 6: Draft schematics list
-  writer.writeUInt32LE(obj.schematicsGranted.size);
-  writer.writeUInt32LE(obj.getPlayListUpdateCounter('schematics'));
-  for (const crc of obj.schematicsGranted) {
-    writer.writeUInt32LE(crc);
-  }
-  variableCount++;
-
-  // 7: Active quests map
-  writer.writeUInt32LE(obj.activeQuests.size);
-  writer.writeUInt32LE(obj.getPlayListUpdateCounter('activeQuests'));
-  for (const [crc, state] of obj.activeQuests) {
-    writer.writeUInt8(0); // Flag for add operation
-    writeQuestEntry(writer, state);
-  }
-  variableCount++;
-
-  // 8: Completed quests list
-  writer.writeUInt32LE(obj.completedQuests.size);
-  writer.writeUInt32LE(obj.getPlayListUpdateCounter('completedQuests'));
-  for (const crc of obj.completedQuests) {
-    writer.writeUInt32LE(crc);
-  }
-  variableCount++;
-
-  // Update variable count
-  const endPos = writer.getPosition();
-  writer.setPosition(variableCountPos);
-  writer.writeUInt16LE(variableCount);
-  writer.setPosition(endPos);
-
-  return writer.toBuffer();
-}
-
-/**
- * Serialize PLAY Baseline 8 (food/drink fill, GCW points, home region)
- */
-export function serializePlayBaseline8(obj: PlayerObject): Uint8Array {
-  const writer = new BufferWriter(256);
-
-  // Baseline header
-  writer.writeUInt32LE(PLAY_TYPE_CRC);
-  writer.writeUInt8(8);
-
-  // Variable count placeholder
-  const variableCountPos = writer.getPosition();
-  writer.writeUInt16LE(0);
-
-  let variableCount = 0;
-
-  // 0: Food fill current
-  writer.writeUInt32LE(obj.foodFillCurrent);
-  variableCount++;
-
-  // 1: Food fill max
-  writer.writeUInt32LE(obj.foodFillMax);
-  variableCount++;
-
-  // 2: Drink fill current
-  writer.writeUInt32LE(obj.drinkFillCurrent);
-  variableCount++;
-
-  // 3: Drink fill max
-  writer.writeUInt32LE(obj.drinkFillMax);
-  variableCount++;
-
-  // 4: GCW points
-  writer.writeUInt32LE(obj.gcwPoints);
-  variableCount++;
-
-  // 5: PvP kills
-  writer.writeUInt32LE(obj.pvpKills);
-  variableCount++;
-
-  // 6: Lifetime GCW points
-  writer.writeUInt32LE(obj.lifetimeGcwPoints);
-  variableCount++;
-
-  // 7: Home region CRC
-  writer.writeUInt32LE(obj.homeRegion);
-  variableCount++;
-
-  // Update variable count
-  const endPos = writer.getPosition();
-  writer.setPosition(variableCountPos);
-  writer.writeUInt16LE(variableCount);
-  writer.setPosition(endPos);
-
-  return writer.toBuffer();
-}
-
-/**
- * Serialize PLAY Baseline 9 (played time, profession, friends, ignore)
- */
-export function serializePlayBaseline9(obj: PlayerObject): Uint8Array {
-  const writer = new BufferWriter(1024);
-
-  // Baseline header
-  writer.writeUInt32LE(PLAY_TYPE_CRC);
-  writer.writeUInt8(9);
-
-  // Variable count placeholder
-  const variableCountPos = writer.getPosition();
-  writer.writeUInt16LE(0);
-
-  let variableCount = 0;
-
-  // 0: Played time (seconds)
-  writer.writeUInt32LE(obj.playedTime);
-  variableCount++;
-
-  // 1: Profession title
-  writeAsciiString(writer, obj.professionTitle);
-  variableCount++;
-
-  // 2: Friends list
-  writer.writeUInt32LE(obj.friends.size);
-  writer.writeUInt32LE(obj.getPlayListUpdateCounter('friends'));
-  for (const name of obj.friends) {
-    writeAsciiString(writer, name);
-  }
-  variableCount++;
-
-  // 3: Ignore list
-  writer.writeUInt32LE(obj.ignore.size);
-  writer.writeUInt32LE(obj.getPlayListUpdateCounter('ignore'));
-  for (const name of obj.ignore) {
-    writeAsciiString(writer, name);
-  }
-  variableCount++;
-
-  // 4: Matchmaking flags
-  writer.writeUInt32LE(obj.matchMakingFlags);
-  variableCount++;
-
-  // 5: Chat flags
-  writer.writeUInt32LE(obj.chatFlags);
-  variableCount++;
-
-  // Update variable count
-  const endPos = writer.getPosition();
-  writer.setPosition(variableCountPos);
-  writer.writeUInt16LE(variableCount);
-  writer.setPosition(endPos);
-
-  return writer.toBuffer();
-}
-
-/**
- * Generate delta for PLAY Baseline 3 changes
- */
-export function generatePlayBaseline3Delta(
-  obj: PlayerObject,
-  changedProperties: number[]
-): Uint8Array | null {
-  if (changedProperties.length === 0) {
-    return null;
-  }
-
-  const writer = new BufferWriter(256);
-
-  // Delta header
-  writer.writeUInt32LE(PLAY_TYPE_CRC);
-  writer.writeUInt8(3);
-
-  const updateCountPos = writer.getPosition();
-  writer.writeUInt16LE(0);
-
-  let updateCount = 0;
-
-  for (const prop of changedProperties) {
-    switch (prop) {
-      case PlayProperty.STATION_ID:
-        writer.writeUInt16LE(0);
-        writeAsciiString(writer, obj.stationId);
-        updateCount++;
-        break;
-
-      case PlayProperty.PLAYER_FLAGS:
-        writer.writeUInt16LE(1);
-        writer.writeUInt64LE(obj.playerFlags);
-        updateCount++;
-        break;
-
-      case PlayProperty.BIOGRAPHY:
-        writer.writeUInt16LE(2);
-        writeUnicodeString(writer, obj.biography);
-        updateCount++;
-        break;
-
-      case PlayProperty.BORN_DATE:
-        writer.writeUInt16LE(3);
-        writer.writeUInt32LE(Math.floor(obj.birthDate / 1000));
-        updateCount++;
-        break;
-
-      case PlayProperty.CURRENT_TITLE:
-        writer.writeUInt16LE(4);
-        writeAsciiString(writer, obj.title);
-        updateCount++;
-        break;
-    }
-  }
-
-  if (updateCount === 0) {
-    return null;
-  }
-
-  const endPos = writer.getPosition();
-  writer.setPosition(updateCountPos);
-  writer.writeUInt16LE(updateCount);
-  writer.setPosition(endPos);
-
-  return writer.toBuffer();
-}
-
-/**
- * Generate delta for PLAY Baseline 6 changes
- */
-export function generatePlayBaseline6Delta(
-  obj: PlayerObject,
-  changedProperties: number[]
-): Uint8Array | null {
-  if (changedProperties.length === 0) {
-    return null;
-  }
-
-  const writer = new BufferWriter(256);
-
-  // Delta header
-  writer.writeUInt32LE(PLAY_TYPE_CRC);
-  writer.writeUInt8(6);
-
-  const updateCountPos = writer.getPosition();
-  writer.writeUInt16LE(0);
-
-  let updateCount = 0;
-
-  for (const prop of changedProperties) {
-    switch (prop) {
-      case PlayProperty.ADMIN_LEVEL:
-        writer.writeUInt16LE(0);
-        writer.writeUInt8(obj.adminLevel);
-        updateCount++;
-        break;
-
-      case PlayProperty.CRAFTING_STAGE:
-        writer.writeUInt16LE(3);
-        writer.writeUInt32LE(obj.craftingStage);
-        updateCount++;
-        break;
-
-      case PlayProperty.CRAFTING_SCHEMATIC:
-        writer.writeUInt16LE(4);
-        writer.writeUInt32LE(obj.craftingSchematic);
-        updateCount++;
-        break;
-
-      case PlayProperty.NEAREST_CRAFTING_STATION:
-        writer.writeUInt16LE(5);
-        writer.writeUInt64LE(obj.nearestCraftingStation);
-        updateCount++;
-        break;
-    }
-  }
-
-  if (updateCount === 0) {
-    return null;
-  }
-
-  const endPos = writer.getPosition();
-  writer.setPosition(updateCountPos);
-  writer.writeUInt16LE(updateCount);
-  writer.setPosition(endPos);
-
-  return writer.toBuffer();
-}
-
-/**
- * Generate delta for PLAY Baseline 8 changes
- */
-export function generatePlayBaseline8Delta(
-  obj: PlayerObject,
-  changedProperties: number[]
-): Uint8Array | null {
-  if (changedProperties.length === 0) {
-    return null;
-  }
-
-  const writer = new BufferWriter(64);
-
-  // Delta header
-  writer.writeUInt32LE(PLAY_TYPE_CRC);
-  writer.writeUInt8(8);
-
-  const updateCountPos = writer.getPosition();
-  writer.writeUInt16LE(0);
-
-  let updateCount = 0;
-
-  for (const prop of changedProperties) {
-    switch (prop) {
-      case PlayProperty.FOOD_FILL_CURRENT:
-        writer.writeUInt16LE(0);
-        writer.writeUInt32LE(obj.foodFillCurrent);
-        updateCount++;
-        break;
-
-      case PlayProperty.FOOD_FILL_MAX:
-        writer.writeUInt16LE(1);
-        writer.writeUInt32LE(obj.foodFillMax);
-        updateCount++;
-        break;
-
-      case PlayProperty.DRINK_FILL_CURRENT:
-        writer.writeUInt16LE(2);
-        writer.writeUInt32LE(obj.drinkFillCurrent);
-        updateCount++;
-        break;
-
-      case PlayProperty.DRINK_FILL_MAX:
-        writer.writeUInt16LE(3);
-        writer.writeUInt32LE(obj.drinkFillMax);
-        updateCount++;
-        break;
-
-      case PlayProperty.GCW_POINTS:
-        writer.writeUInt16LE(4);
-        writer.writeUInt32LE(obj.gcwPoints);
-        updateCount++;
-        break;
-
-      case PlayProperty.PVP_KILLS:
-        writer.writeUInt16LE(5);
-        writer.writeUInt32LE(obj.pvpKills);
-        updateCount++;
-        break;
-
-      case PlayProperty.LIFETIME_GCW_POINTS:
-        writer.writeUInt16LE(6);
-        writer.writeUInt32LE(obj.lifetimeGcwPoints);
-        updateCount++;
-        break;
-
-      case PlayProperty.HOME_REGION:
-        writer.writeUInt16LE(7);
-        writer.writeUInt32LE(obj.homeRegion);
-        updateCount++;
-        break;
-    }
-  }
-
-  if (updateCount === 0) {
-    return null;
-  }
-
-  const endPos = writer.getPosition();
-  writer.setPosition(updateCountPos);
-  writer.writeUInt16LE(updateCount);
-  writer.setPosition(endPos);
-
-  return writer.toBuffer();
-}
-
-/**
- * Generate delta for PLAY Baseline 9 changes
- */
-export function generatePlayBaseline9Delta(
-  obj: PlayerObject,
-  changedProperties: number[]
-): Uint8Array | null {
-  if (changedProperties.length === 0) {
-    return null;
-  }
-
-  const writer = new BufferWriter(64);
-
-  // Delta header
-  writer.writeUInt32LE(PLAY_TYPE_CRC);
-  writer.writeUInt8(9);
-
-  const updateCountPos = writer.getPosition();
-  writer.writeUInt16LE(0);
-
-  let updateCount = 0;
-
-  for (const prop of changedProperties) {
-    switch (prop) {
-      case PlayProperty.PLAYED_TIME:
-        writer.writeUInt16LE(0);
-        writer.writeUInt32LE(obj.playedTime);
-        updateCount++;
-        break;
-
-      case PlayProperty.PROFESSION_TITLE:
-        writer.writeUInt16LE(1);
-        writeAsciiString(writer, obj.professionTitle);
-        updateCount++;
-        break;
-
-      case PlayProperty.MATCHMAKING_FLAGS:
-        writer.writeUInt16LE(4);
-        writer.writeUInt32LE(obj.matchMakingFlags);
-        updateCount++;
-        break;
-
-      case PlayProperty.CHAT_FLAGS:
-        writer.writeUInt16LE(5);
-        writer.writeUInt32LE(obj.chatFlags);
-        updateCount++;
-        break;
-    }
-  }
-
-  if (updateCount === 0) {
-    return null;
-  }
-
-  const endPos = writer.getPosition();
-  writer.setPosition(updateCountPos);
-  writer.writeUInt16LE(updateCount);
-  writer.setPosition(endPos);
-
-  return writer.toBuffer();
-}
-
-/**
- * Generate delta for experience map
- */
-export function generateExperienceDelta(
-  obj: PlayerObject,
-  operation: number,
-  xpType: string,
-  amount?: number
-): Uint8Array {
-  const writer = new BufferWriter(128);
-
-  // Delta header
-  writer.writeUInt32LE(PLAY_TYPE_CRC);
-  writer.writeUInt8(6);
-  writer.writeUInt16LE(1);
-
-  // Variable index for experience
-  writer.writeUInt16LE(1);
-
-  // Map delta
-  writer.writeUInt32LE(obj.experience.size);
-  writer.writeUInt32LE(obj.getPlayListUpdateCounter('experience'));
-
-  writer.writeUInt8(1); // One operation
-  writer.writeUInt8(operation);
-
-  if (operation === 0 || operation === 2) {
-    // Add or Change
-    writeAsciiString(writer, xpType);
-    writer.writeInt32LE(amount ?? 0);
-  } else if (operation === 1) {
-    // Remove
-    writeAsciiString(writer, xpType);
-  }
-
-  return writer.toBuffer();
-}
-
-/**
- * Generate delta for waypoints map
- */
-export function generateWaypointsDelta(
-  obj: PlayerObject,
-  operation: number,
-  waypoint?: Waypoint,
-  waypointId?: ObjectId
-): Uint8Array {
-  const writer = new BufferWriter(256);
-
-  // Delta header
-  writer.writeUInt32LE(PLAY_TYPE_CRC);
-  writer.writeUInt8(6);
-  writer.writeUInt16LE(1);
-
-  // Variable index for waypoints
-  writer.writeUInt16LE(2);
-
-  // Map delta
-  writer.writeUInt32LE(obj.waypoints.size);
-  writer.writeUInt32LE(obj.getPlayListUpdateCounter('waypoints'));
-
-  writer.writeUInt8(1); // One operation
-  writer.writeUInt8(operation);
-
-  if ((operation === 0 || operation === 2) && waypoint) {
-    // Add or Change
-    writeWaypointEntry(writer, waypoint);
-  } else if (operation === 1 && waypointId !== undefined) {
-    // Remove
-    writer.writeUInt64LE(waypointId);
-  }
-
-  return writer.toBuffer();
-}
-
-/**
- * Generate delta for friends list
- */
-export function generateFriendsDelta(
-  obj: PlayerObject,
-  operation: number,
-  name?: string,
-  index?: number
-): Uint8Array {
-  const writer = new BufferWriter(128);
-
-  // Delta header
-  writer.writeUInt32LE(PLAY_TYPE_CRC);
-  writer.writeUInt8(9);
-  writer.writeUInt16LE(1);
-
-  // Variable index for friends
-  writer.writeUInt16LE(2);
-
-  // List delta
-  writer.writeUInt32LE(obj.friends.size);
-  writer.writeUInt32LE(obj.getPlayListUpdateCounter('friends'));
-
-  writer.writeUInt8(1);
-  writer.writeUInt8(operation);
-
-  if (operation === 0 && name !== undefined) {
-    // Add
-    writeAsciiString(writer, name);
-  } else if (operation === 1 && index !== undefined) {
-    // Remove
-    writer.writeUInt16LE(index);
-  }
-
-  return writer.toBuffer();
-}
-
-/**
- * Generate delta for ignore list
- */
-export function generateIgnoreDelta(
-  obj: PlayerObject,
-  operation: number,
-  name?: string,
-  index?: number
-): Uint8Array {
-  const writer = new BufferWriter(128);
-
-  // Delta header
-  writer.writeUInt32LE(PLAY_TYPE_CRC);
-  writer.writeUInt8(9);
-  writer.writeUInt16LE(1);
-
-  // Variable index for ignore
-  writer.writeUInt16LE(3);
-
-  // List delta
-  writer.writeUInt32LE(obj.ignore.size);
-  writer.writeUInt32LE(obj.getPlayListUpdateCounter('ignore'));
-
-  writer.writeUInt8(1);
-  writer.writeUInt8(operation);
-
-  if (operation === 0 && name !== undefined) {
-    // Add
-    writeAsciiString(writer, name);
-  } else if (operation === 1 && index !== undefined) {
-    // Remove
-    writer.writeUInt16LE(index);
-  }
-
-  return writer.toBuffer();
-}
-
-/**
- * Deserialize PLAY Baseline 3
- */
-export function deserializePlayBaseline3(obj: PlayerObject, data: Uint8Array): void {
-  const reader = new BufferReader(data);
-
-  // Skip header
-  reader.skip(5);
-
-  const variableCount = reader.readUInt16LE();
-
-  if (variableCount >= 1) {
-    obj.stationId = readAsciiString(reader);
-  }
-
-  if (variableCount >= 2) {
-    obj.playerFlags = reader.readUInt64LE();
-  }
-
-  if (variableCount >= 3) {
-    obj.biography = readUnicodeString(reader);
-  }
-
-  if (variableCount >= 4) {
-    obj.birthDate = reader.readUInt32LE() * 1000; // Convert to ms
-  }
-
-  if (variableCount >= 5) {
-    obj.title = readAsciiString(reader);
-  }
-}
-
-/**
- * Deserialize PLAY Baseline 6
- */
-export function deserializePlayBaseline6(obj: PlayerObject, data: Uint8Array): void {
-  const reader = new BufferReader(data);
-
-  // Skip header
-  reader.skip(5);
-
-  const variableCount = reader.readUInt16LE();
-
-  if (variableCount >= 1) {
-    obj.adminLevel = reader.readUInt8() as AdminLevelType;
-  }
-
-  if (variableCount >= 2) {
-    const xpCount = reader.readUInt32LE();
-    reader.readUInt32LE(); // Update counter
-    obj.experience.clear();
-    for (let i = 0; i < xpCount; i++) {
-      reader.readUInt8(); // Operation flag
-      const xpType = readAsciiString(reader);
-      const amount = reader.readInt32LE();
-      obj.experience.set(xpType, amount);
-    }
-  }
-
-  if (variableCount >= 3) {
-    const waypointCount = reader.readUInt32LE();
-    reader.readUInt32LE(); // Update counter
-    obj.waypoints.clear();
-    for (let i = 0; i < waypointCount; i++) {
-      reader.readUInt8(); // Operation flag
-      const waypoint = readWaypointEntry(reader);
-      obj.waypoints.set(waypoint.objectId, waypoint);
-    }
-  }
-
-  if (variableCount >= 4) {
-    obj.craftingStage = reader.readUInt32LE() as CraftingStageType;
-  }
-
-  if (variableCount >= 5) {
-    obj.craftingSchematic = reader.readUInt32LE();
-  }
-
-  if (variableCount >= 6) {
-    obj.nearestCraftingStation = reader.readUInt64LE();
-  }
-
-  if (variableCount >= 7) {
-    const schematicCount = reader.readUInt32LE();
-    reader.readUInt32LE(); // Update counter
-    obj.schematicsGranted.clear();
-    for (let i = 0; i < schematicCount; i++) {
-      obj.schematicsGranted.add(reader.readUInt32LE());
-    }
-  }
-
-  if (variableCount >= 8) {
-    const questCount = reader.readUInt32LE();
-    reader.readUInt32LE(); // Update counter
-    obj.activeQuests.clear();
-    for (let i = 0; i < questCount; i++) {
-      reader.readUInt8(); // Operation flag
-      const quest = readQuestEntry(reader);
-      obj.activeQuests.set(quest.questCrc, quest);
-    }
-  }
-
-  if (variableCount >= 9) {
-    const completedCount = reader.readUInt32LE();
-    reader.readUInt32LE(); // Update counter
-    obj.completedQuests.clear();
-    for (let i = 0; i < completedCount; i++) {
-      obj.completedQuests.add(reader.readUInt32LE());
-    }
-  }
-}
-
-/**
- * Deserialize PLAY Baseline 8
- */
-export function deserializePlayBaseline8(obj: PlayerObject, data: Uint8Array): void {
-  const reader = new BufferReader(data);
-
-  // Skip header
-  reader.skip(5);
-
-  const variableCount = reader.readUInt16LE();
-
-  if (variableCount >= 1) {
-    obj.foodFillCurrent = reader.readUInt32LE();
-  }
-
-  if (variableCount >= 2) {
-    obj.foodFillMax = reader.readUInt32LE();
-  }
-
-  if (variableCount >= 3) {
-    obj.drinkFillCurrent = reader.readUInt32LE();
-  }
-
-  if (variableCount >= 4) {
-    obj.drinkFillMax = reader.readUInt32LE();
-  }
-
-  if (variableCount >= 5) {
-    obj.gcwPoints = reader.readUInt32LE();
-  }
-
-  if (variableCount >= 6) {
-    obj.pvpKills = reader.readUInt32LE();
-  }
-
-  if (variableCount >= 7) {
-    obj.lifetimeGcwPoints = reader.readUInt32LE();
-  }
-
-  if (variableCount >= 8) {
-    obj.homeRegion = reader.readUInt32LE();
-  }
-}
-
-/**
- * Deserialize PLAY Baseline 9
- */
-export function deserializePlayBaseline9(obj: PlayerObject, data: Uint8Array): void {
-  const reader = new BufferReader(data);
-
-  // Skip header
-  reader.skip(5);
-
-  const variableCount = reader.readUInt16LE();
-
-  if (variableCount >= 1) {
-    obj.playedTime = reader.readUInt32LE();
-  }
-
-  if (variableCount >= 2) {
-    obj.professionTitle = readAsciiString(reader);
-  }
-
-  if (variableCount >= 3) {
-    const friendsCount = reader.readUInt32LE();
-    reader.readUInt32LE(); // Update counter
-    obj.friends.clear();
-    for (let i = 0; i < friendsCount; i++) {
-      obj.friends.add(readAsciiString(reader));
-    }
-  }
-
-  if (variableCount >= 4) {
-    const ignoreCount = reader.readUInt32LE();
-    reader.readUInt32LE(); // Update counter
-    obj.ignore.clear();
-    for (let i = 0; i < ignoreCount; i++) {
-      obj.ignore.add(readAsciiString(reader));
-    }
-  }
-
-  if (variableCount >= 5) {
-    obj.matchMakingFlags = reader.readUInt32LE();
-  }
-
-  if (variableCount >= 6) {
-    obj.chatFlags = reader.readUInt32LE();
-  }
-}
-
-/**
- * Create all PLAY baselines for an object
- */
-export function createPlayBaselines(obj: PlayerObject): Uint8Array[] {
-  return [
-    serializePlayBaseline3(obj),
-    serializePlayBaseline6(obj),
-    serializePlayBaseline8(obj),
-    serializePlayBaseline9(obj),
-  ];
-}
-
 // ============================================
 // Helper Functions
 // ============================================
 
-/**
- * Write ASCII string with 16-bit length prefix
- */
+/** Write ASCII string with 16-bit LE length prefix */
 function writeAsciiString(writer: BufferWriter, str: string): void {
   writer.writeUInt16LE(str.length);
   for (let i = 0; i < str.length; i++) {
@@ -924,24 +31,7 @@ function writeAsciiString(writer: BufferWriter, str: string): void {
   }
 }
 
-/**
- * Read ASCII string with 16-bit length prefix
- */
-function readAsciiString(reader: BufferReader): string {
-  const length = reader.readUInt16LE();
-  if (length === 0) return '';
-
-  const bytes = reader.readBytes(length);
-  let result = '';
-  for (let i = 0; i < bytes.length; i++) {
-    result += String.fromCharCode(bytes[i] ?? 0);
-  }
-  return result;
-}
-
-/**
- * Write Unicode string with 32-bit length prefix (UTF-16LE)
- */
+/** Write Unicode string with 32-bit LE char count + UTF-16LE bytes */
 function writeUnicodeString(writer: BufferWriter, str: string): void {
   writer.writeUInt32LE(str.length);
   for (let i = 0; i < str.length; i++) {
@@ -950,103 +40,512 @@ function writeUnicodeString(writer: BufferWriter, str: string): void {
 }
 
 /**
- * Read Unicode string with 32-bit length prefix (UTF-16LE)
+ * Write StringId: table(string) + textIndex(u32) + text(string)
+ * C++ format from StringIdArchive.cpp
  */
-function readUnicodeString(reader: BufferReader): string {
-  const length = reader.readUInt32LE();
-  if (length === 0) return '';
+function writeStringId(
+  writer: BufferWriter,
+  table: string,
+  textIndex: number,
+  text: string
+): void {
+  writeAsciiString(writer, table);
+  writer.writeUInt32LE(textIndex);
+  writeAsciiString(writer, text);
+}
 
-  let result = '';
-  for (let i = 0; i < length; i++) {
-    result += String.fromCharCode(reader.readUInt16LE());
-  }
-  return result;
+/** Write an empty AutoDeltaVector/Set/Map: size(0) + counter(0) */
+function writeEmptyList(writer: BufferWriter): void {
+  writer.writeUInt32LE(0);
+  writer.writeUInt32LE(0);
+}
+
+/** Write an empty BitArray: numBytes(0) + numBits(0) */
+function writeEmptyBitArray(writer: BufferWriter): void {
+  writer.writeInt32LE(0);
+  writer.writeInt32LE(0);
 }
 
 /**
- * Write waypoint entry
+ * Write an empty MatchMakingId: vector<int> format
+ * C++ MatchMakingId is bitset<128>, serialized as vector<int>
+ * Empty = i32(0) (no int elements)
  */
-function writeWaypointEntry(writer: BufferWriter, waypoint: Waypoint): void {
-  // Object ID
-  writer.writeUInt64LE(waypoint.objectId);
-  // Cell ID (always 0 for world waypoints)
+function writeEmptyMatchMakingId(writer: BufferWriter): void {
+  writer.writeInt32LE(0);
+}
+
+/**
+ * Write pair<string, pair<bool, bool>> for GCW defender regions
+ * C++ format: string + bool + bool
+ */
+function writeStringBoolBoolPair(
+  writer: BufferWriter,
+  str: string,
+  b1: boolean,
+  b2: boolean
+): void {
+  writeAsciiString(writer, str);
+  writer.writeUInt8(b1 ? 1 : 0);
+  writer.writeUInt8(b2 ? 1 : 0);
+}
+
+/**
+ * Write WaypointDataBase for baseline serialization
+ * C++ format: u32(appearanceCrc) + Location(Vector+NetworkId+u32) + Unicode(name) + NetworkId(legacy) + u8(color) + bool(active)
+ * Location = Vector(x,y,z floats) + NetworkId(cell) + sceneIdCrc(u32)
+ */
+function writeWaypointDataBase(writer: BufferWriter, waypoint: Waypoint): void {
+  // appearanceNameCrc (usually 0)
   writer.writeUInt32LE(0);
-  // Position
+  // Location: Vector (x,y,z)
   writer.writeFloatLE(waypoint.x);
   writer.writeFloatLE(waypoint.y);
   writer.writeFloatLE(waypoint.z);
-  // Planet name (ASCII string)
-  writeAsciiString(writer, waypoint.planetName);
-  // Waypoint name (Unicode string)
+  // Location: cell NetworkId (0 for world waypoints)
+  writer.writeUInt64LE(0n);
+  // Location: sceneIdCrc (CRC of planet name - use 0 for now, proper CRC lookup needed)
+  writer.writeUInt32LE(0);
+  // Waypoint name (Unicode)
   writeUnicodeString(writer, waypoint.name);
+  // Legacy NetworkId (always cms_invalid = 0)
+  writer.writeUInt64LE(0n);
   // Color
   writer.writeUInt8(waypoint.color);
-  // Active flag
+  // Active
   writer.writeUInt8(waypoint.active ? 1 : 0);
 }
 
-/**
- * Read waypoint entry
- */
-function readWaypointEntry(reader: BufferReader): Waypoint {
-  const objectId = reader.readUInt64LE();
-  reader.readUInt32LE(); // Cell ID (ignored)
-  const x = reader.readFloatLE();
-  const y = reader.readFloatLE();
-  const z = reader.readFloatLE();
-  const planetName = readAsciiString(reader);
-  const name = readUnicodeString(reader);
-  const color = reader.readUInt8();
-  const active = reader.readUInt8() !== 0;
+// ============================================
+// PLAY Baseline 3 (shared) - 20 vars
+// SO: complexity, nameStringId, objectName, volume
+// IO: count
+// PO: matchMakingCharacterProfileId, matchMakingPersonalProfileId,
+//     skillTitle, bornDate, playedTime, roleIconChoice, skillTemplate,
+//     currentGcwPoints, currentPvpKills, lifetimeGcwPoints, lifetimePvpKills,
+//     collections, collections2, showBackpack, showHelmet
+// ============================================
 
-  return {
-    objectId,
-    name,
-    planetName,
-    x,
-    y,
-    z,
-    color,
-    active,
-  };
+export function serializePlayBaseline3(obj: PlayerObject): Uint8Array {
+  const writer = new BufferWriter(1024);
+
+  writer.writeUInt32LE(PLAY_TYPE_CRC);
+  writer.writeUInt8(3);
+  writer.writeUInt16LE(20); // variable count
+
+  // -- ServerObject shared (4 vars) --
+
+  // 0: complexity (float)
+  writer.writeFloatLE(obj.complexity);
+
+  // 1: nameStringId (StringId) - table + textIndex + text
+  writeStringId(writer, obj.objectNameStfFile, 0, obj.objectNameStfName);
+
+  // 2: objectName (Unicode::String) - custom display name
+  writeUnicodeString(writer, obj.customName);
+
+  // 3: volume (int)
+  writer.writeInt32LE(obj.volume);
+
+  // -- IntangibleObject shared (1 var) --
+
+  // 4: count (int) - IntangibleObject's count field
+  writer.writeInt32LE(0);
+
+  // -- PlayerObject shared (15 vars) --
+
+  // 5: matchMakingCharacterProfileId (MatchMakingId = vector<int>)
+  writeEmptyMatchMakingId(writer);
+
+  // 6: matchMakingPersonalProfileId (MatchMakingId = vector<int>)
+  writeEmptyMatchMakingId(writer);
+
+  // 7: skillTitle (string)
+  writeAsciiString(writer, obj.title);
+
+  // 8: bornDate (int) - epoch seconds
+  writer.writeInt32LE(Math.floor(obj.birthDate / 1000));
+
+  // 9: playedTime (int) - total seconds played
+  writer.writeInt32LE(obj.playedTime);
+
+  // 10: roleIconChoice (int)
+  writer.writeInt32LE(0);
+
+  // 11: skillTemplate (string) - profession template name
+  writeAsciiString(writer, obj.professionTitle);
+
+  // 12: currentGcwPoints (int)
+  writer.writeInt32LE(obj.gcwPoints);
+
+  // 13: currentPvpKills (int)
+  writer.writeInt32LE(obj.pvpKills);
+
+  // 14: lifetimeGcwPoints (int)
+  writer.writeInt32LE(obj.lifetimeGcwPoints);
+
+  // 15: lifetimePvpKills (int)
+  writer.writeInt32LE(obj.pvpKills);
+
+  // 16: collections (BitArray)
+  writeEmptyBitArray(writer);
+
+  // 17: collections2 (BitArray)
+  writeEmptyBitArray(writer);
+
+  // 18: showBackpack (bool)
+  writer.writeUInt8((obj.playerFlags & 64n) !== 0n ? 1 : 0); // PlayerFlags.SHOW_BACKPACK = 1n << 6n
+
+  // 19: showHelmet (bool)
+  writer.writeUInt8((obj.playerFlags & 1n) !== 0n ? 1 : 0); // PlayerFlags.SHOW_HELMET = 1n << 0n
+
+  return writer.toBuffer();
 }
 
-/**
- * Write quest entry
- */
-function writeQuestEntry(writer: BufferWriter, quest: QuestState): void {
-  writer.writeUInt32LE(quest.questCrc);
-  writer.writeUInt8(quest.active ? 1 : 0);
-  writer.writeUInt16LE(quest.stage);
-  // Write counters as a simple list
-  writer.writeUInt32LE(quest.counters.size);
-  for (const [key, value] of quest.counters) {
-    writeAsciiString(writer, key);
-    writer.writeInt32LE(value);
-  }
+// ============================================
+// PLAY Baseline 6 (shared_np) - 17 vars
+// SO: authServerProcessId, descriptionStringId
+// (NO IntangibleObject vars - all are server-only!)
+// PO: privledgedTitle, currentGcwRank, currentGcwRankProgress,
+//     maxGcwImperialRank, maxGcwRebelRank, gcwRatingActualCalcTime,
+//     citizenshipCity, citizenshipType, cityGcwDefenderRegion,
+//     guildGcwDefenderRegion, squelchedById, squelchedByName,
+//     squelchExpireTime, environmentFlags, defaultAttackOverride
+// ============================================
+
+export function serializePlayBaseline6(obj: PlayerObject): Uint8Array {
+  const writer = new BufferWriter(512);
+
+  writer.writeUInt32LE(PLAY_TYPE_CRC);
+  writer.writeUInt8(6);
+  writer.writeUInt16LE(17); // variable count
+
+  // -- ServerObject shared_np (2 vars) --
+
+  // 0: authServerProcessId (uint32)
+  writer.writeUInt32LE(0);
+
+  // 1: descriptionStringId (StringId) - detail description
+  writeStringId(writer, obj.detailStfFile, 0, obj.detailStfName);
+
+  // -- PlayerObject shared_np (15 vars) --
+
+  // 2: privledgedTitle (int8) - admin level
+  writer.writeInt8(obj.adminLevel);
+
+  // 3: currentGcwRank (int)
+  writer.writeInt32LE(0);
+
+  // 4: currentGcwRankProgress (float)
+  writer.writeFloatLE(0);
+
+  // 5: maxGcwImperialRank (int)
+  writer.writeInt32LE(0);
+
+  // 6: maxGcwRebelRank (int)
+  writer.writeInt32LE(0);
+
+  // 7: gcwRatingActualCalcTime (int32) - epoch time
+  writer.writeInt32LE(0);
+
+  // 8: citizenshipCity (string)
+  writeAsciiString(writer, '');
+
+  // 9: citizenshipType (int)
+  writer.writeInt32LE(0);
+
+  // 10: cityGcwDefenderRegion (pair<string, pair<bool, bool>>)
+  writeStringBoolBoolPair(writer, '', false, false);
+
+  // 11: guildGcwDefenderRegion (pair<string, pair<bool, bool>>)
+  writeStringBoolBoolPair(writer, '', false, false);
+
+  // 12: squelchedById (NetworkId)
+  writer.writeUInt64LE(0n);
+
+  // 13: squelchedByName (string)
+  writeAsciiString(writer, '');
+
+  // 14: squelchExpireTime (int32) - epoch time
+  writer.writeInt32LE(0);
+
+  // 15: environmentFlags (int)
+  writer.writeInt32LE(0);
+
+  // 16: defaultAttackOverride (string)
+  writeAsciiString(writer, '');
+
+  return writer.toBuffer();
 }
 
-/**
- * Read quest entry
- */
-function readQuestEntry(reader: BufferReader): QuestState {
-  const questCrc = reader.readUInt32LE();
-  const active = reader.readUInt8() !== 0;
-  const stage = reader.readUInt16LE();
+// ============================================
+// PLAY Baseline 8 (firstParentAuthClientServer) - 9 vars
+// PO: experiencePoints, waypoints, forcePower, maxForcePower,
+//     completedQuests, activeQuests, currentQuest, quests, workingSkill
+// ============================================
 
-  const counters = new Map<string, number>();
-  const counterCount = reader.readUInt32LE();
-  for (let i = 0; i < counterCount; i++) {
-    const key = readAsciiString(reader);
-    const value = reader.readInt32LE();
-    counters.set(key, value);
+export function serializePlayBaseline8(obj: PlayerObject): Uint8Array {
+  const writer = new BufferWriter(2048);
+
+  writer.writeUInt32LE(PLAY_TYPE_CRC);
+  writer.writeUInt8(8);
+  writer.writeUInt16LE(9); // variable count
+
+  // 0: experiencePoints (AutoDeltaMap<string, int>)
+  writer.writeUInt32LE(obj.experience.size);
+  writer.writeUInt32LE(0); // update counter
+  for (const [xpType, amount] of obj.experience) {
+    writer.writeUInt8(0); // ADD command
+    writeAsciiString(writer, xpType);
+    writer.writeInt32LE(amount);
   }
 
-  return {
-    questCrc,
-    active,
-    stage,
-    acceptedAt: Date.now(),
-    counters,
-  };
+  // 1: waypoints (AutoDeltaMap<NetworkId, WaypointDataBase>)
+  writer.writeUInt32LE(obj.waypoints.size);
+  writer.writeUInt32LE(0); // update counter
+  for (const [waypointId, waypoint] of obj.waypoints) {
+    writer.writeUInt8(0); // ADD command
+    writer.writeUInt64LE(waypointId); // key: NetworkId
+    writeWaypointDataBase(writer, waypoint); // value
+  }
+
+  // 2: forcePower (int)
+  writer.writeInt32LE(0);
+
+  // 3: maxForcePower (int)
+  writer.writeInt32LE(0);
+
+  // 4: completedQuests (BitArray) - old quest system
+  writeEmptyBitArray(writer);
+
+  // 5: activeQuests (BitArray) - old quest system
+  writeEmptyBitArray(writer);
+
+  // 6: currentQuest (uint32)
+  writer.writeUInt32LE(0);
+
+  // 7: quests (AutoDeltaPackedMap<uint32, PlayerQuestData>)
+  // PlayerQuestData: NetworkId(questGiver) + u16(activeTasks) + u16(completedTasks) + bool(completed) + u32(relativeAgeIndex) + bool(hasReceivedReward)
+  writeEmptyList(writer); // empty for now
+
+  // 8: workingSkill (string)
+  writeAsciiString(writer, '');
+
+  return writer.toBuffer();
+}
+
+// ============================================
+// PLAY Baseline 9 (firstParentAuthClientServer_np) - 29 vars
+// PO: craftingLevel, craftingStage, craftingStation, draftSchematics,
+//     craftingComponentBioLink, experimentPoints, expModified,
+//     friendList, ignoreList, spokenLanguage, food, maxFood, drink,
+//     maxDrink, meds, maxMeds, groupWaypoints, playerHateList,
+//     killMeter, accountNumLotsOverLimitSpam, petId, petCommandList,
+//     petToggledCommands, guildRank, citizenRank, galacticReserveDeposit,
+//     pgcRatingCount, pgcRatingTotal, pgcLastRatingTime
+// ============================================
+
+export function serializePlayBaseline9(obj: PlayerObject): Uint8Array {
+  const writer = new BufferWriter(2048);
+
+  writer.writeUInt32LE(PLAY_TYPE_CRC);
+  writer.writeUInt8(9);
+  writer.writeUInt16LE(29); // variable count
+
+  // 0: craftingLevel (int)
+  writer.writeInt32LE(0);
+
+  // 1: craftingStage (int)
+  writer.writeInt32LE(obj.craftingStage);
+
+  // 2: craftingStation (NetworkId)
+  writer.writeUInt64LE(obj.nearestCraftingStation);
+
+  // 3: draftSchematics (AutoDeltaMap<pair<uint32,uint32>, int>)
+  // key: pair<u32(serverCrc), u32(clientCrc)>, value: i32(count)
+  writer.writeUInt32LE(obj.schematicsGranted.size);
+  writer.writeUInt32LE(0); // update counter
+  for (const crc of obj.schematicsGranted) {
+    writer.writeUInt8(0); // ADD command
+    writer.writeUInt32LE(crc); // server CRC
+    writer.writeUInt32LE(crc); // client CRC (same for now)
+    writer.writeInt32LE(1); // count
+  }
+
+  // 4: craftingComponentBioLink (NetworkId)
+  writer.writeUInt64LE(0n);
+
+  // 5: experimentPoints (int)
+  writer.writeInt32LE(0);
+
+  // 6: expModified (int)
+  writer.writeInt32LE(0);
+
+  // 7: friendList (AutoDeltaSet<string>)
+  writer.writeUInt32LE(obj.friends.size);
+  writer.writeUInt32LE(0); // update counter
+  for (const name of obj.friends) {
+    writer.writeUInt8(0); // ADD command
+    writeAsciiString(writer, name);
+  }
+
+  // 8: ignoreList (AutoDeltaSet<string>)
+  writer.writeUInt32LE(obj.ignore.size);
+  writer.writeUInt32LE(0); // update counter
+  for (const name of obj.ignore) {
+    writer.writeUInt8(0); // ADD command
+    writeAsciiString(writer, name);
+  }
+
+  // 9: spokenLanguage (int)
+  writer.writeInt32LE(0);
+
+  // 10: food (int)
+  writer.writeInt32LE(obj.foodFillCurrent);
+
+  // 11: maxFood (int)
+  writer.writeInt32LE(obj.foodFillMax);
+
+  // 12: drink (int)
+  writer.writeInt32LE(obj.drinkFillCurrent);
+
+  // 13: maxDrink (int)
+  writer.writeInt32LE(obj.drinkFillMax);
+
+  // 14: meds (int)
+  writer.writeInt32LE(0);
+
+  // 15: maxMeds (int)
+  writer.writeInt32LE(0);
+
+  // 16: groupWaypoints (AutoDeltaMap<string, NetworkId>)
+  writeEmptyList(writer);
+
+  // 17: playerHateList (AutoDeltaSet<NetworkId>)
+  writeEmptyList(writer);
+
+  // 18: killMeter (int)
+  writer.writeInt32LE(0);
+
+  // 19: accountNumLotsOverLimitSpam (int)
+  writer.writeInt32LE(0);
+
+  // 20: petId (NetworkId)
+  writer.writeUInt64LE(0n);
+
+  // 21: petCommandList (AutoDeltaVector<string>)
+  writeEmptyList(writer);
+
+  // 22: petToggledCommands (AutoDeltaVector<string>)
+  writeEmptyList(writer);
+
+  // 23: guildRank (string)
+  writeAsciiString(writer, '');
+
+  // 24: citizenRank (string)
+  writeAsciiString(writer, '');
+
+  // 25: galacticReserveDeposit (int)
+  writer.writeInt32LE(0);
+
+  // 26: pgcRatingCount (int)
+  writer.writeInt32LE(0);
+
+  // 27: pgcRatingTotal (int)
+  writer.writeInt32LE(0);
+
+  // 28: pgcLastRatingTime (int)
+  writer.writeInt32LE(0);
+
+  return writer.toBuffer();
+}
+
+// ============================================
+// Delta Generators (stubs - not needed for zone-in)
+// ============================================
+
+export function generatePlayBaseline3Delta(
+  _obj: PlayerObject,
+  _changedProperties: number[]
+): Uint8Array | null {
+  return null;
+}
+
+export function generatePlayBaseline6Delta(
+  _obj: PlayerObject,
+  _changedProperties: number[]
+): Uint8Array | null {
+  return null;
+}
+
+export function generatePlayBaseline8Delta(
+  _obj: PlayerObject,
+  _changedProperties: number[]
+): Uint8Array | null {
+  return null;
+}
+
+export function generatePlayBaseline9Delta(
+  _obj: PlayerObject,
+  _changedProperties: number[]
+): Uint8Array | null {
+  return null;
+}
+
+export function generateExperienceDelta(
+  _obj: PlayerObject,
+  _operation: number,
+  _xpType: string,
+  _amount?: number
+): Uint8Array {
+  return new Uint8Array(0);
+}
+
+export function generateWaypointsDelta(
+  _obj: PlayerObject,
+  _operation: number,
+  _waypoint?: Waypoint,
+  _waypointId?: ObjectId
+): Uint8Array {
+  return new Uint8Array(0);
+}
+
+export function generateFriendsDelta(
+  _obj: PlayerObject,
+  _operation: number,
+  _name?: string,
+  _index?: number
+): Uint8Array {
+  return new Uint8Array(0);
+}
+
+export function generateIgnoreDelta(
+  _obj: PlayerObject,
+  _operation: number,
+  _name?: string,
+  _index?: number
+): Uint8Array {
+  return new Uint8Array(0);
+}
+
+// ============================================
+// Deserializers (stubs - not needed for zone-in)
+// ============================================
+
+export function deserializePlayBaseline3(_obj: PlayerObject, _data: Uint8Array): void {}
+export function deserializePlayBaseline6(_obj: PlayerObject, _data: Uint8Array): void {}
+export function deserializePlayBaseline8(_obj: PlayerObject, _data: Uint8Array): void {}
+export function deserializePlayBaseline9(_obj: PlayerObject, _data: Uint8Array): void {}
+
+// ============================================
+// Create All Baselines
+// ============================================
+
+export function createPlayBaselines(obj: PlayerObject): Uint8Array[] {
+  return [
+    serializePlayBaseline3(obj),
+    serializePlayBaseline6(obj),
+    serializePlayBaseline8(obj),
+    serializePlayBaseline9(obj),
+  ];
 }

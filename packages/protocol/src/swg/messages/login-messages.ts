@@ -49,36 +49,25 @@ export interface LoginClientId extends SwgMessageBase {
 
 /**
  * LoginClientToken - Server response for successful authentication
- * Contains session token and station ID for the client
+ * C++ format: token(AutoArray<u8>) + stationId(u32) + username(string_u16LE)
  */
 export interface LoginClientToken extends SwgMessageBase {
   opcode: typeof LoginMessageOpcode.LoginClientToken;
-  sessionToken: string;
-  accountId: number;
-  stationId: bigint;
+  token: Uint8Array;
+  stationId: number;
+  username: string;
 }
 
-/**
- * Error codes for login failures
- */
-export const LoginErrorCode = {
-  InvalidCredentials: 0,
-  AccountSuspended: 1,
-  AccountBanned: 2,
-  ServerFull: 3,
-  ServerUnavailable: 4,
-  AlreadyLoggedIn: 5,
-} as const;
-
-export type LoginErrorCodeType = (typeof LoginErrorCode)[keyof typeof LoginErrorCode];
 
 /**
- * LoginIncorrectClientId - Server response for failed authentication
+ * LoginIncorrectClientId - Server response for failed/successful version check
+ * C++ format: serverId(string) + serverApplicationVersion(string)
+ * The client uses this to verify it's connecting to the right server version
  */
 export interface LoginIncorrectClientId extends SwgMessageBase {
   opcode: typeof LoginMessageOpcode.LoginIncorrectClientId;
-  errorCode: LoginErrorCodeType;
-  errorMessage: string;
+  serverId: string;
+  serverApplicationVersion: string;
 }
 
 /**
@@ -90,12 +79,13 @@ export interface EnumerateCharacterId extends SwgMessageBase {
 
 /**
  * Character data structure for enumeration response
+ * C++ order: name(Unicode) + objectTemplateId(int32/CRC) + networkId(u64) + clusterId(u32) + characterType(int32)
  */
 export interface CharacterData {
-  characterId: bigint;
   characterName: string;
-  objectTemplate: string;
-  serverId: number;
+  objectTemplateCrc: number;
+  characterId: bigint;
+  clusterId: number;
   characterType: number; // 0 = normal, 1 = jedi, etc.
 }
 
@@ -122,10 +112,11 @@ export type LoginMessage =
  */
 export function serializeLoginClientId(message: LoginClientId): Uint8Array {
   const writer = new BufferWriter(256);
+  writer.writeUInt16LE(4); // operandCount
   writer.writeUInt32LE(message.opcode);
-  writer.writeStringWithLength16BE(message.username);
-  writer.writeStringWithLength16BE(message.password);
-  writer.writeStringWithLength16BE(message.clientVersion);
+  writer.writeStringWithLength16LE(message.username);
+  writer.writeStringWithLength16LE(message.password);
+  writer.writeStringWithLength16LE(message.clientVersion);
   return writer.toBuffer();
 }
 
@@ -134,13 +125,14 @@ export function serializeLoginClientId(message: LoginClientId): Uint8Array {
  */
 export function deserializeLoginClientId(data: Uint8Array): LoginClientId {
   const reader = new BufferReader(data);
+  reader.readUInt16LE(); // operandCount
   const opcode = reader.readUInt32LE();
   if (opcode !== LoginMessageOpcode.LoginClientId) {
     throw new Error(`Invalid opcode for LoginClientId: 0x${opcode.toString(16)}`);
   }
-  const username = reader.readStringWithLength16BE();
-  const password = reader.readStringWithLength16BE();
-  const clientVersion = reader.readStringWithLength16BE();
+  const username = reader.readStringWithLength16LE();
+  const password = reader.readStringWithLength16LE();
+  const clientVersion = reader.readStringWithLength16LE();
 
   return {
     opcode: LoginMessageOpcode.LoginClientId,
@@ -155,10 +147,11 @@ export function deserializeLoginClientId(data: Uint8Array): LoginClientId {
  */
 export function serializeLoginClientToken(message: LoginClientToken): Uint8Array {
   const writer = new BufferWriter(128);
+  writer.writeUInt16LE(4); // operandCount
   writer.writeUInt32LE(message.opcode);
-  writer.writeStringWithLength16BE(message.sessionToken);
-  writer.writeUInt32LE(message.accountId);
-  writer.writeUInt64LE(message.stationId);
+  writer.writeAutoArray(message.token);
+  writer.writeUInt32LE(message.stationId);
+  writer.writeStringWithLength16LE(message.username);
   return writer.toBuffer();
 }
 
@@ -167,19 +160,20 @@ export function serializeLoginClientToken(message: LoginClientToken): Uint8Array
  */
 export function deserializeLoginClientToken(data: Uint8Array): LoginClientToken {
   const reader = new BufferReader(data);
+  reader.readUInt16LE(); // operandCount
   const opcode = reader.readUInt32LE();
   if (opcode !== LoginMessageOpcode.LoginClientToken) {
     throw new Error(`Invalid opcode for LoginClientToken: 0x${opcode.toString(16)}`);
   }
-  const sessionToken = reader.readStringWithLength16BE();
-  const accountId = reader.readUInt32LE();
-  const stationId = reader.readUInt64LE();
+  const token = reader.readAutoArray();
+  const stationId = reader.readUInt32LE();
+  const username = reader.readStringWithLength16LE();
 
   return {
     opcode: LoginMessageOpcode.LoginClientToken,
-    sessionToken,
-    accountId,
+    token,
     stationId,
+    username,
   };
 }
 
@@ -190,9 +184,10 @@ export function serializeLoginIncorrectClientId(
   message: LoginIncorrectClientId
 ): Uint8Array {
   const writer = new BufferWriter(128);
+  writer.writeUInt16LE(3); // operandCount
   writer.writeUInt32LE(message.opcode);
-  writer.writeUInt32LE(message.errorCode);
-  writer.writeStringWithLength16BE(message.errorMessage);
+  writer.writeStringWithLength16LE(message.serverId);
+  writer.writeStringWithLength16LE(message.serverApplicationVersion);
   return writer.toBuffer();
 }
 
@@ -203,17 +198,18 @@ export function deserializeLoginIncorrectClientId(
   data: Uint8Array
 ): LoginIncorrectClientId {
   const reader = new BufferReader(data);
+  reader.readUInt16LE(); // operandCount
   const opcode = reader.readUInt32LE();
   if (opcode !== LoginMessageOpcode.LoginIncorrectClientId) {
     throw new Error(`Invalid opcode for LoginIncorrectClientId: 0x${opcode.toString(16)}`);
   }
-  const errorCode = reader.readUInt32LE() as LoginErrorCodeType;
-  const errorMessage = reader.readStringWithLength16BE();
+  const serverId = reader.readStringWithLength16LE();
+  const serverApplicationVersion = reader.readStringWithLength16LE();
 
   return {
     opcode: LoginMessageOpcode.LoginIncorrectClientId,
-    errorCode,
-    errorMessage,
+    serverId,
+    serverApplicationVersion,
   };
 }
 
@@ -224,6 +220,7 @@ export function serializeEnumerateCharacterId(
   message: EnumerateCharacterId
 ): Uint8Array {
   const writer = new BufferWriter(8);
+  writer.writeUInt16LE(1); // operandCount
   writer.writeUInt32LE(message.opcode);
   return writer.toBuffer();
 }
@@ -235,6 +232,7 @@ export function deserializeEnumerateCharacterId(
   data: Uint8Array
 ): EnumerateCharacterId {
   const reader = new BufferReader(data);
+  reader.readUInt16LE(); // operandCount
   const opcode = reader.readUInt32LE();
   if (opcode !== LoginMessageOpcode.EnumerateCharacterId) {
     throw new Error(`Invalid opcode for EnumerateCharacterId: 0x${opcode.toString(16)}`);
@@ -252,15 +250,17 @@ export function serializeEnumerateCharacterIdResponse(
   message: EnumerateCharacterIdResponse
 ): Uint8Array {
   const writer = new BufferWriter(1024);
+  writer.writeUInt16LE(2); // operandCount
   writer.writeUInt32LE(message.opcode);
-  writer.writeUInt32LE(message.characters.length);
+  writer.writeInt32LE(message.characters.length);
 
   for (const char of message.characters) {
-    writer.writeUInt64LE(char.characterId);
+    // C++ order: name(Unicode) + objectTemplateId(int32) + networkId(u64) + clusterId(u32) + characterType(int32)
     writer.writeUnicodeStringWithLength(char.characterName);
-    writer.writeStringWithLength32BE(char.objectTemplate);
-    writer.writeUInt32LE(char.serverId);
-    writer.writeUInt32LE(char.characterType);
+    writer.writeInt32LE(char.objectTemplateCrc);
+    writer.writeUInt64LE(char.characterId);
+    writer.writeUInt32LE(char.clusterId);
+    writer.writeInt32LE(char.characterType);
   }
 
   return writer.toBuffer();
@@ -273,6 +273,7 @@ export function deserializeEnumerateCharacterIdResponse(
   data: Uint8Array
 ): EnumerateCharacterIdResponse {
   const reader = new BufferReader(data);
+  reader.readUInt16LE(); // operandCount
   const opcode = reader.readUInt32LE();
   if (opcode !== LoginMessageOpcode.EnumerateCharacterIdResponse) {
     throw new Error(
@@ -280,21 +281,22 @@ export function deserializeEnumerateCharacterIdResponse(
     );
   }
 
-  const count = reader.readUInt32LE();
+  const count = reader.readInt32LE();
   const characters: CharacterData[] = [];
 
   for (let i = 0; i < count; i++) {
-    const characterId = reader.readUInt64LE();
+    // C++ order: name(Unicode) + objectTemplateId(int32) + networkId(u64) + clusterId(u32) + characterType(int32)
     const characterName = reader.readUnicodeStringWithLength();
-    const objectTemplate = reader.readStringWithLength32BE();
-    const serverId = reader.readUInt32LE();
-    const characterType = reader.readUInt32LE();
+    const objectTemplateCrc = reader.readInt32LE();
+    const characterId = reader.readUInt64LE();
+    const clusterId = reader.readUInt32LE();
+    const characterType = reader.readInt32LE();
 
     characters.push({
-      characterId,
       characterName,
-      objectTemplate,
-      serverId,
+      objectTemplateCrc,
+      characterId,
+      clusterId,
       characterType,
     });
   }
@@ -309,10 +311,11 @@ export function deserializeEnumerateCharacterIdResponse(
  * Get the opcode from raw message data without full deserialization
  */
 export function getLoginMessageOpcode(data: Uint8Array): number {
-  if (data.length < 4) {
+  if (data.length < 6) {
     throw new Error('Message too short to contain opcode');
   }
   const reader = new BufferReader(data);
+  reader.readUInt16LE(); // operandCount
   return reader.readUInt32LE();
 }
 
@@ -327,15 +330,15 @@ export function isLoginMessageOpcode(opcode: number): opcode is LoginMessageOpco
  * Create a LoginClientToken message
  */
 export function createLoginClientToken(
-  sessionToken: string,
-  accountId: number,
-  stationId: bigint
+  token: Uint8Array,
+  stationId: number,
+  username: string
 ): LoginClientToken {
   return {
     opcode: LoginMessageOpcode.LoginClientToken,
-    sessionToken,
-    accountId,
+    token,
     stationId,
+    username,
   };
 }
 
@@ -343,13 +346,13 @@ export function createLoginClientToken(
  * Create a LoginIncorrectClientId message
  */
 export function createLoginIncorrectClientId(
-  errorCode: LoginErrorCodeType,
-  errorMessage: string
+  serverId: string,
+  serverApplicationVersion: string
 ): LoginIncorrectClientId {
   return {
     opcode: LoginMessageOpcode.LoginIncorrectClientId,
-    errorCode,
-    errorMessage,
+    serverId,
+    serverApplicationVersion,
   };
 }
 

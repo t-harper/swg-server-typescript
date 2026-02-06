@@ -43,6 +43,9 @@ export const characters = mysqlTable(
     orientationY: float('orientation_y').notNull().default(0),
     orientationZ: float('orientation_z').notNull().default(0),
     orientationW: float('orientation_w').notNull().default(1),
+    templateName: varchar('template_name', { length: 255 })
+      .notNull()
+      .default('object/creature/player/shared_human_male.iff'),
     createdAt: datetime('created_at').notNull().default(new Date()),
     lastSaved: datetime('last_saved'),
   },

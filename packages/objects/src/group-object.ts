@@ -669,36 +669,36 @@ export class GroupObject {
    */
   static fromJSON(data: Record<string, unknown>): GroupObject {
     const group = new GroupObject(
-      BigInt(data.groupId as string),
-      data.isRaid as boolean
+      BigInt(data['groupId'] as string),
+      data['isRaid'] as boolean
     );
 
     // Restore properties
-    group._leader = BigInt(data.leader as string);
-    group._lootMaster = BigInt(data.lootMaster as string);
-    group._lootRule = data.lootRule as GroupLootRule;
-    group._pickupRule = data.pickupRule as GroupPickupRule;
-    group._lootThreshold = data.lootThreshold as number;
-    group._formation = data.formation as GroupFormationType;
-    group._createdAt = data.createdAt as number;
-    group._updatedAt = data.updatedAt as number;
+    group._leader = BigInt(data['leader'] as string);
+    group._lootMaster = BigInt(data['lootMaster'] as string);
+    group._lootRule = data['lootRule'] as GroupLootRule;
+    group._pickupRule = data['pickupRule'] as GroupPickupRule;
+    group._lootThreshold = data['lootThreshold'] as number;
+    group._formation = data['formation'] as GroupFormationType;
+    group._createdAt = data['createdAt'] as number;
+    group._updatedAt = data['updatedAt'] as number;
 
     // Restore members
-    const members = data.members as Array<Record<string, unknown>>;
+    const members = data['members'] as Array<Record<string, unknown>>;
     for (const m of members) {
       const member: GroupMember = {
-        characterId: BigInt(m.characterId as string),
-        characterName: m.characterName as string,
-        profession: m.profession as string,
-        level: m.level as number,
-        healthPercent: m.healthPercent as number,
-        actionPercent: m.actionPercent as number,
-        mindPercent: m.mindPercent as number,
-        position: m.position as { x: number; y: number; z: number },
-        planetId: m.planetId as string,
-        isOnline: m.isOnline as boolean,
-        isLeader: m.isLeader as boolean,
-        isLootMaster: m.isLootMaster as boolean,
+        characterId: BigInt(m['characterId'] as string),
+        characterName: m['characterName'] as string,
+        profession: m['profession'] as string,
+        level: m['level'] as number,
+        healthPercent: m['healthPercent'] as number,
+        actionPercent: m['actionPercent'] as number,
+        mindPercent: m['mindPercent'] as number,
+        position: m['position'] as { x: number; y: number; z: number },
+        planetId: m['planetId'] as string,
+        isOnline: m['isOnline'] as boolean,
+        isLeader: m['isLeader'] as boolean,
+        isLootMaster: m['isLootMaster'] as boolean,
       };
       group._members.set(member.characterId, member);
     }

@@ -39,11 +39,12 @@ export interface ClientIdMsg extends SwgMessageBase {
  */
 export function serializeClientIdMsg(message: ClientIdMsg): Uint8Array {
   const writer = new BufferWriter(256);
+  writer.writeUInt16LE(4); // operandCount
   writer.writeUInt32LE(message.opcode);
-  writer.writeUInt32LE(message.token.length);
-  writer.writeBytes(message.token);
-  writer.writeStringWithLength16BE(message.clientVersion);
+  // C++ order: gameBitsToClear(u32) + token(AutoArray<u8>) + version(string_u16LE)
   writer.writeUInt32LE(message.gameBitsToClear);
+  writer.writeAutoArray(message.token);
+  writer.writeStringWithLength16LE(message.clientVersion);
   return writer.toBuffer();
 }
 
@@ -52,15 +53,16 @@ export function serializeClientIdMsg(message: ClientIdMsg): Uint8Array {
  */
 export function deserializeClientIdMsg(data: Uint8Array): ClientIdMsg {
   const reader = new BufferReader(data);
+  reader.readUInt16LE(); // operandCount
   const opcode = reader.readUInt32LE();
   if (opcode !== ConnectionMessageOpcode.ClientIdMsg) {
     throw new Error(`Invalid opcode for ClientIdMsg: 0x${opcode.toString(16)}`);
   }
 
-  const tokenSize = reader.readUInt32LE();
-  const token = reader.readBytes(tokenSize);
-  const clientVersion = reader.readStringWithLength16BE();
+  // C++ order: gameBitsToClear(u32) + token(AutoArray<u8>) + version(string_u16LE)
   const gameBitsToClear = reader.readUInt32LE();
+  const token = reader.readAutoArray();
+  const clientVersion = reader.readStringWithLength16LE();
 
   return {
     opcode: ConnectionMessageOpcode.ClientIdMsg,
@@ -103,7 +105,8 @@ export interface SelectCharacter extends SwgMessageBase {
  * Serialize SelectCharacter message
  */
 export function serializeSelectCharacter(message: SelectCharacter): Uint8Array {
-  const writer = new BufferWriter(12);
+  const writer = new BufferWriter(16);
+  writer.writeUInt16LE(2); // operandCount
   writer.writeUInt32LE(message.opcode);
   writer.writeUInt64LE(message.characterId);
   return writer.toBuffer();
@@ -114,6 +117,7 @@ export function serializeSelectCharacter(message: SelectCharacter): Uint8Array {
  */
 export function deserializeSelectCharacter(data: Uint8Array): SelectCharacter {
   const reader = new BufferReader(data);
+  reader.readUInt16LE(); // operandCount
   const opcode = reader.readUInt32LE();
   if (opcode !== ConnectionMessageOpcode.SelectCharacter) {
     throw new Error(`Invalid opcode for SelectCharacter: 0x${opcode.toString(16)}`);
@@ -150,10 +154,11 @@ export type ConnectionMessage = ClientIdMsg | SelectCharacter;
  * Get the opcode from raw connection message data
  */
 export function getConnectionMessageOpcode(data: Uint8Array): number {
-  if (data.length < 4) {
+  if (data.length < 6) {
     throw new Error('Message too short to contain opcode');
   }
   const reader = new BufferReader(data);
+  reader.readUInt16LE(); // operandCount
   return reader.readUInt32LE();
 }
 

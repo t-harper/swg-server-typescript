@@ -36,7 +36,7 @@ import {
 } from '../nodes/actions.js';
 import { Inverter, Succeeder } from '../nodes/decorators.js';
 import { Sequence, Selector, PrioritySelector, Parallel, ParallelPolicy } from '../nodes/composites.js';
-import { BlackboardKeys } from '../ai-context.js';
+import { BlackboardKeys, type AIContext } from '../ai-context.js';
 
 /**
  * Options for customizing pack creature behavior
@@ -148,7 +148,7 @@ export function createPackCreatureTree(
   // Mark combat start time
   const markCombatStart = new Sequence([
     new Inverter(new BlackboardCheck(BlackboardKeys.COMBAT_START_TIME), 'NoCombatStartTime'),
-    new SetBlackboard(BlackboardKeys.COMBAT_START_TIME, (ctx) => Date.now()),
+    new SetBlackboard(BlackboardKeys.COMBAT_START_TIME, (_ctx: AIContext) => Date.now()),
   ], 'MarkCombatStart');
 
   // Full combat behavior

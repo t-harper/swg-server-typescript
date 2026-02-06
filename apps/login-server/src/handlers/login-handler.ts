@@ -8,15 +8,9 @@ import { AccountRepository } from '@swg/database';
 import { SessionStore, type SessionData } from '@swg/redis';
 import {
   LoginMessageOpcode,
-  LoginErrorCode,
   type LoginClientId,
-  type LoginClientToken,
-  type LoginIncorrectClientId,
   createLoginClientToken,
-  createLoginIncorrectClientId,
   serializeLoginClientToken,
-  serializeLoginIncorrectClientId,
-  type LoginErrorCodeType,
 } from '@swg/protocol/swg/messages/login-messages.js';
 
 /**
@@ -88,14 +82,11 @@ export class LoginHandler {
           `[LoginHandler] Login failed for ${username}: ${validationResult.errorMessage}`
         );
 
-        const errorResponse = createLoginIncorrectClientId(
-          validationResult.errorCode,
-          validationResult.errorMessage
-        );
-
+        // In C++, LoginIncorrectClientId is a server identity message, not an error.
+        // On auth failure, we disconnect the client.
         return {
           success: false,
-          response: serializeLoginIncorrectClientId(errorResponse),
+          response: new Uint8Array(0),
         };
       }
 
@@ -126,11 +117,17 @@ export class LoginHandler {
         `[LoginHandler] Login successful for ${username} (accountId: ${account.accountId})`
       );
 
-      // Create success response
+      // Convert session token hex string to byte array for AutoArray<u8> format
+      const tokenBytes = new Uint8Array(sessionToken.length);
+      for (let i = 0; i < sessionToken.length; i++) {
+        tokenBytes[i] = sessionToken.charCodeAt(i);
+      }
+
+      // Create success response with C++ format: token(AutoArray<u8>) + stationId(u32) + username(string)
       const tokenResponse = createLoginClientToken(
-        sessionToken,
-        account.accountId,
-        stationId
+        tokenBytes,
+        Number(stationId),
+        username
       );
 
       return {
@@ -145,14 +142,9 @@ export class LoginHandler {
     } catch (error) {
       console.error(`[LoginHandler] Error during login for ${username}:`, error);
 
-      const errorResponse = createLoginIncorrectClientId(
-        LoginErrorCode.ServerUnavailable,
-        'An internal error occurred. Please try again.'
-      );
-
       return {
         success: false,
-        response: serializeLoginIncorrectClientId(errorResponse),
+        response: new Uint8Array(0),
       };
     }
   }
@@ -166,14 +158,12 @@ export class LoginHandler {
   ): Promise<{
     valid: boolean;
     account?: Account;
-    errorCode: LoginErrorCodeType;
     errorMessage: string;
   }> {
     // Check for empty credentials
     if (!username || !password) {
       return {
         valid: false,
-        errorCode: LoginErrorCode.InvalidCredentials,
         errorMessage: 'Username and password are required.',
       };
     }
@@ -183,7 +173,6 @@ export class LoginHandler {
     if (!account) {
       return {
         valid: false,
-        errorCode: LoginErrorCode.InvalidCredentials,
         errorMessage: 'Invalid username or password.',
       };
     }
@@ -192,7 +181,6 @@ export class LoginHandler {
     if (account.status === 'banned') {
       return {
         valid: false,
-        errorCode: LoginErrorCode.AccountBanned,
         errorMessage: 'This account has been banned.',
       };
     }
@@ -200,7 +188,6 @@ export class LoginHandler {
     if (account.status === 'suspended') {
       return {
         valid: false,
-        errorCode: LoginErrorCode.AccountSuspended,
         errorMessage: 'This account has been suspended.',
       };
     }
@@ -208,7 +195,6 @@ export class LoginHandler {
     if (account.status === 'pending') {
       return {
         valid: false,
-        errorCode: LoginErrorCode.InvalidCredentials,
         errorMessage: 'This account is pending activation.',
       };
     }
@@ -222,7 +208,6 @@ export class LoginHandler {
     if (!isPasswordValid) {
       return {
         valid: false,
-        errorCode: LoginErrorCode.InvalidCredentials,
         errorMessage: 'Invalid username or password.',
       };
     }
@@ -232,8 +217,6 @@ export class LoginHandler {
       account.accountId
     );
     if (existingSession) {
-      // For now, we'll allow re-login by invalidating the old session
-      // In a production environment, you might want to handle this differently
       const existingToken = await this.sessionStore.getTokenByAccountId(
         account.accountId
       );
@@ -248,7 +231,6 @@ export class LoginHandler {
     return {
       valid: true,
       account,
-      errorCode: LoginErrorCode.InvalidCredentials, // Not used when valid
       errorMessage: '',
     };
   }

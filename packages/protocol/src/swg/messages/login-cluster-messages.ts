@@ -16,6 +16,7 @@ import { LoginMessageOpcode, type SwgMessageBase } from './login-messages.js';
 export interface ClusterDataEntry {
   clusterId: number;
   clusterName: string;
+  timeZone: number;
 }
 
 /**
@@ -33,12 +34,14 @@ export interface LoginEnumCluster extends SwgMessageBase {
  */
 export function serializeLoginEnumCluster(message: LoginEnumCluster): Uint8Array {
   const writer = new BufferWriter(256);
+  writer.writeUInt16LE(3); // operandCount
   writer.writeUInt32LE(message.opcode);
   writer.writeUInt32LE(message.clusterData.length);
 
   for (const cluster of message.clusterData) {
     writer.writeUInt32LE(cluster.clusterId);
-    writer.writeStringWithLength16BE(cluster.clusterName);
+    writer.writeStringWithLength16LE(cluster.clusterName);
+    writer.writeInt32LE(cluster.timeZone);
   }
 
   writer.writeUInt32LE(message.maxCharsPerAccount);
@@ -50,6 +53,7 @@ export function serializeLoginEnumCluster(message: LoginEnumCluster): Uint8Array
  */
 export function deserializeLoginEnumCluster(data: Uint8Array): LoginEnumCluster {
   const reader = new BufferReader(data);
+  reader.readUInt16LE(); // operandCount
   const opcode = reader.readUInt32LE();
   if (opcode !== LoginMessageOpcode.LoginEnumCluster) {
     throw new Error(`Invalid opcode for LoginEnumCluster: 0x${opcode.toString(16)}`);
@@ -60,8 +64,9 @@ export function deserializeLoginEnumCluster(data: Uint8Array): LoginEnumCluster 
 
   for (let i = 0; i < count; i++) {
     const clusterId = reader.readUInt32LE();
-    const clusterName = reader.readStringWithLength16BE();
-    clusterData.push({ clusterId, clusterName });
+    const clusterName = reader.readStringWithLength16LE();
+    const timeZone = reader.readInt32LE();
+    clusterData.push({ clusterId, clusterName, timeZone });
   }
 
   const maxCharsPerAccount = reader.readUInt32LE();
@@ -123,12 +128,13 @@ export interface LoginClusterStatus extends SwgMessageBase {
  */
 export function serializeLoginClusterStatus(message: LoginClusterStatus): Uint8Array {
   const writer = new BufferWriter(512);
+  writer.writeUInt16LE(2); // operandCount
   writer.writeUInt32LE(message.opcode);
   writer.writeUInt32LE(message.clusterStatusData.length);
 
   for (const entry of message.clusterStatusData) {
     writer.writeUInt32LE(entry.clusterId);
-    writer.writeStringWithLength16BE(entry.connectionServerAddress);
+    writer.writeStringWithLength16LE(entry.connectionServerAddress);
     writer.writeUInt16LE(entry.connectionServerPort);
     writer.writeUInt16LE(entry.pingPort);
     writer.writeUInt32LE(entry.populationOnline);
@@ -149,6 +155,7 @@ export function serializeLoginClusterStatus(message: LoginClusterStatus): Uint8A
  */
 export function deserializeLoginClusterStatus(data: Uint8Array): LoginClusterStatus {
   const reader = new BufferReader(data);
+  reader.readUInt16LE(); // operandCount
   const opcode = reader.readUInt32LE();
   if (opcode !== LoginMessageOpcode.LoginClusterStatus) {
     throw new Error(`Invalid opcode for LoginClusterStatus: 0x${opcode.toString(16)}`);
@@ -159,7 +166,7 @@ export function deserializeLoginClusterStatus(data: Uint8Array): LoginClusterSta
 
   for (let i = 0; i < count; i++) {
     const clusterId = reader.readUInt32LE();
-    const connectionServerAddress = reader.readStringWithLength16BE();
+    const connectionServerAddress = reader.readStringWithLength16LE();
     const connectionServerPort = reader.readUInt16LE();
     const pingPort = reader.readUInt16LE();
     const populationOnline = reader.readUInt32LE();

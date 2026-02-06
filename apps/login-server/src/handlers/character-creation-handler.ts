@@ -12,6 +12,7 @@ import {
   ReservedPrefixes,
   ReservedNames,
   getCharacterNameErrorString,
+  getCharacterNameErrorStringIdText,
 } from '@swg/protocol/swg/messages/character-name.js';
 import {
   type ClientCreateCharacter,
@@ -21,6 +22,7 @@ import {
   type ClientVerifyAndLockNameResponse,
   type ClientRandomNameRequest,
   type ClientRandomNameResponse,
+  type StringId,
   createCreateCharacterSuccess,
   createCreateCharacterFailure,
   createClientVerifyAndLockNameResponse,
@@ -33,6 +35,7 @@ import {
 
 import {
   Species,
+  getSpeciesByTemplate,
   getSpeciesByTemplateCrc,
   isValidSpeciesTemplate,
   type SpeciesDefinition,
@@ -379,7 +382,40 @@ export class CharacterCreationHandler {
   }
 
   /**
-   * Validate species template
+   * Create a StringId from a CharacterNameErrorType
+   */
+  private errorToStringId(error: CharacterNameErrorType): StringId {
+    return {
+      table: 'ui',
+      textIndex: 0,
+      text: getCharacterNameErrorStringIdText(error),
+    };
+  }
+
+  /**
+   * Validate species template by name string
+   */
+  public validateSpeciesByName(templateName: string): SpeciesValidationResult {
+    const speciesInfo = getSpeciesByTemplate(templateName);
+    if (!speciesInfo) {
+      return {
+        valid: false,
+        error: `Invalid species template: ${templateName}`,
+      };
+    }
+
+    // Determine gender from template name
+    const gender = templateName.includes('female') ? 'female' as GenderType : 'male' as GenderType;
+
+    return {
+      valid: true,
+      species: speciesInfo,
+      gender,
+    };
+  }
+
+  /**
+   * Validate species template by CRC
    */
   public validateSpecies(templateCrc: number): SpeciesValidationResult {
     if (!isValidSpeciesTemplate(templateCrc)) {
@@ -465,7 +501,7 @@ export class CharacterCreationHandler {
    * Validate appearance customization data
    */
   public validateCustomization(
-    appearanceData: Uint8Array,
+    appearanceData: string,
     species: SpeciesDefinition
   ): CustomizationValidationResult {
     // Basic validation - check that appearance data is present and reasonable size
@@ -482,12 +518,6 @@ export class CharacterCreationHandler {
         error: 'Appearance data too large',
       };
     }
-
-    // In a full implementation, we would validate:
-    // - Slider values are within species-specific ranges
-    // - Color indices are valid
-    // - Body part selections exist
-    // For now, accept any reasonably-sized data
 
     return { valid: true };
   }
@@ -513,12 +543,14 @@ export class CharacterCreationHandler {
     session: ClientSession,
     message: ClientCreateCharacter
   ): Promise<CharacterCreationResult> {
+    const charName = message.characterName;
+
     // Check if session is authenticated
     if (!session.authenticated || !session.accountId) {
       return {
         success: false,
         response: serializeCreateCharacterFailure(
-          createCreateCharacterFailure(CharacterNameError.DECLINED_NOT_AUTHORIZED)
+          createCreateCharacterFailure(charName, this.errorToStringId(CharacterNameError.DECLINED_NOT_AUTHORIZED))
         ),
         error: CharacterNameError.DECLINED_NOT_AUTHORIZED,
         errorMessage: 'Not authenticated',
@@ -534,7 +566,7 @@ export class CharacterCreationHandler {
         return {
           success: false,
           response: serializeCreateCharacterFailure(
-            createCreateCharacterFailure(CharacterNameError.DECLINED_TOO_MANY_CHARACTERS)
+            createCreateCharacterFailure(charName, this.errorToStringId(CharacterNameError.DECLINED_TOO_MANY_CHARACTERS))
           ),
           error: CharacterNameError.DECLINED_TOO_MANY_CHARACTERS,
           errorMessage: `Maximum ${MAX_CHARACTERS_PER_ACCOUNT} characters per account`,
@@ -545,23 +577,20 @@ export class CharacterCreationHandler {
       return {
         success: false,
         response: serializeCreateCharacterFailure(
-          createCreateCharacterFailure(CharacterNameError.DECLINED_INTERNAL_ERROR)
+          createCreateCharacterFailure(charName, this.errorToStringId(CharacterNameError.DECLINED_INTERNAL_ERROR))
         ),
         error: CharacterNameError.DECLINED_INTERNAL_ERROR,
         errorMessage: 'Internal error',
       };
     }
 
-    // Validate species
-    const speciesResult = this.validateSpecies(message.templateCrc);
+    // Validate species by template name string
+    const speciesResult = this.validateSpeciesByName(message.templateName);
     if (!speciesResult.valid || !speciesResult.species) {
       return {
         success: false,
         response: serializeCreateCharacterFailure(
-          createCreateCharacterFailure(
-            CharacterNameError.DECLINED_CANT_CREATE_AVATAR,
-            speciesResult.error
-          )
+          createCreateCharacterFailure(charName, this.errorToStringId(CharacterNameError.DECLINED_CANT_CREATE_AVATAR))
         ),
         error: CharacterNameError.DECLINED_CANT_CREATE_AVATAR,
         ...(speciesResult.error !== undefined && { errorMessage: speciesResult.error }),
@@ -570,14 +599,14 @@ export class CharacterCreationHandler {
 
     // Validate name
     const nameResult = await this.validateCharacterName(
-      message.characterName,
+      charName,
       speciesResult.species
     );
     if (!nameResult.valid) {
       return {
         success: false,
         response: serializeCreateCharacterFailure(
-          createCreateCharacterFailure(nameResult.error, nameResult.message)
+          createCreateCharacterFailure(charName, this.errorToStringId(nameResult.error))
         ),
         error: nameResult.error,
         errorMessage: nameResult.message,
@@ -590,10 +619,7 @@ export class CharacterCreationHandler {
       return {
         success: false,
         response: serializeCreateCharacterFailure(
-          createCreateCharacterFailure(
-            CharacterNameError.DECLINED_CANT_CREATE_AVATAR,
-            professionResult.error
-          )
+          createCreateCharacterFailure(charName, this.errorToStringId(CharacterNameError.DECLINED_CANT_CREATE_AVATAR))
         ),
         error: CharacterNameError.DECLINED_CANT_CREATE_AVATAR,
         ...(professionResult.error !== undefined && { errorMessage: professionResult.error }),
@@ -603,38 +629,29 @@ export class CharacterCreationHandler {
     // Validate starting location
     const locationResult = this.validateStartingLocation(
       message.startingLocation,
-      message.startTutorial
+      message.useNewbieTutorial
     );
     if (!locationResult.valid || !locationResult.location) {
       return {
         success: false,
         response: serializeCreateCharacterFailure(
-          createCreateCharacterFailure(
-            CharacterNameError.DECLINED_CANT_CREATE_AVATAR,
-            locationResult.error
-          )
+          createCreateCharacterFailure(charName, this.errorToStringId(CharacterNameError.DECLINED_CANT_CREATE_AVATAR))
         ),
         error: CharacterNameError.DECLINED_CANT_CREATE_AVATAR,
         ...(locationResult.error !== undefined && { errorMessage: locationResult.error }),
       };
     }
 
-    // Validate appearance
-    const customizationResult = this.validateCustomization(
-      message.appearanceData,
-      speciesResult.species
-    );
-    if (!customizationResult.valid) {
+    // Validate appearance (now a string, convert to buffer for storage)
+    const appearanceBuffer = Buffer.from(message.appearanceData, 'ascii');
+    if (appearanceBuffer.length > 4096) {
       return {
         success: false,
         response: serializeCreateCharacterFailure(
-          createCreateCharacterFailure(
-            CharacterNameError.DECLINED_CANT_CREATE_AVATAR,
-            customizationResult.error
-          )
+          createCreateCharacterFailure(charName, this.errorToStringId(CharacterNameError.DECLINED_CANT_CREATE_AVATAR))
         ),
         error: CharacterNameError.DECLINED_CANT_CREATE_AVATAR,
-        ...(customizationResult.error !== undefined && { errorMessage: customizationResult.error }),
+        errorMessage: 'Appearance data too large',
       };
     }
 
@@ -642,12 +659,18 @@ export class CharacterCreationHandler {
     const characterId = this.generateCharacterId();
     const location = locationResult.location;
 
+    // Determine the shared template name for the character
+    // The client sends the non-shared template (e.g., "object/creature/player/human_male.iff")
+    // We store the shared version for EnumerateCharacterIdResponse
+    const sharedTemplateName = message.templateName.replace('/player/', '/player/shared_');
+
     // Create character in database
     try {
       const characterData: CreateCharacterData = {
         characterId,
         accountId,
-        name: message.characterName.trim(),
+        name: charName.trim(),
+        templateName: sharedTemplateName,
         sceneId: location.sceneId,
         x: location.position.x,
         y: location.position.y,
@@ -657,8 +680,8 @@ export class CharacterCreationHandler {
         orientationZ: location.orientation.z,
         orientationW: location.orientation.w,
         appearance: {
-          customizationData: Buffer.from(message.appearanceData),
-          scale: 1.0,
+          customizationData: appearanceBuffer,
+          scale: message.scaleFactor || 1.0,
         },
       };
 
@@ -668,7 +691,7 @@ export class CharacterCreationHandler {
       await this.addStartingSkills(characterId, professionResult.profession!);
 
       console.log(
-        `[CharacterCreation] Created character "${message.characterName}" (ID: ${characterId}) for account ${accountId}`
+        `[CharacterCreation] Created character "${charName}" (ID: ${characterId}) for account ${accountId}`
       );
 
       return {
@@ -681,7 +704,7 @@ export class CharacterCreationHandler {
       return {
         success: false,
         response: serializeCreateCharacterFailure(
-          createCreateCharacterFailure(CharacterNameError.DECLINED_INTERNAL_ERROR)
+          createCreateCharacterFailure(charName, this.errorToStringId(CharacterNameError.DECLINED_INTERNAL_ERROR))
         ),
         error: CharacterNameError.DECLINED_INTERNAL_ERROR,
         errorMessage: 'Failed to create character',
@@ -723,8 +746,8 @@ export class CharacterCreationHandler {
     session: ClientSession,
     message: ClientVerifyAndLockNameRequest
   ): Promise<Uint8Array> {
-    // Validate species first
-    const speciesResult = this.validateSpecies(message.templateCrc);
+    // Validate species first (now using template name string)
+    const speciesResult = this.validateSpeciesByName(message.templateName);
 
     // Validate name
     const nameResult = await this.validateCharacterName(
@@ -734,7 +757,7 @@ export class CharacterCreationHandler {
 
     const response = createClientVerifyAndLockNameResponse(
       message.characterName,
-      nameResult.error
+      this.errorToStringId(nameResult.error)
     );
 
     return serializeClientVerifyAndLockNameResponse(response);
@@ -752,9 +775,9 @@ export class CharacterCreationHandler {
     const firstName = this.generateRandomNamePart(syllables);
 
     const response = createClientRandomNameResponse(
-      firstName,
       message.templateName,
-      CharacterNameError.ACCEPTED
+      firstName,
+      this.errorToStringId(CharacterNameError.ACCEPTED)
     );
 
     return serializeClientRandomNameResponse(response);

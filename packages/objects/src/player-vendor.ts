@@ -59,7 +59,7 @@ export interface VendorItem {
   /** Price in credits */
   price: number;
   /** Optional custom description */
-  description?: string;
+  description?: string | undefined;
   /** When the item was listed */
   listedAt: Date;
 }
@@ -155,9 +155,6 @@ export class PlayerVendor extends TangibleObject {
 
   /** Unique vendor identifier */
   vendorId: ObjectId;
-
-  /** Owner character ID */
-  ownerId: ObjectId;
 
   /** Owner character name (cached for display) */
   ownerName: string;
@@ -370,7 +367,7 @@ export class PlayerVendor extends TangibleObject {
       price: Math.max(1, Math.floor(price)),
       description,
       listedAt: new Date(),
-    } as boolean;
+    };
 
     this.inventory.set(itemId, vendorItem);
     this.deltaTrackerVndr.trackChange(VndrProperty.INVENTORY, DeltaType.Add);

@@ -226,13 +226,13 @@ export interface GuildMember {
   /** Timestamp of last online activity */
   lastOnline: number;
   /** Custom title (optional) */
-  title?: string;
+  title?: string | undefined;
   /** Character ID of the member who sponsored this member */
-  sponsoredBy?: ObjectId;
+  sponsoredBy?: ObjectId | undefined;
   /** Total credits donated to treasury */
   totalDonated: bigint;
   /** Notes about this member (visible to officers) */
-  notes?: string;
+  notes?: string | undefined;
   /** Whether the member is currently online */
   isOnline: boolean;
 }
@@ -341,13 +341,13 @@ export interface GuildLogEntry {
     | 'motd_changed'
     | 'leader_changed';
   /** Character who performed the action (if applicable) */
-  actorId?: ObjectId;
+  actorId?: ObjectId | undefined;
   /** Character who was affected (if applicable) */
-  targetId?: ObjectId;
+  targetId?: ObjectId | undefined;
   /** Additional details */
-  details?: string;
+  details?: string | undefined;
   /** Amount involved (for treasury operations) */
-  amount?: bigint;
+  amount?: bigint | undefined;
 }
 
 // ============================================

@@ -38,15 +38,15 @@ export const DEFAULT_MAX_STACK_SIZE = 25;
  */
 export interface FactoryCrateItemAttributes {
   /** Condition/durability */
-  condition?: number;
+  condition?: number | undefined;
   /** Maximum condition */
-  maxCondition?: number;
+  maxCondition?: number | undefined;
   /** Item quality (0-1) */
-  quality?: number;
+  quality?: number | undefined;
   /** Hit points */
-  hitPoints?: number;
+  hitPoints?: number | undefined;
   /** Custom attributes (key-value pairs) */
-  customAttributes?: Map<string, number | string>;
+  customAttributes?: Map<string, number | string> | undefined;
 }
 
 /**
@@ -75,9 +75,6 @@ export class FactoryCrate extends Container {
   /** Name of the crafter who made these items */
   protected _crafterName: string;
 
-  /** Serial number for tracking */
-  protected _serialNumber: bigint;
-
   /**
    * Create a new FactoryCrate
    * @param objectId - Unique 64-bit identifier
@@ -97,7 +94,7 @@ export class FactoryCrate extends Container {
     this._maxStackSize = DEFAULT_MAX_STACK_SIZE;
     this._itemName = '';
     this._crafterName = '';
-    this._serialNumber = 0n;
+    this.serialNumber = 0n;
 
     // Factory crates have capacity of 1 (one stack)
     this.setMaxCapacity(1);
@@ -142,11 +139,6 @@ export class FactoryCrate extends Container {
   /** Get crafter name */
   get crafterName(): string {
     return this._crafterName;
-  }
-
-  /** Get serial number */
-  get serialNumber(): bigint {
-    return this._serialNumber;
   }
 
   // ============================================
@@ -262,8 +254,8 @@ export class FactoryCrate extends Container {
    * Set serial number
    */
   setSerialNumber(serial: bigint): void {
-    if (this._serialNumber !== serial) {
-      this._serialNumber = serial;
+    if (this.serialNumber !== serial) {
+      this.serialNumber = serial;
       this.deltaTrackerCont3.trackChange(FcrtProperty.SERIAL_NUMBER, DeltaType.Change);
       this.markModified();
     }
@@ -552,7 +544,7 @@ export class FactoryCrate extends Container {
       maxStackSize: this._maxStackSize,
       itemName: this._itemName,
       crafterName: this._crafterName,
-      serialNumber: this._serialNumber.toString(),
+      serialNumber: this.serialNumber.toString(),
     };
   }
 }

@@ -206,7 +206,7 @@ export interface ReverseEngineeringResult {
   /** Chance for a rare schematic (0.0 - 1.0) */
   schematicChance: number;
   /** Schematic obtained (if any) */
-  schematicObtained?: string;
+  schematicObtained?: string | undefined;
 }
 
 /**

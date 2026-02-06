@@ -646,7 +646,7 @@ export class BuildingObject extends TangibleObject {
 
     // If there was a deficit, apply decay
     if (!consumeResult.success && consumeResult.data) {
-      const deficit = consumeResult.data.deficit as number;
+      const deficit = consumeResult.data['deficit'] as number;
       const daysWithoutMaintenance = Math.ceil(deficit / this.maintenance.costPerDay);
       const decayAmount = daysWithoutMaintenance * STRUCTURE_DECAY_RATE;
 

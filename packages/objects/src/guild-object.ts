@@ -265,7 +265,7 @@ export class GuildObject {
       joinedAt: Date.now(),
       totalDonated: 0n,
       isOnline: false,
-    } as GuildOperationResult;
+    };
 
     this._members.set(member.characterId, newMember);
     this.markModified();
@@ -1056,7 +1056,7 @@ export class GuildObject {
       targetId,
       details,
       amount,
-    } as void;
+    };
 
     this._activityLog.unshift(entry);
 
@@ -1121,10 +1121,9 @@ export class GuildObject {
       name: this._name,
       abbreviation: this._abbreviation,
       leaderId: this._leaderId.toString(),
-      members: Array.from(this._members.entries()).map(([id, member]) => ({
-        characterId: id.toString(),
+      members: Array.from(this._members.entries()).map(([, member]) => ({
         ...member,
-        characterId_duplicate: undefined,
+        characterId: member.characterId.toString(),
         totalDonated: member.totalDonated.toString(),
         sponsoredBy: member.sponsoredBy?.toString(),
       })),
@@ -1133,10 +1132,9 @@ export class GuildObject {
       createdAt: this.createdAt.toISOString(),
       modifiedAt: this._modifiedAt.toISOString(),
       sponsoredCity: this._sponsoredCity?.toString() ?? null,
-      wars: Array.from(this._wars.entries()).map(([id, war]) => ({
-        guildId: id.toString(),
+      wars: Array.from(this._wars.entries()).map(([, war]) => ({
         ...war,
-        guildId_duplicate: undefined,
+        guildId: war.guildId.toString(),
         declaredBy: war.declaredBy.toString(),
       })),
       allies: Array.from(this._allies).map((id) => id.toString()),

@@ -50,6 +50,7 @@ export interface CreateCharacterData {
   characterId: bigint;
   accountId: number;
   name: string;
+  templateName: string;
   sceneId: string;
   x?: number;
   y?: number;
@@ -185,6 +186,7 @@ export class CharacterRepository {
       characterId: data.characterId,
       accountId: data.accountId,
       name: data.name,
+      templateName: data.templateName,
       sceneId: data.sceneId,
       x: data.x ?? 0,
       y: data.y ?? 0,

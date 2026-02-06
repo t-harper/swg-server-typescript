@@ -133,9 +133,6 @@ export class HarvesterInstallation extends TangibleObject {
   /** Unique harvester ID (same as objectId typically) */
   harvesterId: ObjectId;
 
-  /** Owner character ID */
-  ownerId: ObjectId;
-
   /** Type of harvester (determines resource types it can extract) */
   harvesterType: HarvesterType;
 
@@ -144,9 +141,6 @@ export class HarvesterInstallation extends TangibleObject {
 
   /** When the harvester was installed/placed */
   installedAt: Date;
-
-  /** World position of the harvester */
-  position: Vector3;
 
   /** Planet/zone where the harvester is placed */
   planetId: string;
@@ -189,9 +183,6 @@ export class HarvesterInstallation extends TangibleObject {
   // ============================================
   // State Properties
   // ============================================
-
-  /** Whether the harvester is currently active (extracting) */
-  isActive: boolean;
 
   /** Timestamp of last extraction cycle */
   lastExtractionTime: number;
@@ -926,7 +917,7 @@ export class HarvesterInstallation extends TangibleObject {
   /**
    * Clear all delta trackers
    */
-  override clearAllDeltas(): void {
+  clearAllDeltas(): void {
     this.deltaTrackerInst3.clear();
     this.deltaTrackerInst6.clear();
     this.clearDirtyFlags();

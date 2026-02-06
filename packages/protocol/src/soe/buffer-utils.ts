@@ -400,10 +400,42 @@ export class BufferReader {
   }
 
   /**
-   * Read a length-prefixed UTF-16 LE string (32-bit character count)
+   * Read a length-prefixed ASCII string (16-bit length, little-endian)
+   * This is the standard SWG Archive string format
+   */
+  readStringWithLength16LE(): string {
+    const length = this.readUInt16LE();
+    if (length === 0) return '';
+    const bytes = this.readBytes(length);
+    return new TextDecoder('ascii').decode(bytes);
+  }
+
+  /**
+   * Read a length-prefixed ASCII string (32-bit length, little-endian)
+   */
+  readStringWithLength32LE(): string {
+    const length = this.readUInt32LE();
+    if (length === 0) return '';
+    const bytes = this.readBytes(length);
+    return new TextDecoder('ascii').decode(bytes);
+  }
+
+  /**
+   * Read an AutoArray<unsigned char> (int32LE count + raw bytes)
+   * Used in C++ Archive for byte array fields
+   */
+  readAutoArray(): Uint8Array {
+    const count = this.readInt32LE();
+    if (count <= 0) return new Uint8Array(0);
+    return this.readBytes(count);
+  }
+
+  /**
+   * Read a length-prefixed UTF-16 LE string (32-bit LE character count)
+   * This is the C++ Archive Unicode::String format
    */
   readUnicodeStringWithLength(): string {
-    const charCount = this.readUInt32BE();
+    const charCount = this.readUInt32LE();
     if (charCount === 0) return '';
     const byteLength = charCount * 2;
     const bytes = this.readBytes(byteLength);
@@ -704,10 +736,39 @@ export class BufferWriter {
   }
 
   /**
-   * Write a length-prefixed UTF-16 LE string (32-bit character count)
+   * Write a length-prefixed ASCII string (16-bit length, little-endian)
+   * This is the standard SWG Archive string format
+   */
+  writeStringWithLength16LE(str: string): void {
+    const encoded = new TextEncoder().encode(str);
+    this.writeUInt16LE(encoded.length);
+    this.writeBytes(encoded);
+  }
+
+  /**
+   * Write a length-prefixed ASCII string (32-bit length, little-endian)
+   */
+  writeStringWithLength32LE(str: string): void {
+    const encoded = new TextEncoder().encode(str);
+    this.writeUInt32LE(encoded.length);
+    this.writeBytes(encoded);
+  }
+
+  /**
+   * Write an AutoArray<unsigned char> (int32LE count + raw bytes)
+   * Used in C++ Archive for byte array fields
+   */
+  writeAutoArray(data: Uint8Array): void {
+    this.writeInt32LE(data.length);
+    this.writeBytes(data);
+  }
+
+  /**
+   * Write a length-prefixed UTF-16 LE string (32-bit LE character count)
+   * This is the C++ Archive Unicode::String format
    */
   writeUnicodeStringWithLength(str: string): void {
-    this.writeUInt32BE(str.length); // Character count
+    this.writeUInt32LE(str.length); // Character count (LE to match C++ Archive)
     for (const char of str) {
       const code = char.charCodeAt(0);
       this.writeUInt16LE(code);

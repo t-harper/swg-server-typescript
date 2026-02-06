@@ -1,6 +1,7 @@
 /**
  * SWG Character Creation Messages
  * Protocol messages for character creation flow
+ * Rewritten to match C++ wire format (operandCount prefix, StringId, correct field order)
  */
 
 import { BufferReader, BufferWriter } from '../../soe/buffer-utils.js';
@@ -9,6 +10,43 @@ import {
   type CharacterNameErrorType,
   getCharacterNameErrorString,
 } from './character-name.js';
+
+// ============================================================================
+// StringId Type (matches C++ StringId wire format)
+// ============================================================================
+
+/**
+ * StringId - Localized string reference
+ * Matches C++ StringId: table(string) + textIndex(u32) + text(string)
+ */
+export interface StringId {
+  table: string;
+  textIndex: number;
+  text: string;
+}
+
+/**
+ * Write a StringId to the buffer
+ */
+function writeStringId(writer: BufferWriter, sid: StringId): void {
+  writer.writeStringWithLength16LE(sid.table);
+  writer.writeUInt32LE(sid.textIndex);
+  writer.writeStringWithLength16LE(sid.text);
+}
+
+/**
+ * Read a StringId from the buffer
+ */
+function readStringId(reader: BufferReader): StringId {
+  const table = reader.readStringWithLength16LE();
+  const textIndex = reader.readUInt32LE();
+  const text = reader.readStringWithLength16LE();
+  return { table, textIndex, text };
+}
+
+// ============================================================================
+// Opcodes
+// ============================================================================
 
 /**
  * Character creation message opcodes
@@ -33,32 +71,43 @@ export const CharacterCreationOpcode = {
 export type CharacterCreationOpcodeType =
   (typeof CharacterCreationOpcode)[keyof typeof CharacterCreationOpcode];
 
+// ============================================================================
+// Message Interfaces (matching C++ addVariable order)
+// ============================================================================
+
 /**
  * ClientCreateCharacter - Client request to create a new character
  * Opcode: 0x00B97C38
+ * 13 fields matching C++ addVariable registration order
  */
 export interface ClientCreateCharacter {
   opcode: typeof CharacterCreationOpcode.ClientCreateCharacter;
-  /** Appearance customization data (race-specific binary data) */
-  appearanceData: Uint8Array;
-  /** Character name (first name, or "first last") */
+  /** Appearance customization data (ASCII string in C++ wire format) */
+  appearanceData: string;
+  /** Character name (Unicode) */
   characterName: string;
-  /** CRC of the species/race template (e.g., human_male) */
-  templateCrc: number;
-  /** Starting location identifier (e.g., "mos_eisley", "tutorial") */
+  /** Template name string path (e.g., "object/creature/player/human_male.iff") */
+  templateName: string;
+  /** Starting location identifier (e.g., "mos_eisley") - ASCII */
   startingLocation: string;
-  /** Hair template path (empty for bald) */
-  hairTemplate: string;
-  /** Hair customization data (color, style modifiers) */
-  hairCustomization: Uint8Array;
-  /** Starting profession (e.g., "combat_marksman", "crafting_artisan") */
+  /** Hair template name path (empty for bald) - ASCII */
+  hairTemplateName: string;
+  /** Hair appearance/customization data (ASCII string in C++ wire format) */
+  hairAppearanceData: string;
+  /** Starting profession (e.g., "combat_marksman") - ASCII */
   profession: string;
-  /** Character biography/backstory */
+  /** Jedi flag */
+  jedi: boolean;
+  /** Scale factor (float) */
+  scaleFactor: number;
+  /** Character biography/backstory (Unicode) */
   biography: string;
   /** Tutorial flag (true to start in tutorial) */
-  startTutorial: boolean;
-  /** Skill template CRC (for skill-based professions in NGE) */
-  skillTemplateCrc: number;
+  useNewbieTutorial: boolean;
+  /** Skill template string (for skill-based professions in NGE) - ASCII */
+  skillTemplate: string;
+  /** Working skill string - ASCII */
+  workingSkill: string;
 }
 
 /**
@@ -77,10 +126,10 @@ export interface CreateCharacterSuccess {
  */
 export interface CreateCharacterFailure {
   opcode: typeof CharacterCreationOpcode.CreateCharacterFailure;
-  /** Error code indicating why creation failed */
-  nameError: CharacterNameErrorType;
-  /** Human-readable error string (localization key or direct message) */
-  errorString: string;
+  /** The character name that failed (Unicode) */
+  characterName: string;
+  /** Error message as StringId */
+  errorMessage: StringId;
 }
 
 /**
@@ -89,9 +138,9 @@ export interface CreateCharacterFailure {
  */
 export interface ClientVerifyAndLockNameRequest {
   opcode: typeof CharacterCreationOpcode.ClientVerifyAndLockNameRequest;
-  /** The species template CRC */
-  templateCrc: number;
-  /** The character name to verify */
+  /** The species template name string path */
+  templateName: string;
+  /** The character name to verify (Unicode) */
   characterName: string;
 }
 
@@ -101,10 +150,10 @@ export interface ClientVerifyAndLockNameRequest {
  */
 export interface ClientVerifyAndLockNameResponse {
   opcode: typeof CharacterCreationOpcode.ClientVerifyAndLockNameResponse;
-  /** The name that was verified */
+  /** The name that was verified (Unicode) */
   characterName: string;
-  /** Error code (ACCEPTED if name is available) */
-  errorCode: CharacterNameErrorType;
+  /** Error message as StringId */
+  errorMessage: StringId;
 }
 
 /**
@@ -113,7 +162,7 @@ export interface ClientVerifyAndLockNameResponse {
  */
 export interface ClientRandomNameRequest {
   opcode: typeof CharacterCreationOpcode.ClientRandomNameRequest;
-  /** The species template path to generate name for */
+  /** The species template path to generate name for - ASCII */
   templateName: string;
 }
 
@@ -123,12 +172,12 @@ export interface ClientRandomNameRequest {
  */
 export interface ClientRandomNameResponse {
   opcode: typeof CharacterCreationOpcode.ClientRandomNameResponse;
-  /** The generated random name */
-  randomName: string;
-  /** The template that was requested */
+  /** The template that was requested - ASCII (FIRST in wire order) */
   templateName: string;
-  /** Error code (ACCEPTED if name was generated) */
-  errorCode: CharacterNameErrorType;
+  /** The generated random name (Unicode) (SECOND in wire order) */
+  randomName: string;
+  /** Error message as StringId */
+  errorMessage: StringId;
 }
 
 /**
@@ -152,58 +201,47 @@ export type CharacterCreationMessage =
  */
 export function deserializeClientCreateCharacter(data: Uint8Array): ClientCreateCharacter {
   const reader = new BufferReader(data);
-  const opcode = reader.readUInt32LE();
 
+  // Skip operandCount prefix
+  reader.readUInt16LE();
+
+  const opcode = reader.readUInt32LE();
   if (opcode !== CharacterCreationOpcode.ClientCreateCharacter) {
     throw new Error(
       `Invalid opcode for ClientCreateCharacter: 0x${opcode.toString(16)}`
     );
   }
 
-  // Read appearance data (length-prefixed)
-  const appearanceLength = reader.readUInt32BE();
-  const appearanceData = reader.readBytes(appearanceLength);
-
-  // Read character name (unicode string)
+  // Read fields in C++ addVariable order
+  const appearanceData = reader.readStringWithLength16LE();
   const characterName = reader.readUnicodeStringWithLength();
-
-  // Read template CRC
-  const templateCrc = reader.readUInt32BE();
-
-  // Read starting location
-  const startingLocation = reader.readUnicodeStringWithLength();
-
-  // Read hair template
-  const hairTemplate = reader.readStringWithLength32BE();
-
-  // Read hair customization data (length-prefixed)
-  const hairCustomizationLength = reader.readUInt32BE();
-  const hairCustomization = reader.readBytes(hairCustomizationLength);
-
-  // Read profession
-  const profession = reader.readStringWithLength32BE();
-
-  // Read tutorial flag
-  const startTutorial = reader.readUInt8() !== 0;
-
-  // Read skill template CRC (NGE)
-  const skillTemplateCrc = reader.readUInt32BE();
-
-  // Read biography (unicode string)
+  const templateName = reader.readStringWithLength16LE();
+  const startingLocation = reader.readStringWithLength16LE();
+  const hairTemplateName = reader.readStringWithLength16LE();
+  const hairAppearanceData = reader.readStringWithLength16LE();
+  const profession = reader.readStringWithLength16LE();
+  const jedi = reader.readUInt8() !== 0;
+  const scaleFactor = reader.readFloatLE();
   const biography = reader.readUnicodeStringWithLength();
+  const useNewbieTutorial = reader.readUInt8() !== 0;
+  const skillTemplate = reader.readStringWithLength16LE();
+  const workingSkill = reader.readStringWithLength16LE();
 
   return {
     opcode: CharacterCreationOpcode.ClientCreateCharacter,
     appearanceData,
     characterName,
-    templateCrc,
+    templateName,
     startingLocation,
-    hairTemplate,
-    hairCustomization,
+    hairTemplateName,
+    hairAppearanceData,
     profession,
+    jedi,
+    scaleFactor,
     biography,
-    startTutorial,
-    skillTemplateCrc,
+    useNewbieTutorial,
+    skillTemplate,
+    workingSkill,
   };
 }
 
@@ -213,39 +251,24 @@ export function deserializeClientCreateCharacter(data: Uint8Array): ClientCreate
 export function serializeClientCreateCharacter(message: ClientCreateCharacter): Uint8Array {
   const writer = new BufferWriter(2048);
 
+  // operandCount prefix (13 fields)
+  writer.writeUInt16LE(13);
   writer.writeUInt32LE(message.opcode);
 
-  // Write appearance data
-  writer.writeUInt32BE(message.appearanceData.length);
-  writer.writeBytes(message.appearanceData);
-
-  // Write character name (unicode)
+  // Write fields in C++ addVariable order
+  writer.writeStringWithLength16LE(message.appearanceData);
   writer.writeUnicodeStringWithLength(message.characterName);
-
-  // Write template CRC
-  writer.writeUInt32BE(message.templateCrc);
-
-  // Write starting location
-  writer.writeUnicodeStringWithLength(message.startingLocation);
-
-  // Write hair template
-  writer.writeStringWithLength32BE(message.hairTemplate);
-
-  // Write hair customization
-  writer.writeUInt32BE(message.hairCustomization.length);
-  writer.writeBytes(message.hairCustomization);
-
-  // Write profession
-  writer.writeStringWithLength32BE(message.profession);
-
-  // Write tutorial flag
-  writer.writeUInt8(message.startTutorial ? 1 : 0);
-
-  // Write skill template CRC
-  writer.writeUInt32BE(message.skillTemplateCrc);
-
-  // Write biography
+  writer.writeStringWithLength16LE(message.templateName);
+  writer.writeStringWithLength16LE(message.startingLocation);
+  writer.writeStringWithLength16LE(message.hairTemplateName);
+  writer.writeStringWithLength16LE(message.hairAppearanceData);
+  writer.writeStringWithLength16LE(message.profession);
+  writer.writeUInt8(message.jedi ? 1 : 0);
+  writer.writeFloatLE(message.scaleFactor);
   writer.writeUnicodeStringWithLength(message.biography);
+  writer.writeUInt8(message.useNewbieTutorial ? 1 : 0);
+  writer.writeStringWithLength16LE(message.skillTemplate);
+  writer.writeStringWithLength16LE(message.workingSkill);
 
   return writer.toBuffer();
 }
@@ -255,8 +278,12 @@ export function serializeClientCreateCharacter(message: ClientCreateCharacter): 
  */
 export function serializeCreateCharacterSuccess(message: CreateCharacterSuccess): Uint8Array {
   const writer = new BufferWriter(16);
+
+  // operandCount prefix (1 field)
+  writer.writeUInt16LE(1);
   writer.writeUInt32LE(message.opcode);
   writer.writeUInt64LE(message.characterId);
+
   return writer.toBuffer();
 }
 
@@ -265,8 +292,11 @@ export function serializeCreateCharacterSuccess(message: CreateCharacterSuccess)
  */
 export function deserializeCreateCharacterSuccess(data: Uint8Array): CreateCharacterSuccess {
   const reader = new BufferReader(data);
-  const opcode = reader.readUInt32LE();
 
+  // Skip operandCount prefix
+  reader.readUInt16LE();
+
+  const opcode = reader.readUInt32LE();
   if (opcode !== CharacterCreationOpcode.CreateCharacterSuccess) {
     throw new Error(
       `Invalid opcode for CreateCharacterSuccess: 0x${opcode.toString(16)}`
@@ -286,9 +316,13 @@ export function deserializeCreateCharacterSuccess(data: Uint8Array): CreateChara
  */
 export function serializeCreateCharacterFailure(message: CreateCharacterFailure): Uint8Array {
   const writer = new BufferWriter(256);
+
+  // operandCount prefix (2 fields)
+  writer.writeUInt16LE(2);
   writer.writeUInt32LE(message.opcode);
-  writer.writeUInt32BE(message.nameError);
-  writer.writeUnicodeStringWithLength(message.errorString);
+  writer.writeUnicodeStringWithLength(message.characterName);
+  writeStringId(writer, message.errorMessage);
+
   return writer.toBuffer();
 }
 
@@ -297,21 +331,24 @@ export function serializeCreateCharacterFailure(message: CreateCharacterFailure)
  */
 export function deserializeCreateCharacterFailure(data: Uint8Array): CreateCharacterFailure {
   const reader = new BufferReader(data);
-  const opcode = reader.readUInt32LE();
 
+  // Skip operandCount prefix
+  reader.readUInt16LE();
+
+  const opcode = reader.readUInt32LE();
   if (opcode !== CharacterCreationOpcode.CreateCharacterFailure) {
     throw new Error(
       `Invalid opcode for CreateCharacterFailure: 0x${opcode.toString(16)}`
     );
   }
 
-  const nameError = reader.readUInt32BE() as CharacterNameErrorType;
-  const errorString = reader.readUnicodeStringWithLength();
+  const characterName = reader.readUnicodeStringWithLength();
+  const errorMessage = readStringId(reader);
 
   return {
     opcode: CharacterCreationOpcode.CreateCharacterFailure,
-    nameError,
-    errorString,
+    characterName,
+    errorMessage,
   };
 }
 
@@ -322,20 +359,23 @@ export function deserializeClientVerifyAndLockNameRequest(
   data: Uint8Array
 ): ClientVerifyAndLockNameRequest {
   const reader = new BufferReader(data);
-  const opcode = reader.readUInt32LE();
 
+  // Skip operandCount prefix
+  reader.readUInt16LE();
+
+  const opcode = reader.readUInt32LE();
   if (opcode !== CharacterCreationOpcode.ClientVerifyAndLockNameRequest) {
     throw new Error(
       `Invalid opcode for ClientVerifyAndLockNameRequest: 0x${opcode.toString(16)}`
     );
   }
 
-  const templateCrc = reader.readUInt32BE();
+  const templateName = reader.readStringWithLength16LE();
   const characterName = reader.readUnicodeStringWithLength();
 
   return {
     opcode: CharacterCreationOpcode.ClientVerifyAndLockNameRequest,
-    templateCrc,
+    templateName,
     characterName,
   };
 }
@@ -347,9 +387,13 @@ export function serializeClientVerifyAndLockNameRequest(
   message: ClientVerifyAndLockNameRequest
 ): Uint8Array {
   const writer = new BufferWriter(256);
+
+  // operandCount prefix (2 fields)
+  writer.writeUInt16LE(2);
   writer.writeUInt32LE(message.opcode);
-  writer.writeUInt32BE(message.templateCrc);
+  writer.writeStringWithLength16LE(message.templateName);
   writer.writeUnicodeStringWithLength(message.characterName);
+
   return writer.toBuffer();
 }
 
@@ -360,9 +404,13 @@ export function serializeClientVerifyAndLockNameResponse(
   message: ClientVerifyAndLockNameResponse
 ): Uint8Array {
   const writer = new BufferWriter(256);
+
+  // operandCount prefix (2 fields)
+  writer.writeUInt16LE(2);
   writer.writeUInt32LE(message.opcode);
   writer.writeUnicodeStringWithLength(message.characterName);
-  writer.writeUInt32BE(message.errorCode);
+  writeStringId(writer, message.errorMessage);
+
   return writer.toBuffer();
 }
 
@@ -373,8 +421,11 @@ export function deserializeClientVerifyAndLockNameResponse(
   data: Uint8Array
 ): ClientVerifyAndLockNameResponse {
   const reader = new BufferReader(data);
-  const opcode = reader.readUInt32LE();
 
+  // Skip operandCount prefix
+  reader.readUInt16LE();
+
+  const opcode = reader.readUInt32LE();
   if (opcode !== CharacterCreationOpcode.ClientVerifyAndLockNameResponse) {
     throw new Error(
       `Invalid opcode for ClientVerifyAndLockNameResponse: 0x${opcode.toString(16)}`
@@ -382,12 +433,12 @@ export function deserializeClientVerifyAndLockNameResponse(
   }
 
   const characterName = reader.readUnicodeStringWithLength();
-  const errorCode = reader.readUInt32BE() as CharacterNameErrorType;
+  const errorMessage = readStringId(reader);
 
   return {
     opcode: CharacterCreationOpcode.ClientVerifyAndLockNameResponse,
     characterName,
-    errorCode,
+    errorMessage,
   };
 }
 
@@ -398,15 +449,18 @@ export function deserializeClientRandomNameRequest(
   data: Uint8Array
 ): ClientRandomNameRequest {
   const reader = new BufferReader(data);
-  const opcode = reader.readUInt32LE();
 
+  // Skip operandCount prefix
+  reader.readUInt16LE();
+
+  const opcode = reader.readUInt32LE();
   if (opcode !== CharacterCreationOpcode.ClientRandomNameRequest) {
     throw new Error(
       `Invalid opcode for ClientRandomNameRequest: 0x${opcode.toString(16)}`
     );
   }
 
-  const templateName = reader.readStringWithLength32BE();
+  const templateName = reader.readStringWithLength16LE();
 
   return {
     opcode: CharacterCreationOpcode.ClientRandomNameRequest,
@@ -421,8 +475,12 @@ export function serializeClientRandomNameRequest(
   message: ClientRandomNameRequest
 ): Uint8Array {
   const writer = new BufferWriter(256);
+
+  // operandCount prefix (1 field)
+  writer.writeUInt16LE(1);
   writer.writeUInt32LE(message.opcode);
-  writer.writeStringWithLength32BE(message.templateName);
+  writer.writeStringWithLength16LE(message.templateName);
+
   return writer.toBuffer();
 }
 
@@ -433,10 +491,16 @@ export function serializeClientRandomNameResponse(
   message: ClientRandomNameResponse
 ): Uint8Array {
   const writer = new BufferWriter(256);
+
+  // operandCount prefix (3 fields)
+  writer.writeUInt16LE(3);
   writer.writeUInt32LE(message.opcode);
+
+  // Wire order: templateName (ASCII) FIRST, randomName (Unicode) SECOND
+  writer.writeStringWithLength16LE(message.templateName);
   writer.writeUnicodeStringWithLength(message.randomName);
-  writer.writeStringWithLength32BE(message.templateName);
-  writer.writeUInt32BE(message.errorCode);
+  writeStringId(writer, message.errorMessage);
+
   return writer.toBuffer();
 }
 
@@ -447,23 +511,27 @@ export function deserializeClientRandomNameResponse(
   data: Uint8Array
 ): ClientRandomNameResponse {
   const reader = new BufferReader(data);
-  const opcode = reader.readUInt32LE();
 
+  // Skip operandCount prefix
+  reader.readUInt16LE();
+
+  const opcode = reader.readUInt32LE();
   if (opcode !== CharacterCreationOpcode.ClientRandomNameResponse) {
     throw new Error(
       `Invalid opcode for ClientRandomNameResponse: 0x${opcode.toString(16)}`
     );
   }
 
+  // Wire order: templateName (ASCII) FIRST, randomName (Unicode) SECOND
+  const templateName = reader.readStringWithLength16LE();
   const randomName = reader.readUnicodeStringWithLength();
-  const templateName = reader.readStringWithLength32BE();
-  const errorCode = reader.readUInt32BE() as CharacterNameErrorType;
+  const errorMessage = readStringId(reader);
 
   return {
     opcode: CharacterCreationOpcode.ClientRandomNameResponse,
-    randomName,
     templateName,
-    errorCode,
+    randomName,
+    errorMessage,
   };
 }
 
@@ -485,13 +553,13 @@ export function createCreateCharacterSuccess(characterId: bigint): CreateCharact
  * Create a CreateCharacterFailure message
  */
 export function createCreateCharacterFailure(
-  nameError: CharacterNameErrorType,
-  errorString?: string
+  characterName: string,
+  errorMessage: StringId
 ): CreateCharacterFailure {
   return {
     opcode: CharacterCreationOpcode.CreateCharacterFailure,
-    nameError,
-    errorString: errorString ?? getCharacterNameErrorString(nameError),
+    characterName,
+    errorMessage,
   };
 }
 
@@ -500,12 +568,12 @@ export function createCreateCharacterFailure(
  */
 export function createClientVerifyAndLockNameResponse(
   characterName: string,
-  errorCode: CharacterNameErrorType
+  errorMessage: StringId
 ): ClientVerifyAndLockNameResponse {
   return {
     opcode: CharacterCreationOpcode.ClientVerifyAndLockNameResponse,
     characterName,
-    errorCode,
+    errorMessage,
   };
 }
 
@@ -513,17 +581,21 @@ export function createClientVerifyAndLockNameResponse(
  * Create a ClientRandomNameResponse message
  */
 export function createClientRandomNameResponse(
-  randomName: string,
   templateName: string,
-  errorCode: CharacterNameErrorType = CharacterNameError.ACCEPTED
+  randomName: string,
+  errorMessage: StringId
 ): ClientRandomNameResponse {
   return {
     opcode: CharacterCreationOpcode.ClientRandomNameResponse,
-    randomName,
     templateName,
-    errorCode,
+    randomName,
+    errorMessage,
   };
 }
+
+// ============================================================================
+// Opcode Utilities
+// ============================================================================
 
 /**
  * Check if an opcode is a character creation message opcode
@@ -538,11 +610,13 @@ export function isCharacterCreationOpcode(
 
 /**
  * Get the opcode from raw message data
+ * Skips the operandCount u16 prefix before reading the u32 opcode
  */
 export function getCharacterCreationOpcode(data: Uint8Array): number {
-  if (data.length < 4) {
+  if (data.length < 6) {
     throw new Error('Message too short to contain opcode');
   }
   const reader = new BufferReader(data);
+  reader.readUInt16LE(); // operandCount
   return reader.readUInt32LE();
 }

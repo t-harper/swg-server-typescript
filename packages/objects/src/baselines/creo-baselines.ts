@@ -2,13 +2,11 @@
  * CREO Baseline Serialization
  * Handles serialization of CreatureObject data for client synchronization
  *
- * SWG baselines are packets that synchronize object state between server and client.
- * Creature objects (CREO) use baselines 1, 3, 4, and 6 for their specific data.
- *
- * Baseline 1: Credits (bank and cash)
- * Baseline 3: Posture, faction, species, HAM wounds, skills
- * Baseline 4: Movement, acceleration, skill mods, group, locomotion
- * Baseline 6: Level, HAM, equipment, buffs, mood, target, defenders
+ * Variable lists derived from C++ Packager.cpp (swg-source-docker):
+ *   CREO1 (authClientServer, 4 vars): SO + CO
+ *   CREO3 (shared, 19 vars): SO + TO + CO
+ *   CREO4 (authClientServer_np, 16 vars): CO only
+ *   CREO6 (shared_np, 35 vars): SO + TO + CO
  */
 
 import { BufferWriter, BufferReader } from '@swg/protocol';
@@ -26,1052 +24,11 @@ import {
 /** CREO type identifier (CRC of "CREO") */
 export const CREO_TYPE_CRC = 0x4352454f; // "CREO" in ASCII
 
-/**
- * Serialize CREO Baseline 1 (credits)
- * This baseline contains bank and cash credits
- */
-export function serializeCreoBaseline1(obj: CreatureObject): Uint8Array {
-  const writer = new BufferWriter(64);
-
-  // Baseline header
-  writer.writeUInt32LE(CREO_TYPE_CRC);
-  writer.writeUInt8(1);
-
-  // Variable count placeholder
-  const variableCountPos = writer.getPosition();
-  writer.writeUInt16LE(0);
-
-  let variableCount = 0;
-
-  // 0: Bank credits
-  writer.writeUInt32LE(obj.bankCredits);
-  variableCount++;
-
-  // 1: Cash credits
-  writer.writeUInt32LE(obj.cashCredits);
-  variableCount++;
-
-  // Update variable count
-  const endPos = writer.getPosition();
-  writer.setPosition(variableCountPos);
-  writer.writeUInt16LE(variableCount);
-  writer.setPosition(endPos);
-
-  return writer.toBuffer();
-}
-
-/**
- * Serialize CREO Baseline 3 (shared creature data)
- * This baseline contains posture, faction, species, wounds, skills
- */
-export function serializeCreoBaseline3(obj: CreatureObject): Uint8Array {
-  const writer = new BufferWriter(512);
-
-  // Baseline header
-  writer.writeUInt32LE(CREO_TYPE_CRC);
-  writer.writeUInt8(3);
-
-  // Variable count placeholder
-  const variableCountPos = writer.getPosition();
-  writer.writeUInt16LE(0);
-
-  let variableCount = 0;
-
-  // 0: Posture
-  writer.writeUInt8(obj.posture);
-  variableCount++;
-
-  // 1: Faction rank
-  writer.writeUInt8(obj.factionRank);
-  variableCount++;
-
-  // 2: Owner/master ID
-  writer.writeUInt64LE(obj.masterId);
-  variableCount++;
-
-  // 3: Height (scale)
-  writer.writeFloatLE(obj.height);
-  variableCount++;
-
-  // 4: Battle fatigue
-  writer.writeUInt32LE(obj.battleFatigue);
-  variableCount++;
-
-  // 5: State bitmask (64-bit)
-  writer.writeUInt64LE(obj.stateBitmask);
-  variableCount++;
-
-  // 6: HAM wounds list
-  writer.writeUInt32LE(HAM_ATTRIBUTE_COUNT);
-  writer.writeUInt32LE(obj.getListUpdateCounter('hamWounds'));
-  for (let i = 0; i < HAM_ATTRIBUTE_COUNT; i++) {
-    writer.writeUInt32LE(obj.hamWounds[i] ?? 0);
-  }
-  variableCount++;
-
-  // Update variable count
-  const endPos = writer.getPosition();
-  writer.setPosition(variableCountPos);
-  writer.writeUInt16LE(variableCount);
-  writer.setPosition(endPos);
-
-  return writer.toBuffer();
-}
-
-/**
- * Serialize CREO Baseline 4 (movement and group data)
- */
-export function serializeCreoBaseline4(obj: CreatureObject): Uint8Array {
-  const writer = new BufferWriter(1024);
-
-  // Baseline header
-  writer.writeUInt32LE(CREO_TYPE_CRC);
-  writer.writeUInt8(4);
-
-  // Variable count placeholder
-  const variableCountPos = writer.getPosition();
-  writer.writeUInt16LE(0);
-
-  let variableCount = 0;
-
-  // 0: Acceleration scale
-  writer.writeFloatLE(obj.accelScale);
-  variableCount++;
-
-  // 1: Acceleration multiplier (base)
-  writer.writeFloatLE(obj.accelMultiplierBase);
-  variableCount++;
-
-  // 2: Acceleration multiplier (mod)
-  writer.writeFloatLE(obj.accelMultiplierMod);
-  variableCount++;
-
-  // 3: HAM encumbrance list
-  writer.writeUInt32LE(HAM_ATTRIBUTE_COUNT);
-  writer.writeUInt32LE(obj.getListUpdateCounter('hamEncumbrance'));
-  for (let i = 0; i < HAM_ATTRIBUTE_COUNT; i++) {
-    writer.writeUInt32LE(obj.hamEncumbrance[i] ?? 0);
-  }
-  variableCount++;
-
-  // 4: Skill mods map
-  writer.writeUInt32LE(obj.skillMods.size);
-  writer.writeUInt32LE(obj.getListUpdateCounter('skillMods'));
-  for (const [modName, value] of obj.skillMods) {
-    writer.writeUInt8(0); // Flag for add operation
-    writeAsciiString(writer, modName);
-    writer.writeInt32LE(value);
-  }
-  variableCount++;
-
-  // 5: Speed multiplier (base)
-  writer.writeFloatLE(obj.speedMultiplierBase);
-  variableCount++;
-
-  // 6: Speed multiplier (mod)
-  writer.writeFloatLE(obj.speedMultiplierMod);
-  variableCount++;
-
-  // 7: Listen to ID
-  writer.writeUInt64LE(obj.listenToId);
-  variableCount++;
-
-  // 8: Run speed
-  writer.writeFloatLE(obj.runSpeed);
-  variableCount++;
-
-  // 9: Slope mod angle
-  writer.writeFloatLE(obj.slopeModeAngle);
-  variableCount++;
-
-  // 10: Slope mod percent
-  writer.writeFloatLE(obj.slopeModPercent);
-  variableCount++;
-
-  // 11: Turn rate
-  writer.writeFloatLE(obj.turnRate);
-  variableCount++;
-
-  // 12: Walk speed
-  writer.writeFloatLE(obj.walkSpeed);
-  variableCount++;
-
-  // 13: Water mod percent
-  writer.writeFloatLE(obj.waterModPercent);
-  variableCount++;
-
-  // 14: Group invites list
-  writer.writeUInt32LE(obj.groupInvites.length);
-  writer.writeUInt32LE(obj.getListUpdateCounter('groupInvites'));
-  for (const inviterId of obj.groupInvites) {
-    writer.writeUInt64LE(inviterId);
-  }
-  variableCount++;
-
-  // 15: Guild ID
-  writer.writeUInt32LE(obj.guildId);
-  variableCount++;
-
-  // 16: Weapon ID
-  writer.writeUInt64LE(obj.weaponId);
-  variableCount++;
-
-  // 17: Group ID
-  writer.writeUInt64LE(obj.groupId);
-  variableCount++;
-
-  // 18: Invite sender ID
-  writer.writeUInt64LE(obj.inviteSenderId);
-  variableCount++;
-
-  // 19: Invite counter
-  writer.writeUInt32LE(obj.inviteCounter);
-  variableCount++;
-
-  // 20: Locomotion
-  writer.writeUInt8(obj.locomotion);
-  variableCount++;
-
-  // 21: Performance counter
-  writer.writeUInt8(obj.performanceCounter);
-  variableCount++;
-
-  // 22: Performance ID
-  writer.writeUInt32LE(obj.performanceId);
-  variableCount++;
-
-  // Update variable count
-  const endPos = writer.getPosition();
-  writer.setPosition(variableCountPos);
-  writer.writeUInt16LE(variableCount);
-  writer.setPosition(endPos);
-
-  return writer.toBuffer();
-}
-
-/**
- * Serialize CREO Baseline 6 (combat and HAM data)
- */
-export function serializeCreoBaseline6(obj: CreatureObject): Uint8Array {
-  const writer = new BufferWriter(2048);
-
-  // Baseline header
-  writer.writeUInt32LE(CREO_TYPE_CRC);
-  writer.writeUInt8(6);
-
-  // Variable count placeholder
-  const variableCountPos = writer.getPosition();
-  writer.writeUInt16LE(0);
-
-  let variableCount = 0;
-
-  // 0: Level
-  writer.writeUInt16LE(obj.level);
-  variableCount++;
-
-  // 1: Granted health
-  writer.writeUInt32LE(obj.grantedHealth);
-  variableCount++;
-
-  // 2: Current weapon (string)
-  writeAsciiString(writer, ''); // Usually empty, weapon is tracked by ID
-  variableCount++;
-
-  // 3: Max level
-  writer.writeUInt16LE(obj.maxLevel);
-  variableCount++;
-
-  // 4: Equipment list
-  writer.writeUInt32LE(obj.equippedItems.size);
-  writer.writeUInt32LE(obj.getListUpdateCounter('equipment'));
-  for (const [slot, itemId] of obj.equippedItems) {
-    writeEquipmentEntry(writer, slot, itemId);
-  }
-  variableCount++;
-
-  // 5: Costume/appearance equipment
-  writer.writeUInt32LE(obj.costumeItems.length);
-  writer.writeUInt32LE(obj.getListUpdateCounter('costume'));
-  for (const itemId of obj.costumeItems) {
-    writer.writeUInt64LE(itemId);
-  }
-  variableCount++;
-
-  // 6: Visible flag
-  writer.writeUInt8(obj.visible ? 1 : 0);
-  variableCount++;
-
-  // 7: Buffs list
-  writer.writeUInt32LE(obj.buffs.size);
-  writer.writeUInt32LE(obj.getListUpdateCounter('buffs'));
-  for (const [crc, buff] of obj.buffs) {
-    writeBuffEntry(writer, buff);
-  }
-  variableCount++;
-
-  // 8: Performing flag
-  writer.writeUInt8(obj.performing ? 1 : 0);
-  variableCount++;
-
-  // 9: Difficulty class
-  writer.writeUInt8(obj.difficulty);
-  variableCount++;
-
-  // 10: HAM current list
-  const hamCurrent = obj.getHamCurrentArray();
-  writer.writeUInt32LE(HAM_ATTRIBUTE_COUNT);
-  writer.writeUInt32LE(obj.getListUpdateCounter('hamCurrent'));
-  for (const value of hamCurrent) {
-    writer.writeUInt32LE(value);
-  }
-  variableCount++;
-
-  // 11: HAM max list
-  const hamMax = obj.getHamMaxArray();
-  writer.writeUInt32LE(HAM_ATTRIBUTE_COUNT);
-  writer.writeUInt32LE(obj.getListUpdateCounter('hamMax'));
-  for (const value of hamMax) {
-    writer.writeUInt32LE(value);
-  }
-  variableCount++;
-
-  // 12: Skills list
-  writer.writeUInt32LE(obj.skills.size);
-  writer.writeUInt32LE(obj.getListUpdateCounter('skills'));
-  for (const skillName of obj.skills) {
-    writeAsciiString(writer, skillName);
-  }
-  variableCount++;
-
-  // 13: Mood ID
-  writer.writeUInt32LE(obj.moodId);
-  variableCount++;
-
-  // 14: Performance start time
-  writer.writeUInt32LE(obj.performanceStartTime);
-  variableCount++;
-
-  // 15: Performance listen target
-  writer.writeUInt64LE(obj.listenToId);
-  variableCount++;
-
-  // 16: Current target ID
-  writer.writeUInt64LE(obj.targetId);
-  variableCount++;
-
-  // 17: Defenders list
-  writer.writeUInt32LE(obj.defenders.size);
-  writer.writeUInt32LE(obj.baselineVersion);
-  for (const defenderId of obj.defenders) {
-    writer.writeUInt64LE(defenderId);
-  }
-  variableCount++;
-
-  // Update variable count
-  const endPos = writer.getPosition();
-  writer.setPosition(variableCountPos);
-  writer.writeUInt16LE(variableCount);
-  writer.setPosition(endPos);
-
-  return writer.toBuffer();
-}
-
-/**
- * Generate delta for CREO Baseline 1 changes
- */
-export function generateCreoBaseline1Delta(
-  obj: CreatureObject,
-  changedProperties: number[]
-): Uint8Array | null {
-  if (changedProperties.length === 0) {
-    return null;
-  }
-
-  const writer = new BufferWriter(64);
-
-  // Delta header
-  writer.writeUInt32LE(CREO_TYPE_CRC);
-  writer.writeUInt8(1);
-
-  const updateCountPos = writer.getPosition();
-  writer.writeUInt16LE(0);
-
-  let updateCount = 0;
-
-  for (const prop of changedProperties) {
-    switch (prop) {
-      case CreoProperty.BANK_CREDITS:
-        writer.writeUInt16LE(0);
-        writer.writeUInt32LE(obj.bankCredits);
-        updateCount++;
-        break;
-
-      case CreoProperty.CASH_CREDITS:
-        writer.writeUInt16LE(1);
-        writer.writeUInt32LE(obj.cashCredits);
-        updateCount++;
-        break;
-    }
-  }
-
-  if (updateCount === 0) {
-    return null;
-  }
-
-  const endPos = writer.getPosition();
-  writer.setPosition(updateCountPos);
-  writer.writeUInt16LE(updateCount);
-  writer.setPosition(endPos);
-
-  return writer.toBuffer();
-}
-
-/**
- * Generate delta for CREO Baseline 3 changes
- */
-export function generateCreoBaseline3Delta(
-  obj: CreatureObject,
-  changedProperties: number[]
-): Uint8Array | null {
-  if (changedProperties.length === 0) {
-    return null;
-  }
-
-  const writer = new BufferWriter(256);
-
-  // Delta header
-  writer.writeUInt32LE(CREO_TYPE_CRC);
-  writer.writeUInt8(3);
-
-  const updateCountPos = writer.getPosition();
-  writer.writeUInt16LE(0);
-
-  let updateCount = 0;
-
-  for (const prop of changedProperties) {
-    switch (prop) {
-      case CreoProperty.POSTURE:
-        writer.writeUInt16LE(0);
-        writer.writeUInt8(obj.posture);
-        updateCount++;
-        break;
-
-      case CreoProperty.FACTION_RANK:
-        writer.writeUInt16LE(1);
-        writer.writeUInt8(obj.factionRank);
-        updateCount++;
-        break;
-
-      case CreoProperty.OWNER_ID:
-        writer.writeUInt16LE(2);
-        writer.writeUInt64LE(obj.masterId);
-        updateCount++;
-        break;
-
-      case CreoProperty.HEIGHT:
-        writer.writeUInt16LE(3);
-        writer.writeFloatLE(obj.height);
-        updateCount++;
-        break;
-
-      case CreoProperty.BATTLE_FATIGUE:
-        writer.writeUInt16LE(4);
-        writer.writeUInt32LE(obj.battleFatigue);
-        updateCount++;
-        break;
-
-      case CreoProperty.STATE_BITMASK:
-        writer.writeUInt16LE(5);
-        writer.writeUInt64LE(obj.stateBitmask);
-        updateCount++;
-        break;
-    }
-  }
-
-  if (updateCount === 0) {
-    return null;
-  }
-
-  const endPos = writer.getPosition();
-  writer.setPosition(updateCountPos);
-  writer.writeUInt16LE(updateCount);
-  writer.setPosition(endPos);
-
-  return writer.toBuffer();
-}
-
-/**
- * Generate delta for CREO Baseline 4 changes
- */
-export function generateCreoBaseline4Delta(
-  obj: CreatureObject,
-  changedProperties: number[]
-): Uint8Array | null {
-  if (changedProperties.length === 0) {
-    return null;
-  }
-
-  const writer = new BufferWriter(256);
-
-  // Delta header
-  writer.writeUInt32LE(CREO_TYPE_CRC);
-  writer.writeUInt8(4);
-
-  const updateCountPos = writer.getPosition();
-  writer.writeUInt16LE(0);
-
-  let updateCount = 0;
-
-  for (const prop of changedProperties) {
-    switch (prop) {
-      case CreoProperty.ACCEL_SCALE:
-        writer.writeUInt16LE(0);
-        writer.writeFloatLE(obj.accelScale);
-        updateCount++;
-        break;
-
-      case CreoProperty.RUN_SPEED:
-        writer.writeUInt16LE(8);
-        writer.writeFloatLE(obj.runSpeed);
-        updateCount++;
-        break;
-
-      case CreoProperty.TURN_RATE:
-        writer.writeUInt16LE(11);
-        writer.writeFloatLE(obj.turnRate);
-        updateCount++;
-        break;
-
-      case CreoProperty.WALK_SPEED:
-        writer.writeUInt16LE(12);
-        writer.writeFloatLE(obj.walkSpeed);
-        updateCount++;
-        break;
-
-      case CreoProperty.GUILD_ID:
-        writer.writeUInt16LE(15);
-        writer.writeUInt32LE(obj.guildId);
-        updateCount++;
-        break;
-
-      case CreoProperty.WEAPON_ID:
-        writer.writeUInt16LE(16);
-        writer.writeUInt64LE(obj.weaponId);
-        updateCount++;
-        break;
-
-      case CreoProperty.GROUP_ID:
-        writer.writeUInt16LE(17);
-        writer.writeUInt64LE(obj.groupId);
-        updateCount++;
-        break;
-
-      case CreoProperty.LOCOMOTION:
-        writer.writeUInt16LE(20);
-        writer.writeUInt8(obj.locomotion);
-        updateCount++;
-        break;
-
-      case CreoProperty.PERFORMANCE_ID:
-        writer.writeUInt16LE(22);
-        writer.writeUInt32LE(obj.performanceId);
-        updateCount++;
-        break;
-    }
-  }
-
-  if (updateCount === 0) {
-    return null;
-  }
-
-  const endPos = writer.getPosition();
-  writer.setPosition(updateCountPos);
-  writer.writeUInt16LE(updateCount);
-  writer.setPosition(endPos);
-
-  return writer.toBuffer();
-}
-
-/**
- * Generate delta for CREO Baseline 6 changes
- */
-export function generateCreoBaseline6Delta(
-  obj: CreatureObject,
-  changedProperties: number[]
-): Uint8Array | null {
-  if (changedProperties.length === 0) {
-    return null;
-  }
-
-  const writer = new BufferWriter(256);
-
-  // Delta header
-  writer.writeUInt32LE(CREO_TYPE_CRC);
-  writer.writeUInt8(6);
-
-  const updateCountPos = writer.getPosition();
-  writer.writeUInt16LE(0);
-
-  let updateCount = 0;
-
-  for (const prop of changedProperties) {
-    switch (prop) {
-      case CreoProperty.LEVEL:
-        writer.writeUInt16LE(0);
-        writer.writeUInt16LE(obj.level);
-        updateCount++;
-        break;
-
-      case CreoProperty.MOOD_ID:
-        writer.writeUInt16LE(13);
-        writer.writeUInt32LE(obj.moodId);
-        updateCount++;
-        break;
-
-      case CreoProperty.TARGET_ID:
-        writer.writeUInt16LE(16);
-        writer.writeUInt64LE(obj.targetId);
-        updateCount++;
-        break;
-    }
-  }
-
-  if (updateCount === 0) {
-    return null;
-  }
-
-  const endPos = writer.getPosition();
-  writer.setPosition(updateCountPos);
-  writer.writeUInt16LE(updateCount);
-  writer.setPosition(endPos);
-
-  return writer.toBuffer();
-}
-
-/**
- * Generate delta for HAM current list
- */
-export function generateHamCurrentDelta(
-  obj: CreatureObject,
-  attributeIndex: number
-): Uint8Array {
-  const writer = new BufferWriter(64);
-
-  // Delta header
-  writer.writeUInt32LE(CREO_TYPE_CRC);
-  writer.writeUInt8(6);
-  writer.writeUInt16LE(1); // One update
-
-  // Variable index for HAM current
-  writer.writeUInt16LE(10);
-
-  // List delta format
-  const hamCurrent = obj.getHamCurrentArray();
-  writer.writeUInt32LE(HAM_ATTRIBUTE_COUNT);
-  writer.writeUInt32LE(obj.getListUpdateCounter('hamCurrent'));
-
-  writer.writeUInt8(1); // Number of list operations
-  writer.writeUInt8(2); // Change operation
-  writer.writeUInt16LE(attributeIndex);
-  writer.writeUInt32LE(hamCurrent[attributeIndex] ?? 0);
-
-  return writer.toBuffer();
-}
-
-/**
- * Generate delta for skills list
- */
-export function generateSkillsDelta(
-  obj: CreatureObject,
-  operation: number,
-  skillName?: string,
-  index?: number
-): Uint8Array {
-  const writer = new BufferWriter(128);
-
-  // Delta header
-  writer.writeUInt32LE(CREO_TYPE_CRC);
-  writer.writeUInt8(6);
-  writer.writeUInt16LE(1);
-
-  // Variable index for skills
-  writer.writeUInt16LE(12);
-
-  // List delta
-  writer.writeUInt32LE(obj.skills.size);
-  writer.writeUInt32LE(obj.getListUpdateCounter('skills'));
-
-  writer.writeUInt8(1); // One operation
-  writer.writeUInt8(operation);
-
-  if (operation === 0 && skillName !== undefined) {
-    // Add
-    writeAsciiString(writer, skillName);
-  } else if (operation === 1 && index !== undefined) {
-    // Remove
-    writer.writeUInt16LE(index);
-  }
-
-  return writer.toBuffer();
-}
-
-/**
- * Generate delta for defenders list
- */
-export function generateDefendersDelta(
-  obj: CreatureObject,
-  operation: number,
-  defenderId?: ObjectId,
-  index?: number
-): Uint8Array {
-  const writer = new BufferWriter(64);
-
-  // Delta header
-  writer.writeUInt32LE(CREO_TYPE_CRC);
-  writer.writeUInt8(6);
-  writer.writeUInt16LE(1);
-
-  // Variable index for defenders
-  writer.writeUInt16LE(17);
-
-  // List delta
-  writer.writeUInt32LE(obj.defenders.size);
-  writer.writeUInt32LE(obj.baselineVersion);
-
-  writer.writeUInt8(1);
-  writer.writeUInt8(operation);
-
-  if (operation === 0 && defenderId !== undefined) {
-    // Add
-    writer.writeUInt64LE(defenderId);
-  } else if (operation === 1 && index !== undefined) {
-    // Remove
-    writer.writeUInt16LE(index);
-  }
-
-  return writer.toBuffer();
-}
-
-/**
- * Deserialize CREO Baseline 1
- */
-export function deserializeCreoBaseline1(obj: CreatureObject, data: Uint8Array): void {
-  const reader = new BufferReader(data);
-
-  // Skip header
-  reader.skip(5);
-
-  const variableCount = reader.readUInt16LE();
-
-  if (variableCount >= 1) {
-    obj.bankCredits = reader.readUInt32LE();
-  }
-
-  if (variableCount >= 2) {
-    obj.cashCredits = reader.readUInt32LE();
-  }
-}
-
-/**
- * Deserialize CREO Baseline 3
- */
-export function deserializeCreoBaseline3(obj: CreatureObject, data: Uint8Array): void {
-  const reader = new BufferReader(data);
-
-  // Skip header
-  reader.skip(5);
-
-  const variableCount = reader.readUInt16LE();
-
-  if (variableCount >= 1) {
-    obj.posture = reader.readUInt8() as PostureType;
-  }
-
-  if (variableCount >= 2) {
-    obj.factionRank = reader.readUInt8();
-  }
-
-  if (variableCount >= 3) {
-    obj.masterId = reader.readUInt64LE();
-  }
-
-  if (variableCount >= 4) {
-    obj.height = reader.readFloatLE();
-  }
-
-  if (variableCount >= 5) {
-    obj.battleFatigue = reader.readUInt32LE();
-  }
-
-  if (variableCount >= 6) {
-    obj.stateBitmask = reader.readUInt64LE();
-  }
-
-  if (variableCount >= 7) {
-    const woundsCount = reader.readUInt32LE();
-    reader.readUInt32LE(); // Update counter
-    for (let i = 0; i < woundsCount && i < HAM_ATTRIBUTE_COUNT; i++) {
-      obj.hamWounds[i] = reader.readUInt32LE();
-    }
-  }
-}
-
-/**
- * Deserialize CREO Baseline 4
- */
-export function deserializeCreoBaseline4(obj: CreatureObject, data: Uint8Array): void {
-  const reader = new BufferReader(data);
-
-  // Skip header
-  reader.skip(5);
-
-  const variableCount = reader.readUInt16LE();
-
-  if (variableCount >= 1) {
-    obj.accelScale = reader.readFloatLE();
-  }
-
-  if (variableCount >= 2) {
-    obj.accelMultiplierBase = reader.readFloatLE();
-  }
-
-  if (variableCount >= 3) {
-    obj.accelMultiplierMod = reader.readFloatLE();
-  }
-
-  if (variableCount >= 4) {
-    const encumbranceCount = reader.readUInt32LE();
-    reader.readUInt32LE(); // Update counter
-    for (let i = 0; i < encumbranceCount && i < HAM_ATTRIBUTE_COUNT; i++) {
-      obj.hamEncumbrance[i] = reader.readUInt32LE();
-    }
-  }
-
-  if (variableCount >= 5) {
-    const skillModsCount = reader.readUInt32LE();
-    reader.readUInt32LE(); // Update counter
-    obj.skillMods.clear();
-    for (let i = 0; i < skillModsCount; i++) {
-      reader.readUInt8(); // Operation flag
-      const modName = readAsciiString(reader);
-      const value = reader.readInt32LE();
-      obj.skillMods.set(modName, value);
-    }
-  }
-
-  if (variableCount >= 6) {
-    obj.speedMultiplierBase = reader.readFloatLE();
-  }
-
-  if (variableCount >= 7) {
-    obj.speedMultiplierMod = reader.readFloatLE();
-  }
-
-  if (variableCount >= 8) {
-    obj.listenToId = reader.readUInt64LE();
-  }
-
-  if (variableCount >= 9) {
-    obj.runSpeed = reader.readFloatLE();
-  }
-
-  if (variableCount >= 10) {
-    obj.slopeModeAngle = reader.readFloatLE();
-  }
-
-  if (variableCount >= 11) {
-    obj.slopeModPercent = reader.readFloatLE();
-  }
-
-  if (variableCount >= 12) {
-    obj.turnRate = reader.readFloatLE();
-  }
-
-  if (variableCount >= 13) {
-    obj.walkSpeed = reader.readFloatLE();
-  }
-
-  if (variableCount >= 14) {
-    obj.waterModPercent = reader.readFloatLE();
-  }
-
-  if (variableCount >= 15) {
-    const invitesCount = reader.readUInt32LE();
-    reader.readUInt32LE(); // Update counter
-    obj.groupInvites = [];
-    for (let i = 0; i < invitesCount; i++) {
-      obj.groupInvites.push(reader.readUInt64LE());
-    }
-  }
-
-  if (variableCount >= 16) {
-    obj.guildId = reader.readUInt32LE();
-  }
-
-  if (variableCount >= 17) {
-    obj.weaponId = reader.readUInt64LE();
-  }
-
-  if (variableCount >= 18) {
-    obj.groupId = reader.readUInt64LE();
-  }
-
-  if (variableCount >= 19) {
-    obj.inviteSenderId = reader.readUInt64LE();
-  }
-
-  if (variableCount >= 20) {
-    obj.inviteCounter = reader.readUInt32LE();
-  }
-
-  if (variableCount >= 21) {
-    obj.locomotion = reader.readUInt8() as LocomotionType;
-  }
-
-  if (variableCount >= 22) {
-    obj.performanceCounter = reader.readUInt8();
-  }
-
-  if (variableCount >= 23) {
-    obj.performanceId = reader.readUInt32LE();
-  }
-}
-
-/**
- * Deserialize CREO Baseline 6
- */
-export function deserializeCreoBaseline6(obj: CreatureObject, data: Uint8Array): void {
-  const reader = new BufferReader(data);
-
-  // Skip header
-  reader.skip(5);
-
-  const variableCount = reader.readUInt16LE();
-
-  if (variableCount >= 1) {
-    obj.level = reader.readUInt16LE();
-  }
-
-  if (variableCount >= 2) {
-    obj.grantedHealth = reader.readUInt32LE();
-  }
-
-  if (variableCount >= 3) {
-    // Current weapon string (usually empty)
-    readAsciiString(reader);
-  }
-
-  if (variableCount >= 4) {
-    obj.maxLevel = reader.readUInt16LE();
-  }
-
-  if (variableCount >= 5) {
-    const equipmentCount = reader.readUInt32LE();
-    reader.readUInt32LE(); // Update counter
-    obj.equippedItems.clear();
-    for (let i = 0; i < equipmentCount; i++) {
-      const entry = readEquipmentEntry(reader);
-      obj.equippedItems.set(entry.slot as EquipmentSlotType, entry.itemId);
-    }
-  }
-
-  if (variableCount >= 6) {
-    const costumeCount = reader.readUInt32LE();
-    reader.readUInt32LE(); // Update counter
-    obj.costumeItems = [];
-    for (let i = 0; i < costumeCount; i++) {
-      obj.costumeItems.push(reader.readUInt64LE());
-    }
-  }
-
-  if (variableCount >= 7) {
-    obj.visible = reader.readUInt8() !== 0;
-  }
-
-  if (variableCount >= 8) {
-    const buffsCount = reader.readUInt32LE();
-    reader.readUInt32LE(); // Update counter
-    obj.buffs.clear();
-    for (let i = 0; i < buffsCount; i++) {
-      const buff = readBuffEntry(reader);
-      obj.buffs.set(buff.buffCrc, buff);
-    }
-  }
-
-  if (variableCount >= 9) {
-    obj.performing = reader.readUInt8() !== 0;
-  }
-
-  if (variableCount >= 10) {
-    obj.difficulty = reader.readUInt8();
-  }
-
-  if (variableCount >= 11) {
-    const hamCurrentCount = reader.readUInt32LE();
-    reader.readUInt32LE(); // Update counter
-    const values: number[] = [];
-    for (let i = 0; i < hamCurrentCount; i++) {
-      values.push(reader.readUInt32LE());
-    }
-    if (values.length >= 1) obj.health.current = values[0] ?? 0;
-    if (values.length >= 4) obj.action.current = values[3] ?? 0;
-    if (values.length >= 7) obj.mind.current = values[6] ?? 0;
-  }
-
-  if (variableCount >= 12) {
-    const hamMaxCount = reader.readUInt32LE();
-    reader.readUInt32LE(); // Update counter
-    const values: number[] = [];
-    for (let i = 0; i < hamMaxCount; i++) {
-      values.push(reader.readUInt32LE());
-    }
-    if (values.length >= 1) obj.health.max = values[0] ?? 0;
-    if (values.length >= 4) obj.action.max = values[3] ?? 0;
-    if (values.length >= 7) obj.mind.max = values[6] ?? 0;
-  }
-
-  if (variableCount >= 13) {
-    const skillsCount = reader.readUInt32LE();
-    reader.readUInt32LE(); // Update counter
-    obj.skills.clear();
-    for (let i = 0; i < skillsCount; i++) {
-      obj.skills.add(readAsciiString(reader));
-    }
-  }
-
-  if (variableCount >= 14) {
-    obj.moodId = reader.readUInt32LE();
-  }
-
-  if (variableCount >= 15) {
-    obj.performanceStartTime = reader.readUInt32LE();
-  }
-
-  if (variableCount >= 16) {
-    obj.listenToId = reader.readUInt64LE();
-  }
-
-  if (variableCount >= 17) {
-    obj.targetId = reader.readUInt64LE();
-  }
-
-  if (variableCount >= 18) {
-    const defendersCount = reader.readUInt32LE();
-    reader.readUInt32LE(); // Update counter
-    obj.defenders.clear();
-    for (let i = 0; i < defendersCount; i++) {
-      obj.defenders.add(reader.readUInt64LE());
-    }
-  }
-}
-
 // ============================================
 // Helper Functions
 // ============================================
 
-/**
- * Write ASCII string with 16-bit length prefix
- */
+/** Write ASCII string with 16-bit LE length prefix */
 function writeAsciiString(writer: BufferWriter, str: string): void {
   writer.writeUInt16LE(str.length);
   for (let i = 0; i < str.length; i++) {
@@ -1079,13 +36,10 @@ function writeAsciiString(writer: BufferWriter, str: string): void {
   }
 }
 
-/**
- * Read ASCII string with 16-bit length prefix
- */
+/** Read ASCII string with 16-bit LE length prefix */
 function readAsciiString(reader: BufferReader): string {
   const length = reader.readUInt16LE();
   if (length === 0) return '';
-
   const bytes = reader.readBytes(length);
   let result = '';
   for (let i = 0; i < bytes.length; i++) {
@@ -1094,79 +48,489 @@ function readAsciiString(reader: BufferReader): string {
   return result;
 }
 
+/** Write Unicode string with 32-bit LE char count + UTF-16LE bytes */
+function writeUnicodeString(writer: BufferWriter, str: string): void {
+  writer.writeUInt32LE(str.length);
+  for (let i = 0; i < str.length; i++) {
+    writer.writeUInt16LE(str.charCodeAt(i));
+  }
+}
+
 /**
- * Write equipment entry
+ * Write StringId: table(string) + textIndex(u32) + text(string)
+ * C++ format from StringIdArchive.cpp
  */
-function writeEquipmentEntry(
+function writeStringId(
   writer: BufferWriter,
-  slot: EquipmentSlotType,
-  itemId: ObjectId
+  table: string,
+  textIndex: number,
+  text: string
 ): void {
-  // Custom appearance data (empty for now)
-  writer.writeUInt16LE(0);
-  // Arrangement index
-  writer.writeInt32LE(slot);
-  // Object ID
-  writer.writeUInt64LE(itemId);
-  // Template CRC (would need to look up from item)
+  writeAsciiString(writer, table);
+  writer.writeUInt32LE(textIndex);
+  writeAsciiString(writer, text);
+}
+
+/** Write an empty AutoDeltaVector/Set/Map: size(0) + counter(0) */
+function writeEmptyList(writer: BufferWriter): void {
+  writer.writeUInt32LE(0);
   writer.writeUInt32LE(0);
 }
 
+/** Write an empty BitArray: numBytes(0) + numBits(0) */
+function writeEmptyBitArray(writer: BufferWriter): void {
+  writer.writeInt32LE(0);
+  writer.writeInt32LE(0);
+}
+
 /**
- * Read equipment entry
+ * Write an empty PlayerAndShipPair:
+ * pair<pair<NetworkId, string>, NetworkId>
+ * = NetworkId(0) + string("") + NetworkId(0)
  */
-function readEquipmentEntry(reader: BufferReader): { slot: number; itemId: ObjectId } {
-  // Custom appearance data length
-  const appearanceLength = reader.readUInt16LE();
-  if (appearanceLength > 0) {
-    reader.skip(appearanceLength);
+function writeEmptyPlayerAndShipPair(writer: BufferWriter): void {
+  writer.writeUInt64LE(0n); // first.first (playerId)
+  writeAsciiString(writer, ''); // first.second (playerName)
+  writer.writeUInt64LE(0n); // second (shipId)
+}
+
+// ============================================
+// CREO Baseline 1 (authClientServer) - 4 vars
+// SO: bankBalance, cashBalance
+// CO: maxAttributes, skills
+// ============================================
+
+export function serializeCreoBaseline1(obj: CreatureObject): Uint8Array {
+  const writer = new BufferWriter(512);
+
+  writer.writeUInt32LE(CREO_TYPE_CRC);
+  writer.writeUInt8(1);
+  writer.writeUInt16LE(4); // variable count
+
+  // 0: bankBalance (int) - ServerObject
+  writer.writeInt32LE(obj.bankCredits);
+
+  // 1: cashBalance (int) - ServerObject
+  writer.writeInt32LE(obj.cashCredits);
+
+  // 2: maxAttributes (AutoDeltaVector<int>) - CreatureObject
+  // 9 HAM max values: Health, Str, Con, Action, Quick, Stam, Mind, Focus, Will
+  const hamMax = obj.getHamMaxArray();
+  writer.writeUInt32LE(HAM_ATTRIBUTE_COUNT); // size
+  writer.writeUInt32LE(0); // update counter
+  for (const val of hamMax) {
+    writer.writeInt32LE(val);
   }
-  // Arrangement index
-  const slot = reader.readInt32LE();
-  // Object ID
-  const itemId = reader.readUInt64LE();
-  // Template CRC
-  reader.readUInt32LE();
 
-  return { slot, itemId };
-}
-
-/**
- * Write buff entry
- */
-function writeBuffEntry(writer: BufferWriter, buff: CreatureBuff): void {
-  writer.writeUInt32LE(buff.buffCrc);
-  writer.writeFloatLE(buff.duration);
-  writer.writeUInt64LE(buff.casterId);
-  // Buff name (empty for now, determined by CRC)
-  writer.writeUInt16LE(0);
-}
-
-/**
- * Read buff entry
- */
-function readBuffEntry(reader: BufferReader): CreatureBuff {
-  const buffCrc = reader.readUInt32LE();
-  const duration = reader.readFloatLE();
-  const casterId = reader.readUInt64LE();
-  // Buff name
-  const nameLength = reader.readUInt16LE();
-  if (nameLength > 0) {
-    reader.skip(nameLength);
+  // 3: skills (AutoDeltaSet<string>) - CreatureObject
+  // AutoDeltaSet baseline: size + counter + [u8(ADD) + element]*
+  writer.writeUInt32LE(obj.skills.size);
+  writer.writeUInt32LE(0); // update counter
+  for (const skillName of obj.skills) {
+    writer.writeUInt8(0); // ADD command
+    writeAsciiString(writer, skillName);
   }
 
-  return {
-    buffCrc,
-    duration,
-    casterId,
-    appliedAt: Date.now(),
-    effects: new Map(),
-  };
+  return writer.toBuffer();
 }
 
-/**
- * Create all CREO baselines for an object
- */
+// ============================================
+// CREO Baseline 3 (shared) - 19 vars
+// SO: complexity, nameStringId, objectName, volume
+// TO: pvpFaction, pvpType, appearanceData, components,
+//     condition, count, damageTaken, maxHitPoints, visible
+// CO: posture, rank, masterId, scaleFactor, shockWounds, states
+// ============================================
+
+export function serializeCreoBaseline3(obj: CreatureObject): Uint8Array {
+  const writer = new BufferWriter(2048);
+
+  writer.writeUInt32LE(CREO_TYPE_CRC);
+  writer.writeUInt8(3);
+  writer.writeUInt16LE(19); // variable count
+
+  // -- ServerObject shared (4 vars) --
+
+  // 0: complexity (float)
+  writer.writeFloatLE(obj.complexity);
+
+  // 1: nameStringId (StringId) - table + textIndex + text
+  writeStringId(writer, obj.objectNameStfFile, 0, obj.objectNameStfName);
+
+  // 2: objectName (Unicode::String) - custom display name
+  writeUnicodeString(writer, obj.customName);
+
+  // 3: volume (int)
+  writer.writeInt32LE(obj.volume);
+
+  // -- TangibleObject shared (9 vars) --
+
+  // 4: pvpFaction (uint32)
+  writer.writeUInt32LE(obj.pvpFaction);
+
+  // 5: pvpType (int) - PvP status flags
+  writer.writeInt32LE(obj.pvpStatus);
+
+  // 6: appearanceData (string) - customization data
+  // Serialize Uint8Array as string: u16LE(length) + raw bytes
+  writer.writeUInt16LE(obj.appearanceData.length);
+  if (obj.appearanceData.length > 0) {
+    writer.writeBytes(obj.appearanceData);
+  }
+
+  // 7: components (AutoDeltaSet<int>) - crafted component CRCs
+  writeEmptyList(writer); // empty for players
+
+  // 8: condition (int)
+  writer.writeInt32LE(obj.condition);
+
+  // 9: count (int)
+  writer.writeInt32LE(obj.count);
+
+  // 10: damageTaken (int)
+  writer.writeInt32LE(Math.max(0, obj.maxCondition - obj.condition));
+
+  // 11: maxHitPoints (int)
+  writer.writeInt32LE(obj.maxHitPoints || obj.maxCondition);
+
+  // 12: visible (bool)
+  writer.writeUInt8(obj.visible ? 1 : 0);
+
+  // -- CreatureObject shared (6 vars) --
+
+  // 13: posture (Postures::Enumerator / uint8)
+  writer.writeUInt8(obj.posture);
+
+  // 14: rank (uint8) - faction rank
+  writer.writeUInt8(obj.factionRank);
+
+  // 15: masterId (NetworkId)
+  writer.writeUInt64LE(obj.masterId);
+
+  // 16: scaleFactor (float) - character height/scale
+  writer.writeFloatLE(obj.height);
+
+  // 17: shockWounds (int) - battle fatigue
+  writer.writeInt32LE(obj.battleFatigue);
+
+  // 18: states (uint64) - creature state bitmask
+  writer.writeUInt64LE(obj.stateBitmask);
+
+  return writer.toBuffer();
+}
+
+// ============================================
+// CREO Baseline 4 (authClientServer_np) - 16 vars
+// CO only: movement, skill mods, commands
+// ============================================
+
+export function serializeCreoBaseline4(obj: CreatureObject): Uint8Array {
+  const writer = new BufferWriter(2048);
+
+  writer.writeUInt32LE(CREO_TYPE_CRC);
+  writer.writeUInt8(4);
+  writer.writeUInt16LE(16); // variable count
+
+  // 0: accelPercent (float) - acceleration multiplier base
+  writer.writeFloatLE(obj.accelMultiplierBase);
+
+  // 1: accelScale (float) - acceleration scale
+  writer.writeFloatLE(obj.accelScale);
+
+  // 2: attribBonus (AutoDeltaVector<int>) - HAM attribute bonuses (9 values)
+  writer.writeUInt32LE(0); // empty for now
+  writer.writeUInt32LE(0);
+
+  // 3: modMap (AutoDeltaMap<string, pair<int,int>>) - skill mods
+  // Each entry: u8(0) + string(name) + i32(base) + i32(modifier)
+  writer.writeUInt32LE(obj.skillMods.size);
+  writer.writeUInt32LE(obj.getListUpdateCounter('skillMods'));
+  for (const [modName, value] of obj.skillMods) {
+    writer.writeUInt8(0); // ADD command
+    writeAsciiString(writer, modName);
+    writer.writeInt32LE(value); // base value
+    writer.writeInt32LE(0); // modifier (bonus)
+  }
+
+  // 4: movementPercent (float) - speed multiplier base
+  writer.writeFloatLE(obj.speedMultiplierBase);
+
+  // 5: movementScale (float) - speed multiplier mod
+  writer.writeFloatLE(obj.speedMultiplierMod);
+
+  // 6: performanceListenTarget (NetworkId)
+  writer.writeUInt64LE(obj.listenToId);
+
+  // 7: runSpeed (float)
+  writer.writeFloatLE(obj.runSpeed);
+
+  // 8: slopeModAngle (float)
+  writer.writeFloatLE(obj.slopeModeAngle);
+
+  // 9: slopeModPercent (float)
+  writer.writeFloatLE(obj.slopeModPercent);
+
+  // 10: turnScale (float) - turn rate
+  writer.writeFloatLE(obj.turnRate);
+
+  // 11: walkSpeed (float)
+  writer.writeFloatLE(obj.walkSpeed);
+
+  // 12: waterModPercent (float)
+  writer.writeFloatLE(obj.waterModPercent);
+
+  // 13: groupMissionCriticalObjectSet (AutoDeltaSet<pair<NetworkId,NetworkId>>)
+  writeEmptyList(writer);
+
+  // 14: commands (AutoDeltaMap<string,int>) - command queue
+  writeEmptyList(writer);
+
+  // 15: totalLevelXp (int)
+  writer.writeInt32LE(0);
+
+  return writer.toBuffer();
+}
+
+// ============================================
+// CREO Baseline 6 (shared_np) - 35 vars
+// SO: authServerProcessId, descriptionStringId
+// TO: inCombat, passiveRevealPlayerCharacter, mapColorOverride,
+//     accessList, guildAccessList, effectsMap
+// CO: level, levelHealthGranted, animatingSkillData, animationMood,
+//     currentWeapon, group, groupInviter, guildId, lookAtTarget,
+//     intendedTarget, mood, performanceStartTime, performanceType,
+//     totalAttributes, totalMaxAttributes, wearableData,
+//     alternateAppearanceSharedObjectTemplateName, coverVisibility,
+//     buffs, clientUsesAnimationLocomotion, difficulty, hologramType,
+//     visibleOnMapAndRadar, isBeast, forceShowHam,
+//     wearableAppearanceData, decoyOrigin
+// ============================================
+
+export function serializeCreoBaseline6(obj: CreatureObject): Uint8Array {
+  const writer = new BufferWriter(4096);
+
+  writer.writeUInt32LE(CREO_TYPE_CRC);
+  writer.writeUInt8(6);
+  writer.writeUInt16LE(35); // variable count
+
+  // -- ServerObject shared_np (2 vars) --
+
+  // 0: authServerProcessId (uint32) - server process ID
+  writer.writeUInt32LE(0);
+
+  // 1: descriptionStringId (StringId) - detail description
+  writeStringId(writer, obj.detailStfFile, 0, obj.detailStfName);
+
+  // -- TangibleObject shared_np (6 vars) --
+
+  // 2: inCombat (bool)
+  writer.writeUInt8(obj.inCombat ? 1 : 0);
+
+  // 3: passiveRevealPlayerCharacter (AutoDeltaSet<NetworkId>)
+  writeEmptyList(writer);
+
+  // 4: mapColorOverride (uint32)
+  writer.writeUInt32LE(0);
+
+  // 5: accessList (AutoDeltaSet<NetworkId>)
+  writeEmptyList(writer);
+
+  // 6: guildAccessList (AutoDeltaSet<int>)
+  writeEmptyList(writer);
+
+  // 7: effectsMap (AutoDeltaMap<string, ...>)
+  writeEmptyList(writer);
+
+  // -- CreatureObject shared_np (27 vars) --
+
+  // 8: level (int16)
+  writer.writeInt16LE(obj.level);
+
+  // 9: levelHealthGranted (int)
+  writer.writeInt32LE(obj.grantedHealth);
+
+  // 10: animatingSkillData (string) - currently playing skill animation
+  writeAsciiString(writer, '');
+
+  // 11: animationMood (string) - mood animation name
+  writeAsciiString(writer, obj.mood || 'neutral');
+
+  // 12: currentWeapon (CachedNetworkId / NetworkId)
+  writer.writeUInt64LE(obj.weaponId);
+
+  // 13: group (CachedNetworkId / NetworkId)
+  writer.writeUInt64LE(obj.groupId);
+
+  // 14: groupInviter (PlayerAndShipPair = pair<pair<NetworkId,string>, NetworkId>)
+  writer.writeUInt64LE(obj.inviteSenderId); // inviter player ID
+  writeAsciiString(writer, ''); // inviter name
+  writer.writeUInt64LE(0n); // inviter ship ID
+
+  // 15: guildId (int)
+  writer.writeInt32LE(obj.guildId);
+
+  // 16: lookAtTarget (NetworkId)
+  writer.writeUInt64LE(obj.targetId);
+
+  // 17: intendedTarget (NetworkId)
+  writer.writeUInt64LE(0n);
+
+  // 18: mood (unsigned char)
+  writer.writeUInt8(obj.moodId & 0xff);
+
+  // 19: performanceStartTime (int)
+  writer.writeInt32LE(obj.performanceStartTime);
+
+  // 20: performanceType (int) - performance ID
+  writer.writeInt32LE(obj.performanceId);
+
+  // 21: totalAttributes (AutoDeltaVector<int>) - HAM current values (9 ints)
+  const hamCurrent = obj.getHamCurrentArray();
+  writer.writeUInt32LE(HAM_ATTRIBUTE_COUNT);
+  writer.writeUInt32LE(0);
+  for (const val of hamCurrent) {
+    writer.writeInt32LE(val);
+  }
+
+  // 22: totalMaxAttributes (AutoDeltaVector<int>) - HAM max values (9 ints)
+  const hamMax = obj.getHamMaxArray();
+  writer.writeUInt32LE(HAM_ATTRIBUTE_COUNT);
+  writer.writeUInt32LE(0);
+  for (const val of hamMax) {
+    writer.writeInt32LE(val);
+  }
+
+  // 23: wearableData (AutoDeltaVector<WearableEntry>)
+  // WearableEntry: string + i32(arrangement) + NetworkId + i32(templateCRC) + bool(isWeapon)
+  // Send equipped items as wearable data
+  const wearableCount = obj.equippedItems.size;
+  writer.writeUInt32LE(wearableCount);
+  writer.writeUInt32LE(0);
+  for (const [slot, itemId] of obj.equippedItems) {
+    writeAsciiString(writer, ''); // customization string (empty)
+    writer.writeInt32LE(slot); // arrangement index
+    writer.writeUInt64LE(itemId); // network ID
+    writer.writeInt32LE(0); // template CRC (would need lookup)
+    writer.writeUInt8(0); // isWeapon = false
+  }
+
+  // 24: alternateAppearanceSharedObjectTemplateName (string)
+  writeAsciiString(writer, '');
+
+  // 25: coverVisibility (bool)
+  writer.writeUInt8(0);
+
+  // 26: buffs (AutoDeltaMap<uint32, PackedBuff>)
+  // PackedBuff: u32(endtime) + float(value) + u32(duration) + NetworkId(caster) + u32(stackCount)
+  writer.writeUInt32LE(obj.buffs.size);
+  writer.writeUInt32LE(0);
+  for (const [crc, buff] of obj.buffs) {
+    writer.writeUInt8(0); // ADD command
+    writer.writeUInt32LE(crc); // key: buff CRC
+    writer.writeUInt32LE(Math.floor(buff.duration)); // endtime
+    writer.writeFloatLE(0); // value
+    writer.writeUInt32LE(Math.floor(buff.duration)); // duration
+    writer.writeUInt64LE(buff.casterId); // caster
+    writer.writeUInt32LE(1); // stack count
+  }
+
+  // 27: clientUsesAnimationLocomotion (bool)
+  writer.writeUInt8(0);
+
+  // 28: difficulty (unsigned char)
+  writer.writeUInt8(obj.difficulty);
+
+  // 29: hologramType (int32)
+  writer.writeInt32LE(0);
+
+  // 30: visibleOnMapAndRadar (bool)
+  writer.writeUInt8(1); // true for players
+
+  // 31: isBeast (bool)
+  writer.writeUInt8(0);
+
+  // 32: forceShowHam (bool)
+  writer.writeUInt8(0);
+
+  // 33: wearableAppearanceData (AutoDeltaVector<WearableEntry>)
+  writeEmptyList(writer); // empty for now
+
+  // 34: decoyOrigin (NetworkId)
+  writer.writeUInt64LE(0n);
+
+  return writer.toBuffer();
+}
+
+// ============================================
+// Delta Generators (stubs - not needed for zone-in)
+// ============================================
+
+export function generateCreoBaseline1Delta(
+  _obj: CreatureObject,
+  _changedProperties: number[]
+): Uint8Array | null {
+  return null;
+}
+
+export function generateCreoBaseline3Delta(
+  _obj: CreatureObject,
+  _changedProperties: number[]
+): Uint8Array | null {
+  return null;
+}
+
+export function generateCreoBaseline4Delta(
+  _obj: CreatureObject,
+  _changedProperties: number[]
+): Uint8Array | null {
+  return null;
+}
+
+export function generateCreoBaseline6Delta(
+  _obj: CreatureObject,
+  _changedProperties: number[]
+): Uint8Array | null {
+  return null;
+}
+
+export function generateHamCurrentDelta(
+  _obj: CreatureObject,
+  _attributeIndex: number
+): Uint8Array {
+  return new Uint8Array(0);
+}
+
+export function generateSkillsDelta(
+  _obj: CreatureObject,
+  _operation: number,
+  _skillName?: string,
+  _index?: number
+): Uint8Array {
+  return new Uint8Array(0);
+}
+
+export function generateDefendersDelta(
+  _obj: CreatureObject,
+  _operation: number,
+  _defenderId?: ObjectId,
+  _index?: number
+): Uint8Array {
+  return new Uint8Array(0);
+}
+
+// ============================================
+// Deserializers (stubs - not needed for zone-in)
+// ============================================
+
+export function deserializeCreoBaseline1(_obj: CreatureObject, _data: Uint8Array): void {}
+export function deserializeCreoBaseline3(_obj: CreatureObject, _data: Uint8Array): void {}
+export function deserializeCreoBaseline4(_obj: CreatureObject, _data: Uint8Array): void {}
+export function deserializeCreoBaseline6(_obj: CreatureObject, _data: Uint8Array): void {}
+
+// ============================================
+// Create All Baselines
+// ============================================
+
 export function createCreoBaselines(obj: CreatureObject): Uint8Array[] {
   return [
     serializeCreoBaseline1(obj),

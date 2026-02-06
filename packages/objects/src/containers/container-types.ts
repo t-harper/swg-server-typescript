@@ -177,15 +177,15 @@ export interface TransferResult {
   /** Human-readable error message */
   message: string;
   /** ID of the item that was transferred (if successful) */
-  itemId?: ObjectId;
+  itemId?: ObjectId | undefined;
   /** Source container ID */
-  sourceContainerId?: ObjectId;
+  sourceContainerId?: ObjectId | undefined;
   /** Target container ID */
-  targetContainerId?: ObjectId;
+  targetContainerId?: ObjectId | undefined;
   /** Slot the item was placed in (if any) */
-  slot?: string;
+  slot?: string | undefined;
   /** Previous slot the item was in (if any) */
-  previousSlot?: string;
+  previousSlot?: string | undefined;
 }
 
 /**
@@ -199,7 +199,7 @@ export interface ContainedItem {
   /** The item's volume */
   volume: number;
   /** Named slot this item occupies (undefined if in general storage) */
-  slot?: string;
+  slot?: string | undefined;
   /** Arrangement index within container */
   arrangementIndex: number;
   /** Timestamp when item was added */
@@ -233,15 +233,15 @@ export interface ContainerChangeEvent {
   /** Container ID */
   containerId: ObjectId;
   /** Item ID (if applicable) */
-  itemId?: ObjectId;
+  itemId?: ObjectId | undefined;
   /** Slot name (if applicable) */
-  slot?: string;
+  slot?: string | undefined;
   /** Previous slot (for moves) */
-  previousSlot?: string;
+  previousSlot?: string | undefined;
   /** Timestamp of the change */
   timestamp: number;
   /** Actor who caused the change (player ID) */
-  actorId?: ObjectId;
+  actorId?: ObjectId | undefined;
 }
 
 /**
@@ -313,7 +313,7 @@ export function createSuccessResult(
     targetContainerId,
     slot,
     previousSlot,
-  } as TransferResult;
+  };
 }
 
 /**
@@ -333,7 +333,7 @@ export function createFailureResult(
     itemId,
     sourceContainerId,
     targetContainerId,
-  } as TransferResult;
+  };
 }
 
 /**

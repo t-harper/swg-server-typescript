@@ -4,51 +4,48 @@
  * Pre-defined metrics for game server monitoring.
  */
 
-import { MetricRegistry } from '../metric-types.js';
+import { MetricRegistry, CounterMetric, GaugeMetric, HistogramMetric } from '../metric-types.js';
 import { getDefaultRegistry } from '../metric-registry.js';
-import { Counter } from '../counters.js';
-import { Gauge } from '../gauges.js';
-import { Histogram } from '../histograms.js';
 
 /**
  * Game metrics collection
  */
 export interface GameMetrics {
   // Player metrics
-  playersOnline: Gauge;
-  playerLogins: Counter;
-  playerLogouts: Counter;
+  playersOnline: GaugeMetric;
+  playerLogins: CounterMetric;
+  playerLogouts: CounterMetric;
 
   // Connection metrics
-  connectionsTotal: Counter;
-  connectionsActive: Gauge;
-  connectionErrors: Counter;
+  connectionsTotal: CounterMetric;
+  connectionsActive: GaugeMetric;
+  connectionErrors: CounterMetric;
 
   // Packet metrics
-  packetsReceived: Counter;
-  packetsSent: Counter;
-  bytesReceived: Counter;
-  bytesSent: Counter;
-  packetErrors: Counter;
+  packetsReceived: CounterMetric;
+  packetsSent: CounterMetric;
+  bytesReceived: CounterMetric;
+  bytesSent: CounterMetric;
+  packetErrors: CounterMetric;
 
   // Message processing
-  messageProcessingDuration: Histogram;
-  messagesProcessed: Counter;
-  messageErrors: Counter;
+  messageProcessingDuration: HistogramMetric;
+  messagesProcessed: CounterMetric;
+  messageErrors: CounterMetric;
 
   // Zone metrics
-  zonePlayerCount: Gauge;
-  zoneObjectCount: Gauge;
+  zonePlayerCount: GaugeMetric;
+  zoneObjectCount: GaugeMetric;
 
   // Object metrics
-  objectsLoaded: Gauge;
-  objectsCreated: Counter;
-  objectsDestroyed: Counter;
+  objectsLoaded: GaugeMetric;
+  objectsCreated: CounterMetric;
+  objectsDestroyed: CounterMetric;
 
   // Server metrics
-  serverUptime: Gauge;
-  tickDuration: Histogram;
-  ticksTotal: Counter;
+  serverUptime: GaugeMetric;
+  tickDuration: HistogramMetric;
+  ticksTotal: CounterMetric;
 }
 
 /**

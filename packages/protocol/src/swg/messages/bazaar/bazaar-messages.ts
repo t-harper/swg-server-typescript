@@ -178,8 +178,8 @@ export function serializeBazaarSearchMessage(message: BazaarSearchMessage): Uint
 
   // Write filters
   writer.writeInt32LE(message.filters.category);
-  writer.writeStringWithLength16BE(message.filters.planetId);
-  writer.writeStringWithLength16BE(message.filters.regionId);
+  writer.writeStringWithLength16LE(message.filters.planetId);
+  writer.writeStringWithLength16LE(message.filters.regionId);
   writer.writeInt32LE(message.filters.minPrice);
   writer.writeInt32LE(message.filters.maxPrice);
   writer.writeUnicodeStringWithLength(message.filters.itemNameSearch);
@@ -204,8 +204,8 @@ export function deserializeBazaarSearchMessage(data: Uint8Array): BazaarSearchMe
 
   const terminalId = reader.readUInt64LE();
   const category = reader.readInt32LE();
-  const planetId = reader.readStringWithLength16BE();
-  const regionId = reader.readStringWithLength16BE();
+  const planetId = reader.readStringWithLength16LE();
+  const regionId = reader.readStringWithLength16LE();
   const minPrice = reader.readInt32LE();
   const maxPrice = reader.readInt32LE();
   const itemNameSearch = reader.readUnicodeStringWithLength();
@@ -271,8 +271,8 @@ export function serializeBazaarSearchResultsMessage(
     writer.writeInt32LE(listing.price);
     writer.writeUInt8(listing.isAuction ? 1 : 0);
     writer.writeInt32LE(listing.instantSalePrice);
-    writer.writeStringWithLength16BE(listing.planetId);
-    writer.writeStringWithLength16BE(listing.regionId);
+    writer.writeStringWithLength16LE(listing.planetId);
+    writer.writeStringWithLength16LE(listing.regionId);
     writer.writeUInt64LE(listing.expiresAt);
     writer.writeUInt32LE(listing.bidCount);
   }
@@ -311,8 +311,8 @@ export function deserializeBazaarSearchResultsMessage(
       price: reader.readInt32LE(),
       isAuction: reader.readUInt8() !== 0,
       instantSalePrice: reader.readInt32LE(),
-      planetId: reader.readStringWithLength16BE(),
-      regionId: reader.readStringWithLength16BE(),
+      planetId: reader.readStringWithLength16LE(),
+      regionId: reader.readStringWithLength16LE(),
       expiresAt: reader.readUInt64LE(),
       bidCount: reader.readUInt32LE(),
     });
@@ -663,8 +663,8 @@ export function serializeBazaarDetailsResponseMessage(
     writer.writeInt32LE(message.listing.price);
     writer.writeUInt8(message.listing.isAuction ? 1 : 0);
     writer.writeInt32LE(message.listing.instantSalePrice);
-    writer.writeStringWithLength16BE(message.listing.planetId);
-    writer.writeStringWithLength16BE(message.listing.regionId);
+    writer.writeStringWithLength16LE(message.listing.planetId);
+    writer.writeStringWithLength16LE(message.listing.regionId);
     writer.writeUInt64LE(message.listing.expiresAt);
     writer.writeUInt32LE(message.listing.bidCount);
   }
@@ -703,8 +703,8 @@ export function deserializeBazaarDetailsResponseMessage(
       price: reader.readInt32LE(),
       isAuction: reader.readUInt8() !== 0,
       instantSalePrice: reader.readInt32LE(),
-      planetId: reader.readStringWithLength16BE(),
-      regionId: reader.readStringWithLength16BE(),
+      planetId: reader.readStringWithLength16LE(),
+      regionId: reader.readStringWithLength16LE(),
       expiresAt: reader.readUInt64LE(),
       bidCount: reader.readUInt32LE(),
     };

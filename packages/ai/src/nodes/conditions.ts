@@ -95,7 +95,7 @@ export class IsTargetInRange extends LeafNode {
       return NodeStatus.Failure;
     }
 
-    const distance = this.calculateDistance(creature, target);
+    const distance = this.calculateDistance(creature.position, target.position);
 
     if (distance <= this.range) {
       return NodeStatus.Success;
@@ -137,7 +137,7 @@ export class IsTargetVisible extends LeafNode {
 
     // Simple distance check for now
     // Full implementation would include LOS checks
-    const distance = this.calculateDistance(creature, target);
+    const distance = this.calculateDistance(creature.position, target.position);
 
     if (distance <= this.maxRange) {
       return NodeStatus.Success;
@@ -227,8 +227,8 @@ export class IsAtHome extends LeafNode {
   tick(context: AIContext): NodeStatus {
     const { creature, homePosition } = context;
 
-    const dx = creature.x - homePosition.x;
-    const dz = creature.z - homePosition.z;
+    const dx = creature.position.x - homePosition.x;
+    const dz = creature.position.z - homePosition.z;
     const distance = Math.sqrt(dx * dx + dz * dz);
 
     if (distance <= this.tolerance) {
@@ -256,8 +256,8 @@ export class IsAwayFromHome extends LeafNode {
   tick(context: AIContext): NodeStatus {
     const { creature, homePosition } = context;
 
-    const dx = creature.x - homePosition.x;
-    const dz = creature.z - homePosition.z;
+    const dx = creature.position.x - homePosition.x;
+    const dz = creature.position.z - homePosition.z;
     const distance = Math.sqrt(dx * dx + dz * dz);
 
     if (distance > this.maxDistance) {

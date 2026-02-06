@@ -188,6 +188,71 @@ export const ReservedNames = [
 ] as const;
 
 /**
+ * Get the StringId text key for a character name error
+ * Maps error codes to the C++ NameErrors.cpp text keys used in StringId
+ * @param error The error code
+ * @returns StringId text value (e.g., "name_approved", "name_declined_in_use")
+ */
+export function getCharacterNameErrorStringIdText(error: CharacterNameErrorType): string {
+  switch (error) {
+    case CharacterNameError.ACCEPTED:
+      return 'name_approved';
+    case CharacterNameError.DECLINED:
+      return 'name_declined_syntax';
+    case CharacterNameError.DECLINED_RESERVED:
+      return 'name_declined_reserved';
+    case CharacterNameError.DECLINED_PROFANE:
+      return 'name_declined_profane';
+    case CharacterNameError.DECLINED_EMPTY:
+      return 'name_declined_empty';
+    case CharacterNameError.DECLINED_FICTION:
+      return 'name_declined_fictionally_inappropriate';
+    case CharacterNameError.DECLINED_RACIALLY_INSENSITIVE:
+      return 'name_declined_racially_insensitive';
+    case CharacterNameError.DECLINED_IN_USE:
+      return 'name_declined_in_use';
+    case CharacterNameError.DECLINED_SYNTAX:
+      return 'name_declined_syntax';
+    case CharacterNameError.DECLINED_RETRY:
+      return 'name_declined_retry';
+    case CharacterNameError.DECLINED_DEVELOPER:
+      return 'name_declined_developer';
+    case CharacterNameError.DECLINED_NOT_CREATURE:
+      return 'name_declined_syntax';
+    case CharacterNameError.DECLINED_CANNOT_MODIFY:
+      return 'name_declined_syntax';
+    case CharacterNameError.DECLINED_NOT_AUTHORIZED:
+      return 'name_declined_not_authorized_for_species';
+    case CharacterNameError.DECLINED_CANT_CREATE_AVATAR:
+      return 'name_declined_cant_create_avatar';
+    case CharacterNameError.DECLINED_INTERNAL_ERROR:
+      return 'name_declined_internal_error';
+    case CharacterNameError.DECLINED_NO_NAME:
+      return 'name_declined_empty';
+    case CharacterNameError.DECLINED_TOO_SHORT:
+      return 'name_declined_too_short';
+    case CharacterNameError.DECLINED_TOO_LONG:
+      return 'name_declined_too_long';
+    case CharacterNameError.DECLINED_NO_NAME_GENERATOR:
+      return 'name_declined_no_name_generator';
+    case CharacterNameError.DECLINED_TRANSFER:
+      return 'name_declined_syntax';
+    case CharacterNameError.DECLINED_TOO_MANY_CHARACTERS:
+      return 'name_declined_too_many_characters';
+    case CharacterNameError.DECLINED_CENTRAL_SERVER_DOWN:
+      return 'name_declined_internal_error';
+    case CharacterNameError.DECLINED_NUMBER:
+      return 'name_declined_number';
+    case CharacterNameError.DECLINED_MUST_INCLUDE_SURNAME:
+      return 'name_declined_must_include_surname';
+    case CharacterNameError.DECLINED_CANNOT_INCLUDE_SURNAME:
+      return 'name_declined_cannot_include_surname';
+    default:
+      return 'name_declined_syntax';
+  }
+}
+
+/**
  * Get the error string for a character name error
  * @param error The error code
  * @returns Human-readable error string

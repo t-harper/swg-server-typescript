@@ -212,12 +212,10 @@ export async function createServer(config: ServerConfig): Promise<LoginServer> {
             loginSession.clientSession.accountId = result.session.accountId;
             loginSession.clientSession.stationId = result.session.stationId;
             loginSession.clientSession.sessionToken = result.session.sessionToken;
-          }
 
-          // Send response using reliable delivery
-          sessionManager.sendReliable(soeSession, result.response);
+            // Send LoginClientToken response
+            sessionManager.sendReliable(soeSession, result.response);
 
-          if (result.success && result.session) {
             // Send cluster enumeration
             const maxChars = config.maxCharsPerAccount ?? 2;
             const clusterConfig = {
@@ -228,7 +226,7 @@ export async function createServer(config: ServerConfig): Promise<LoginServer> {
             };
 
             const enumCluster = createLoginEnumCluster(
-              [{ clusterId: clusterConfig.clusterId, clusterName: clusterConfig.clusterName }],
+              [{ clusterId: clusterConfig.clusterId, clusterName: clusterConfig.clusterName, timeZone: 0 }],
               maxChars
             );
             sessionManager.sendReliable(soeSession, serializeLoginEnumCluster(enumCluster));
@@ -248,6 +246,9 @@ export async function createServer(config: ServerConfig): Promise<LoginServer> {
               onlineFreeTrialLimit: 3000,
             }]);
             sessionManager.sendReliable(soeSession, serializeLoginClusterStatus(clusterStatus));
+          } else {
+            // Auth failed - disconnect the client
+            sessionManager.disconnectSession(soeSession, DisconnectReason.Application);
           }
 
           break;

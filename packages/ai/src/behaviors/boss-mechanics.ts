@@ -62,17 +62,17 @@ export interface BossPhase {
   /** Abilities available in this phase */
   abilities: string[];
   /** Whether boss is immune to damage in this phase */
-  damageImmune?: boolean;
+  damageImmune?: boolean | undefined;
   /** Speed multiplier for this phase */
-  speedMultiplier?: number;
+  speedMultiplier?: number | undefined;
   /** Damage multiplier for this phase */
-  damageMultiplier?: number;
+  damageMultiplier?: number | undefined;
   /** Special behaviors for this phase */
-  specialBehaviors?: string[];
+  specialBehaviors?: string[] | undefined;
   /** Callback when phase starts */
-  onPhaseStart?: (context: AIContext) => void;
+  onPhaseStart?: ((context: AIContext) => void) | undefined;
   /** Callback when phase ends */
-  onPhaseEnd?: (context: AIContext) => void;
+  onPhaseEnd?: ((context: AIContext) => void) | undefined;
 }
 
 /**
@@ -88,19 +88,19 @@ export interface BossAbility {
   /** Cast time in seconds (0 = instant) */
   castTime: number;
   /** Required phases (empty = all phases) */
-  phases?: number[];
+  phases?: number[] | undefined;
   /** Health threshold to use (below this health %) */
-  healthThreshold?: number;
+  healthThreshold?: number | undefined;
   /** Whether this is an enrage ability */
-  isEnrageAbility?: boolean;
+  isEnrageAbility?: boolean | undefined;
   /** Target selection */
   targeting: 'current' | 'random' | 'highest_threat' | 'lowest_health' | 'all' | 'position';
   /** Number of targets (for 'random') */
-  targetCount?: number;
+  targetCount?: number | undefined;
   /** Callback to execute ability */
   execute: (context: AIContext, targets: CreatureObject[], positions?: Vector3[]) => void;
   /** Optional condition check */
-  condition?: (context: AIContext) => boolean;
+  condition?: ((context: AIContext) => boolean) | undefined;
 }
 
 /**
@@ -116,13 +116,13 @@ export interface AddSpawnDefinition {
   /** Add template/type */
   addType: string;
   /** Spawn positions (or callback) */
-  positions?: Vector3[] | ((context: AIContext) => Vector3[]);
+  positions?: Vector3[] | ((context: AIContext) => Vector3[]) | undefined;
   /** Maximum active adds of this type */
-  maxActive?: number;
+  maxActive?: number | undefined;
   /** Respawn time if killed (0 = no respawn) */
-  respawnTime?: number;
+  respawnTime?: number | undefined;
   /** Callback when adds spawn */
-  onSpawn?: (context: AIContext, addIds: ObjectId[]) => void;
+  onSpawn?: ((context: AIContext, addIds: ObjectId[]) => void) | undefined;
 }
 
 /**
@@ -140,9 +140,9 @@ export interface EnrageConfig {
   /** Whether enrage is a soft enrage (gradual) or hard (instant) */
   softEnrage: boolean;
   /** Soft enrage ramp-up time (seconds) */
-  rampUpTime?: number;
+  rampUpTime?: number | undefined;
   /** Callback when enrage triggers */
-  onEnrage?: (context: AIContext) => void;
+  onEnrage?: ((context: AIContext) => void) | undefined;
 }
 
 /**
@@ -161,13 +161,13 @@ export class PhaseController extends LeafNode {
   allowPhaseSkip: boolean;
 
   /** Callback when phase changes */
-  onPhaseChange?: (context: AIContext, oldPhase: number, newPhase: number) => void;
+  onPhaseChange?: ((context: AIContext, oldPhase: number, newPhase: number) => void) | undefined;
 
   constructor(
     options: {
       phases?: BossPhase[];
       allowPhaseSkip?: boolean;
-      onPhaseChange?: (context: AIContext, oldPhase: number, newPhase: number) => void;
+      onPhaseChange?: ((context: AIContext, oldPhase: number, newPhase: number) => void) | undefined;
     } = {},
     name?: string
   ) {
@@ -270,13 +270,13 @@ export class SpecialAbilityExecutor extends LeafNode {
   private lastAbilityTime: number = 0;
 
   /** Callback to get potential targets */
-  getPotentialTargets?: (context: AIContext) => CreatureObject[];
+  getPotentialTargets?: ((context: AIContext) => CreatureObject[]) | undefined;
 
   constructor(
     options: {
       abilities?: BossAbility[];
       globalCooldown?: number;
-      getPotentialTargets?: (context: AIContext) => CreatureObject[];
+      getPotentialTargets?: ((context: AIContext) => CreatureObject[]) | undefined;
     } = {},
     name?: string
   ) {
@@ -399,10 +399,10 @@ export class AddSpawnController extends LeafNode {
   spawns: AddSpawnDefinition[];
 
   /** Callback to spawn adds */
-  spawnAdd?: (context: AIContext, addType: string, position: Vector3) => ObjectId | null;
+  spawnAdd?: ((context: AIContext, addType: string, position: Vector3) => ObjectId | null) | undefined;
 
   /** Callback to check if add is alive */
-  isAddAlive?: (addId: ObjectId) => boolean;
+  isAddAlive?: ((addId: ObjectId) => boolean) | undefined;
 
   /** Spawned add tracking */
   private spawnedAdds: Map<string, { ids: ObjectId[]; lastSpawn: number }> = new Map();
@@ -410,8 +410,8 @@ export class AddSpawnController extends LeafNode {
   constructor(
     options: {
       spawns?: AddSpawnDefinition[];
-      spawnAdd?: (context: AIContext, addType: string, position: Vector3) => ObjectId | null;
-      isAddAlive?: (addId: ObjectId) => boolean;
+      spawnAdd?: ((context: AIContext, addType: string, position: Vector3) => ObjectId | null) | undefined;
+      isAddAlive?: ((addId: ObjectId) => boolean) | undefined;
     } = {},
     name?: string
   ) {
@@ -520,9 +520,9 @@ export class AddSpawnController extends LeafNode {
       const angle = (i / count) * Math.PI * 2;
       const distance = 10;
       positions.push({
-        x: creature.x + Math.cos(angle) * distance,
-        y: creature.y,
-        z: creature.z + Math.sin(angle) * distance,
+        x: creature.position.x + Math.cos(angle) * distance,
+        y: creature.position.y,
+        z: creature.position.z + Math.sin(angle) * distance,
       });
     }
 
@@ -543,20 +543,20 @@ export class EnrageTimer extends LeafNode {
   config: EnrageConfig;
 
   /** Callback to apply enrage stats */
-  applyEnrageStats?: (context: AIContext, multipliers: {
+  applyEnrageStats?: ((context: AIContext, multipliers: {
     damage: number;
     speed: number;
     attackSpeed: number;
-  }) => void;
+  }) => void) | undefined;
 
   constructor(
     options: {
       config?: Partial<EnrageConfig>;
-      applyEnrageStats?: (context: AIContext, multipliers: {
+      applyEnrageStats?: ((context: AIContext, multipliers: {
         damage: number;
         speed: number;
         attackSpeed: number;
-      }) => void;
+      }) => void) | undefined;
     } = {},
     name?: string
   ) {
@@ -640,20 +640,20 @@ export class BossMechanicCheck extends LeafNode {
   checkType: 'phase' | 'enraged' | 'adds_alive' | 'immune' | 'health_threshold';
 
   /** Value to compare against */
-  checkValue?: number;
+  checkValue?: number | undefined;
 
   /** Comparison operator */
   operator: '==' | '!=' | '<' | '<=' | '>' | '>=';
 
   /** Callback to count alive adds */
-  countAliveAdds?: (context: AIContext) => number;
+  countAliveAdds?: ((context: AIContext) => number) | undefined;
 
   constructor(
     options: {
       checkType: 'phase' | 'enraged' | 'adds_alive' | 'immune' | 'health_threshold';
-      checkValue?: number;
+      checkValue?: number | undefined;
       operator?: '==' | '!=' | '<' | '<=' | '>' | '>=';
-      countAliveAdds?: (context: AIContext) => number;
+      countAliveAdds?: ((context: AIContext) => number) | undefined;
     },
     name?: string
   ) {
@@ -740,8 +740,8 @@ export class UniqueMechanic extends LeafNode {
     options: {
       mechanicId: string;
       executeMechanic: (context: AIContext) => boolean;
-      duration?: number;
-      cooldown?: number;
+      duration?: number | undefined;
+      cooldown?: number | undefined;
     },
     name?: string
   ) {
@@ -801,30 +801,30 @@ export class UniqueMechanic extends LeafNode {
  */
 export interface BossMechanicsOptions {
   /** Phase definitions */
-  phases?: BossPhase[];
+  phases?: BossPhase[] | undefined;
   /** Special abilities */
-  abilities?: BossAbility[];
+  abilities?: BossAbility[] | undefined;
   /** Add spawn definitions */
-  addSpawns?: AddSpawnDefinition[];
+  addSpawns?: AddSpawnDefinition[] | undefined;
   /** Enrage configuration */
-  enrageConfig?: Partial<EnrageConfig>;
+  enrageConfig?: Partial<EnrageConfig> | undefined;
   /** Unique mechanics */
   uniqueMechanics?: Array<{
     mechanicId: string;
     executeMechanic: (context: AIContext) => boolean;
-    duration?: number;
-    cooldown?: number;
-  }>;
+    duration?: number | undefined;
+    cooldown?: number | undefined;
+  }> | undefined;
   /** Callbacks */
-  getPotentialTargets?: (context: AIContext) => CreatureObject[];
-  spawnAdd?: (context: AIContext, addType: string, position: Vector3) => ObjectId | null;
-  isAddAlive?: (addId: ObjectId) => boolean;
-  applyEnrageStats?: (context: AIContext, multipliers: {
+  getPotentialTargets?: ((context: AIContext) => CreatureObject[]) | undefined;
+  spawnAdd?: ((context: AIContext, addType: string, position: Vector3) => ObjectId | null) | undefined;
+  isAddAlive?: ((addId: ObjectId) => boolean) | undefined;
+  applyEnrageStats?: ((context: AIContext, multipliers: {
     damage: number;
     speed: number;
     attackSpeed: number;
-  }) => void;
-  onPhaseChange?: (context: AIContext, oldPhase: number, newPhase: number) => void;
+  }) => void) | undefined;
+  onPhaseChange?: ((context: AIContext, oldPhase: number, newPhase: number) => void) | undefined;
 }
 
 /**

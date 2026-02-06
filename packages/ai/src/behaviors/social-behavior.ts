@@ -65,7 +65,7 @@ export class CallForHelpAdvanced extends LeafNode {
   radius: number;
 
   /** Social group identifier */
-  socialGroup?: string;
+  socialGroup?: string | undefined;
 
   /** Urgency level (affects response priority) */
   urgencyLevel: 'low' | 'medium' | 'high' | 'critical';
@@ -74,34 +74,34 @@ export class CallForHelpAdvanced extends LeafNode {
   cooldown: number;
 
   /** Callback to notify nearby allies */
-  notifyAllies?: (
+  notifyAllies?: ((
     context: AIContext,
     radius: number,
     socialGroup: string | undefined,
     urgency: string
-  ) => void;
+  ) => void) | undefined;
 
   constructor(
     options: {
-      radius?: number;
-      socialGroup?: string;
-      urgencyLevel?: 'low' | 'medium' | 'high' | 'critical';
-      cooldown?: number;
-      notifyAllies?: (
+      radius?: number | undefined;
+      socialGroup?: string | undefined;
+      urgencyLevel?: 'low' | 'medium' | 'high' | 'critical' | undefined;
+      cooldown?: number | undefined;
+      notifyAllies?: ((
         context: AIContext,
         radius: number,
         socialGroup: string | undefined,
         urgency: string
-      ) => void;
+      ) => void) | undefined;
     } = {},
     name?: string
   ) {
     super(name ?? 'CallForHelpAdvanced');
     this.radius = options.radius ?? 32;
-    this.socialGroup = options.socialGroup;
+    this.socialGroup = options.socialGroup ?? undefined;
     this.urgencyLevel = options.urgencyLevel ?? 'medium';
     this.cooldown = options.cooldown ?? 10;
-    this.notifyAllies = options.notifyAllies;
+    this.notifyAllies = options.notifyAllies ?? undefined;
   }
 
   tick(context: AIContext): NodeStatus {
@@ -132,9 +132,9 @@ export class CallForHelpAdvanced extends LeafNode {
     // Store attacker position for directional response
     if (context.target) {
       setBlackboardValue(context, 'call_for_help_threat_position', {
-        x: context.target.x,
-        y: context.target.y,
-        z: context.target.z,
+        x: context.target.position.x,
+        y: context.target.position.y,
+        z: context.target.position.z,
       });
     }
 
@@ -171,28 +171,28 @@ export class RespondToHelpCall extends LeafNode {
   maxResponseDistance: number;
 
   /** Callback to get help call info */
-  getHelpCalls?: (context: AIContext) => Array<{
+  getHelpCalls?: ((context: AIContext) => Array<{
     callerId: ObjectId;
     position: Vector3;
     urgency: string;
-    threatPosition?: Vector3;
-  }>;
+    threatPosition?: Vector3 | undefined;
+  }>) | undefined;
 
   constructor(
     options: {
-      maxResponseDistance?: number;
-      getHelpCalls?: (context: AIContext) => Array<{
+      maxResponseDistance?: number | undefined;
+      getHelpCalls?: ((context: AIContext) => Array<{
         callerId: ObjectId;
         position: Vector3;
         urgency: string;
-        threatPosition?: Vector3;
-      }>;
+        threatPosition?: Vector3 | undefined;
+      }>) | undefined;
     } = {},
     name?: string
   ) {
     super(name ?? 'RespondToHelpCall');
     this.maxResponseDistance = options.maxResponseDistance ?? 48;
-    this.getHelpCalls = options.getHelpCalls;
+    this.getHelpCalls = options.getHelpCalls ?? undefined;
   }
 
   tick(context: AIContext): NodeStatus {
@@ -211,8 +211,8 @@ export class RespondToHelpCall extends LeafNode {
       .map(call => ({
         ...call,
         distance: Math.sqrt(
-          (call.position.x - creature.x) ** 2 +
-          (call.position.z - creature.z) ** 2
+          (call.position.x - creature.position.x) ** 2 +
+          (call.position.z - creature.position.z) ** 2
         ),
       }))
       .filter(call => call.distance <= this.maxResponseDistance)
@@ -270,21 +270,21 @@ export class PackFormation extends LeafNode {
 
   constructor(
     options: {
-      spacing?: number;
-      formationType?: 'line' | 'wedge' | 'circle' | 'loose';
-      getPackMembers?: (context: AIContext) => Array<{
+      spacing?: number | undefined;
+      formationType?: 'line' | 'wedge' | 'circle' | 'loose' | undefined;
+      getPackMembers?: ((context: AIContext) => Array<{
         id: ObjectId;
         position: Vector3;
         isLeader: boolean;
-      }>;
-      tolerance?: number;
+      }>) | undefined;
+      tolerance?: number | undefined;
     } = {},
     name?: string
   ) {
     super(name ?? 'PackFormation');
     this.spacing = options.spacing ?? 3;
     this.formationType = options.formationType ?? 'wedge';
-    this.getPackMembers = options.getPackMembers;
+    this.getPackMembers = options.getPackMembers ?? undefined;
     this.tolerance = options.tolerance ?? 1.5;
   }
 
@@ -316,8 +316,8 @@ export class PackFormation extends LeafNode {
     // Calculate formation position
     const targetPos = this.calculateFormationPosition(leader.position, myIndex, members.length);
 
-    const dx = targetPos.x - creature.x;
-    const dz = targetPos.z - creature.z;
+    const dx = targetPos.x - creature.position.x;
+    const dz = targetPos.z - creature.position.z;
     const distance = Math.sqrt(dx * dx + dz * dz);
 
     if (distance <= this.tolerance) {
@@ -332,10 +332,10 @@ export class PackFormation extends LeafNode {
       const dirX = dx / distance;
       const dirZ = dz / distance;
 
-      const newX = creature.x + dirX * Math.min(moveDistance, distance);
-      const newZ = creature.z + dirZ * Math.min(moveDistance, distance);
+      const newX = creature.position.x + dirX * Math.min(moveDistance, distance);
+      const newZ = creature.position.z + dirZ * Math.min(moveDistance, distance);
 
-      creature.setPosition(newX, creature.y, newZ);
+      creature.setPosition(newX, creature.position.y, newZ);
 
       const heading = Math.atan2(dirX, dirZ);
       creature.setHeading(heading);
@@ -420,12 +420,12 @@ export class FleeAdvanced extends LeafNode {
 
   constructor(
     options: {
-      healthThreshold?: number;
-      fleeDistance?: number;
-      maxFleeDistance?: number;
-      triggerPackFlee?: boolean;
-      speedMultiplier?: number;
-      getAllyPositions?: (context: AIContext) => Vector3[];
+      healthThreshold?: number | undefined;
+      fleeDistance?: number | undefined;
+      maxFleeDistance?: number | undefined;
+      triggerPackFlee?: boolean | undefined;
+      speedMultiplier?: number | undefined;
+      getAllyPositions?: ((context: AIContext) => Vector3[]) | undefined;
     } = {},
     name?: string
   ) {
@@ -435,7 +435,7 @@ export class FleeAdvanced extends LeafNode {
     this.maxFleeDistance = options.maxFleeDistance ?? 64;
     this.triggerPackFlee = options.triggerPackFlee ?? false;
     this.speedMultiplier = options.speedMultiplier ?? 1.2;
-    this.getAllyPositions = options.getAllyPositions;
+    this.getAllyPositions = options.getAllyPositions ?? undefined;
   }
 
   tick(context: AIContext): NodeStatus {
@@ -451,8 +451,8 @@ export class FleeAdvanced extends LeafNode {
       return NodeStatus.Success;
     }
 
-    const dx = creature.x - target.x;
-    const dz = creature.z - target.z;
+    const dx = creature.position.x - target.position.x;
+    const dz = creature.position.z - target.position.z;
     const distance = Math.sqrt(dx * dx + dz * dz);
 
     // Far enough away
@@ -475,7 +475,7 @@ export class FleeAdvanced extends LeafNode {
         // Find nearest ally that's away from threat
         const validAllies = allyPositions.filter(pos => {
           const allyToThreat = Math.sqrt(
-            (pos.x - target.x) ** 2 + (pos.z - target.z) ** 2
+            (pos.x - target.position.x) ** 2 + (pos.z - target.position.z) ** 2
           );
           return allyToThreat > distance; // Ally is farther from threat
         });
@@ -483,14 +483,14 @@ export class FleeAdvanced extends LeafNode {
         if (validAllies.length > 0) {
           // Sort by distance to us
           validAllies.sort((a, b) => {
-            const distA = Math.sqrt((a.x - creature.x) ** 2 + (a.z - creature.z) ** 2);
-            const distB = Math.sqrt((b.x - creature.x) ** 2 + (b.z - creature.z) ** 2);
+            const distA = Math.sqrt((a.x - creature.position.x) ** 2 + (a.z - creature.position.z) ** 2);
+            const distB = Math.sqrt((b.x - creature.position.x) ** 2 + (b.z - creature.position.z) ** 2);
             return distA - distB;
           });
 
           const nearestAlly = validAllies[0]!;
-          const toDx = nearestAlly.x - creature.x;
-          const toDz = nearestAlly.z - creature.z;
+          const toDx = nearestAlly.x - creature.position.x;
+          const toDz = nearestAlly.z - creature.position.z;
           const toDist = Math.sqrt(toDx * toDx + toDz * toDz);
           if (toDist > 0) {
             // Blend flee direction with direction to ally
@@ -511,10 +511,10 @@ export class FleeAdvanced extends LeafNode {
     const speed = creature.runSpeed * this.speedMultiplier;
     const moveDistance = speed * deltaTime;
 
-    const newX = creature.x + fleeDir.x * moveDistance;
-    const newZ = creature.z + fleeDir.z * moveDistance;
+    const newX = creature.position.x + fleeDir.x * moveDistance;
+    const newZ = creature.position.z + fleeDir.z * moveDistance;
 
-    creature.setPosition(newX, creature.y, newZ);
+    creature.setPosition(newX, creature.position.y, newZ);
 
     // Face away from threat
     const heading = Math.atan2(fleeDir.x, fleeDir.z);
@@ -524,9 +524,9 @@ export class FleeAdvanced extends LeafNode {
     if (this.triggerPackFlee) {
       setBlackboardValue(context, 'pack_flee_triggered', true);
       setBlackboardValue(context, SocialBlackboardKeys.FLEE_SOURCE, {
-        x: target.x,
-        y: target.y,
-        z: target.z,
+        x: target.position.x,
+        y: target.position.y,
+        z: target.position.z,
       });
     }
 
@@ -563,12 +563,12 @@ export class TerritorialAggression extends LeafNode {
 
   constructor(
     options: {
-      territoryRadius?: number;
-      warningDistance?: number;
-      attackDistance?: number;
-      warningDuration?: number;
-      onWarn?: (context: AIContext, intruderId: ObjectId) => void;
-      onMarkHostile?: (context: AIContext, intruderId: ObjectId) => void;
+      territoryRadius?: number | undefined;
+      warningDistance?: number | undefined;
+      attackDistance?: number | undefined;
+      warningDuration?: number | undefined;
+      onWarn?: ((context: AIContext, intruderId: ObjectId) => void) | undefined;
+      onMarkHostile?: ((context: AIContext, intruderId: ObjectId) => void) | undefined;
     } = {},
     name?: string
   ) {
@@ -577,8 +577,8 @@ export class TerritorialAggression extends LeafNode {
     this.warningDistance = options.warningDistance ?? 20;
     this.attackDistance = options.attackDistance ?? 10;
     this.warningDuration = options.warningDuration ?? 5;
-    this.onWarn = options.onWarn;
-    this.onMarkHostile = options.onMarkHostile;
+    this.onWarn = options.onWarn ?? undefined;
+    this.onMarkHostile = options.onMarkHostile ?? undefined;
   }
 
   tick(context: AIContext): NodeStatus {
@@ -594,8 +594,8 @@ export class TerritorialAggression extends LeafNode {
 
     // Calculate target distance from territory center
     const targetDistFromCenter = Math.sqrt(
-      (target.x - territoryCenter.x) ** 2 +
-      (target.z - territoryCenter.z) ** 2
+      (target.position.x - territoryCenter.x) ** 2 +
+      (target.position.z - territoryCenter.z) ** 2
     );
 
     // Outside territory
@@ -667,18 +667,18 @@ export class PackLeaderBehavior extends LeafNode {
 
   constructor(
     options: {
-      getPackMembers?: (context: AIContext) => Array<{
+      getPackMembers?: ((context: AIContext) => Array<{
         id: ObjectId;
         position: Vector3;
         healthPercent: number;
-      }>;
-      directPackMember?: (context: AIContext, memberId: ObjectId, command: string, target?: Vector3 | ObjectId) => void;
+      }>) | undefined;
+      directPackMember?: ((context: AIContext, memberId: ObjectId, command: string, target?: Vector3 | ObjectId) => void) | undefined;
     } = {},
     name?: string
   ) {
     super(name ?? 'PackLeaderBehavior');
-    this.getPackMembers = options.getPackMembers;
-    this.directPackMember = options.directPackMember;
+    this.getPackMembers = options.getPackMembers ?? undefined;
+    this.directPackMember = options.directPackMember ?? undefined;
   }
 
   tick(context: AIContext): NodeStatus {
@@ -745,15 +745,15 @@ export class HerdBehavior extends LeafNode {
 
   constructor(
     options: {
-      cohesionWeight?: number;
-      separationWeight?: number;
-      alignmentWeight?: number;
-      maxHerdDistance?: number;
-      personalSpace?: number;
-      getHerdMembers?: (context: AIContext) => Array<{
+      cohesionWeight?: number | undefined;
+      separationWeight?: number | undefined;
+      alignmentWeight?: number | undefined;
+      maxHerdDistance?: number | undefined;
+      personalSpace?: number | undefined;
+      getHerdMembers?: ((context: AIContext) => Array<{
         position: Vector3;
         velocity: Vector3;
-      }>;
+      }>) | undefined;
     } = {},
     name?: string
   ) {
@@ -763,7 +763,7 @@ export class HerdBehavior extends LeafNode {
     this.alignmentWeight = options.alignmentWeight ?? 0.5;
     this.maxHerdDistance = options.maxHerdDistance ?? 20;
     this.personalSpace = options.personalSpace ?? 3;
-    this.getHerdMembers = options.getHerdMembers;
+    this.getHerdMembers = options.getHerdMembers ?? undefined;
   }
 
   tick(context: AIContext): NodeStatus {
@@ -790,7 +790,7 @@ export class HerdBehavior extends LeafNode {
     // Store herd center
     setBlackboardValue(context, SocialBlackboardKeys.HERD_CENTER, {
       x: centerX,
-      y: creature.y,
+      y: creature.position.y,
       z: centerZ,
     });
 
@@ -798,8 +798,8 @@ export class HerdBehavior extends LeafNode {
     let steerX = 0, steerZ = 0;
 
     // Cohesion - steer toward center
-    const toCenterX = centerX - creature.x;
-    const toCenterZ = centerZ - creature.z;
+    const toCenterX = centerX - creature.position.x;
+    const toCenterZ = centerZ - creature.position.z;
     const distToCenter = Math.sqrt(toCenterX ** 2 + toCenterZ ** 2);
 
     if (distToCenter > 0) {
@@ -809,8 +809,8 @@ export class HerdBehavior extends LeafNode {
 
     // Separation - avoid nearby members
     for (const member of members) {
-      const dx = creature.x - member.position.x;
-      const dz = creature.z - member.position.z;
+      const dx = creature.position.x - member.position.x;
+      const dz = creature.position.z - member.position.z;
       const dist = Math.sqrt(dx ** 2 + dz ** 2);
 
       if (dist > 0 && dist < this.personalSpace) {
@@ -844,10 +844,10 @@ export class HerdBehavior extends LeafNode {
       const speed = creature.walkSpeed * 0.7; // Leisurely herding pace
       const moveDistance = speed * deltaTime;
 
-      const newX = creature.x + steerX * moveDistance;
-      const newZ = creature.z + steerZ * moveDistance;
+      const newX = creature.position.x + steerX * moveDistance;
+      const newZ = creature.position.z + steerZ * moveDistance;
 
-      creature.setPosition(newX, creature.y, newZ);
+      creature.setPosition(newX, creature.position.y, newZ);
 
       if (steerMag > 0.2) {
         const heading = Math.atan2(steerX, steerZ);
@@ -864,17 +864,17 @@ export class HerdBehavior extends LeafNode {
  */
 export interface SocialBehaviorOptions {
   /** Social group identifier */
-  socialGroup?: string;
+  socialGroup?: string | undefined;
   /** Whether this is a pack leader */
-  isPackLeader?: boolean;
+  isPackLeader?: boolean | undefined;
   /** Territory radius */
-  territoryRadius?: number;
+  territoryRadius?: number | undefined;
   /** Flee health threshold */
-  fleeThreshold?: number;
+  fleeThreshold?: number | undefined;
   /** Help call radius */
-  helpCallRadius?: number;
+  helpCallRadius?: number | undefined;
   /** Formation type for pack */
-  formationType?: 'line' | 'wedge' | 'circle' | 'loose';
+  formationType?: 'line' | 'wedge' | 'circle' | 'loose' | undefined;
 }
 
 /**
@@ -882,13 +882,13 @@ export interface SocialBehaviorOptions {
  */
 export function createPackBehavior(
   options: SocialBehaviorOptions & {
-    getPackMembers?: (context: AIContext) => Array<{
+    getPackMembers?: ((context: AIContext) => Array<{
       id: ObjectId;
       position: Vector3;
       isLeader: boolean;
       healthPercent: number;
-    }>;
-    directPackMember?: (context: AIContext, memberId: ObjectId, command: string, target?: Vector3 | ObjectId) => void;
+    }>) | undefined;
+    directPackMember?: ((context: AIContext, memberId: ObjectId, command: string, target?: Vector3 | ObjectId) => void) | undefined;
   }
 ): BehaviorTree {
   const {
@@ -941,8 +941,8 @@ export function createPackBehavior(
  */
 export function createTerritorialBehavior(
   options: SocialBehaviorOptions & {
-    onWarn?: (context: AIContext, intruderId: ObjectId) => void;
-    onMarkHostile?: (context: AIContext, intruderId: ObjectId) => void;
+    onWarn?: ((context: AIContext, intruderId: ObjectId) => void) | undefined;
+    onMarkHostile?: ((context: AIContext, intruderId: ObjectId) => void) | undefined;
   }
 ): BehaviorTree {
   const {
@@ -967,12 +967,12 @@ export function createTerritorialBehavior(
  */
 export function createHerdingBehavior(
   options: {
-    getHerdMembers?: (context: AIContext) => Array<{
+    getHerdMembers?: ((context: AIContext) => Array<{
       position: Vector3;
       velocity: Vector3;
-    }>;
-    fleeThreshold?: number;
-    getAllyPositions?: (context: AIContext) => Vector3[];
+    }>) | undefined;
+    fleeThreshold?: number | undefined;
+    getAllyPositions?: ((context: AIContext) => Vector3[]) | undefined;
   }
 ): BehaviorTree {
   const {

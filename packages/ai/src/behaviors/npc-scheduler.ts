@@ -209,9 +209,9 @@ export class ScheduleController extends LeafNode {
 
   constructor(
     options: {
-      activities?: ScheduleActivity[];
-      timeProvider?: TimeProvider;
-      checkInterval?: number;
+      activities?: ScheduleActivity[] | undefined;
+      timeProvider?: TimeProvider | undefined;
+      checkInterval?: number | undefined;
     } = {},
     name?: string
   ) {
@@ -358,8 +358,8 @@ export class ShopSchedule extends LeafNode {
 
   constructor(
     options: {
-      shopHours?: ShopHours;
-      timeProvider?: TimeProvider;
+      shopHours?: ShopHours | undefined;
+      timeProvider?: TimeProvider | undefined;
     } = {},
     name?: string
   ) {
@@ -444,8 +444,8 @@ export class SleepCycle extends LeafNode {
 
   constructor(
     options: {
-      sleepSchedule?: SleepSchedule;
-      timeProvider?: TimeProvider;
+      sleepSchedule?: SleepSchedule | undefined;
+      timeProvider?: TimeProvider | undefined;
     } = {},
     name?: string
   ) {
@@ -516,8 +516,8 @@ export class EventScheduler extends LeafNode {
 
   constructor(
     options: {
-      events?: ScheduledEvent[];
-      timeProvider?: TimeProvider;
+      events?: ScheduledEvent[] | undefined;
+      timeProvider?: TimeProvider | undefined;
     } = {},
     name?: string
   ) {
@@ -637,7 +637,7 @@ export class MoveToActivityLocation extends LeafNode {
 
   constructor(
     options: {
-      stopDistance?: number;
+      stopDistance?: number | undefined;
     } = {},
     name?: string
   ) {
@@ -653,8 +653,8 @@ export class MoveToActivityLocation extends LeafNode {
       return NodeStatus.Success;
     }
 
-    const dx = targetLocation.x - creature.x;
-    const dz = targetLocation.z - creature.z;
+    const dx = targetLocation.x - creature.position.x;
+    const dz = targetLocation.z - creature.position.z;
     const distance = Math.sqrt(dx * dx + dz * dz);
 
     if (distance <= this.stopDistance) {
@@ -669,10 +669,10 @@ export class MoveToActivityLocation extends LeafNode {
       const dirX = dx / distance;
       const dirZ = dz / distance;
 
-      const newX = creature.x + dirX * Math.min(moveDistance, distance);
-      const newZ = creature.z + dirZ * Math.min(moveDistance, distance);
+      const newX = creature.position.x + dirX * Math.min(moveDistance, distance);
+      const newZ = creature.position.z + dirZ * Math.min(moveDistance, distance);
 
-      creature.setPosition(newX, creature.y, newZ);
+      creature.setPosition(newX, creature.position.y, newZ);
 
       const heading = Math.atan2(dirX, dirZ);
       creature.setHeading(heading);
@@ -745,17 +745,17 @@ export class CheckScheduleActivity extends LeafNode {
  */
 export interface NPCSchedulerOptions {
   /** Schedule activities */
-  activities?: ScheduleActivity[];
+  activities?: ScheduleActivity[] | undefined;
   /** Shop hours (if applicable) */
-  shopHours?: ShopHours;
+  shopHours?: ShopHours | undefined;
   /** Sleep schedule (if applicable) */
-  sleepSchedule?: SleepSchedule;
+  sleepSchedule?: SleepSchedule | undefined;
   /** Scheduled events */
-  events?: ScheduledEvent[];
+  events?: ScheduledEvent[] | undefined;
   /** Time provider */
-  timeProvider?: TimeProvider;
+  timeProvider?: TimeProvider | undefined;
   /** Schedule check interval (seconds) */
-  checkInterval?: number;
+  checkInterval?: number | undefined;
 }
 
 /**
@@ -819,8 +819,8 @@ export function createNPCSchedulerBehavior(options: NPCSchedulerOptions): Behavi
 export function createShopkeeperSchedule(
   shopHours: ShopHours,
   options?: {
-    sleepSchedule?: SleepSchedule;
-    timeProvider?: TimeProvider;
+    sleepSchedule?: SleepSchedule | undefined;
+    timeProvider?: TimeProvider | undefined;
   }
 ): BehaviorTree {
   return createNPCSchedulerBehavior({
@@ -837,8 +837,8 @@ export function createDailyRoutineSchedule(
   activities: ScheduleActivity[],
   sleepSchedule?: SleepSchedule,
   options?: {
-    timeProvider?: TimeProvider;
-    checkInterval?: number;
+    timeProvider?: TimeProvider | undefined;
+    checkInterval?: number | undefined;
   }
 ): BehaviorTree {
   return createNPCSchedulerBehavior({

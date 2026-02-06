@@ -820,7 +820,6 @@ export function requiresPilotPrivilege(msg: AnyShipMessage): boolean {
     msg.operation === ShipOperation.UpdateTransform ||
     msg.operation === ShipOperation.Booster ||
     msg.operation === ShipOperation.ShieldBalance ||
-    msg.operation === ShipOperation.CapacitorAllocation ||
     msg.operation === ShipOperation.Hyperspace ||
     msg.operation === ShipOperation.Docking ||
     msg.operation === ShipOperation.Launch ||

@@ -38,7 +38,7 @@ interface ContainerRegistration {
   /** Timestamp when registered */
   registeredAt: number;
   /** Parent container ID (if nested) */
-  parentContainerId?: ObjectId;
+  parentContainerId?: ObjectId | undefined;
 }
 
 /**
@@ -48,7 +48,7 @@ interface ItemLocation {
   /** Container ID holding the item */
   containerId: ObjectId;
   /** Slot the item is in (if any) */
-  slot?: string;
+  slot?: string | undefined;
 }
 
 /**
@@ -101,7 +101,7 @@ export class ContainerManager {
       container,
       registeredAt: Date.now(),
       parentContainerId,
-    } as void;
+    };
 
     this.containers.set(container.objectId, registration);
 
@@ -200,9 +200,9 @@ export class ContainerManager {
   private handleContainerChange(event: {
     type: number;
     containerId: ObjectId;
-    itemId?: ObjectId;
-    slot?: string;
-    previousSlot?: string;
+    itemId?: ObjectId | undefined;
+    slot?: string | undefined;
+    previousSlot?: string | undefined;
   }): void {
     // ContainerChangeType.ItemAdded = 0
     // ContainerChangeType.ItemRemoved = 1

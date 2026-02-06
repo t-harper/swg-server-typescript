@@ -101,17 +101,17 @@ export class WaypointPatrol extends LeafNode {
   private isReversed: boolean = false;
 
   /** Callback when reaching a waypoint */
-  onWaypointReached?: (context: AIContext, waypointIndex: number) => void;
+  onWaypointReached?: ((context: AIContext, waypointIndex: number) => void) | undefined;
 
   constructor(
     options: {
-      waypoints?: Vector3[];
+      waypoints?: Vector3[] | undefined;
       loopMode?: 'loop' | 'reverse' | 'stop';
       waitTimeAtWaypoint?: number;
       waitTimeVariance?: number;
       speedMultiplier?: number;
       stopDistance?: number;
-      onWaypointReached?: (context: AIContext, waypointIndex: number) => void;
+      onWaypointReached?: ((context: AIContext, waypointIndex: number) => void) | undefined;
     } = {},
     name?: string
   ) {
@@ -168,8 +168,8 @@ export class WaypointPatrol extends LeafNode {
     // Get current target waypoint
     const targetPos = waypoints[index]!;
 
-    const dx = targetPos.x - creature.x;
-    const dz = targetPos.z - creature.z;
+    const dx = targetPos.x - creature.position.x;
+    const dz = targetPos.z - creature.position.z;
     const distance = Math.sqrt(dx * dx + dz * dz);
 
     // Check if reached waypoint
@@ -202,10 +202,10 @@ export class WaypointPatrol extends LeafNode {
       const dirX = dx / distance;
       const dirZ = dz / distance;
 
-      const newX = creature.x + dirX * Math.min(moveDistance, distance);
-      const newZ = creature.z + dirZ * Math.min(moveDistance, distance);
+      const newX = creature.position.x + dirX * Math.min(moveDistance, distance);
+      const newZ = creature.position.z + dirZ * Math.min(moveDistance, distance);
 
-      creature.setPosition(newX, creature.y, newZ);
+      creature.setPosition(newX, creature.position.y, newZ);
 
       const heading = Math.atan2(dirX, dirZ);
       creature.setHeading(heading);
@@ -251,7 +251,7 @@ export class WaypointPatrol extends LeafNode {
  */
 export class RandomPatrol extends LeafNode {
   /** Center point of patrol area */
-  center?: Vector3;
+  center?: Vector3 | undefined;
 
   /** Radius of patrol area */
   radius: number;
@@ -267,7 +267,7 @@ export class RandomPatrol extends LeafNode {
 
   constructor(
     options: {
-      center?: Vector3;
+      center?: Vector3 | undefined;
       radius?: number;
       minMoveDistance?: number;
       waitTimeBetweenMoves?: number;
@@ -303,14 +303,14 @@ export class RandomPatrol extends LeafNode {
       }
 
       // Pick new destination
-      destination = this.pickRandomDestination(center, creature);
+      destination = this.pickRandomDestination(center);
       setBlackboardValue(context, BlackboardKeys.MOVE_DESTINATION, destination);
       setBlackboardValue(context, BlackboardKeys.LAST_WANDER_TIME, now);
     }
 
     // Move toward destination
-    const dx = destination.x - creature.x;
-    const dz = destination.z - creature.z;
+    const dx = destination.x - creature.position.x;
+    const dz = destination.z - creature.position.z;
     const distance = Math.sqrt(dx * dx + dz * dz);
 
     if (distance <= this.stopDistance) {
@@ -327,10 +327,10 @@ export class RandomPatrol extends LeafNode {
       const dirX = dx / distance;
       const dirZ = dz / distance;
 
-      const newX = creature.x + dirX * Math.min(moveDistance, distance);
-      const newZ = creature.z + dirZ * Math.min(moveDistance, distance);
+      const newX = creature.position.x + dirX * Math.min(moveDistance, distance);
+      const newZ = creature.position.z + dirZ * Math.min(moveDistance, distance);
 
-      creature.setPosition(newX, creature.y, newZ);
+      creature.setPosition(newX, creature.position.y, newZ);
 
       const heading = Math.atan2(dirX, dirZ);
       creature.setHeading(heading);
@@ -339,7 +339,7 @@ export class RandomPatrol extends LeafNode {
     return NodeStatus.Running;
   }
 
-  private pickRandomDestination(center: Vector3, creature: { x: number; z: number }): Vector3 {
+  private pickRandomDestination(center: Vector3): Vector3 {
     // Try multiple times to find a valid destination
     for (let attempt = 0; attempt < 5; attempt++) {
       const angle = Math.random() * Math.PI * 2;
@@ -376,7 +376,7 @@ export class RandomPatrol extends LeafNode {
  */
 export class GuardPost extends LeafNode {
   /** Guard post position */
-  postPosition?: Vector3;
+  postPosition?: Vector3 | undefined;
 
   /** Tolerance for "at post" */
   tolerance: number;
@@ -392,7 +392,7 @@ export class GuardPost extends LeafNode {
 
   constructor(
     options: {
-      postPosition?: Vector3;
+      postPosition?: Vector3 | undefined;
       tolerance?: number;
       lookAroundInterval?: number;
       lookDuration?: number;
@@ -417,8 +417,8 @@ export class GuardPost extends LeafNode {
       ?? getBlackboardValue<Vector3>(context, this.postPositionKey)
       ?? homePosition;
 
-    const dx = postPos.x - creature.x;
-    const dz = postPos.z - creature.z;
+    const dx = postPos.x - creature.position.x;
+    const dz = postPos.z - creature.position.z;
     const distance = Math.sqrt(dx * dx + dz * dz);
 
     // If not at post, return to it
@@ -430,10 +430,10 @@ export class GuardPost extends LeafNode {
         const dirX = dx / distance;
         const dirZ = dz / distance;
 
-        const newX = creature.x + dirX * Math.min(moveDistance, distance);
-        const newZ = creature.z + dirZ * Math.min(moveDistance, distance);
+        const newX = creature.position.x + dirX * Math.min(moveDistance, distance);
+        const newZ = creature.position.z + dirZ * Math.min(moveDistance, distance);
 
-        creature.setPosition(newX, creature.y, newZ);
+        creature.setPosition(newX, creature.position.y, newZ);
 
         const heading = Math.atan2(dirX, dirZ);
         creature.setHeading(heading);
@@ -451,7 +451,7 @@ export class GuardPost extends LeafNode {
       const lookElapsed = (now - lookStartTime) / 1000;
       if (lookElapsed < this.lookDuration) {
         // Slowly rotate
-        const currentHeading = creature.heading ?? 0;
+        const currentHeading = creature.getHeading();
         const rotationSpeed = (Math.PI / 2) / this.lookDuration; // 90 degrees over duration
         creature.setHeading(currentHeading + rotationSpeed * deltaTime);
         return NodeStatus.Running;
@@ -575,16 +575,16 @@ export class PatrolGroupCoordinator extends LeafNode {
   isLeader: boolean;
 
   /** Callback to get leader position */
-  getLeaderPosition?: (leaderId: ObjectId) => Vector3 | null;
+  getLeaderPosition?: ((leaderId: ObjectId) => Vector3 | null) | undefined;
 
   /** Formation tolerance */
   formationTolerance: number;
 
   constructor(
     options: {
-      formationOffset?: Vector3;
+      formationOffset?: Vector3 | undefined;
       isLeader?: boolean;
-      getLeaderPosition?: (leaderId: ObjectId) => Vector3 | null;
+      getLeaderPosition?: ((leaderId: ObjectId) => Vector3 | null) | undefined;
       formationTolerance?: number;
     } = {},
     name?: string
@@ -626,8 +626,8 @@ export class PatrolGroupCoordinator extends LeafNode {
       z: leaderPos.z + offset.z,
     };
 
-    const dx = targetPos.x - creature.x;
-    const dz = targetPos.z - creature.z;
+    const dx = targetPos.x - creature.position.x;
+    const dz = targetPos.z - creature.position.z;
     const distance = Math.sqrt(dx * dx + dz * dz);
 
     // Check if in formation
@@ -643,10 +643,10 @@ export class PatrolGroupCoordinator extends LeafNode {
       const dirX = dx / distance;
       const dirZ = dz / distance;
 
-      const newX = creature.x + dirX * Math.min(moveDistance, distance);
-      const newZ = creature.z + dirZ * Math.min(moveDistance, distance);
+      const newX = creature.position.x + dirX * Math.min(moveDistance, distance);
+      const newZ = creature.position.z + dirZ * Math.min(moveDistance, distance);
 
-      creature.setPosition(newX, creature.y, newZ);
+      creature.setPosition(newX, creature.position.y, newZ);
 
       const heading = Math.atan2(dirX, dirZ);
       creature.setHeading(heading);
@@ -663,23 +663,23 @@ export interface PatrolBehaviorOptions {
   /** Patrol mode */
   mode: PatrolMode;
   /** Waypoints for waypoint patrol */
-  waypoints?: Vector3[];
+  waypoints?: Vector3[] | undefined;
   /** Center for random patrol */
-  patrolCenter?: Vector3;
+  patrolCenter?: Vector3 | undefined;
   /** Radius for random patrol */
-  patrolRadius?: number;
+  patrolRadius?: number | undefined;
   /** Guard post position */
-  guardPostPosition?: Vector3;
+  guardPostPosition?: Vector3 | undefined;
   /** Detection range */
-  detectRange?: number;
+  detectRange?: number | undefined;
   /** Attack range */
-  attackRange?: number;
+  attackRange?: number | undefined;
   /** Max chase distance */
-  maxChaseDistance?: number;
+  maxChaseDistance?: number | undefined;
   /** Social group for coordination */
-  socialGroup?: string;
+  socialGroup?: string | undefined;
   /** Alert duration in seconds */
-  alertDuration?: number;
+  alertDuration?: number | undefined;
 }
 
 /**
@@ -742,8 +742,8 @@ export function createPatrolBehavior(options: PatrolBehaviorOptions): BehaviorTr
 export function createPatrolGroupBehavior(
   options: PatrolBehaviorOptions & {
     isLeader: boolean;
-    formationOffset?: Vector3;
-    getLeaderPosition?: (leaderId: ObjectId) => Vector3 | null;
+    formationOffset?: Vector3 | undefined;
+    getLeaderPosition?: ((leaderId: ObjectId) => Vector3 | null) | undefined;
   }
 ): BehaviorTree {
   const baseBehavior = createPatrolBehavior(options);

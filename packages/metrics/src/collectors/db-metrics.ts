@@ -4,11 +4,8 @@
  * Pre-defined metrics for database monitoring.
  */
 
-import { MetricRegistry } from '../metric-types.js';
+import { MetricRegistry, CounterMetric, GaugeMetric, HistogramMetric } from '../metric-types.js';
 import { getDefaultRegistry } from '../metric-registry.js';
-import { Counter } from '../counters.js';
-import { Gauge } from '../gauges.js';
-import { Histogram } from '../histograms.js';
 import { dbLatencyBuckets } from '../histograms.js';
 
 /**
@@ -21,29 +18,29 @@ export type QueryType = 'select' | 'insert' | 'update' | 'delete' | 'transaction
  */
 export interface DatabaseMetrics {
   // Query metrics
-  queryDuration: Histogram;
-  queriesTotal: Counter;
-  queryErrors: Counter;
-  queryRowsAffected: Counter;
-  queryRowsReturned: Counter;
+  queryDuration: HistogramMetric;
+  queriesTotal: CounterMetric;
+  queryErrors: CounterMetric;
+  queryRowsAffected: CounterMetric;
+  queryRowsReturned: CounterMetric;
 
   // Connection pool metrics
-  connectionPoolSize: Gauge;
-  connectionPoolActive: Gauge;
-  connectionPoolIdle: Gauge;
-  connectionPoolWaiting: Gauge;
+  connectionPoolSize: GaugeMetric;
+  connectionPoolActive: GaugeMetric;
+  connectionPoolIdle: GaugeMetric;
+  connectionPoolWaiting: GaugeMetric;
 
   // Connection lifecycle
-  connectionCreated: Counter;
-  connectionClosed: Counter;
-  connectionErrors: Counter;
-  connectionTimeouts: Counter;
+  connectionCreated: CounterMetric;
+  connectionClosed: CounterMetric;
+  connectionErrors: CounterMetric;
+  connectionTimeouts: CounterMetric;
 
   // Transaction metrics
-  transactionDuration: Histogram;
-  transactionsTotal: Counter;
-  transactionCommits: Counter;
-  transactionRollbacks: Counter;
+  transactionDuration: HistogramMetric;
+  transactionsTotal: CounterMetric;
+  transactionCommits: CounterMetric;
+  transactionRollbacks: CounterMetric;
 }
 
 /**
@@ -196,19 +193,19 @@ export function extractTableName(sql: string): string {
 
   // SELECT ... FROM table
   const fromMatch = trimmed.match(/from\s+["'`]?(\w+)["'`]?/);
-  if (fromMatch) return fromMatch[1];
+  if (fromMatch?.[1]) return fromMatch[1];
 
   // INSERT INTO table
   const insertMatch = trimmed.match(/insert\s+into\s+["'`]?(\w+)["'`]?/);
-  if (insertMatch) return insertMatch[1];
+  if (insertMatch?.[1]) return insertMatch[1];
 
   // UPDATE table
   const updateMatch = trimmed.match(/update\s+["'`]?(\w+)["'`]?/);
-  if (updateMatch) return updateMatch[1];
+  if (updateMatch?.[1]) return updateMatch[1];
 
   // DELETE FROM table
   const deleteMatch = trimmed.match(/delete\s+from\s+["'`]?(\w+)["'`]?/);
-  if (deleteMatch) return deleteMatch[1];
+  if (deleteMatch?.[1]) return deleteMatch[1];
 
   return 'unknown';
 }

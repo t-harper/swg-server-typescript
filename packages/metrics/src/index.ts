@@ -25,8 +25,7 @@
  */
 
 // Types
-export {
-  MetricType,
+export type {
   MetricLabels,
   LabelPair,
   BaseMetric,
@@ -46,6 +45,10 @@ export {
   HistogramConfig,
   SummaryConfig,
   MetricRegistry,
+} from './metric-types.js';
+
+export {
+  MetricType,
   DEFAULT_BUCKETS,
   DEFAULT_QUANTILES,
   linearBuckets,
@@ -90,8 +93,11 @@ export {
 } from './histograms.js';
 
 // Game metrics collector
-export {
+export type {
   GameMetrics,
+} from './collectors/game-metrics.js';
+
+export {
   createGameMetrics,
   getGameMetrics,
   resetGameMetrics,
@@ -105,13 +111,16 @@ export {
 } from './collectors/game-metrics.js';
 
 // Database metrics collector
-export {
+export type {
   DatabaseMetrics,
   QueryType,
   QueryResult,
   QueryContext,
   TransactionContext,
   PoolStats,
+} from './collectors/db-metrics.js';
+
+export {
   createDatabaseMetrics,
   getDatabaseMetrics,
   resetDatabaseMetrics,
@@ -122,13 +131,16 @@ export {
 } from './collectors/db-metrics.js';
 
 // Prometheus exporter
-export {
-  PrometheusExporter,
+export type {
   PrometheusExporterOptions,
   MetricsRequest,
   MetricsResponse,
   MetricsHandler,
   ParsedMetric,
+} from './exporters/prometheus.js';
+
+export {
+  PrometheusExporter,
   createPrometheusExporter,
   exportMetrics,
   createMetricsEndpoint,

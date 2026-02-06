@@ -534,7 +534,7 @@ export class CityObject {
    * End the current election and determine the winner
    * @returns Operation result with winner info
    */
-  endElection(): CityOperationResult & { winnerId?: ObjectId; winnerName?: string } {
+  endElection(): CityOperationResult & { winnerId?: ObjectId; winnerName?: string | undefined } {
     if (!this.currentElection) {
       return {
         success: false,
@@ -1017,77 +1017,80 @@ export class CityObject {
    * Create a CityObject from JSON data
    */
   static fromJSON(data: Record<string, unknown>): CityObject {
-    const citizens = (data.citizens as Array<Record<string, unknown>>) || [];
-    const founder = citizens.find((c) => c.rank === CitizenRank.Mayor);
+    const citizens = (data['citizens'] as Array<Record<string, unknown>>) || [];
+    const founder = citizens.find((c) => c['rank'] === CitizenRank.Mayor);
 
     const city = new CityObject(
-      BigInt(data.cityId as string),
-      data.name as string,
-      data.planetId as string,
-      (data.position as { x: number; z: number }).x,
-      (data.position as { x: number; z: number }).z,
-      BigInt(founder?.characterId as string || '0'),
-      (founder?.name as string) || 'Unknown'
+      BigInt(data['cityId'] as string),
+      data['name'] as string,
+      data['planetId'] as string,
+      (data['position'] as { x: number; z: number }).x,
+      (data['position'] as { x: number; z: number }).z,
+      BigInt(founder?.['characterId'] as string || '0'),
+      (founder?.['name'] as string) || 'Unknown'
     );
 
     // Restore rank and specialization
-    city.rank = data.rank as CityRank;
-    city.radius = data.radius as number;
-    city.specialization = data.specialization as CitySpecialization;
-    city.mayorId = BigInt(data.mayorId as string);
-    city.guildId = data.guildId ? BigInt(data.guildId as string) : undefined;
+    city.rank = data['rank'] as CityRank;
+    city.radius = data['radius'] as number;
+    city.specialization = data['specialization'] as CitySpecialization;
+    city.mayorId = BigInt(data['mayorId'] as string);
+    const guildIdVal = data['guildId'];
+    if (guildIdVal) {
+      city.guildId = BigInt(guildIdVal as string);
+    }
 
     // Restore citizens
     city.citizens.clear();
     for (const citizenData of citizens) {
       const record: CitizenRecord = {
-        characterId: BigInt(citizenData.characterId as string),
-        name: citizenData.name as string,
-        rank: citizenData.rank as CitizenRank,
-        joinedAt: new Date(citizenData.joinedAt as string),
-        votedFor: citizenData.votedFor ? BigInt(citizenData.votedFor as string) : undefined,
+        characterId: BigInt(citizenData['characterId'] as string),
+        name: citizenData['name'] as string,
+        rank: citizenData['rank'] as CitizenRank,
+        joinedAt: new Date(citizenData['joinedAt'] as string),
+        votedFor: citizenData['votedFor'] ? BigInt(citizenData['votedFor'] as string) : undefined,
       };
       city.citizens.set(record.characterId, record);
     }
 
     // Restore economy
-    city.treasury = BigInt(data.treasury as string);
-    city.taxes = ((data.taxes as Array<Record<string, unknown>>) || []).map((t) => ({
-      taxType: t.taxType as TaxType,
-      taxRate: t.taxRate as number,
-      lastCollected: new Date(t.lastCollected as string),
+    city.treasury = BigInt(data['treasury'] as string);
+    city.taxes = ((data['taxes'] as Array<Record<string, unknown>>) || []).map((t) => ({
+      taxType: t['taxType'] as TaxType,
+      taxRate: t['taxRate'] as number,
+      lastCollected: new Date(t['lastCollected'] as string),
     }));
 
     // Restore structures
     city.structures.clear();
-    for (const structData of (data.structures as Array<Record<string, unknown>>) || []) {
+    for (const structData of (data['structures'] as Array<Record<string, unknown>>) || []) {
       city.structures.set(
-        BigInt(structData.objectId as string),
-        structData.type as CityStructureType
+        BigInt(structData['objectId'] as string),
+        structData['type'] as CityStructureType
       );
     }
 
     // Restore election
-    if (data.currentElection) {
-      const electionData = data.currentElection as Record<string, unknown>;
+    if (data['currentElection']) {
+      const electionData = data['currentElection'] as Record<string, unknown>;
       city.currentElection = {
-        startedAt: new Date(electionData.startedAt as string),
-        endsAt: new Date(electionData.endsAt as string),
+        startedAt: new Date(electionData['startedAt'] as string),
+        endsAt: new Date(electionData['endsAt'] as string),
         candidates: new Map(
-          ((electionData.candidates as Array<Record<string, unknown>>) || []).map((c) => [
-            BigInt(c.candidateId as string),
-            c.votes as number,
+          ((electionData['candidates'] as Array<Record<string, unknown>>) || []).map((c) => [
+            BigInt(c['candidateId'] as string),
+            c['votes'] as number,
           ])
         ),
         hasVoted: new Set(
-          ((electionData.hasVoted as string[]) || []).map((id) => BigInt(id))
+          ((electionData['hasVoted'] as string[]) || []).map((id) => BigInt(id))
         ),
       };
     }
 
     // Restore timestamps
-    city.foundedAt = new Date(data.foundedAt as string);
-    city.upkeepPaid = new Date(data.upkeepPaid as string);
+    city.foundedAt = new Date(data['foundedAt'] as string);
+    city.upkeepPaid = new Date(data['upkeepPaid'] as string);
 
     return city;
   }

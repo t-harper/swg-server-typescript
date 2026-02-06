@@ -13,11 +13,7 @@ import {
 } from '@swg/protocol/swg/messages/login-messages.js';
 import type { ClientSession } from './login-handler.js';
 
-/**
- * Default character object template
- * Used when a character doesn't have a specific template stored
- */
-const DEFAULT_OBJECT_TEMPLATE = 'object/creature/player/shared_human_male.iff';
+import { TemplateCrc, calculateTemplateCrc } from '@swg/objects';
 
 /**
  * Character type constants
@@ -156,14 +152,14 @@ export class CharacterHandler {
       // Determine character type (could be stored in DB or determined by skills)
       const characterType = await this.determineCharacterType(char);
 
-      // Get object template (would normally be stored with character data)
-      const objectTemplate = await this.getCharacterTemplate(char);
+      // Compute object template CRC from stored template name
+      const objectTemplateCrc = this.getCharacterTemplate(char);
 
       characterDataList.push({
-        characterId: char.characterId,
         characterName: char.name,
-        objectTemplate,
-        serverId: this.serverId,
+        objectTemplateCrc,
+        characterId: char.characterId,
+        clusterId: this.serverId,
         characterType,
       });
     }
@@ -205,14 +201,14 @@ export class CharacterHandler {
   }
 
   /**
-   * Get the object template for a character
-   * In a full implementation, this would be stored with the character
+   * Get the object template CRC for a character
+   * Computes CRC from the stored template_name in the database
    */
-  private async getCharacterTemplate(character: Character): Promise<string> {
-    // In a production environment, the object template would be stored
-    // in the character data or determined by race/gender
-    // For now, return a default template
-    return DEFAULT_OBJECT_TEMPLATE;
+  private getCharacterTemplate(character: Character): number {
+    if (character.templateName) {
+      return calculateTemplateCrc(character.templateName);
+    }
+    return TemplateCrc.HUMAN_MALE;
   }
 
   /**

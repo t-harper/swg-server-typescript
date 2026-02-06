@@ -548,7 +548,7 @@ export {
   getVendorTypeName,
   type VendorItem,
   type VendorSaleResult,
-  type MaintenanceStatus,
+  type MaintenanceStatus as VendorMaintenanceStatus,
 } from './player-vendor.js';
 
 // Vendor network messages
@@ -1231,7 +1231,7 @@ export {
   getChassisTypeName,
   getComponentSlotName,
   getShipFactionName,
-  getConditionStateName,
+  getConditionStateName as getShipConditionStateName,
   isWeaponSlot,
   isArmorSlot,
   getWeaponSlotIndex,

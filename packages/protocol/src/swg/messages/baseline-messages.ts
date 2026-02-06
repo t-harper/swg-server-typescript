@@ -40,7 +40,8 @@ export interface BaselinesMessage extends SwgMessageBase {
  * Serialize BaselinesMessage message
  */
 export function serializeBaselinesMessage(message: BaselinesMessage): Uint8Array {
-  const writer = new BufferWriter(32 + message.payload.length);
+  const writer = new BufferWriter(34 + message.payload.length);
+  writer.writeUInt16LE(5); // operandCount
   writer.writeUInt32LE(message.opcode);
   writer.writeUInt64LE(message.targetId);
   writer.writeUInt32LE(message.typeTag);
@@ -55,6 +56,7 @@ export function serializeBaselinesMessage(message: BaselinesMessage): Uint8Array
  */
 export function deserializeBaselinesMessage(data: Uint8Array): BaselinesMessage {
   const reader = new BufferReader(data);
+  reader.readUInt16LE(); // operandCount
   const opcode = reader.readUInt32LE();
   if (opcode !== BaselineMessageOpcode.BaselinesMessage) {
     throw new Error(`Invalid opcode for BaselinesMessage: 0x${opcode.toString(16)}`);
@@ -114,7 +116,8 @@ export interface DeltasMessage extends SwgMessageBase {
  * Serialize DeltasMessage message
  */
 export function serializeDeltasMessage(message: DeltasMessage): Uint8Array {
-  const writer = new BufferWriter(32 + message.payload.length);
+  const writer = new BufferWriter(34 + message.payload.length);
+  writer.writeUInt16LE(5); // operandCount
   writer.writeUInt32LE(message.opcode);
   writer.writeUInt64LE(message.targetId);
   writer.writeUInt32LE(message.typeTag);
@@ -129,6 +132,7 @@ export function serializeDeltasMessage(message: DeltasMessage): Uint8Array {
  */
 export function deserializeDeltasMessage(data: Uint8Array): DeltasMessage {
   const reader = new BufferReader(data);
+  reader.readUInt16LE(); // operandCount
   const opcode = reader.readUInt32LE();
   if (opcode !== BaselineMessageOpcode.DeltasMessage) {
     throw new Error(`Invalid opcode for DeltasMessage: 0x${opcode.toString(16)}`);
@@ -180,10 +184,11 @@ export type BaselineMessage = BaselinesMessage | DeltasMessage;
  * Get the opcode from raw baseline message data
  */
 export function getBaselineMessageOpcode(data: Uint8Array): number {
-  if (data.length < 4) {
+  if (data.length < 6) {
     throw new Error('Message too short to contain opcode');
   }
   const reader = new BufferReader(data);
+  reader.readUInt16LE(); // operandCount
   return reader.readUInt32LE();
 }
 

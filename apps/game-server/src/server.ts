@@ -29,7 +29,6 @@ import {
   serializeSceneEndBaselines,
   createServerTimeMessage,
   serializeServerTimeMessage,
-  getTerrainFileName,
 } from '@swg/protocol/swg/messages/zone-messages.js';
 import {
   ConnectionMessageOpcode,
@@ -292,7 +291,7 @@ export async function createServer(config: ServerConfig): Promise<GameServer> {
   async function sendZoneInSequence(
     gameSession: GameSession,
     playerObj: PlayerObjectClass,
-    character: { sceneId: string; x: number; y: number; z: number; orientationX: number; orientationY: number; orientationZ: number; orientationW: number },
+    character: { sceneId: string; x: number; y: number; z: number; orientationX: number; orientationY: number; orientationZ: number; orientationW: number; templateName?: string },
     send: SendReliable
   ): Promise<void> {
     const objectId = playerObj.objectId;
@@ -301,16 +300,21 @@ export async function createServer(config: ServerConfig): Promise<GameServer> {
       `[GameServer] Sending zone-in sequence for ${objectId} to ${character.sceneId} (${character.x}, ${character.y}, ${character.z})`
     );
 
-    // 1. CmdStartScene - tells the client which terrain to load and where
-    const terrainFile = getTerrainFileName(character.sceneId);
+    // 1. CmdStartScene - tells the client which scene to load and where
+    // sceneName is the scene ID (e.g., "tatooine"), not the terrain file path
+    const templatePath = character.templateName || 'object/creature/player/shared_human_male.iff';
+    const galacticTime = BigInt(Math.floor(Date.now() / 1000));
+    const serverEpoch = Math.floor(Date.now() / 1000);
     const startScene = createCmdStartScene(
       objectId,
-      terrainFile,
+      character.sceneId,    // scene name like "tatooine"
       character.x,
       character.y,
       character.z,
-      playerObj.templateCrc,
-      BigInt(Math.floor(Date.now() / 1000))
+      0,                    // startYaw
+      templatePath,         // template name string, not CRC
+      galacticTime,
+      serverEpoch
     );
     send(serializeCmdStartScene(startScene));
 
@@ -362,9 +366,9 @@ export async function createServer(config: ServerConfig): Promise<GameServer> {
 
     // Check for ClientIdMsg before requiring an authenticated session.
     // This is the first message a client sends after connecting.
-    if (data.length >= 4) {
+    if (data.length >= 6) {
       const view = new DataView(data.buffer, data.byteOffset, data.byteLength);
-      const opcode = view.getUint32(0, true);
+      const opcode = view.getUint32(2, true); // skip u16 operandCount
 
       if (opcode === ConnectionMessageOpcode.ClientIdMsg) {
         await handleClientIdMsg(soeSession, data);
@@ -413,9 +417,9 @@ export async function createServer(config: ServerConfig): Promise<GameServer> {
       }
 
       // Check for 4-byte opcode messages
-      if (data.length >= 4) {
+      if (data.length >= 6) {
         const view = new DataView(data.buffer, data.byteOffset, data.byteLength);
-        const opcode = view.getUint32(0, true);
+        const opcode = view.getUint32(2, true); // skip u16 operandCount
 
         // Handle zone messages
         if (opcode === ZoneMessageOpcode.CmdSceneReady) {

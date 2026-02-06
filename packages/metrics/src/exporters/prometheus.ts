@@ -298,14 +298,14 @@ export function parsePrometheusText(text: string): ParsedMetric[] {
     if (trimmed === '' || trimmed.startsWith('#')) {
       // Parse comments
       const helpMatch = trimmed.match(/^# HELP (\S+) (.*)$/);
-      if (helpMatch) {
+      if (helpMatch?.[1] && helpMatch[2] !== undefined) {
         currentName = helpMatch[1];
         currentHelp = helpMatch[2];
         continue;
       }
 
       const typeMatch = trimmed.match(/^# TYPE (\S+) (\S+)$/);
-      if (typeMatch) {
+      if (typeMatch?.[2]) {
         currentType = typeMatch[2];
         continue;
       }
@@ -315,16 +315,18 @@ export function parsePrometheusText(text: string): ParsedMetric[] {
 
     // Parse metric line
     const metricMatch = trimmed.match(/^(\S+?)(\{[^}]*\})?\s+(\S+)(\s+\d+)?$/);
-    if (metricMatch) {
+    if (metricMatch?.[1] && metricMatch[3] !== undefined) {
       const name = metricMatch[1];
-      const labelsStr = metricMatch[2] || '';
+      const labelsStr = metricMatch[2] ?? '';
       const value = parseFloat(metricMatch[3]);
 
       const labels: MetricLabels = {};
       if (labelsStr) {
         const labelMatches = labelsStr.matchAll(/(\w+)="([^"]*)"/g);
         for (const match of labelMatches) {
-          labels[match[1]] = match[2];
+          if (match[1] && match[2] !== undefined) {
+            labels[match[1]] = match[2];
+          }
         }
       }
 

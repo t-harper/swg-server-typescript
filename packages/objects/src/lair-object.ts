@@ -336,7 +336,7 @@ export class LairObject extends TangibleObject {
       return null;
     }
     const index = Math.floor(Math.random() * this.creatureTemplates.length);
-    return this.creatureTemplates[index];
+    return this.creatureTemplates[index] ?? null;
   }
 
   /**

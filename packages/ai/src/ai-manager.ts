@@ -27,7 +27,7 @@ export interface AIAgent {
   /** AI context with state data */
   context: AIContext;
   /** Social group for pack behavior */
-  socialGroup?: string;
+  socialGroup?: string | undefined;
   /** Whether AI is currently active */
   active: boolean;
   /** Priority for processing order (higher = processed first) */
@@ -47,7 +47,7 @@ export interface CallForHelpEvent {
   /** Radius to search for allies */
   radius: number;
   /** Social group to notify */
-  socialGroup?: string;
+  socialGroup?: string | undefined;
   /** Timestamp of the call */
   timestamp: number;
 }
@@ -126,9 +126,9 @@ export class AIManager {
     } = {}
   ): void {
     const homePosition = options.homePosition ?? {
-      x: creature.x,
-      y: creature.y,
-      z: creature.z,
+      x: creature.position.x,
+      y: creature.position.y,
+      z: creature.position.z,
     };
 
     const context = createAIContext(creature, homePosition);
@@ -314,7 +314,7 @@ export class AIManager {
         this.callsForHelp.push({
           callerId: creature.objectId,
           threatId: highestThreat,
-          position: { x: creature.x, y: creature.y, z: creature.z },
+          position: { x: creature.position.x, y: creature.position.y, z: creature.position.z },
           radius,
           socialGroup: group ?? agent.socialGroup,
           timestamp: Date.now(),
@@ -352,8 +352,8 @@ export class AIManager {
         }
 
         // Check distance
-        const dx = agent.creature.x - event.position.x;
-        const dz = agent.creature.z - event.position.z;
+        const dx = agent.creature.position.x - event.position.x;
+        const dz = agent.creature.position.z - event.position.z;
         const distance = Math.sqrt(dx * dx + dz * dz);
 
         if (distance > event.radius) {
@@ -502,8 +502,8 @@ export class AIManager {
         continue;
       }
 
-      const dx = other.creature.x - creature.x;
-      const dz = other.creature.z - creature.z;
+      const dx = other.creature.position.x - creature.position.x;
+      const dz = other.creature.position.z - creature.position.z;
       const distance = Math.sqrt(dx * dx + dz * dz);
 
       if (distance <= radius) {
@@ -548,8 +548,8 @@ export class AIManager {
     const result: AIAgent[] = [];
 
     for (const agent of this.agents.values()) {
-      const dx = agent.creature.x - position.x;
-      const dz = agent.creature.z - position.z;
+      const dx = agent.creature.position.x - position.x;
+      const dz = agent.creature.position.z - position.z;
       const distance = Math.sqrt(dx * dx + dz * dz);
 
       if (distance <= radius) {

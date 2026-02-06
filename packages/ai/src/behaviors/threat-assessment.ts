@@ -122,9 +122,9 @@ export class ThreatTableManager {
 
   constructor(
     options: {
-      rules?: Partial<ThreatGenerationRules>;
-      decayRate?: number;
-      combatRange?: number;
+      rules?: Partial<ThreatGenerationRules> | undefined;
+      decayRate?: number | undefined;
+      combatRange?: number | undefined;
     } = {}
   ) {
     this.rules = { ...DEFAULT_THREAT_RULES, ...options.rules };
@@ -322,26 +322,26 @@ export class UpdateThreatTable extends LeafNode {
   threatManager: ThreatTableManager;
 
   /** Callback to get pending threat events */
-  getPendingThreatEvents?: (context: AIContext) => Array<{
+  getPendingThreatEvents?: ((context: AIContext) => Array<{
     sourceId: ObjectId;
     amount: number;
     type: 'damage' | 'healing' | 'ability' | 'taunt';
     position: Vector3;
-  }>;
+  }>) | undefined;
 
   /** Callback to resolve creature position */
-  getCreaturePosition?: (id: ObjectId) => Vector3 | null;
+  getCreaturePosition?: ((id: ObjectId) => Vector3 | null) | undefined;
 
   constructor(
     options: {
-      threatManager?: ThreatTableManager;
-      getPendingThreatEvents?: (context: AIContext) => Array<{
+      threatManager?: ThreatTableManager | undefined;
+      getPendingThreatEvents?: ((context: AIContext) => Array<{
         sourceId: ObjectId;
         amount: number;
         type: 'damage' | 'healing' | 'ability' | 'taunt';
         position: Vector3;
-      }>;
-      getCreaturePosition?: (id: ObjectId) => Vector3 | null;
+      }>) | undefined;
+      getCreaturePosition?: ((id: ObjectId) => Vector3 | null) | undefined;
     } = {},
     name?: string
   ) {
@@ -368,8 +368,8 @@ export class UpdateThreatTable extends LeafNode {
         const pos = this.getCreaturePosition(entry.targetId);
         if (pos) {
           const distance = Math.sqrt(
-            (pos.x - creature.x) ** 2 +
-            (pos.z - creature.z) ** 2
+            (pos.x - creature.position.x) ** 2 +
+            (pos.z - creature.position.z) ** 2
           );
           if (distance <= this.threatManager.combatRange) {
             this.threatManager.setInRange(entry.targetId, pos);
@@ -401,19 +401,19 @@ export class UpdateThreatTable extends LeafNode {
  */
 export class SelectThreatTarget extends LeafNode {
   /** Threat table manager (or get from blackboard) */
-  threatManager?: ThreatTableManager;
+  threatManager?: ThreatTableManager | undefined;
 
   /** Threshold percentage for switching targets (e.g., 1.1 = 110%) */
   switchThreshold: number;
 
   /** Callback to resolve creature from ID */
-  resolveCreature?: (id: ObjectId) => CreatureObject | null;
+  resolveCreature?: ((id: ObjectId) => CreatureObject | null) | undefined;
 
   constructor(
     options: {
-      threatManager?: ThreatTableManager;
-      switchThreshold?: number;
-      resolveCreature?: (id: ObjectId) => CreatureObject | null;
+      threatManager?: ThreatTableManager | undefined;
+      switchThreshold?: number | undefined;
+      resolveCreature?: ((id: ObjectId) => CreatureObject | null) | undefined;
     } = {},
     name?: string
   ) {
@@ -527,9 +527,9 @@ export class ApplyTaunt extends LeafNode {
     const manager = getBlackboardValue<ThreatTableManager>(context, ThreatBlackboardKeys.THREAT_TABLE);
     if (manager) {
       manager.addThreat(target.objectId, this.bonusThreat, 'taunt', {
-        x: target.x,
-        y: target.y,
-        z: target.z,
+        x: target.position.x,
+        y: target.position.y,
+        z: target.position.z,
       });
     }
 
@@ -553,13 +553,13 @@ export class CheckDeaggro extends LeafNode {
   maxRange: number;
 
   /** Callback to check if target is valid */
-  isTargetValid?: (id: ObjectId) => boolean;
+  isTargetValid?: ((id: ObjectId) => boolean) | undefined;
 
   constructor(
     options: {
-      combatTimeout?: number;
-      maxRange?: number;
-      isTargetValid?: (id: ObjectId) => boolean;
+      combatTimeout?: number | undefined;
+      maxRange?: number | undefined;
+      isTargetValid?: ((id: ObjectId) => boolean) | undefined;
     } = {},
     name?: string
   ) {
@@ -590,8 +590,8 @@ export class CheckDeaggro extends LeafNode {
 
       // Check range
       const distance = Math.sqrt(
-        (entry.lastPosition.x - creature.x) ** 2 +
-        (entry.lastPosition.z - creature.z) ** 2
+        (entry.lastPosition.x - creature.position.x) ** 2 +
+        (entry.lastPosition.z - creature.position.z) ** 2
       );
 
       if (distance <= this.maxRange && entry.inRange) {
@@ -639,8 +639,8 @@ export class LeashCheck extends LeafNode {
 
   constructor(
     options: {
-      leashDistance?: number;
-      clearThreatOnLeash?: boolean;
+      leashDistance?: number | undefined;
+      clearThreatOnLeash?: boolean | undefined;
     } = {},
     name?: string
   ) {
@@ -653,8 +653,8 @@ export class LeashCheck extends LeafNode {
     const { creature, homePosition } = context;
 
     const distance = Math.sqrt(
-      (creature.x - homePosition.x) ** 2 +
-      (creature.z - homePosition.z) ** 2
+      (creature.position.x - homePosition.x) ** 2 +
+      (creature.position.z - homePosition.z) ** 2
     );
 
     if (distance > this.leashDistance) {
@@ -715,15 +715,15 @@ export class ThreatDump extends LeafNode {
  */
 export class AssistTarget extends LeafNode {
   /** Callback to get ally's target */
-  getAllyTarget?: (context: AIContext, allyId: ObjectId) => ObjectId | null;
+  getAllyTarget?: ((context: AIContext, allyId: ObjectId) => ObjectId | null) | undefined;
 
   /** Callback to resolve creature */
-  resolveCreature?: (id: ObjectId) => CreatureObject | null;
+  resolveCreature?: ((id: ObjectId) => CreatureObject | null) | undefined;
 
   constructor(
     options: {
-      getAllyTarget?: (context: AIContext, allyId: ObjectId) => ObjectId | null;
-      resolveCreature?: (id: ObjectId) => CreatureObject | null;
+      getAllyTarget?: ((context: AIContext, allyId: ObjectId) => ObjectId | null) | undefined;
+      resolveCreature?: ((id: ObjectId) => CreatureObject | null) | undefined;
     } = {},
     name?: string
   ) {
@@ -755,9 +755,9 @@ export class AssistTarget extends LeafNode {
     const manager = getBlackboardValue<ThreatTableManager>(context, ThreatBlackboardKeys.THREAT_TABLE);
     if (manager) {
       manager.addThreat(allyTargetId, 50, 'ability', {
-        x: target.x,
-        y: target.y,
-        z: target.z,
+        x: target.position.x,
+        y: target.position.y,
+        z: target.position.z,
       });
     }
 
@@ -770,27 +770,27 @@ export class AssistTarget extends LeafNode {
  */
 export interface ThreatAssessmentOptions {
   /** Threat generation rules */
-  rules?: Partial<ThreatGenerationRules>;
+  rules?: Partial<ThreatGenerationRules> | undefined;
   /** Decay rate per second */
-  decayRate?: number;
+  decayRate?: number | undefined;
   /** Combat range */
-  combatRange?: number;
+  combatRange?: number | undefined;
   /** Leash distance */
-  leashDistance?: number;
+  leashDistance?: number | undefined;
   /** Combat timeout for deaggro */
-  combatTimeout?: number;
+  combatTimeout?: number | undefined;
   /** Switch threshold */
-  switchThreshold?: number;
+  switchThreshold?: number | undefined;
   /** Callbacks */
-  getPendingThreatEvents?: (context: AIContext) => Array<{
+  getPendingThreatEvents?: ((context: AIContext) => Array<{
     sourceId: ObjectId;
     amount: number;
     type: 'damage' | 'healing' | 'ability' | 'taunt';
     position: Vector3;
-  }>;
-  getCreaturePosition?: (id: ObjectId) => Vector3 | null;
-  resolveCreature?: (id: ObjectId) => CreatureObject | null;
-  isTargetValid?: (id: ObjectId) => boolean;
+  }>) | undefined;
+  getCreaturePosition?: ((id: ObjectId) => Vector3 | null) | undefined;
+  resolveCreature?: ((id: ObjectId) => CreatureObject | null) | undefined;
+  isTargetValid?: ((id: ObjectId) => boolean) | undefined;
 }
 
 /**
@@ -851,8 +851,8 @@ export function createThreatAssessmentBehavior(options: ThreatAssessmentOptions)
  */
 export function createThreatManager(
   options?: Partial<ThreatGenerationRules> & {
-    decayRate?: number;
-    combatRange?: number;
+    decayRate?: number | undefined;
+    combatRange?: number | undefined;
   }
 ): ThreatTableManager {
   return new ThreatTableManager({

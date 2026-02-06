@@ -142,28 +142,28 @@ export class TargetPriority extends LeafNode {
   lowHealthThreshold: number;
 
   /** Callback to get potential targets */
-  getPotentialTargets?: (context: AIContext) => Array<{
+  getPotentialTargets?: ((context: AIContext) => Array<{
     creature: CreatureObject;
     type: TargetType;
     threat: number;
-  }>;
+  }>) | undefined;
 
   /** Callback to identify target type */
-  identifyTargetType?: (creature: CreatureObject) => TargetType;
+  identifyTargetType?: ((creature: CreatureObject) => TargetType) | undefined;
 
   constructor(
     options: {
-      typeWeights?: Partial<Record<TargetType, number>>;
+      typeWeights?: Partial<Record<TargetType, number>> | undefined;
       lowHealthWeight?: number;
       proximityWeight?: number;
       threatWeight?: number;
       lowHealthThreshold?: number;
-      getPotentialTargets?: (context: AIContext) => Array<{
+      getPotentialTargets?: ((context: AIContext) => Array<{
         creature: CreatureObject;
         type: TargetType;
         threat: number;
-      }>;
-      identifyTargetType?: (creature: CreatureObject) => TargetType;
+      }>) | undefined;
+      identifyTargetType?: ((creature: CreatureObject) => TargetType) | undefined;
     } = {},
     name?: string
   ) {
@@ -217,8 +217,8 @@ export class TargetPriority extends LeafNode {
 
       // Proximity bonus (closer = higher score)
       const distance = Math.sqrt(
-        (target.creature.x - creature.x) ** 2 +
-        (target.creature.z - creature.z) ** 2
+        (target.creature.position.x - creature.position.x) ** 2 +
+        (target.creature.position.z - creature.position.z) ** 2
       );
       const maxRange = 64;
       score += this.proximityWeight * (1 - Math.min(distance, maxRange) / maxRange);
@@ -324,8 +324,8 @@ export class RangeManagement extends LeafNode {
       return NodeStatus.Failure;
     }
 
-    const dx = target.x - creature.x;
-    const dz = target.z - creature.z;
+    const dx = target.position.x - creature.position.x;
+    const dz = target.position.z - creature.position.z;
     const distance = Math.sqrt(dx * dx + dz * dz);
 
     // Check if in acceptable range
@@ -357,10 +357,10 @@ export class RangeManagement extends LeafNode {
       }
     }
 
-    const newX = creature.x + moveDir.x * moveDistance;
-    const newZ = creature.z + moveDir.z * moveDistance;
+    const newX = creature.position.x + moveDir.x * moveDistance;
+    const newZ = creature.position.z + moveDir.z * moveDistance;
 
-    creature.setPosition(newX, creature.y, newZ);
+    creature.setPosition(newX, creature.position.y, newZ);
 
     // Face target
     const heading = Math.atan2(dx / distance, dz / distance);
@@ -386,16 +386,16 @@ export class AbilityRotation extends LeafNode {
   private cooldowns: Map<string, number> = new Map();
 
   /** Callback to execute ability */
-  executeAbility?: (context: AIContext, ability: AbilityDefinition) => boolean;
+  executeAbility?: ((context: AIContext, ability: AbilityDefinition) => boolean) | undefined;
 
   /** Callback to check if ability can be used */
-  canUseAbility?: (context: AIContext, ability: AbilityDefinition) => boolean;
+  canUseAbility?: ((context: AIContext, ability: AbilityDefinition) => boolean) | undefined;
 
   constructor(
     options: {
       abilities?: AbilityDefinition[];
-      executeAbility?: (context: AIContext, ability: AbilityDefinition) => boolean;
-      canUseAbility?: (context: AIContext, ability: AbilityDefinition) => boolean;
+      executeAbility?: ((context: AIContext, ability: AbilityDefinition) => boolean) | undefined;
+      canUseAbility?: ((context: AIContext, ability: AbilityDefinition) => boolean) | undefined;
     } = {},
     name?: string
   ) {
@@ -415,8 +415,8 @@ export class AbilityRotation extends LeafNode {
 
     // Calculate distance to target
     const distance = Math.sqrt(
-      (target.x - creature.x) ** 2 +
-      (target.z - creature.z) ** 2
+      (target.position.x - creature.position.x) ** 2 +
+      (target.position.z - creature.position.z) ** 2
     );
 
     // Sort abilities by priority
@@ -488,13 +488,13 @@ export class DefensiveCooldowns extends LeafNode {
   private lastDefensiveTime: number = 0;
 
   /** Callback to execute defensive ability */
-  executeDefensive?: (context: AIContext, ability: AbilityDefinition) => boolean;
+  executeDefensive?: ((context: AIContext, ability: AbilityDefinition) => boolean) | undefined;
 
   constructor(
     options: {
       defensiveAbilities?: AbilityDefinition[];
       globalCooldown?: number;
-      executeDefensive?: (context: AIContext, ability: AbilityDefinition) => boolean;
+      executeDefensive?: ((context: AIContext, ability: AbilityDefinition) => boolean) | undefined;
     } = {},
     name?: string
   ) {
@@ -606,8 +606,8 @@ export class KitingBehavior extends LeafNode {
       return NodeStatus.Failure;
     }
 
-    const dx = target.x - creature.x;
-    const dz = target.z - creature.z;
+    const dx = target.position.x - creature.position.x;
+    const dz = target.position.z - creature.position.z;
     const distance = Math.sqrt(dx * dx + dz * dz);
 
     // Don't kite if target is at range
@@ -652,10 +652,10 @@ export class KitingBehavior extends LeafNode {
     const speed = creature.runSpeed * this.speedMultiplier;
     const moveDistance = speed * deltaTime;
 
-    const newX = creature.x + moveX * moveDistance;
-    const newZ = creature.z + moveZ * moveDistance;
+    const newX = creature.position.x + moveX * moveDistance;
+    const newZ = creature.position.z + moveZ * moveDistance;
 
-    creature.setPosition(newX, creature.y, newZ);
+    creature.setPosition(newX, creature.position.y, newZ);
 
     // Face target while kiting
     const heading = Math.atan2(dx / distance, dz / distance);
@@ -681,13 +681,13 @@ export class AoEAvoidance extends LeafNode {
   speedMultiplier: number;
 
   /** Callback to get active AoE zones */
-  getAoEZones?: (context: AIContext) => AoEZone[];
+  getAoEZones?: ((context: AIContext) => AoEZone[]) | undefined;
 
   constructor(
     options: {
       safetyMargin?: number;
       speedMultiplier?: number;
-      getAoEZones?: (context: AIContext) => AoEZone[];
+      getAoEZones?: ((context: AIContext) => AoEZone[]) | undefined;
     } = {},
     name?: string
   ) {
@@ -720,8 +720,8 @@ export class AoEAvoidance extends LeafNode {
     let escapeDir = { x: 0, z: 0 };
 
     for (const zone of zones) {
-      const dx = creature.x - zone.center.x;
-      const dz = creature.z - zone.center.z;
+      const dx = creature.position.x - zone.center.x;
+      const dz = creature.position.z - zone.center.z;
       const distance = Math.sqrt(dx ** 2 + dz ** 2);
 
       if (distance < zone.radius + this.safetyMargin) {
@@ -755,10 +755,10 @@ export class AoEAvoidance extends LeafNode {
     const speed = creature.runSpeed * this.speedMultiplier;
     const moveDistance = speed * deltaTime;
 
-    const newX = creature.x + escapeDir.x * moveDistance;
-    const newZ = creature.z + escapeDir.z * moveDistance;
+    const newX = creature.position.x + escapeDir.x * moveDistance;
+    const newZ = creature.position.z + escapeDir.z * moveDistance;
 
-    creature.setPosition(newX, creature.y, newZ);
+    creature.setPosition(newX, creature.position.y, newZ);
 
     // Face escape direction
     const heading = Math.atan2(escapeDir.x, escapeDir.z);
@@ -842,15 +842,15 @@ export interface CombatTacticsOptions {
   /** Whether to use kiting */
   useKiting?: boolean;
   /** Callbacks */
-  getPotentialTargets?: (context: AIContext) => Array<{
+  getPotentialTargets?: ((context: AIContext) => Array<{
     creature: CreatureObject;
     type: TargetType;
     threat: number;
-  }>;
-  executeAbility?: (context: AIContext, ability: AbilityDefinition) => boolean;
-  canUseAbility?: (context: AIContext, ability: AbilityDefinition) => boolean;
-  executeDefensive?: (context: AIContext, ability: AbilityDefinition) => boolean;
-  getAoEZones?: (context: AIContext) => AoEZone[];
+  }>) | undefined;
+  executeAbility?: ((context: AIContext, ability: AbilityDefinition) => boolean) | undefined;
+  canUseAbility?: ((context: AIContext, ability: AbilityDefinition) => boolean) | undefined;
+  executeDefensive?: ((context: AIContext, ability: AbilityDefinition) => boolean) | undefined;
+  getAoEZones?: ((context: AIContext) => AoEZone[]) | undefined;
 }
 
 /**

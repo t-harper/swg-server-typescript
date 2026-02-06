@@ -470,7 +470,7 @@ export class ShipComponentObject extends TangibleObject {
    * Repair this component
    * @param amount - Amount of hitpoints to restore
    */
-  repair(amount: number): void {
+  override repair(amount: number): void {
     const oldHitpoints = this.hitpoints;
     this.hitpoints = Math.min(this.maxHitpoints, this.hitpoints + amount);
 

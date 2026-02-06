@@ -119,8 +119,8 @@ export class Histogram implements HistogramMetric {
 
     // Increment all buckets where value <= bucket boundary
     for (let i = 0; i < this.buckets.length; i++) {
-      if (value <= this.buckets[i]) {
-        data.buckets[i]++;
+      if (value <= this.buckets[i]!) {
+        data.buckets[i]!++;
       }
     }
 
@@ -146,7 +146,7 @@ export class Histogram implements HistogramMetric {
     return {
       sum: data.sum,
       count: data.count,
-      buckets: this.buckets.map((le, i) => ({ le, count: data.buckets[i] })),
+      buckets: this.buckets.map((le, i) => ({ le, count: data.buckets[i] ?? 0 })),
     };
   }
 
@@ -197,7 +197,7 @@ export class Histogram implements HistogramMetric {
       value: {
         sum: data.sum,
         count: data.count,
-        buckets: this.buckets.map((le, i) => ({ le, count: data.buckets[i] })),
+        buckets: this.buckets.map((le, i) => ({ le, count: data.buckets[i] ?? 0 })),
       },
     }));
   }

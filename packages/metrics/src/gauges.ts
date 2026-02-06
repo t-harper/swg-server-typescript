@@ -41,7 +41,7 @@ export class Gauge implements GaugeMetric {
   readonly labelNames: readonly string[];
 
   private values: Map<string, GaugeValue> = new Map();
-  private collectCallback?: () => number;
+  private collectCallback?: (() => number) | undefined;
 
   constructor(config: GaugeConfig) {
     this.name = config.name;

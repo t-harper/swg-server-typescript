@@ -87,9 +87,6 @@ export class LootContainer extends Container {
   /** Permission mode for looting */
   protected _permissionMode: LootPermissionMode;
 
-  /** Timestamp when the loot was created */
-  protected _createdAt: number;
-
   /** Timestamp when the loot expires */
   protected _expiresAt: number;
 
@@ -132,7 +129,7 @@ export class LootContainer extends Container {
     this._permissionMode = LootPermissionMode.KillerOnly;
 
     const now = Date.now();
-    this._createdAt = now;
+    this.createdAt = now;
     this._expiresAt = now + DEFAULT_LOOT_DURATION_MS;
 
     this._looted = false;
@@ -179,11 +176,6 @@ export class LootContainer extends Container {
   /** Get permission mode */
   get permissionMode(): LootPermissionMode {
     return this._permissionMode;
-  }
-
-  /** Get created timestamp */
-  get createdAt(): number {
-    return this._createdAt;
   }
 
   /** Get expiration timestamp */
@@ -587,7 +579,7 @@ export class LootContainer extends Container {
       killerId: this._killerId.toString(),
       groupId: this._groupId.toString(),
       permissionMode: this._permissionMode,
-      createdAt: this._createdAt,
+      createdAt: this.createdAt,
       expiresAt: this._expiresAt,
       remainingTime: this.getRemainingTime(),
       looted: this._looted,

@@ -363,10 +363,11 @@ export class ShipObject extends TangibleObject {
     this.componentSlots.set(slot, mount);
 
     // Track delta
-    this.deltaTrackerShip3.trackListChange(
+    this.deltaTrackerShip3.trackMapChange(
       ShipProperty.COMPONENT_SLOTS,
       slot,
-      mount
+      mount,
+      false
     );
 
     // Mark stats for recalculation
@@ -392,10 +393,11 @@ export class ShipObject extends TangibleObject {
     this.componentSlots.set(slot, emptyMount);
 
     // Track delta
-    this.deltaTrackerShip3.trackListChange(
+    this.deltaTrackerShip3.trackMapChange(
       ShipProperty.COMPONENT_SLOTS,
       slot,
-      emptyMount
+      emptyMount,
+      false
     );
 
     // Mark stats for recalculation
@@ -442,10 +444,11 @@ export class ShipObject extends TangibleObject {
       this.weaponHardpoints.push(hardpoint);
     }
 
-    this.deltaTrackerShip3.trackListChange(
+    this.deltaTrackerShip3.trackMapChange(
       ShipProperty.WEAPON_HARDPOINTS,
       hardpoint.slotIndex,
-      hardpoint
+      hardpoint,
+      existingIndex < 0
     );
     this.markModified();
   }
@@ -615,10 +618,11 @@ export class ShipObject extends TangibleObject {
         }
 
         remainingDamage -= armorDamage;
-        this.deltaTrackerShip3.trackListChange(
+        this.deltaTrackerShip3.trackMapChange(
           ShipProperty.COMPONENT_SLOTS,
           armorSlot,
-          armorMount
+          armorMount,
+          false
         );
       }
     }

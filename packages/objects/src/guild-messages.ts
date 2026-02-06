@@ -1246,7 +1246,6 @@ export function requiresOfficerPermission(msg: AnyGuildRequestMessage): boolean 
 export function requiresLeaderPermission(msg: AnyGuildRequestMessage): boolean {
   return (
     msg.operation === GuildOperation.Disband ||
-    msg.operation === GuildOperation.TransferLeader ||
     msg.operation === GuildOperation.DeclareWar ||
     msg.operation === GuildOperation.AcceptPeace ||
     msg.operation === GuildOperation.Withdraw

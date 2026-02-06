@@ -55,7 +55,7 @@ export class AttackTarget extends LeafNode {
     }
 
     // Check range
-    const distance = this.calculateDistance(creature, target);
+    const distance = this.calculateDistance(creature.position, target.position);
     if (distance < this.minRange || distance > this.maxRange) {
       return NodeStatus.Failure;
     }
@@ -124,7 +124,7 @@ export class MoveToTarget extends LeafNode {
       return NodeStatus.Failure;
     }
 
-    const distance = this.calculateDistance(creature, target);
+    const distance = this.calculateDistance(creature.position, target.position);
 
     // Check if close enough
     if (distance <= this.stopDistance) {
@@ -136,8 +136,8 @@ export class MoveToTarget extends LeafNode {
     const moveDistance = speed * deltaTime;
 
     // Direction to target
-    const dx = target.x - creature.x;
-    const dz = target.z - creature.z;
+    const dx = target.position.x - creature.position.x;
+    const dz = target.position.z - creature.position.z;
     const length = Math.sqrt(dx * dx + dz * dz);
 
     if (length > 0) {
@@ -145,10 +145,10 @@ export class MoveToTarget extends LeafNode {
       const dirZ = dz / length;
 
       // Move toward target
-      const newX = creature.x + dirX * Math.min(moveDistance, distance - this.stopDistance);
-      const newZ = creature.z + dirZ * Math.min(moveDistance, distance - this.stopDistance);
+      const newX = creature.position.x + dirX * Math.min(moveDistance, distance - this.stopDistance);
+      const newZ = creature.position.z + dirZ * Math.min(moveDistance, distance - this.stopDistance);
 
-      creature.setPosition(newX, creature.y, newZ);
+      creature.setPosition(newX, creature.position.y, newZ);
 
       // Face target
       const heading = Math.atan2(dirX, dirZ);
@@ -176,7 +176,7 @@ export class MoveToTarget extends LeafNode {
  */
 export class MoveToPosition extends LeafNode {
   /** Target position (if specified directly) */
-  position?: Vector3;
+  position?: Vector3 | undefined;
 
   /** Blackboard key for position (if using blackboard) */
   positionKey?: string;
@@ -209,8 +209,8 @@ export class MoveToPosition extends LeafNode {
       return NodeStatus.Failure;
     }
 
-    const dx = targetPos.x - creature.x;
-    const dz = targetPos.z - creature.z;
+    const dx = targetPos.x - creature.position.x;
+    const dz = targetPos.z - creature.position.z;
     const distance = Math.sqrt(dx * dx + dz * dz);
 
     // Check if close enough
@@ -227,10 +227,10 @@ export class MoveToPosition extends LeafNode {
       const dirZ = dz / distance;
 
       // Move toward position
-      const newX = creature.x + dirX * Math.min(moveDistance, distance - this.stopDistance);
-      const newZ = creature.z + dirZ * Math.min(moveDistance, distance - this.stopDistance);
+      const newX = creature.position.x + dirX * Math.min(moveDistance, distance - this.stopDistance);
+      const newZ = creature.position.z + dirZ * Math.min(moveDistance, distance - this.stopDistance);
 
-      creature.setPosition(newX, creature.y, newZ);
+      creature.setPosition(newX, creature.position.y, newZ);
 
       // Face movement direction
       const heading = Math.atan2(dirX, dirZ);
@@ -306,8 +306,8 @@ export class Patrol extends LeafNode {
 
     const targetPos = waypoints[index]!;
 
-    const dx = targetPos.x - creature.x;
-    const dz = targetPos.z - creature.z;
+    const dx = targetPos.x - creature.position.x;
+    const dz = targetPos.z - creature.position.z;
     const distance = Math.sqrt(dx * dx + dz * dz);
 
     // Check if reached waypoint
@@ -326,10 +326,10 @@ export class Patrol extends LeafNode {
       const dirX = dx / distance;
       const dirZ = dz / distance;
 
-      const newX = creature.x + dirX * Math.min(moveDistance, distance);
-      const newZ = creature.z + dirZ * Math.min(moveDistance, distance);
+      const newX = creature.position.x + dirX * Math.min(moveDistance, distance);
+      const newZ = creature.position.z + dirZ * Math.min(moveDistance, distance);
 
-      creature.setPosition(newX, creature.y, newZ);
+      creature.setPosition(newX, creature.position.y, newZ);
 
       const heading = Math.atan2(dirX, dirZ);
       creature.setHeading(heading);
@@ -428,8 +428,8 @@ export class Flee extends LeafNode {
       return NodeStatus.Success;
     }
 
-    const dx = creature.x - target.x;
-    const dz = creature.z - target.z;
+    const dx = creature.position.x - target.position.x;
+    const dz = creature.position.z - target.position.z;
     const distance = Math.sqrt(dx * dx + dz * dz);
 
     // Far enough away
@@ -450,10 +450,10 @@ export class Flee extends LeafNode {
       const dirX = dx / distance;
       const dirZ = dz / distance;
 
-      const newX = creature.x + dirX * moveDistance;
-      const newZ = creature.z + dirZ * moveDistance;
+      const newX = creature.position.x + dirX * moveDistance;
+      const newZ = creature.position.z + dirZ * moveDistance;
 
-      creature.setPosition(newX, creature.y, newZ);
+      creature.setPosition(newX, creature.position.y, newZ);
 
       // Face away from target
       const heading = Math.atan2(dirX, dirZ);
@@ -477,7 +477,7 @@ export class CallForHelp extends LeafNode {
   radius: number;
 
   /** Social group identifier (creatures of same group will respond) */
-  socialGroup?: string;
+  socialGroup?: string | undefined;
 
   constructor(radius: number = 32, socialGroup?: string, name?: string) {
     super(name ?? 'CallForHelp');
@@ -517,7 +517,7 @@ export class CallForHelp extends LeafNode {
  */
 export class SelectHighestThreat extends LeafNode {
   /** Callback to resolve ObjectId to CreatureObject */
-  resolveCreature?: (id: ObjectId) => import('@swg/objects').CreatureObject | null;
+  resolveCreature?: ((id: ObjectId) => import('@swg/objects').CreatureObject | null) | undefined;
 
   constructor(
     resolveCreature?: (id: ObjectId) => import('@swg/objects').CreatureObject | null,
@@ -609,8 +609,8 @@ export class Wander extends LeafNode {
     }
 
     // Move toward destination
-    const dx = destination.x - creature.x;
-    const dz = destination.z - creature.z;
+    const dx = destination.x - creature.position.x;
+    const dz = destination.z - creature.position.z;
     const distance = Math.sqrt(dx * dx + dz * dz);
 
     if (distance <= 1) {
@@ -627,10 +627,10 @@ export class Wander extends LeafNode {
       const dirX = dx / distance;
       const dirZ = dz / distance;
 
-      const newX = creature.x + dirX * Math.min(moveDistance, distance);
-      const newZ = creature.z + dirZ * Math.min(moveDistance, distance);
+      const newX = creature.position.x + dirX * Math.min(moveDistance, distance);
+      const newZ = creature.position.z + dirZ * Math.min(moveDistance, distance);
 
-      creature.setPosition(newX, creature.y, newZ);
+      creature.setPosition(newX, creature.position.y, newZ);
 
       const heading = Math.atan2(dirX, dirZ);
       creature.setHeading(heading);
@@ -682,8 +682,8 @@ export class ReturnHome extends LeafNode {
     // Mark as returning
     setBlackboardValue(context, BlackboardKeys.RETURNING_HOME, true);
 
-    const dx = homePosition.x - creature.x;
-    const dz = homePosition.z - creature.z;
+    const dx = homePosition.x - creature.position.x;
+    const dz = homePosition.z - creature.position.z;
     const distance = Math.sqrt(dx * dx + dz * dz);
 
     // Check if home
@@ -700,10 +700,10 @@ export class ReturnHome extends LeafNode {
       const dirX = dx / distance;
       const dirZ = dz / distance;
 
-      const newX = creature.x + dirX * Math.min(moveDistance, distance);
-      const newZ = creature.z + dirZ * Math.min(moveDistance, distance);
+      const newX = creature.position.x + dirX * Math.min(moveDistance, distance);
+      const newZ = creature.position.z + dirZ * Math.min(moveDistance, distance);
 
-      creature.setPosition(newX, creature.y, newZ);
+      creature.setPosition(newX, creature.position.y, newZ);
 
       const heading = Math.atan2(dirX, dirZ);
       creature.setHeading(heading);

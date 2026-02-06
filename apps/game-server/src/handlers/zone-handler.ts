@@ -20,7 +20,6 @@ import {
   serializeSceneEndBaselines,
   createServerTimeMessage,
   serializeServerTimeMessage,
-  getTerrainFileName,
 } from '@swg/protocol';
 import type { CreatureObject, PlayerObject } from '@swg/objects';
 import { DEFAULT_PLAYER_TEMPLATE_CRC } from '@swg/objects';
@@ -40,6 +39,7 @@ export interface ZoneInData {
   orientationZ: number;
   orientationW: number;
   templateCrc: number;
+  templateName: string;
 }
 
 /**
@@ -65,17 +65,21 @@ export function sendZoneIn(
   send: SendReliable
 ): ZoneInResult {
   try {
-    const terrainFileName = getTerrainFileName(data.sceneId);
     const templateCrc = data.templateCrc || DEFAULT_PLAYER_TEMPLATE_CRC;
+    const templateName = data.templateName || 'object/creature/player/shared_human_male.iff';
     const galacticTime = BigInt(Math.floor(Date.now() / 1000));
+    const serverEpoch = Math.floor(Date.now() / 1000);
 
     // 1. CmdStartScene -- triggers the client loading screen
+    // sceneName is the scene ID (e.g., "tatooine"), NOT the terrain file path
     const startScene = createCmdStartScene(
       data.characterId,
-      terrainFileName,
+      data.sceneId,       // scene name like "tatooine"
       data.x, data.y, data.z,
-      templateCrc,
-      galacticTime
+      0,                  // startYaw
+      templateName,       // template path string
+      galacticTime,
+      serverEpoch
     );
     send(serializeCmdStartScene(startScene));
 
