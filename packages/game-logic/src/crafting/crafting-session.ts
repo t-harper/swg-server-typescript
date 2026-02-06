@@ -56,25 +56,25 @@ export interface LoadedIngredient {
   slotId: string;
 
   /** Resource ID if this is a resource */
-  resourceId?: ObjectId;
+  resourceId?: ObjectId | undefined;
 
   /** Quantity of resource loaded */
-  resourceQuantity?: number;
+  resourceQuantity?: number | undefined;
 
   /** Quality of the resource (0-1000 scale, SWG standard) */
-  resourceQuality?: number;
+  resourceQuality?: number | undefined;
 
   /** Resource attributes for quality calculation */
-  resourceAttributes?: ResourceAttributes;
+  resourceAttributes?: ResourceAttributes | undefined;
 
   /** Component object ID if this is a component */
-  componentId?: ObjectId;
+  componentId?: ObjectId | undefined;
 
   /** Quantity of components (usually 1) */
   quantity: number;
 
   /** Quality of the component if applicable */
-  componentQuality?: number;
+  componentQuality?: number | undefined;
 }
 
 /**
@@ -82,17 +82,17 @@ export interface LoadedIngredient {
  * Values are on the 0-1000 scale used in SWG.
  */
 export interface ResourceAttributes {
-  conductivity?: number;
-  coldResistance?: number;
-  decayResistance?: number;
-  entangleResistance?: number;
-  flavor?: number;
-  heatResistance?: number;
-  malleability?: number;
-  overallQuality?: number;
-  potentialEnergy?: number;
-  shockResistance?: number;
-  unitToughness?: number;
+  conductivity?: number | undefined;
+  coldResistance?: number | undefined;
+  decayResistance?: number | undefined;
+  entangleResistance?: number | undefined;
+  flavor?: number | undefined;
+  heatResistance?: number | undefined;
+  malleability?: number | undefined;
+  overallQuality?: number | undefined;
+  potentialEnergy?: number | undefined;
+  shockResistance?: number | undefined;
+  unitToughness?: number | undefined;
 }
 
 /**
@@ -137,7 +137,7 @@ export class CraftingSession {
   readonly craftingTool: ObjectId;
 
   /** Object ID of the crafting station (if any) */
-  readonly craftingStation?: ObjectId;
+  readonly craftingStation?: ObjectId | undefined;
 
   /** Current stage of the crafting workflow */
   private _stage: CraftingStage;
@@ -163,7 +163,7 @@ export class CraftingSession {
   private _assemblyAttempted: boolean;
 
   /** Result of the assembly phase */
-  private _assemblyResult?: AssemblyResult;
+  private _assemblyResult?: AssemblyResult | undefined;
 
   /** Calculated attribute values after assembly */
   private _assembledAttributes: Map<string, number>;
@@ -186,10 +186,10 @@ export class CraftingSession {
   // ============================================
 
   /** Custom name for the crafted item */
-  private _customName?: string;
+  private _customName?: string | undefined;
 
   /** Output item ID once created */
-  private _outputObjectId?: ObjectId;
+  private _outputObjectId?: ObjectId | undefined;
 
   /**
    * Creates a new crafting session.

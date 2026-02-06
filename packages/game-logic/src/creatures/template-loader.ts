@@ -23,7 +23,7 @@ import {
 export interface CreatureTemplateJson {
   templateName: string;
   displayName: string;
-  description?: string;
+  description?: string | undefined;
   level: number;
   difficulty: number;
   healthRange: [number, number];
@@ -33,28 +33,28 @@ export interface CreatureTemplateJson {
   attackSpeed: number;
   armor: number;
   accuracy: number;
-  damageType?: string;
-  weaponTemplate?: string;
-  specialAbilities?: CreatureSpecialAbility[];
+  damageType?: string | undefined;
+  weaponTemplate?: string | undefined;
+  specialAbilities?: CreatureSpecialAbility[] | undefined;
   walkSpeed: number;
   runSpeed: number;
-  turnRate?: number;
+  turnRate?: number | undefined;
   faction: string;
   aggressiveRadius: number;
   assistRadius: number;
-  pvpEnabled?: boolean;
+  pvpEnabled?: boolean | undefined;
   lootTable: string;
   xpValue: number;
-  creditRange?: [number, number];
+  creditRange?: [number, number] | undefined;
   behaviorTree: string;
   socialGroup: string;
-  leashDistance?: number;
-  roamRadius?: number;
-  patrolPath?: string;
+  leashDistance?: number | undefined;
+  roamRadius?: number | undefined;
+  patrolPath?: string | undefined;
   appearanceTemplate: string;
   scale: number;
-  equipment?: CreatureEquipment[];
-  customization?: number[];
+  equipment?: CreatureEquipment[] | undefined;
+  customization?: number[] | undefined;
 }
 
 /**
@@ -62,7 +62,7 @@ export interface CreatureTemplateJson {
  */
 export interface ParseResult<T> {
   success: boolean;
-  data?: T;
+  data?: T | undefined;
   errors: string[];
 }
 
@@ -126,7 +126,7 @@ export function parseCreatureTemplate(json: unknown): ParseResult<CreatureTempla
   const template: CreatureTemplate = {
     templateName: templateName!,
     displayName: displayName!,
-    description: raw.description as string | undefined,
+    description: raw['description'] as string | undefined,
     level: level!,
     difficulty: difficulty!,
     healthRange: healthRange!,
@@ -136,29 +136,29 @@ export function parseCreatureTemplate(json: unknown): ParseResult<CreatureTempla
     attackSpeed: attackSpeed!,
     armor: armor!,
     accuracy: accuracy!,
-    damageType: raw.damageType as string | undefined,
-    weaponTemplate: raw.weaponTemplate as string | undefined,
+    damageType: raw['damageType'] as string | undefined,
+    weaponTemplate: raw['weaponTemplate'] as string | undefined,
     walkSpeed: walkSpeed!,
     runSpeed: runSpeed!,
-    turnRate: raw.turnRate as number | undefined,
+    turnRate: raw['turnRate'] as number | undefined,
     faction: faction!,
     aggressiveRadius: aggressiveRadius!,
     assistRadius: assistRadius!,
-    pvpEnabled: raw.pvpEnabled as boolean | undefined,
+    pvpEnabled: raw['pvpEnabled'] as boolean | undefined,
     lootTable: lootTable!,
     xpValue: xpValue!,
-    creditRange: raw.creditRange as StatRange | undefined,
+    creditRange: raw['creditRange'] as StatRange | undefined,
     behaviorTree: behaviorTree!,
     socialGroup: socialGroup!,
-    leashDistance: raw.leashDistance as number | undefined,
-    roamRadius: raw.roamRadius as number | undefined,
-    patrolPath: raw.patrolPath as string | undefined,
+    leashDistance: raw['leashDistance'] as number | undefined,
+    roamRadius: raw['roamRadius'] as number | undefined,
+    patrolPath: raw['patrolPath'] as string | undefined,
     appearanceTemplate: appearanceTemplate!,
     scale: scale!,
-    equipment: raw.equipment as CreatureEquipment[] | undefined,
-    specialAbilities: raw.specialAbilities as CreatureSpecialAbility[] | undefined,
-    customization: raw.customization
-      ? new Uint8Array(raw.customization as number[])
+    equipment: raw['equipment'] as CreatureEquipment[] | undefined,
+    specialAbilities: raw['specialAbilities'] as CreatureSpecialAbility[] | undefined,
+    customization: raw['customization']
+      ? new Uint8Array(raw['customization'] as number[])
       : undefined,
   };
 

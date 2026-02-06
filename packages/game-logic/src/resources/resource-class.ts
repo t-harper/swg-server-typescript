@@ -140,10 +140,10 @@ export interface ResourceClass {
   isSpawnable: boolean;
 
   /** Description of the resource class */
-  description?: string;
+  description?: string | undefined;
 
   /** CRC hash of the class name for network protocol */
-  crc?: number;
+  crc?: number | undefined;
 }
 
 /**
@@ -160,8 +160,8 @@ export interface ResourceClassData {
   maxAttributeValues: Record<string, number>;
   planetRestrictions: string[];
   isSpawnable: boolean;
-  description?: string;
-  crc?: number;
+  description?: string | undefined;
+  crc?: number | undefined;
 }
 
 /**

@@ -19,8 +19,8 @@
       "import": "./dist/swg/index.js"
     },
     "./swg/messages/*": {
-      "types": "./dist/swg/messages/*.d.ts",
-      "import": "./dist/swg/messages/*.js"
+      "types": "./dist/swg/messages/*",
+      "import": "./dist/swg/messages/*"
     }
   },
   "scripts": {

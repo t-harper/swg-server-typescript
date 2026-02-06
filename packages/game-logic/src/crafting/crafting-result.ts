@@ -26,10 +26,10 @@ export interface AssemblyResult {
   message: string;
 
   /** The success roll value (for debugging/logging) */
-  roll?: number;
+  roll?: number | undefined;
 
   /** Quality bonus from critical success */
-  criticalBonus?: number;
+  criticalBonus?: number | undefined;
 }
 
 /**
@@ -62,7 +62,7 @@ export interface ExperimentationResult {
   pointsSpent: number;
 
   /** The success roll value (for debugging/logging) */
-  roll?: number;
+  roll?: number | undefined;
 }
 
 /**
@@ -102,10 +102,10 @@ export interface CraftingOutput {
   xpType: string;
 
   /** Whether the item is a factory schematic (for mass production) */
-  isFactorySchematic?: boolean;
+  isFactorySchematic?: boolean | undefined;
 
   /** Serial number for factory-produced items */
-  serialNumber?: number;
+  serialNumber?: number | undefined;
 }
 
 /**
@@ -184,10 +184,10 @@ export interface CraftingOperationResult<T = void> {
   errorCode: CraftingErrorCode;
 
   /** Human-readable error message */
-  errorMessage?: string;
+  errorMessage?: string | undefined;
 
   /** Result data if successful */
-  data?: T;
+  data?: T | undefined;
 }
 
 /**

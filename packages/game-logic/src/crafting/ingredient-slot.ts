@@ -47,19 +47,19 @@ export interface IngredientSlot {
    * For identical slots, the number of separate items needed
    * (vs resource units)
    */
-  identicalCount?: number;
+  identicalCount?: number | undefined;
 
   /**
    * For component slots, whether the component must be
    * of a specific quality tier
    */
-  minComponentQuality?: number;
+  minComponentQuality?: number | undefined;
 
   /**
    * Maximum resource quality cap for this slot
    * (some slots cap quality contribution)
    */
-  qualityCap?: number;
+  qualityCap?: number | undefined;
 }
 
 /**

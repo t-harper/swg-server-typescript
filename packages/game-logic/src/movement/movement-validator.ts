@@ -143,7 +143,7 @@ export class MovementValidator {
     const calculatedSpeed = distance / deltaTimeSeconds;
 
     // Determine max allowed speed
-    let baseSpeed = state.isRunning ? MovementSpeed.RUN : MovementSpeed.WALK;
+    let baseSpeed: number = state.isRunning ? MovementSpeed.RUN : MovementSpeed.WALK;
     if (state.isMounted && state.mountSpeed) {
       baseSpeed = state.mountSpeed;
     }

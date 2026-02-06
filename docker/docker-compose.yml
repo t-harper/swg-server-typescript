@@ -8,13 +8,13 @@ services:
 
   mysql:
     image: mysql:8.0
-    container_name: swg-mysql
+    container_name: swg-js-mysql
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-swg_root_password}
-      MYSQL_DATABASE: ${MYSQL_DATABASE:-swgemu}
-      MYSQL_USER: ${MYSQL_USER:-swgemu}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-swgemu_password}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-swg}
+      MYSQL_USER: ${MYSQL_USER:-swg}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-swg}
     ports:
       - "${MYSQL_PORT:-3306}:3306"
     volumes:
@@ -31,7 +31,7 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: swg-redis
+    container_name: swg-js-redis
     restart: unless-stopped
     command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-swg_redis_password}
     ports:
@@ -54,18 +54,20 @@ services:
     build:
       context: ..
       dockerfile: docker/Dockerfile.login-server
-    container_name: swg-login-server
+    container_name: swg-js-login-server
     restart: unless-stopped
     environment:
       NODE_ENV: ${NODE_ENV:-production}
       SERVER_TYPE: login-server
-      LOGIN_SERVER_PORT: 44453
-      # Database
+      LOGIN_PORT: 44453
+      # Database (DB_* for app, DATABASE_* for entrypoint wait script)
       DATABASE_HOST: mysql
       DATABASE_PORT: 3306
-      DATABASE_NAME: ${MYSQL_DATABASE:-swgemu}
-      DATABASE_USER: ${MYSQL_USER:-swgemu}
-      DATABASE_PASSWORD: ${MYSQL_PASSWORD:-swgemu_password}
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: ${MYSQL_DATABASE:-swg}
+      DB_USER: ${MYSQL_USER:-swg}
+      DB_PASSWORD: ${MYSQL_PASSWORD:-swg}
       # Redis
       REDIS_HOST: redis
       REDIS_PORT: 6379
@@ -73,6 +75,8 @@ services:
       # Server Settings
       SERVER_NAME: ${SERVER_NAME:-SWG Server}
       LOG_LEVEL: ${LOG_LEVEL:-info}
+      # Connection server public address (sent to clients in LoginClusterStatus)
+      CONNECTION_SERVER_PUBLIC_ADDRESS: ${PUBLIC_ADDRESS:-10.254.0.212}
     ports:
       - "${LOGIN_SERVER_PORT:-44453}:44453/udp"
     depends_on:
@@ -89,12 +93,20 @@ services:
     build:
       context: ..
       dockerfile: docker/Dockerfile.connection-server
-    container_name: swg-connection-server
+    container_name: swg-js-connection-server
     restart: unless-stopped
     environment:
       NODE_ENV: ${NODE_ENV:-production}
       SERVER_TYPE: connection-server
-      CONNECTION_SERVER_PORT: 44455
+      CONNECTION_PORT: 44455
+      # Database (DB_* for app, DATABASE_* for entrypoint wait script)
+      DATABASE_HOST: mysql
+      DATABASE_PORT: 3306
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: ${MYSQL_DATABASE:-swg}
+      DB_USER: ${MYSQL_USER:-swg}
+      DB_PASSWORD: ${MYSQL_PASSWORD:-swg}
       # Redis
       REDIS_HOST: redis
       REDIS_PORT: 6379
@@ -121,18 +133,20 @@ services:
     build:
       context: ..
       dockerfile: docker/Dockerfile.chat-server
-    container_name: swg-chat-server
+    container_name: swg-js-chat-server
     restart: unless-stopped
     environment:
       NODE_ENV: ${NODE_ENV:-production}
       SERVER_TYPE: chat-server
-      CHAT_SERVER_PORT: 44462
-      # Database
+      CHAT_PORT: 44462
+      # Database (DB_* for app, DATABASE_* for entrypoint wait script)
       DATABASE_HOST: mysql
       DATABASE_PORT: 3306
-      DATABASE_NAME: ${MYSQL_DATABASE:-swgemu}
-      DATABASE_USER: ${MYSQL_USER:-swgemu}
-      DATABASE_PASSWORD: ${MYSQL_PASSWORD:-swgemu_password}
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: ${MYSQL_DATABASE:-swg}
+      DB_USER: ${MYSQL_USER:-swg}
+      DB_PASSWORD: ${MYSQL_PASSWORD:-swg}
       # Redis
       REDIS_HOST: redis
       REDIS_PORT: 6379
@@ -160,13 +174,15 @@ services:
     environment:
       NODE_ENV: ${NODE_ENV:-production}
       SERVER_TYPE: game-server
-      GAME_SERVER_PORT: 44460
-      # Database
+      GAME_PORT: 44463
+      # Database (DB_* for app, DATABASE_* for entrypoint wait script)
       DATABASE_HOST: mysql
       DATABASE_PORT: 3306
-      DATABASE_NAME: ${MYSQL_DATABASE:-swgemu}
-      DATABASE_USER: ${MYSQL_USER:-swgemu}
-      DATABASE_PASSWORD: ${MYSQL_PASSWORD:-swgemu_password}
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: ${MYSQL_DATABASE:-swg}
+      DB_USER: ${MYSQL_USER:-swg}
+      DB_PASSWORD: ${MYSQL_PASSWORD:-swg}
       # Redis
       REDIS_HOST: redis
       REDIS_PORT: 6379
@@ -181,7 +197,7 @@ services:
       CONNECTION_SERVER_HOST: connection-server
       CONNECTION_SERVER_PORT: 44455
     ports:
-      - "44460-44469:44460/udp"
+      - "${GAME_SERVER_PORT:-44463}:44463/udp"
     depends_on:
       mysql:
         condition: service_healthy

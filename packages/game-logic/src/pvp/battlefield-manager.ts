@@ -152,7 +152,7 @@ export interface CaptureResult extends BattlefieldOperationResult {
   /** Whether capture is complete */
   captureComplete?: boolean;
   /** New controller if capture complete */
-  newController?: TeamDesignation;
+  newController?: TeamDesignation | undefined;
 }
 
 /**

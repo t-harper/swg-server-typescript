@@ -427,5 +427,5 @@ export interface EquippedItem {
   /** Template CRC of the item */
   templateCrc: number;
   /** Custom appearance data */
-  appearanceData?: Uint8Array;
+  appearanceData?: Uint8Array | undefined;
 }

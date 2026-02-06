@@ -46,7 +46,7 @@ export interface SkillLearnedEvent {
   /** Whether this completes a master box */
   isMaster: boolean;
   /** Profession name if master was achieved */
-  professionMastered?: string;
+  professionMastered?: string | undefined;
 }
 
 /**
@@ -100,11 +100,11 @@ export interface LearnSkillResult {
   /** XP spent to learn this skill */
   xpSpent: { type: string; amount: number };
   /** Error message if failed */
-  error?: string;
+  error?: string | undefined;
   /** Whether mastery was achieved */
   isMaster: boolean;
   /** Profession mastered if applicable */
-  professionMastered?: string;
+  professionMastered?: string | undefined;
 }
 
 /**
@@ -124,7 +124,7 @@ export interface SurrenderSkillResult {
   /** Certifications lost from surrendering */
   certificationsLost: string[];
   /** Error message if failed */
-  error?: string;
+  error?: string | undefined;
 }
 
 // ============================================

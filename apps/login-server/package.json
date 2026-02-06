@@ -18,6 +18,7 @@
     "@swg/database": "workspace:*",
     "@swg/protocol": "workspace:*",
     "@swg/redis": "workspace:*",
+    "@swg/objects": "workspace:*",
     "@swg/shared-types": "workspace:*"
   },
   "devDependencies": {

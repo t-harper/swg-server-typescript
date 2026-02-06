@@ -284,7 +284,9 @@ export class PackFormation extends LeafNode {
     super(name ?? 'PackFormation');
     this.spacing = options.spacing ?? 3;
     this.formationType = options.formationType ?? 'wedge';
-    this.getPackMembers = options.getPackMembers ?? undefined;
+    if (options.getPackMembers) {
+      this.getPackMembers = options.getPackMembers;
+    }
     this.tolerance = options.tolerance ?? 1.5;
   }
 
@@ -435,7 +437,9 @@ export class FleeAdvanced extends LeafNode {
     this.maxFleeDistance = options.maxFleeDistance ?? 64;
     this.triggerPackFlee = options.triggerPackFlee ?? false;
     this.speedMultiplier = options.speedMultiplier ?? 1.2;
-    this.getAllyPositions = options.getAllyPositions ?? undefined;
+    if (options.getAllyPositions) {
+      this.getAllyPositions = options.getAllyPositions;
+    }
   }
 
   tick(context: AIContext): NodeStatus {
@@ -577,8 +581,12 @@ export class TerritorialAggression extends LeafNode {
     this.warningDistance = options.warningDistance ?? 20;
     this.attackDistance = options.attackDistance ?? 10;
     this.warningDuration = options.warningDuration ?? 5;
-    this.onWarn = options.onWarn ?? undefined;
-    this.onMarkHostile = options.onMarkHostile ?? undefined;
+    if (options.onWarn) {
+      this.onWarn = options.onWarn;
+    }
+    if (options.onMarkHostile) {
+      this.onMarkHostile = options.onMarkHostile;
+    }
   }
 
   tick(context: AIContext): NodeStatus {
@@ -677,8 +685,12 @@ export class PackLeaderBehavior extends LeafNode {
     name?: string
   ) {
     super(name ?? 'PackLeaderBehavior');
-    this.getPackMembers = options.getPackMembers ?? undefined;
-    this.directPackMember = options.directPackMember ?? undefined;
+    if (options.getPackMembers) {
+      this.getPackMembers = options.getPackMembers;
+    }
+    if (options.directPackMember) {
+      this.directPackMember = options.directPackMember;
+    }
   }
 
   tick(context: AIContext): NodeStatus {
@@ -763,7 +775,9 @@ export class HerdBehavior extends LeafNode {
     this.alignmentWeight = options.alignmentWeight ?? 0.5;
     this.maxHerdDistance = options.maxHerdDistance ?? 20;
     this.personalSpace = options.personalSpace ?? 3;
-    this.getHerdMembers = options.getHerdMembers ?? undefined;
+    if (options.getHerdMembers) {
+      this.getHerdMembers = options.getHerdMembers;
+    }
   }
 
   tick(context: AIContext): NodeStatus {

@@ -51,7 +51,7 @@ export interface ItemEquippedEvent extends BaseEquipmentEvent {
   /** Template CRC of the item */
   templateCrc: CrcValue;
   /** Item's appearance data (for visual update) */
-  appearanceData?: Uint8Array;
+  appearanceData?: Uint8Array | undefined;
 }
 
 /**
@@ -79,7 +79,7 @@ export interface WeaponChangedEvent extends BaseEquipmentEvent {
   /** Slot of the new weapon */
   slot: EquipmentSlotType;
   /** New weapon template CRC */
-  templateCrc?: CrcValue;
+  templateCrc?: CrcValue | undefined;
 }
 
 /**

@@ -80,9 +80,9 @@ export interface FactionOperationResult {
   /** Whether the operation succeeded */
   success: boolean;
   /** Error message if failed */
-  error?: string;
+  error?: string | undefined;
   /** Informational message */
-  message?: string;
+  message?: string | undefined;
 }
 
 /**
@@ -90,11 +90,11 @@ export interface FactionOperationResult {
  */
 export interface EnlistResult extends FactionOperationResult {
   /** Faction enlisted in */
-  faction?: Faction;
+  faction?: Faction | undefined;
   /** Starting rank */
-  rank?: number;
+  rank?: number | undefined;
   /** Rank title */
-  rankTitle?: string;
+  rankTitle?: string | undefined;
 }
 
 /**
@@ -102,11 +102,11 @@ export interface EnlistResult extends FactionOperationResult {
  */
 export interface StatusChangeResult extends FactionOperationResult {
   /** Previous status */
-  previousStatus?: FactionStatus;
+  previousStatus?: FactionStatus | undefined;
   /** New status */
-  newStatus?: FactionStatus;
+  newStatus?: FactionStatus | undefined;
   /** When the status change takes effect (for delayed changes) */
-  effectiveAt?: Date;
+  effectiveAt?: Date | undefined;
 }
 
 /**
@@ -114,19 +114,19 @@ export interface StatusChangeResult extends FactionOperationResult {
  */
 export interface PointChangeResult extends FactionOperationResult {
   /** Previous point total */
-  previousPoints?: number;
+  previousPoints?: number | undefined;
   /** New point total */
-  newPoints?: number;
+  newPoints?: number | undefined;
   /** Points changed */
-  pointsDelta?: number;
+  pointsDelta?: number | undefined;
   /** Previous rank */
-  previousRank?: number;
+  previousRank?: number | undefined;
   /** New rank */
-  newRank?: number;
+  newRank?: number | undefined;
   /** Whether rank changed */
-  rankChanged?: boolean;
+  rankChanged?: boolean | undefined;
   /** New rank title if promoted/demoted */
-  newRankTitle?: string;
+  newRankTitle?: string | undefined;
 }
 
 /**
@@ -134,9 +134,9 @@ export interface PointChangeResult extends FactionOperationResult {
  */
 export interface PerkPurchaseResult extends FactionOperationResult {
   /** Perk that was purchased */
-  perk?: FactionPerk;
+  perk?: FactionPerk | undefined;
   /** Remaining faction points */
-  remainingPoints?: number;
+  remainingPoints?: number | undefined;
 }
 
 // ============================================

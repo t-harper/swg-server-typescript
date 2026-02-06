@@ -97,7 +97,7 @@ export const DEFAULT_SURVEY_CONFIG: SurveyServiceConfig = {
 export interface SurveyExecutionResult {
   success: boolean;
   results: SurveyResult[];
-  errorMessage?: string;
+  errorMessage?: string | undefined;
   effectiveRange: number;
   effectiveAccuracy: number;
   xpGained: number;
@@ -109,7 +109,7 @@ export interface SurveyExecutionResult {
 export interface SampleExecutionResult {
   success: boolean;
   result: SampleResult;
-  errorMessage?: string;
+  errorMessage?: string | undefined;
   effectiveSampleSize: number;
 }
 

@@ -430,9 +430,9 @@ export class InvestigationSystem {
       'Seen traveling between starports',
     ];
 
-    const activity = activities[Math.floor(Math.random() * activities.length)];
+    const activity = activities[Math.floor(Math.random() * activities.length)]!;
     const frequencies = ['daily', 'frequently', 'occasionally', 'rarely'];
-    const frequency = frequencies[Math.floor(Math.random() * frequencies.length)];
+    const frequency = frequencies[Math.floor(Math.random() * frequencies.length)]!;
 
     return {
       type: 'activity',
@@ -450,9 +450,9 @@ export class InvestigationSystem {
     const associates = await this.targetService.getTargetAssociates(target.characterId);
 
     if (associates.length > 0) {
-      const associate = associates[Math.floor(Math.random() * associates.length)];
+      const associate = associates[Math.floor(Math.random() * associates.length)]!;
       const relationships = ['guild member', 'friend', 'business partner', 'traveling companion'];
-      const relationship = relationships[Math.floor(Math.random() * relationships.length)];
+      const relationship = relationships[Math.floor(Math.random() * relationships.length)]!;
 
       return {
         type: 'associate',
@@ -485,7 +485,7 @@ export class InvestigationSystem {
       'has a recognizable stance',
     ];
 
-    return descriptors[Math.floor(Math.random() * descriptors.length)];
+    return descriptors[Math.floor(Math.random() * descriptors.length)]!;
   }
 
   /**

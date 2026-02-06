@@ -62,10 +62,10 @@ export interface CraftingSessionEventData {
   sessionId: bigint;
 
   /** The schematic being crafted */
-  schematicId?: string;
+  schematicId?: string | undefined;
 
   /** Additional event-specific data */
-  data?: Record<string, unknown>;
+  data?: Record<string, unknown> | undefined;
 }
 
 /**
@@ -128,7 +128,7 @@ export class CraftingSessionManager {
   private stats: SessionManagerStats;
 
   /** Cleanup timer handle */
-  private cleanupTimer?: ReturnType<typeof setInterval>;
+  private cleanupTimer?: ReturnType<typeof setInterval> | undefined;
 
   /** Default options */
   private static readonly DEFAULT_OPTIONS: Required<SessionManagerOptions> = {

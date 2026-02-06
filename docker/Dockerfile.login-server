@@ -16,6 +16,7 @@ COPY packages/database/package.json ./packages/database/
 COPY packages/protocol/package.json ./packages/protocol/
 COPY packages/redis/package.json ./packages/redis/
 COPY packages/shared-types/package.json ./packages/shared-types/
+COPY packages/objects/package.json ./packages/objects/
 
 # Install dependencies
 RUN pnpm install --frozen-lockfile
@@ -27,6 +28,7 @@ COPY packages/database ./packages/database
 COPY packages/protocol ./packages/protocol
 COPY packages/redis ./packages/redis
 COPY packages/shared-types ./packages/shared-types
+COPY packages/objects ./packages/objects
 COPY tsconfig.json ./
 
 # Build the application
@@ -59,6 +61,7 @@ COPY packages/database/package.json ./packages/database/
 COPY packages/protocol/package.json ./packages/protocol/
 COPY packages/redis/package.json ./packages/redis/
 COPY packages/shared-types/package.json ./packages/shared-types/
+COPY packages/objects/package.json ./packages/objects/
 
 # Install production dependencies only
 RUN pnpm install --frozen-lockfile --prod
@@ -70,6 +73,7 @@ COPY --from=builder /app/packages/database/dist ./packages/database/dist
 COPY --from=builder /app/packages/protocol/dist ./packages/protocol/dist
 COPY --from=builder /app/packages/redis/dist ./packages/redis/dist
 COPY --from=builder /app/packages/shared-types/dist ./packages/shared-types/dist
+COPY --from=builder /app/packages/objects/dist ./packages/objects/dist
 
 # Copy scripts
 COPY --chmod=755 docker/scripts/entrypoint.sh /usr/local/bin/entrypoint.sh

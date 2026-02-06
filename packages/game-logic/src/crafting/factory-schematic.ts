@@ -33,19 +33,19 @@ export interface FactoryIngredient {
   quantity: number;
 
   /** Required resource type (for resources) */
-  resourceType?: string;
+  resourceType?: string | undefined;
 
   /** Allowed resource classes (for resources) */
-  allowedResourceClasses?: string[];
+  allowedResourceClasses?: string[] | undefined;
 
   /** Required component template CRC (for components) */
-  componentTemplateCrc?: CrcValue;
+  componentTemplateCrc?: CrcValue | undefined;
 
   /** Minimum component quality (0-100) for components */
-  minComponentQuality?: number;
+  minComponentQuality?: number | undefined;
 
   /** Resource attribute weights for quality calculation */
-  resourceWeights?: ResourceWeights;
+  resourceWeights?: ResourceWeights | undefined;
 }
 
 /**
@@ -133,7 +133,7 @@ export interface FactorySchematic {
   inUse: boolean;
 
   /** Factory ID if currently installed in a factory */
-  installedInFactoryId?: ObjectId;
+  installedInFactoryId?: ObjectId | undefined;
 }
 
 /**
@@ -144,13 +144,13 @@ export interface FactorySchematicCreationResult {
   success: boolean;
 
   /** The created factory schematic (if successful) */
-  schematic?: FactorySchematic;
+  schematic?: FactorySchematic | undefined;
 
   /** Error message (if failed) */
-  errorMessage?: string;
+  errorMessage?: string | undefined;
 
   /** Error code */
-  errorCode?: FactorySchematicErrorCode;
+  errorCode?: FactorySchematicErrorCode | undefined;
 }
 
 /**
@@ -436,27 +436,27 @@ export function deserializeFactorySchematic(
   data: Record<string, unknown>
 ): FactorySchematic {
   return {
-    schematicId: BigInt(data.schematicId as string),
-    draftSchematicId: data.draftSchematicId as string,
-    draftSchematicCrc: data.draftSchematicCrc as number,
-    schematicName: data.schematicName as string,
-    crafterId: BigInt(data.crafterId as string),
-    crafterName: data.crafterName as string,
-    createdAt: data.createdAt as number,
-    itemAttributes: data.itemAttributes as LockedAttribute[],
-    ingredientsList: data.ingredientsList as FactoryIngredient[],
-    outputTemplateCrc: data.outputTemplateCrc as number,
-    outputTemplate: data.outputTemplate as string,
-    outputQuantity: data.outputQuantity as number,
-    manufacturingComplexity: data.manufacturingComplexity as number,
-    baseManufacturingTime: data.baseManufacturingTime as number,
-    manufacturingVolume: data.manufacturingVolume as number,
-    serialNumberCounter: BigInt(data.serialNumberCounter as string),
-    quality: data.quality as number,
-    category: data.category as string,
-    inUse: data.inUse as boolean,
-    installedInFactoryId: data.installedInFactoryId
-      ? BigInt(data.installedInFactoryId as string)
+    schematicId: BigInt(data['schematicId'] as string),
+    draftSchematicId: data['draftSchematicId'] as string,
+    draftSchematicCrc: data['draftSchematicCrc'] as number,
+    schematicName: data['schematicName'] as string,
+    crafterId: BigInt(data['crafterId'] as string),
+    crafterName: data['crafterName'] as string,
+    createdAt: data['createdAt'] as number,
+    itemAttributes: data['itemAttributes'] as LockedAttribute[],
+    ingredientsList: data['ingredientsList'] as FactoryIngredient[],
+    outputTemplateCrc: data['outputTemplateCrc'] as number,
+    outputTemplate: data['outputTemplate'] as string,
+    outputQuantity: data['outputQuantity'] as number,
+    manufacturingComplexity: data['manufacturingComplexity'] as number,
+    baseManufacturingTime: data['baseManufacturingTime'] as number,
+    manufacturingVolume: data['manufacturingVolume'] as number,
+    serialNumberCounter: BigInt(data['serialNumberCounter'] as string),
+    quality: data['quality'] as number,
+    category: data['category'] as string,
+    inUse: data['inUse'] as boolean,
+    installedInFactoryId: data['installedInFactoryId']
+      ? BigInt(data['installedInFactoryId'] as string)
       : undefined,
   };
 }

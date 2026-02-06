@@ -111,15 +111,15 @@ export interface DroidUpdateResult {
   /** Whether target was found */
   targetFound: boolean;
   /** Target position if found */
-  targetPosition?: Vector3;
+  targetPosition?: Vector3 | undefined;
   /** Distance to target */
-  targetDistance?: number;
+  targetDistance?: number | undefined;
   /** Direction to target (heading) */
-  targetHeading?: number;
+  targetHeading?: number | undefined;
   /** Whether droid completed its task */
   taskComplete: boolean;
   /** Message for the owner */
-  message?: string;
+  message?: string | undefined;
 }
 
 /**

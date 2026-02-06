@@ -16,19 +16,19 @@ export interface SlotRequirement {
   /** Object types allowed in this slot */
   allowedObjectTypes: ObjectType[];
   /** Skill certification required to use this slot (optional) */
-  requiredCertification?: string;
+  requiredCertification?: string | undefined;
   /** Species that cannot use this slot (optional) */
-  speciesRestrictions?: SpeciesType[];
+  speciesRestrictions?: SpeciesType[] | undefined;
   /** Genders that cannot use this slot (optional) */
-  genderRestrictions?: GenderType[];
+  genderRestrictions?: GenderType[] | undefined;
   /** Minimum level required (optional) */
-  minLevel?: number;
+  minLevel?: number | undefined;
   /** Maximum items that can be equipped (default 1) */
-  maxItems?: number;
+  maxItems?: number | undefined;
   /** Whether the slot is always available or requires unlocking */
-  requiresUnlock?: boolean;
+  requiresUnlock?: boolean | undefined;
   /** Skill that unlocks this slot */
-  unlockSkill?: string;
+  unlockSkill?: string | undefined;
 }
 
 /**
@@ -38,9 +38,9 @@ export interface RequirementCheckResult {
   /** Whether the requirement is met */
   allowed: boolean;
   /** Reason code if not allowed */
-  reason?: EquipmentFailureReasonType;
+  reason?: EquipmentFailureReasonType | undefined;
   /** Human-readable message */
-  message?: string;
+  message?: string | undefined;
 }
 
 /**
@@ -431,17 +431,17 @@ export function validateSlotRequirements(
  */
 export interface ItemEquipmentRequirement {
   /** Required skill certification */
-  requiredCertification?: string;
+  requiredCertification?: string | undefined;
   /** Required species */
-  requiredSpecies?: SpeciesType[];
+  requiredSpecies?: SpeciesType[] | undefined;
   /** Required gender */
-  requiredGender?: GenderType;
+  requiredGender?: GenderType | undefined;
   /** Required minimum level */
-  minLevel?: number;
+  minLevel?: number | undefined;
   /** Required faction */
-  requiredFaction?: number;
+  requiredFaction?: number | undefined;
   /** Bio-link owner (if bio-linked) */
-  bioLinkOwner?: bigint;
+  bioLinkOwner?: bigint | undefined;
 }
 
 /**

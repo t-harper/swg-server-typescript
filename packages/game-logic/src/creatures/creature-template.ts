@@ -31,7 +31,7 @@ export interface CreatureEquipment {
   /** Template path for the equipment */
   template: string;
   /** Chance to spawn with this equipment (0-1) */
-  chance?: number;
+  chance?: number | undefined;
 }
 
 /**
@@ -43,9 +43,9 @@ export interface CreatureSpecialAbility {
   /** Cooldown in milliseconds */
   cooldown: number;
   /** Damage or effect magnitude */
-  magnitude?: number;
+  magnitude?: number | undefined;
   /** Chance to use (0-1), default 1 */
-  chance?: number;
+  chance?: number | undefined;
 }
 
 /**
@@ -64,7 +64,7 @@ export interface CreatureTemplate {
   displayName: string;
 
   /** Optional description */
-  description?: string;
+  description?: string | undefined;
 
   // ============================================
   // Stats
@@ -106,13 +106,13 @@ export interface CreatureTemplate {
   accuracy: number;
 
   /** Damage type dealt (kinetic, energy, etc.) */
-  damageType?: string;
+  damageType?: string | undefined;
 
   /** Weapon template path (optional) */
-  weaponTemplate?: string;
+  weaponTemplate?: string | undefined;
 
   /** Special abilities (for elite/boss) */
-  specialAbilities?: CreatureSpecialAbility[];
+  specialAbilities?: CreatureSpecialAbility[] | undefined;
 
   // ============================================
   // Movement
@@ -125,7 +125,7 @@ export interface CreatureTemplate {
   runSpeed: number;
 
   /** Turn rate in radians per second */
-  turnRate?: number;
+  turnRate?: number | undefined;
 
   // ============================================
   // Faction
@@ -141,7 +141,7 @@ export interface CreatureTemplate {
   assistRadius: number;
 
   /** Whether this creature is pvp-flagged */
-  pvpEnabled?: boolean;
+  pvpEnabled?: boolean | undefined;
 
   // ============================================
   // Loot
@@ -154,7 +154,7 @@ export interface CreatureTemplate {
   xpValue: number;
 
   /** Credit drop range [min, max] */
-  creditRange?: StatRange;
+  creditRange?: StatRange | undefined;
 
   // ============================================
   // AI
@@ -167,13 +167,13 @@ export interface CreatureTemplate {
   socialGroup: string;
 
   /** Leash distance - max distance from spawn before returning */
-  leashDistance?: number;
+  leashDistance?: number | undefined;
 
   /** Roam radius - distance creature wanders from spawn */
-  roamRadius?: number;
+  roamRadius?: number | undefined;
 
   /** Patrol path identifier (optional) */
-  patrolPath?: string;
+  patrolPath?: string | undefined;
 
   // ============================================
   // Appearance
@@ -186,10 +186,10 @@ export interface CreatureTemplate {
   scale: number;
 
   /** Optional equipment loadout */
-  equipment?: CreatureEquipment[];
+  equipment?: CreatureEquipment[] | undefined;
 
   /** Tint/color customization data */
-  customization?: Uint8Array;
+  customization?: Uint8Array | undefined;
 }
 
 /**

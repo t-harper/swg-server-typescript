@@ -39,11 +39,11 @@ export interface LairWaveConfig {
   /** Number of creatures in this wave */
   creatureCount: number;
   /** Override creature templates for this wave (optional) */
-  creatureOverride?: string[];
+  creatureOverride?: string[] | undefined;
   /** Delay before spawning this wave (milliseconds) */
-  spawnDelay?: number;
+  spawnDelay?: number | undefined;
   /** Whether boss spawns in this wave */
-  spawnBoss?: boolean;
+  spawnBoss?: boolean | undefined;
 }
 
 /**
@@ -62,7 +62,7 @@ export interface LairTemplate {
   displayName: string;
 
   /** Optional description */
-  description?: string;
+  description?: string | undefined;
 
   /** Lair type classification */
   lairType: LairType;
@@ -75,7 +75,7 @@ export interface LairTemplate {
   appearanceTemplate: string;
 
   /** Scale factor for rendering (1.0 = normal) */
-  scale?: number;
+  scale?: number | undefined;
 
   // ============================================
   // Creature Spawning
@@ -91,7 +91,7 @@ export interface LairTemplate {
   babyTemplate: string | null;
 
   /** Chance to spawn baby instead of adult (0.0-1.0) */
-  babySpawnChance?: number;
+  babySpawnChance?: number | undefined;
 
   // ============================================
   // Spawn Settings
@@ -110,10 +110,10 @@ export interface LairTemplate {
   respawnDelay: number;
 
   /** Spawn behavior type */
-  spawnBehavior?: LairSpawnBehavior;
+  spawnBehavior?: LairSpawnBehavior | undefined;
 
   /** Radius to detect approaching players (for OnApproach behavior) */
-  detectionRadius?: number;
+  detectionRadius?: number | undefined;
 
   // ============================================
   // Wave Settings
@@ -129,10 +129,10 @@ export interface LairTemplate {
   waveTriggerDamage: number;
 
   /** Custom wave configurations (optional) */
-  waves?: LairWaveConfig[];
+  waves?: LairWaveConfig[] | undefined;
 
   /** Delay between waves (milliseconds) */
-  waveCooldown?: number;
+  waveCooldown?: number | undefined;
 
   // ============================================
   // Destruction/Combat
@@ -142,19 +142,19 @@ export interface LairTemplate {
   healthMultiplier: number;
 
   /** Base health for the lair */
-  baseHealth?: number;
+  baseHealth?: number | undefined;
 
   /** Armor/damage reduction value */
-  armor?: number;
+  armor?: number | undefined;
 
   /** Whether lair regenerates health when not in combat */
-  regeneratesHealth?: boolean;
+  regeneratesHealth?: boolean | undefined;
 
   /** Health regeneration rate (per second) */
-  healthRegenRate?: number;
+  healthRegenRate?: number | undefined;
 
   /** Time out of combat before regeneration starts (milliseconds) */
-  regenDelay?: number;
+  regenDelay?: number | undefined;
 
   // ============================================
   // Rewards
@@ -167,29 +167,29 @@ export interface LairTemplate {
   lootTable: string;
 
   /** Credit drop range [min, max] */
-  creditRange?: [number, number];
+  creditRange?: [number, number] | undefined;
 
   /** Badge awarded on destruction (optional) */
-  badge?: string;
+  badge?: string | undefined;
 
   // ============================================
   // AI/Behavior
   // ============================================
 
   /** Faction for the lair and its creatures */
-  faction?: string;
+  faction?: string | undefined;
 
   /** Whether creatures from this lair are aggressive */
-  aggressive?: boolean;
+  aggressive?: boolean | undefined;
 
   /** Social group for spawned creatures */
-  socialGroup?: string;
+  socialGroup?: string | undefined;
 
   /** How far creatures can roam from lair */
-  creatureRoamRadius?: number;
+  creatureRoamRadius?: number | undefined;
 
   /** How far creatures will chase before returning */
-  creatureLeashDistance?: number;
+  creatureLeashDistance?: number | undefined;
 }
 
 /**
@@ -386,7 +386,7 @@ export function applyLairDifficulty(
   template: LairTemplate,
   difficulty: keyof typeof LAIR_DIFFICULTY_MODIFIERS
 ): LairTemplate {
-  const mods = LAIR_DIFFICULTY_MODIFIERS[difficulty];
+  const mods = LAIR_DIFFICULTY_MODIFIERS[difficulty]!;
 
   return {
     ...template,
@@ -420,13 +420,13 @@ export function getWaveCreatureTemplate(
 ): string {
   // Check for wave-specific override
   if (template.waves && template.waves[waveIndex]?.creatureOverride) {
-    const overrides = template.waves[waveIndex].creatureOverride!;
-    return overrides[Math.floor(Math.random() * overrides.length)];
+    const overrides = template.waves[waveIndex]!.creatureOverride!;
+    return overrides[Math.floor(Math.random() * overrides.length)]!;
   }
 
   // Use default creature templates
   const templates = template.creatureTemplates;
-  return templates[Math.floor(Math.random() * templates.length)];
+  return templates[Math.floor(Math.random() * templates.length)]!;
 }
 
 /**
@@ -441,7 +441,7 @@ export function getWaveCreatureCount(
 ): number {
   // Check for wave-specific count
   if (template.waves && template.waves[waveIndex]) {
-    return template.waves[waveIndex].creatureCount;
+    return template.waves[waveIndex]!.creatureCount;
   }
 
   // Use default creatures per wave

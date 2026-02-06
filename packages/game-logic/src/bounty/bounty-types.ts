@@ -390,9 +390,9 @@ export interface BountyOperationResult {
   /** Result code */
   resultCode: BountyResultCode;
   /** Error message if failed */
-  errorMessage?: string;
+  errorMessage?: string | undefined;
   /** Mission ID if applicable */
-  missionId?: bigint;
+  missionId?: bigint | undefined;
 }
 
 /**
@@ -436,17 +436,17 @@ export interface DroidTrackingResult {
   /** Whether tracking was successful */
   success: boolean;
   /** Target's approximate location */
-  location?: Vector3;
+  location?: Vector3 | undefined;
   /** Zone where target was found */
-  zone?: string;
+  zone?: string | undefined;
   /** Accuracy of the location */
-  accuracy?: number;
+  accuracy?: number | undefined;
   /** Distance to target in meters */
-  distance?: number;
+  distance?: number | undefined;
   /** Direction to target (compass heading) */
-  heading?: number;
+  heading?: number | undefined;
   /** Error message if failed */
-  errorMessage?: string;
+  errorMessage?: string | undefined;
 }
 
 /**
@@ -462,7 +462,7 @@ export interface AreaScanResult {
   /** Detected targets in area */
   detectedTargets: DetectedTarget[];
   /** Error message if failed */
-  errorMessage?: string;
+  errorMessage?: string | undefined;
 }
 
 /**

@@ -126,7 +126,7 @@ export interface PatrolWaypoint {
   /** Time to wait at waypoint (ms) */
   waitTime: number;
   /** Optional behavior at waypoint */
-  behavior?: NPCBehavior;
+  behavior?: NPCBehavior | undefined;
 }
 
 /**
@@ -582,8 +582,8 @@ export class FactionNPCSpawner {
       .filter(sp => sp.faction === faction && sp.active && sp.currentCount < sp.maxNPCs);
 
     for (let i = 0; i < toSpawn && availableSpawnPoints.length > 0; i++) {
-      const spawnPoint = availableSpawnPoints[i % availableSpawnPoints.length];
-      const template = templates[Math.floor(Math.random() * templates.length)];
+      const spawnPoint = availableSpawnPoints[i % availableSpawnPoints.length]!;
+      const template = templates[Math.floor(Math.random() * templates.length)]!;
 
       const npc = this.spawnNPC(template, tier, spawnPoint);
       if (npc) {
@@ -610,7 +610,7 @@ export class FactionNPCSpawner {
     // Determine role based on spawn point and tier
     let role = NPCRole.PATROL;
     if (spawnPoint.allowedRoles.length > 0) {
-      role = spawnPoint.allowedRoles[Math.floor(Math.random() * spawnPoint.allowedRoles.length)];
+      role = spawnPoint.allowedRoles[Math.floor(Math.random() * spawnPoint.allowedRoles.length)]!;
     }
     if (tier === NPCSpawnTier.COMMAND && template.templateId.includes('commander')) {
       role = NPCRole.COMMANDER;
@@ -622,7 +622,7 @@ export class FactionNPCSpawner {
       const routes = Array.from(this.patrolRoutes.values())
         .filter(r => r.faction === template.faction);
       if (routes.length > 0) {
-        patrolRoute = routes[Math.floor(Math.random() * routes.length)];
+        patrolRoute = routes[Math.floor(Math.random() * routes.length)] ?? null;
       }
     }
 
@@ -708,7 +708,7 @@ export class FactionNPCSpawner {
     );
 
     for (let i = 0; i < toSpawn; i++) {
-      const template = templates[Math.floor(Math.random() * templates.length)];
+      const template = templates[Math.floor(Math.random() * templates.length)]!;
       const offset = {
         x: (Math.random() - 0.5) * 20,
         y: 0,
@@ -896,7 +896,7 @@ export class FactionNPCSpawner {
     const waypoints = npc.patrolRoute.waypoints;
     if (waypoints.length === 0) return;
 
-    const currentWaypoint = waypoints[npc.currentWaypointIndex];
+    const currentWaypoint = waypoints[npc.currentWaypointIndex]!;
 
     // Check if NPC has reached waypoint
     const distance = this.calculateDistance(npc.position, currentWaypoint.position);
@@ -914,7 +914,7 @@ export class FactionNPCSpawner {
     }
 
     // Move towards current waypoint
-    const targetWaypoint = waypoints[npc.currentWaypointIndex];
+    const targetWaypoint = waypoints[npc.currentWaypointIndex]!;
     const direction = this.normalizeVector({
       x: targetWaypoint.position.x - npc.position.x,
       y: targetWaypoint.position.y - npc.position.y,

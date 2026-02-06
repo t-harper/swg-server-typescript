@@ -106,11 +106,11 @@ export interface QuestLocation {
   /** Y coordinate */
   y: number;
   /** Z coordinate (optional) */
-  z?: number;
+  z?: number | undefined;
   /** Radius around the point for location-based objectives */
-  radius?: number;
+  radius?: number | undefined;
   /** Building or POI name (optional) */
-  buildingName?: string;
+  buildingName?: string | undefined;
 }
 
 /**
@@ -126,15 +126,15 @@ export interface QuestObjective {
   /** Number required to complete (kills, items, etc.) */
   count: number;
   /** Location for location-based objectives */
-  location?: QuestLocation;
+  location?: QuestLocation | undefined;
   /** Whether this objective is optional */
   optional: boolean;
   /** Description shown in the journal */
-  description?: string;
+  description?: string | undefined;
   /** Order in which objectives must be completed (0 = any order) */
-  sequenceOrder?: number;
+  sequenceOrder?: number | undefined;
   /** Time limit in seconds (0 = no limit) */
-  timeLimit?: number;
+  timeLimit?: number | undefined;
 }
 
 /**
@@ -146,15 +146,15 @@ export interface QuestReward {
   /** Numeric value (credits, XP amount, faction points) */
   value: number;
   /** Item template for ITEM rewards */
-  itemTemplate?: string;
+  itemTemplate?: string | undefined;
   /** Quantity for ITEM rewards */
-  itemQuantity?: number;
+  itemQuantity?: number | undefined;
   /** XP type for XP rewards */
-  xpType?: string;
+  xpType?: string | undefined;
   /** Faction name for FACTION rewards */
-  factionType?: string;
+  factionType?: string | undefined;
   /** Skill name for SKILL rewards */
-  skillName?: string;
+  skillName?: string | undefined;
 }
 
 /**
@@ -166,7 +166,7 @@ export interface QuestPrerequisite {
   /** Value for the prerequisite (level number, faction name, quest ID, skill name) */
   value: string | number;
   /** Minimum amount for numeric prerequisites (faction standing, level) */
-  minAmount?: number;
+  minAmount?: number | undefined;
 }
 
 /**
@@ -194,19 +194,19 @@ export interface Quest {
   /** Prerequisites to accept the quest */
   prerequisites: QuestPrerequisite[];
   /** Quest giver NPC template */
-  questGiver?: string;
+  questGiver?: string | undefined;
   /** Time limit in seconds (0 = no limit) */
-  timeLimit?: number;
+  timeLimit?: number | undefined;
   /** Category for journal organization */
-  category?: string;
+  category?: string | undefined;
   /** Journal entry text (can differ from description) */
-  journalText?: string;
+  journalText?: string | undefined;
   /** Whether quest is hidden from journal until discovered */
-  hidden?: boolean;
+  hidden?: boolean | undefined;
   /** Minimum group size required */
-  minGroupSize?: number;
+  minGroupSize?: number | undefined;
   /** Maximum group size allowed */
-  maxGroupSize?: number;
+  maxGroupSize?: number | undefined;
 }
 
 /**
@@ -220,11 +220,11 @@ export interface ThemeParkQuest extends Quest {
   /** Quest IDs that can be started after completing this one */
   nextQuests: string[];
   /** Branch identifier for branching quest chains */
-  branch?: string;
+  branch?: string | undefined;
   /** Whether this is a branch point (multiple nextQuests) */
-  isBranchPoint?: boolean;
+  isBranchPoint?: boolean | undefined;
   /** Whether this is a chain finale */
-  isFinale?: boolean;
+  isFinale?: boolean | undefined;
 }
 
 /**
@@ -246,11 +246,11 @@ export interface ThemeParkChain {
   /** All quest IDs in this chain */
   questIds: string[];
   /** Faction associated with this chain */
-  faction?: string;
+  faction?: string | undefined;
   /** Minimum level to start */
-  minLevel?: number;
+  minLevel?: number | undefined;
   /** Final rewards for completing the entire chain */
-  chainRewards?: QuestReward[];
+  chainRewards?: QuestReward[] | undefined;
 }
 
 /**
@@ -266,21 +266,21 @@ export interface QuestData {
   shareable: boolean;
   objectives: QuestObjectiveData[];
   rewards: QuestRewardData[];
-  prerequisites?: QuestPrerequisiteData[];
-  questGiver?: string;
-  timeLimit?: number;
-  category?: string;
-  journalText?: string;
-  hidden?: boolean;
-  minGroupSize?: number;
-  maxGroupSize?: number;
+  prerequisites?: QuestPrerequisiteData[] | undefined;
+  questGiver?: string | undefined;
+  timeLimit?: number | undefined;
+  category?: string | undefined;
+  journalText?: string | undefined;
+  hidden?: boolean | undefined;
+  minGroupSize?: number | undefined;
+  maxGroupSize?: number | undefined;
   // Theme park fields
-  questChain?: string;
-  position?: number;
-  nextQuests?: string[];
-  branch?: string;
-  isBranchPoint?: boolean;
-  isFinale?: boolean;
+  questChain?: string | undefined;
+  position?: number | undefined;
+  nextQuests?: string[] | undefined;
+  branch?: string | undefined;
+  isBranchPoint?: boolean | undefined;
+  isFinale?: boolean | undefined;
 }
 
 /**
@@ -295,14 +295,14 @@ export interface QuestObjectiveData {
     planet: string;
     x: number;
     y: number;
-    z?: number;
-    radius?: number;
-    buildingName?: string;
-  };
-  optional?: boolean;
-  description?: string;
-  sequenceOrder?: number;
-  timeLimit?: number;
+    z?: number | undefined;
+    radius?: number | undefined;
+    buildingName?: string | undefined;
+  } | undefined;
+  optional?: boolean | undefined;
+  description?: string | undefined;
+  sequenceOrder?: number | undefined;
+  timeLimit?: number | undefined;
 }
 
 /**
@@ -311,11 +311,11 @@ export interface QuestObjectiveData {
 export interface QuestRewardData {
   type: string;
   value: number;
-  itemTemplate?: string;
-  itemQuantity?: number;
-  xpType?: string;
-  factionType?: string;
-  skillName?: string;
+  itemTemplate?: string | undefined;
+  itemQuantity?: number | undefined;
+  xpType?: string | undefined;
+  factionType?: string | undefined;
+  skillName?: string | undefined;
 }
 
 /**
@@ -324,7 +324,7 @@ export interface QuestRewardData {
 export interface QuestPrerequisiteData {
   type: string;
   value: string | number;
-  minAmount?: number;
+  minAmount?: number | undefined;
 }
 
 /**
@@ -340,12 +340,12 @@ export interface ThemeParkChainData {
     planet: string;
     x: number;
     y: number;
-    z?: number;
+    z?: number | undefined;
   };
   questIds: string[];
-  faction?: string;
-  minLevel?: number;
-  chainRewards?: QuestRewardData[];
+  faction?: string | undefined;
+  minLevel?: number | undefined;
+  chainRewards?: QuestRewardData[] | undefined;
 }
 
 /**

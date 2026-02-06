@@ -209,7 +209,7 @@ export interface AttunementResult<T = void> {
   /** Error message if failed */
   errorMessage?: string;
   /** Result data */
-  data?: T;
+  data?: T | undefined;
 }
 
 // ============================================
@@ -316,7 +316,7 @@ export class CrystalAttunementManager {
     // Check alignment requirements
     const alignmentCheck = this.checkAlignmentRequirement(crystal.crystalType, jediState);
     if (!alignmentCheck.success) {
-      return alignmentCheck as AttunementResult<AttunementSession>;
+      return alignmentCheck as unknown as AttunementResult<AttunementSession>;
     }
 
     // Calculate required times

@@ -313,7 +313,7 @@ export interface ExperimentationState {
   itemDestroyed: boolean;
 
   /** Reason for destruction if destroyed */
-  destructionReason?: string;
+  destructionReason?: string | undefined;
 }
 
 /**
@@ -326,7 +326,7 @@ export interface SerializedExperimentationState {
   lineStates: Array<[string, ExperimentationLineState]>;
   history: ExperimentationGroupResult[];
   itemDestroyed: boolean;
-  destructionReason?: string;
+  destructionReason?: string | undefined;
 }
 
 /**

@@ -58,7 +58,7 @@ export interface ResourceInstance {
   isActive: boolean;
 
   /** Server ID where this resource was created (for multi-server setups) */
-  serverId?: string;
+  serverId?: string | undefined;
 }
 
 /**
@@ -73,7 +73,7 @@ export interface ResourceInstanceData {
   expiresAt: string; // ISO date string
   planetId: string;
   isActive: boolean;
-  serverId?: string;
+  serverId?: string | undefined;
 }
 
 /**
@@ -208,8 +208,8 @@ export function generateResourceName(
   const planetAdj = PLANET_ADJECTIVES[planet] ?? planet;
 
   // Generate unique identifier part
-  const prefix = NAME_PREFIXES[Math.floor(random() * NAME_PREFIXES.length)];
-  const suffix = NAME_SUFFIXES[Math.floor(random() * NAME_SUFFIXES.length)];
+  const prefix = NAME_PREFIXES[Math.floor(random() * NAME_PREFIXES.length)]!;
+  const suffix = NAME_SUFFIXES[Math.floor(random() * NAME_SUFFIXES.length)]!;
 
   // Combine: "Tatooinian Banthanite Steel" or "Corellian Kraytium"
   const uniquePart = prefix + suffix;
@@ -450,7 +450,7 @@ export function findBestResource(
  */
 export function getResourceSummary(instance: ResourceInstance): string {
   const attrs = Array.from(instance.attributes.entries())
-    .map(([attr, value]) => `${attr.split('_').map(w => w[0].toUpperCase()).join('')}: ${value}`)
+    .map(([attr, value]) => `${attr.split('_').map(w => w[0]!.toUpperCase()).join('')}: ${value}`)
     .join(', ');
 
   return `${instance.resourceName} (${instance.resourceClass.className}) - ${attrs}`;

@@ -70,27 +70,27 @@ export enum CraftingComplexity {
  */
 export interface ResourceWeights {
   /** Conductivity weight */
-  conductivity?: number;
+  conductivity?: number | undefined;
   /** Cold Resistance weight */
-  coldResistance?: number;
+  coldResistance?: number | undefined;
   /** Decay Resistance weight */
-  decayResistance?: number;
+  decayResistance?: number | undefined;
   /** Entangle Resistance weight */
-  entangleResistance?: number;
+  entangleResistance?: number | undefined;
   /** Flavor weight (for food) */
-  flavor?: number;
+  flavor?: number | undefined;
   /** Heat Resistance weight */
-  heatResistance?: number;
+  heatResistance?: number | undefined;
   /** Malleability weight */
-  malleability?: number;
+  malleability?: number | undefined;
   /** Overall Quality weight */
-  overallQuality?: number;
+  overallQuality?: number | undefined;
   /** Potential Energy weight */
-  potentialEnergy?: number;
+  potentialEnergy?: number | undefined;
   /** Shock Resistance weight */
-  shockResistance?: number;
+  shockResistance?: number | undefined;
   /** Unit Toughness weight */
-  unitToughness?: number;
+  unitToughness?: number | undefined;
 }
 
 /**

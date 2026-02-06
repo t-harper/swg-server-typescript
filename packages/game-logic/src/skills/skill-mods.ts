@@ -316,37 +316,37 @@ export type SkillModCategory =
  * Get the category of a skill mod
  */
 export function getSkillModCategory(modName: string): SkillModCategory | null {
-  if (Object.values(RangedCombatMods).includes(modName as SkillModName)) {
+  if ((Object.values(RangedCombatMods) as string[]).includes(modName)) {
     return 'ranged_combat';
   }
-  if (Object.values(MeleeCombatMods).includes(modName as SkillModName)) {
+  if ((Object.values(MeleeCombatMods) as string[]).includes(modName)) {
     return 'melee_combat';
   }
-  if (Object.values(GeneralCombatMods).includes(modName as SkillModName)) {
+  if ((Object.values(GeneralCombatMods) as string[]).includes(modName)) {
     return 'general_combat';
   }
-  if (Object.values(MedicalMods).includes(modName as SkillModName)) {
+  if ((Object.values(MedicalMods) as string[]).includes(modName)) {
     return 'medical';
   }
-  if (Object.values(CraftingMods).includes(modName as SkillModName)) {
+  if ((Object.values(CraftingMods) as string[]).includes(modName)) {
     return 'crafting';
   }
-  if (Object.values(SpecializedCraftingMods).includes(modName as SkillModName)) {
+  if ((Object.values(SpecializedCraftingMods) as string[]).includes(modName)) {
     return 'specialized_crafting';
   }
-  if (Object.values(EntertainerMods).includes(modName as SkillModName)) {
+  if ((Object.values(EntertainerMods) as string[]).includes(modName)) {
     return 'entertainer';
   }
-  if (Object.values(ScoutMods).includes(modName as SkillModName)) {
+  if ((Object.values(ScoutMods) as string[]).includes(modName)) {
     return 'scout';
   }
-  if (Object.values(HamMods).includes(modName as SkillModName)) {
+  if ((Object.values(HamMods) as string[]).includes(modName)) {
     return 'ham';
   }
-  if (Object.values(ForceMods).includes(modName as SkillModName)) {
+  if ((Object.values(ForceMods) as string[]).includes(modName)) {
     return 'force';
   }
-  if (Object.values(SlicingMods).includes(modName as SkillModName)) {
+  if ((Object.values(SlicingMods) as string[]).includes(modName)) {
     return 'slicing';
   }
   return null;

@@ -83,7 +83,7 @@ export interface LightsaberCraftingResult<T = void> {
   /** Error message if failed */
   errorMessage?: string;
   /** Result data */
-  data?: T;
+  data?: T | undefined;
 }
 
 // ============================================

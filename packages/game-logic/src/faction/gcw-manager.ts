@@ -99,9 +99,9 @@ export interface GCWOperationResult {
   /** Whether the operation succeeded */
   success: boolean;
   /** Error message if failed */
-  error?: string;
+  error?: string | undefined;
   /** Informational message */
-  message?: string;
+  message?: string | undefined;
 }
 
 /**
@@ -109,13 +109,13 @@ export interface GCWOperationResult {
  */
 export interface ContributionResult extends GCWOperationResult {
   /** Points contributed */
-  pointsContributed?: number;
+  pointsContributed?: number | undefined;
   /** New regional control percentage for faction */
-  newControlPercent?: number;
+  newControlPercent?: number | undefined;
   /** Whether this caused a region flip */
-  regionFlipped?: boolean;
+  regionFlipped?: boolean | undefined;
   /** New region status if flipped */
-  newRegionStatus?: GCWRegionStatus;
+  newRegionStatus?: GCWRegionStatus | undefined;
 }
 
 /**
@@ -123,7 +123,7 @@ export interface ContributionResult extends GCWOperationResult {
  */
 export interface BasePlacementResult extends GCWOperationResult {
   /** The placed base */
-  base?: FactionBase;
+  base?: FactionBase | undefined;
 }
 
 /**
@@ -131,9 +131,9 @@ export interface BasePlacementResult extends GCWOperationResult {
  */
 export interface BaseDestructionResult extends GCWOperationResult {
   /** Points awarded for destruction */
-  pointsAwarded?: number;
+  pointsAwarded?: number | undefined;
   /** The destroyed base */
-  destroyedBase?: FactionBase;
+  destroyedBase?: FactionBase | undefined;
 }
 
 /**

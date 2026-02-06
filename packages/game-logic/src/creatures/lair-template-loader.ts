@@ -20,40 +20,40 @@ import {
 export interface LairTemplateJson {
   templateName: string;
   displayName: string;
-  description?: string;
+  description?: string | undefined;
   lairType: string;
   appearanceTemplate: string;
-  scale?: number;
+  scale?: number | undefined;
   creatureTemplates: string[];
   bossTemplate: string | null;
   babyTemplate: string | null;
-  babySpawnChance?: number;
+  babySpawnChance?: number | undefined;
   minCreatures: number;
   maxCreatures: number;
   spawnRadius: number;
   respawnDelay: number;
-  spawnBehavior?: string;
-  detectionRadius?: number;
+  spawnBehavior?: string | undefined;
+  detectionRadius?: number | undefined;
   waveCount: number;
   creaturesPerWave: number;
   waveTriggerDamage: number;
-  waves?: LairWaveConfig[];
-  waveCooldown?: number;
+  waves?: LairWaveConfig[] | undefined;
+  waveCooldown?: number | undefined;
   healthMultiplier: number;
-  baseHealth?: number;
-  armor?: number;
-  regeneratesHealth?: boolean;
-  healthRegenRate?: number;
-  regenDelay?: number;
+  baseHealth?: number | undefined;
+  armor?: number | undefined;
+  regeneratesHealth?: boolean | undefined;
+  healthRegenRate?: number | undefined;
+  regenDelay?: number | undefined;
   xpBonus: number;
   lootTable: string;
-  creditRange?: [number, number];
-  badge?: string;
-  faction?: string;
-  aggressive?: boolean;
-  socialGroup?: string;
-  creatureRoamRadius?: number;
-  creatureLeashDistance?: number;
+  creditRange?: [number, number] | undefined;
+  badge?: string | undefined;
+  faction?: string | undefined;
+  aggressive?: boolean | undefined;
+  socialGroup?: string | undefined;
+  creatureRoamRadius?: number | undefined;
+  creatureLeashDistance?: number | undefined;
 }
 
 /**
@@ -61,7 +61,7 @@ export interface LairTemplateJson {
  */
 export interface LairParseResult {
   success: boolean;
-  data?: LairTemplate;
+  data?: LairTemplate | undefined;
   errors: string[];
 }
 
@@ -118,40 +118,40 @@ export function parseLairTemplate(json: unknown): LairParseResult {
   const template: LairTemplate = {
     templateName: templateName!,
     displayName: displayName!,
-    description: raw.description as string | undefined,
+    description: raw['description'] as string | undefined,
     lairType: lairType!,
     appearanceTemplate: appearanceTemplate!,
-    scale: raw.scale as number | undefined,
+    scale: raw['scale'] as number | undefined,
     creatureTemplates: creatureTemplates!,
-    bossTemplate: (raw.bossTemplate as string) ?? null,
-    babyTemplate: (raw.babyTemplate as string) ?? null,
-    babySpawnChance: raw.babySpawnChance as number | undefined,
+    bossTemplate: (raw['bossTemplate'] as string) ?? null,
+    babyTemplate: (raw['babyTemplate'] as string) ?? null,
+    babySpawnChance: raw['babySpawnChance'] as number | undefined,
     minCreatures: minCreatures!,
     maxCreatures: maxCreatures!,
     spawnRadius: spawnRadius!,
     respawnDelay: respawnDelay!,
     spawnBehavior,
-    detectionRadius: raw.detectionRadius as number | undefined,
+    detectionRadius: raw['detectionRadius'] as number | undefined,
     waveCount: waveCount!,
     creaturesPerWave: creaturesPerWave!,
     waveTriggerDamage: waveTriggerDamage!,
-    waves: parseWaves(raw.waves),
-    waveCooldown: raw.waveCooldown as number | undefined,
+    waves: parseWaves(raw['waves']),
+    waveCooldown: raw['waveCooldown'] as number | undefined,
     healthMultiplier: healthMultiplier!,
-    baseHealth: raw.baseHealth as number | undefined,
-    armor: raw.armor as number | undefined,
-    regeneratesHealth: raw.regeneratesHealth as boolean | undefined,
-    healthRegenRate: raw.healthRegenRate as number | undefined,
-    regenDelay: raw.regenDelay as number | undefined,
+    baseHealth: raw['baseHealth'] as number | undefined,
+    armor: raw['armor'] as number | undefined,
+    regeneratesHealth: raw['regeneratesHealth'] as boolean | undefined,
+    healthRegenRate: raw['healthRegenRate'] as number | undefined,
+    regenDelay: raw['regenDelay'] as number | undefined,
     xpBonus: xpBonus!,
     lootTable: lootTable!,
-    creditRange: raw.creditRange as [number, number] | undefined,
-    badge: raw.badge as string | undefined,
-    faction: raw.faction as string | undefined,
-    aggressive: raw.aggressive as boolean | undefined,
-    socialGroup: raw.socialGroup as string | undefined,
-    creatureRoamRadius: raw.creatureRoamRadius as number | undefined,
-    creatureLeashDistance: raw.creatureLeashDistance as number | undefined,
+    creditRange: raw['creditRange'] as [number, number] | undefined,
+    badge: raw['badge'] as string | undefined,
+    faction: raw['faction'] as string | undefined,
+    aggressive: raw['aggressive'] as boolean | undefined,
+    socialGroup: raw['socialGroup'] as string | undefined,
+    creatureRoamRadius: raw['creatureRoamRadius'] as number | undefined,
+    creatureLeashDistance: raw['creatureLeashDistance'] as number | undefined,
   };
 
   // Run validation
@@ -307,10 +307,10 @@ function parseWaves(value: unknown): LairWaveConfig[] | undefined {
     }
     const w = wave as Record<string, unknown>;
     waves.push({
-      creatureCount: (w.creatureCount as number) ?? 3,
-      creatureOverride: w.creatureOverride as string[] | undefined,
-      spawnDelay: w.spawnDelay as number | undefined,
-      spawnBoss: w.spawnBoss as boolean | undefined,
+      creatureCount: (w['creatureCount'] as number) ?? 3,
+      creatureOverride: w['creatureOverride'] as string[] | undefined,
+      spawnDelay: w['spawnDelay'] as number | undefined,
+      spawnBoss: w['spawnBoss'] as boolean | undefined,
     });
   }
 

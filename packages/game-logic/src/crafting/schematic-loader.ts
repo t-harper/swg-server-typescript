@@ -6,15 +6,15 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { DraftSchematic, validateDraftSchematic } from './draft-schematic.js';
-import { SchematicCategory, SchematicResultCode } from './schematic-types.js';
+import { SchematicCategory, SchematicResultCode, CraftingToolType, CraftingXpType } from './schematic-types.js';
 
 /**
  * Result of a schematic loading operation
  */
 export interface SchematicLoadResult {
   code: SchematicResultCode;
-  schematic?: DraftSchematic;
-  errors?: string[];
+  schematic?: DraftSchematic | undefined;
+  errors?: string[] | undefined;
 }
 
 /**
@@ -52,7 +52,7 @@ export function calculateSchematicCrc(schematicId: string): number {
 
   for (let i = 0; i < str.length; i++) {
     const byte = str.charCodeAt(i);
-    crc = (crc >>> 8) ^ CRC32_TABLE[(crc ^ byte) & 0xff];
+    crc = (crc >>> 8) ^ CRC32_TABLE[(crc ^ byte) & 0xff]!;
   }
 
   return (crc ^ 0xffffffff) >>> 0;
@@ -203,9 +203,9 @@ export class SchematicLoader {
       subcategory: schematicData.subcategory,
       complexity: schematicData.complexity || 5,
       complexityTier: schematicData.complexityTier || 2,
-      craftingTool: schematicData.craftingTool || 'generic_crafting_tool',
+      craftingTool: schematicData.craftingTool || CraftingToolType.GenericCraftingTool,
       slots: schematicData.slots || [],
-      xpType: schematicData.xpType || 'crafting_general',
+      xpType: schematicData.xpType || CraftingXpType.Artisan,
       xpAmount: schematicData.xpAmount || 0,
       outputTemplate: schematicData.outputTemplate || '',
       outputQuantity: schematicData.outputQuantity || 1,

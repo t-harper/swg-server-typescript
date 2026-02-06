@@ -115,17 +115,17 @@ export interface RewardResult {
   /** Whether the reward was granted */
   success: boolean;
   /** Error message if failed */
-  error?: string;
+  error?: string | undefined;
   /** Base points before modifiers */
-  basePoints?: number;
+  basePoints?: number | undefined;
   /** Final points after modifiers */
-  finalPoints?: number;
+  finalPoints?: number | undefined;
   /** Modifiers applied */
-  modifiers?: RewardModifier[];
+  modifiers?: RewardModifier[] | undefined;
   /** Message to display to player */
-  message?: string;
+  message?: string | undefined;
   /** GCW points contributed (if any) */
-  gcwPointsContributed?: number;
+  gcwPointsContributed?: number | undefined;
 }
 
 /**
@@ -216,7 +216,7 @@ export interface RewardGrantedEvent {
   faction: Faction;
   points: number;
   source: GCWContributionSource;
-  regionId?: string;
+  regionId?: string | undefined;
   timestamp: Date;
 }
 
@@ -563,7 +563,7 @@ export class FactionRewardManager {
   private async checkAntiFarming(
     killerId: ObjectId,
     victimId: ObjectId
-  ): Promise<{ allowed: boolean; reason?: string }> {
+  ): Promise<{ allowed: boolean; reason?: string | undefined }> {
     // Check cooldown
     const lastKillTime = await this.repository.getLastKillTime(killerId, victimId);
     if (lastKillTime) {
@@ -845,9 +845,9 @@ export class FactionRewardManager {
    */
   async purchaseItem(playerId: ObjectId, itemId: string): Promise<{
     success: boolean;
-    error?: string;
-    item?: FactionItem;
-    message?: string;
+    error?: string | undefined;
+    item?: FactionItem | undefined;
+    message?: string | undefined;
   }> {
     const playerData = await this.factionManager.getPlayerData(playerId);
 

@@ -45,7 +45,7 @@ export interface ResourceContainer {
   ownerId: ObjectId;
 
   /** Parent container ID (inventory, storage, etc.) */
-  parentContainerId?: bigint;
+  parentContainerId?: bigint | undefined;
 
   /** Last modified timestamp */
   lastModified: Date;
@@ -61,7 +61,7 @@ export interface ResourceContainerData {
   quantity: number;
   maxQuantity: number;
   ownerId: string;
-  parentContainerId?: string;
+  parentContainerId?: string | undefined;
   lastModified: string;
 }
 
@@ -322,7 +322,7 @@ export function splitContainer(
     {
       quantity: splitAmount,
       maxQuantity: source.maxQuantity,
-      parentContainerId: source.parentContainerId,
+      ...(source.parentContainerId !== undefined ? { parentContainerId: source.parentContainerId } : {}),
     }
   );
 

@@ -33,8 +33,8 @@ import {
  */
 export interface QuestLoadResult {
   code: QuestResultCode;
-  quest?: Quest;
-  errors?: string[];
+  quest?: Quest | undefined;
+  errors?: string[] | undefined;
 }
 
 /**

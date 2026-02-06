@@ -153,7 +153,7 @@ export interface BountyAcceptResponseMessage {
   /** Error message if failed */
   errorMessage: string;
   /** Mission data if successful */
-  mission?: MissionData;
+  mission?: MissionData | undefined;
 }
 
 /**
@@ -210,10 +210,10 @@ export interface ClueData {
   /** Source description */
   source: string;
   /** Type-specific data */
-  locationData?: LocationClueNetworkData;
-  aliasData?: AliasClueNetworkData;
-  activityData?: ActivityClueNetworkData;
-  associateData?: AssociateClueNetworkData;
+  locationData?: LocationClueNetworkData | undefined;
+  aliasData?: AliasClueNetworkData | undefined;
+  activityData?: ActivityClueNetworkData | undefined;
+  associateData?: AssociateClueNetworkData | undefined;
 }
 
 /**
@@ -297,7 +297,7 @@ export interface ClueResponseMessage {
   /** Mission ID */
   missionId: bigint;
   /** Clue data if successful */
-  clue?: ClueData;
+  clue?: ClueData | undefined;
   /** Error message if failed */
   errorMessage: string;
 }
@@ -348,13 +348,13 @@ export interface SeekerDroidUpdateMessage {
   /** Whether target was found */
   targetFound: boolean;
   /** Target position if found */
-  targetX?: number;
-  targetY?: number;
-  targetZ?: number;
+  targetX?: number | undefined;
+  targetY?: number | undefined;
+  targetZ?: number | undefined;
   /** Distance to target */
-  targetDistance?: number;
+  targetDistance?: number | undefined;
   /** Heading to target */
-  targetHeading?: number;
+  targetHeading?: number | undefined;
   /** Status message */
   message: string;
 }
@@ -375,7 +375,7 @@ export interface DeployProbeMessage {
   /** Scan center Z coordinate */
   scanZ: number;
   /** Optional mission ID */
-  missionId?: bigint;
+  missionId?: bigint | undefined;
 }
 
 /**
@@ -568,7 +568,7 @@ export interface MissionDetailsResponseMessage {
   /** Whether request succeeded */
   success: boolean;
   /** Mission data if found */
-  mission?: MissionData;
+  mission?: MissionData | undefined;
   /** Error message if failed */
   errorMessage: string;
 }

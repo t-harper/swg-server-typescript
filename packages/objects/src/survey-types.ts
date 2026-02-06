@@ -80,9 +80,9 @@ export interface SampleResult {
   /** Concentration at the sample point (0-100) */
   concentration: number;
   /** Error message if sampling failed */
-  errorMessage?: string;
+  errorMessage?: string | undefined;
   /** XP gained from sampling (survey XP) */
-  xpGained?: number;
+  xpGained?: number | undefined;
 }
 
 /**

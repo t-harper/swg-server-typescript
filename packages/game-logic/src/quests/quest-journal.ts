@@ -27,7 +27,7 @@ export interface ObjectiveProgress {
   /** Whether this objective is complete */
   complete: boolean;
   /** Timestamp when objective was completed (if complete) */
-  completedAt?: number;
+  completedAt?: number | undefined;
 }
 
 /**
@@ -43,7 +43,7 @@ export interface ActiveQuest {
   /** Timestamp when quest was accepted */
   acceptedAt: number;
   /** Timestamp when quest will expire (if time-limited) */
-  expiresAt?: number;
+  expiresAt?: number | undefined;
   /** Number of times this quest has been completed (for repeatable quests) */
   completionCount: number;
 }
@@ -77,10 +77,10 @@ export interface QuestJournalData {
       currentCount: number;
       requiredCount: number;
       complete: boolean;
-      completedAt?: number;
+      completedAt?: number | undefined;
     }>;
     acceptedAt: number;
-    expiresAt?: number;
+    expiresAt?: number | undefined;
     completionCount: number;
   }>;
   /** Completed quests history */
@@ -100,7 +100,7 @@ export interface QuestJournalData {
 export interface JournalOperationResult {
   success: boolean;
   code: QuestResultCode;
-  message?: string;
+  message?: string | undefined;
 }
 
 /**
@@ -713,7 +713,7 @@ export class QuestJournal {
 
     this.completedQuests.clear();
     for (let i = 0; i < MAX_COMPLETED_RECORDS && i < records.length; i++) {
-      this.completedQuests.set(records[i][0], records[i][1]);
+      this.completedQuests.set(records[i]![0], records[i]![1]);
     }
   }
 

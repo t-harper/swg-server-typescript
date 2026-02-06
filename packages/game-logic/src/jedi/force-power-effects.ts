@@ -337,7 +337,7 @@ export class ForceEffectHandler {
       return false;
     }
 
-    const removed = effects.splice(index, 1)[0];
+    const removed = effects.splice(index, 1)[0]!;
 
     // Remove stat modifier if applicable
     if (isStatModifierEffect(removed.effect.type) && removed.effect.statModified) {
@@ -395,14 +395,14 @@ export class ForceEffectHandler {
         case StackingMode.REPLACE:
           return {
             canApply: true,
-            effectToReplace: samePowerEffects[0].effectId,
+            effectToReplace: samePowerEffects[0]!.effectId,
             stackCount: 1,
             newStackCount: 1,
           };
 
         case StackingMode.REFRESH:
           // Refresh existing effect duration
-          const toRefresh = samePowerEffects[0];
+          const toRefresh = samePowerEffects[0]!;
           toRefresh.expiresAt = Date.now() + effect.duration;
           toRefresh.remainingTicks =
             effect.tickInterval > 0 ? Math.floor(effect.duration / effect.tickInterval) : 0;
@@ -430,7 +430,7 @@ export class ForceEffectHandler {
           };
 
         case StackingMode.KEEP_HIGHER:
-          const existing = samePowerEffects[0];
+          const existing = samePowerEffects[0]!;
           if (effect.magnitude > existing.effect.magnitude) {
             return {
               canApply: true,

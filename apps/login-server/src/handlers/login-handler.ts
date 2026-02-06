@@ -168,13 +168,11 @@ export class LoginHandler {
       };
     }
 
-    // Find account by username
-    const account = await this.accountRepository.findByUsername(username);
+    // Find account by username, or auto-create if it doesn't exist
+    let account = await this.accountRepository.findByUsername(username);
     if (!account) {
-      return {
-        valid: false,
-        errorMessage: 'Invalid username or password.',
-      };
+      console.log(`[LoginHandler] Account not found for ${username}, creating new account`);
+      account = await this.accountRepository.create({ username, password });
     }
 
     // Check account status

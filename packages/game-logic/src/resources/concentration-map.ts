@@ -161,7 +161,7 @@ export class ConcentrationMap {
     }
 
     const index = cellZ * this.width + cellX;
-    return this.data[index];
+    return this.data[index]!;
   }
 
   /**
@@ -203,7 +203,7 @@ export class ConcentrationMap {
       return 0;
     }
     const index = cellZ * this.width + cellX;
-    return this.data[index];
+    return this.data[index]!;
   }
 
   /**
@@ -218,8 +218,9 @@ export class ConcentrationMap {
     for (let z = 0; z < this.height; z++) {
       for (let x = 0; x < this.width; x++) {
         const index = z * this.width + x;
-        if (this.data[index] > maxConc) {
-          maxConc = this.data[index];
+        const val = this.data[index]!;
+        if (val > maxConc) {
+          maxConc = val;
           maxX = x;
           maxZ = z;
         }
@@ -244,11 +245,12 @@ export class ConcentrationMap {
     for (let z = 0; z < this.height; z++) {
       for (let x = 0; x < this.width; x++) {
         const index = z * this.width + x;
-        if (this.data[index] >= threshold) {
+        const val = this.data[index]!;
+        if (val >= threshold) {
           points.push({
             x: this.originX + (x + 0.5) * this.cellSize,
             z: this.originZ + (z + 0.5) * this.cellSize,
-            concentration: this.data[index],
+            concentration: val,
           });
         }
       }
@@ -263,7 +265,7 @@ export class ConcentrationMap {
   getAverageConcentration(): number {
     let sum = 0;
     for (let i = 0; i < this.data.length; i++) {
-      sum += this.data[i];
+      sum += this.data[i]!;
     }
     return sum / this.data.length;
   }
@@ -433,7 +435,7 @@ export function mergeConcentrationMaps(
     throw new Error('Cannot merge empty array of maps');
   }
 
-  const first = maps[0];
+  const first = maps[0]!;
   const dims = first.getDimensions();
   const data = new Float32Array(dims.width * dims.height);
 
@@ -442,11 +444,11 @@ export function mergeConcentrationMaps(
     for (const map of maps) {
       const serialized = map.serialize();
       for (let i = 0; i < data.length; i++) {
-        data[i] += serialized.data[i];
+        data[i] = data[i]! + serialized.data[i]!;
       }
     }
     for (let i = 0; i < data.length; i++) {
-      data[i] /= maps.length;
+      data[i] = data[i]! / maps.length;
     }
   } else {
     // max mode
@@ -454,7 +456,7 @@ export function mergeConcentrationMaps(
     for (const map of maps) {
       const serialized = map.serialize();
       for (let i = 0; i < data.length; i++) {
-        data[i] = Math.max(data[i], serialized.data[i]);
+        data[i] = Math.max(data[i]!, serialized.data[i]!);
       }
     }
   }

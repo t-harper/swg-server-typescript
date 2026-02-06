@@ -44,7 +44,7 @@ export interface WeaponAppearance {
   /** Which slot the weapon is in */
   slot: EquipmentSlotType;
   /** Custom appearance data */
-  appearanceData?: Uint8Array;
+  appearanceData?: Uint8Array | undefined;
 }
 
 /**

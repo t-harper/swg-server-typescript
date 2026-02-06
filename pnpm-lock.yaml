@@ -140,6 +140,9 @@ importers:
       '@swg/database':
         specifier: workspace:*
         version: link:../../packages/database
+      '@swg/objects':
+        specifier: workspace:*
+        version: link:../../packages/objects
       '@swg/protocol':
         specifier: workspace:*
         version: link:../../packages/protocol

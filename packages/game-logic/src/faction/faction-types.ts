@@ -247,7 +247,7 @@ export interface FactionBase {
   /** Owner player ID */
   ownerId: ObjectId;
   /** Guild ID if guild-owned */
-  guildId?: ObjectId;
+  guildId?: ObjectId | undefined;
   /** Current base health */
   health: number;
   /** Maximum base health */

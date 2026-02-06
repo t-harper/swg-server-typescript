@@ -224,13 +224,13 @@ export interface BattlefieldObjective {
   /** Points awarded for capturing */
   capturePoints: number;
   /** For DESTROY_STRUCTURE: current health */
-  health?: number;
+  health?: number | undefined;
   /** For DESTROY_STRUCTURE: max health */
-  maxHealth?: number;
+  maxHealth?: number | undefined;
   /** For HOLD_GROUND: hold duration required in ms */
-  holdDurationMs?: number;
+  holdDurationMs?: number | undefined;
   /** For HOLD_GROUND: current hold time in ms */
-  currentHoldTimeMs?: number;
+  currentHoldTimeMs?: number | undefined;
   /** Display name */
   name: string;
   /** Whether objective is active */

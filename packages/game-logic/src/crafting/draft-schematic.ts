@@ -35,7 +35,7 @@ export interface SchematicAttribute {
   experimentationModifier: number;
 
   /** Whether this attribute is hidden from players */
-  hidden?: boolean;
+  hidden?: boolean | undefined;
 }
 
 /**
@@ -108,7 +108,7 @@ export interface DraftSchematic {
   category: SchematicCategory;
 
   /** Subcategory for further organization */
-  subcategory?: string;
+  subcategory?: string | undefined;
 
   /**
    * Crafting difficulty level (1-25 in SWG).
@@ -144,7 +144,7 @@ export interface DraftSchematic {
   skillRequired: string;
 
   /** Additional skills that unlock this schematic */
-  additionalSkillsRequired?: string[];
+  additionalSkillsRequired?: string[] | undefined;
 
   /** Attributes of the output item */
   itemAttributes: SchematicAttribute[];
@@ -153,10 +153,10 @@ export interface DraftSchematic {
   assembly: AssemblyConfig;
 
   /** Experimentation configuration (if experimentable) */
-  experimentation?: ExperimentationConfig;
+  experimentation?: ExperimentationConfig | undefined;
 
   /** Description shown in schematic viewer */
-  description?: string;
+  description?: string | undefined;
 
   /** Whether this schematic can be learned from a data disk */
   learnable: boolean;
