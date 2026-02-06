@@ -90,9 +90,9 @@ async function main(): Promise<void> {
   const statsInterval = setInterval(() => {
     const stats = server.getStats();
     console.log(
-      `[Stats] Sessions: ${stats.activeSessions} | ` +
-      `Packets: ${stats.network.packetsReceived}/${stats.network.packetsSent} (rx/tx) | ` +
-      `Bytes: ${formatBytes(stats.network.bytesReceived)}/${formatBytes(stats.network.bytesSent)} (rx/tx)`
+      `[Stats] SOE Sessions: ${stats.activeSessions} | ` +
+      `Connection Sessions: ${stats.connectionSessions} | ` +
+      `Uptime: ${Math.floor((Date.now() - stats.startTime) / 1000)}s`
     );
   }, 60000); // Log stats every minute
 
@@ -127,22 +127,6 @@ async function main(): Promise<void> {
     console.error('Unhandled rejection:', reason);
     // Don't exit on unhandled rejection, just log it
   });
-}
-
-/**
- * Format bytes to human-readable string
- */
-function formatBytes(bytes: bigint): string {
-  const units = ['B', 'KB', 'MB', 'GB', 'TB'];
-  let value = Number(bytes);
-  let unitIndex = 0;
-
-  while (value >= 1024 && unitIndex < units.length - 1) {
-    value /= 1024;
-    unitIndex++;
-  }
-
-  return `${value.toFixed(2)} ${units[unitIndex]}`;
 }
 
 // Run main if this is the entry point

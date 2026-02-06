@@ -1,6 +1,9 @@
 /**
  * Connection Server
  * Main server orchestration for client connections and routing
+ *
+ * Uses SessionManager from @swg/protocol/soe for proper SOE protocol handling
+ * including encryption, CRC validation, reliable delivery, and fragmentation.
  */
 
 import type { ServerConfig } from '@swg/config';
@@ -12,20 +15,18 @@ import {
   createPubSubManager,
 } from '@swg/redis';
 import {
-  SoeOpcode,
-  deserialize,
-  serialize,
-  createSessionResponse,
-  createDisconnect,
-  createPing,
+  SessionManager,
+  type Session,
   DisconnectReason,
-  SoeProtocolDefaults,
-  type SoePacket,
-  type SessionRequestPacket,
-  type DataPacket,
-} from '@swg/protocol';
+} from '@swg/protocol/soe';
+import {
+  ConnectionMessageOpcode,
+  deserializeClientIdMsg,
+  deserializeSelectCharacter,
+  getConnectionMessageOpcode,
+} from '@swg/protocol/swg/messages/connection-messages.js';
 
-import { UdpServer, createUdpServer, type RemoteInfo } from './network/udp-server.js';
+import { UdpServer, createUdpServer } from './network/udp-server.js';
 import {
   ConnectionHandler,
   createConnectionHandler,
@@ -45,7 +46,7 @@ import {
 interface ServerShutdownMessage {
   type: 'server_shutdown';
   serverId: string;
-  serverType: 'connection';
+  serverType: string;
   address: string;
   port: number;
   timestamp: number;
@@ -67,35 +68,24 @@ export interface ConnectionServer {
  * Server statistics
  */
 export interface ConnectionServerStats {
-  /** Number of active sessions */
+  /** Number of active SOE sessions */
   activeSessions: number;
-  /** UDP server stats */
-  network: {
-    bytesReceived: bigint;
-    bytesSent: bigint;
-    packetsReceived: bigint;
-    packetsSent: bigint;
-    uptime: number;
-  };
+  /** Number of authenticated connection sessions */
+  connectionSessions: number;
   /** Server start time */
   startTime: number;
 }
 
 /**
- * Internal server state
+ * Extended session linking SOE session to connection handler session
  */
-interface ServerState {
-  udpServer: UdpServer;
-  connectionHandler: ConnectionHandler;
-  routingHandler: RoutingHandler;
-  sessionStore: SessionStore;
-  pubsub: PubSubManager;
-  config: ServerConfig;
-  heartbeatInterval: ReturnType<typeof setInterval> | null;
-  pruneInterval: ReturnType<typeof setInterval> | null;
-  startTime: number;
-  isRunning: boolean;
-  serverId: string;
+interface ConnectionSession {
+  soeSession: Session;
+  clientSession: ClientSession;
+  authenticated: boolean;
+  accountId?: number;
+  stationId?: number;
+  sessionToken?: string;
 }
 
 /**
@@ -135,6 +125,17 @@ export async function createServer(config: ServerConfig): Promise<ConnectionServ
     reuseAddr: true,
   });
 
+  // Create SOE session manager
+  const sessionManager = new SessionManager({
+    udpBufferSize: 496,
+    sessionTimeout: connectionConfig.disconnectTimeout ?? 60000,
+    resendTimeout: 500,
+    maxRetries: 5,
+    enableCompression: true,
+    enableEncryption: true,
+    tickInterval: 100,
+  });
+
   // Create handlers
   const connectionHandler = createConnectionHandler(sessionStore, pubsub, {
     serverAddress: connectionConfig.bindAddress,
@@ -147,476 +148,497 @@ export async function createServer(config: ServerConfig): Promise<ConnectionServ
     defaultGameServer: { address: '127.0.0.1', port: 44463 },
   });
 
-  // Create server state
-  const state: ServerState = {
-    udpServer,
-    connectionHandler,
-    routingHandler,
-    sessionStore,
-    pubsub,
-    config,
-    heartbeatInterval: null,
-    pruneInterval: null,
-    startTime: 0,
-    isRunning: false,
-    serverId,
-  };
+  // Connection sessions map (keyed by SOE session key address:port)
+  const connectionSessions = new Map<string, ConnectionSession>();
 
-  // Set up message handler
+  // Server state
+  let heartbeatInterval: ReturnType<typeof setInterval> | null = null;
+  let pruneInterval: ReturnType<typeof setInterval> | null = null;
+  let startTime = 0;
+  let isRunning = false;
+
+  /**
+   * Get or create a connection session for a SOE session
+   */
+  function getConnectionSession(soeSession: Session): ConnectionSession {
+    const key = soeSession.getKey();
+    let connSession = connectionSessions.get(key);
+
+    if (!connSession) {
+      // Create a new client session in the connection handler
+      const clientSession = connectionHandler.handleNewConnection(
+        soeSession.sessionId,
+        soeSession.clientAddress.address,
+        soeSession.clientAddress.port,
+      );
+
+      connSession = {
+        soeSession,
+        clientSession,
+        authenticated: false,
+      };
+
+      connectionSessions.set(key, connSession);
+    }
+
+    return connSession;
+  }
+
+  /**
+   * Handle SWG message received from client via SessionManager 'data' event
+   */
+  async function handleSwgMessage(
+    soeSession: Session,
+    data: Uint8Array,
+  ): Promise<void> {
+    const clientKey = soeSession.getKey();
+
+    if (data.length < 4) {
+      console.warn(`[ConnectionServer] SWG message too short from ${clientKey}`);
+      return;
+    }
+
+    const connSession = getConnectionSession(soeSession);
+    const opcode = getConnectionMessageOpcode(data);
+
+    try {
+      switch (opcode) {
+        case ConnectionMessageOpcode.ClientIdMsg: {
+          await handleClientIdMsg(connSession, data, clientKey);
+          break;
+        }
+
+        case ConnectionMessageOpcode.SelectCharacter: {
+          await handleSelectCharacter(connSession, data, clientKey);
+          break;
+        }
+
+        default:
+          console.log(
+            `[ConnectionServer] Unknown SWG message opcode: 0x${opcode.toString(16)} from ${clientKey}`,
+          );
+      }
+    } catch (error) {
+      console.error(`[ConnectionServer] Error handling SWG message from ${clientKey}:`, error);
+    }
+  }
+
+  /**
+   * Handle ClientIdMsg (0xD5899226) - client sends auth token
+   */
+  async function handleClientIdMsg(
+    connSession: ConnectionSession,
+    data: Uint8Array,
+    clientKey: string,
+  ): Promise<void> {
+    console.log(`[ConnectionServer] ClientIdMsg from ${clientKey}`);
+
+    const message = deserializeClientIdMsg(data);
+
+    // Convert token bytes to hex string for Redis lookup
+    const tokenHex = [...new Uint8Array(message.token)]
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('');
+
+    console.log(
+      `[ConnectionServer] Token received from ${clientKey}, ` +
+      `clientVersion: ${message.clientVersion}`,
+    );
+
+    if (!tokenHex || tokenHex.length === 0) {
+      console.log(`[ConnectionServer] Empty token from ${clientKey}`);
+      sessionManager.disconnectSession(
+        connSession.soeSession,
+        DisconnectReason.Application,
+      );
+      return;
+    }
+
+    // Validate the token against Redis session store
+    const result = await connectionHandler.validateSession(tokenHex);
+
+    if (!result.valid || !result.session) {
+      console.log(
+        `[ConnectionServer] Invalid token from ${clientKey}: ${result.error}`,
+      );
+      sessionManager.disconnectSession(
+        connSession.soeSession,
+        DisconnectReason.Application,
+      );
+      return;
+    }
+
+    // Authenticate the session
+    await connectionHandler.authenticateSession(
+      connSession.clientSession,
+      tokenHex,
+      result.session,
+    );
+
+    // Update connection session state
+    connSession.authenticated = true;
+    connSession.accountId = result.session.accountId;
+    connSession.stationId = result.session.stationId;
+    connSession.sessionToken = tokenHex;
+
+    console.log(
+      `[ConnectionServer] Session authenticated for account ${result.session.accountId} ` +
+      `(station: ${result.session.stationId}) from ${clientKey}`,
+    );
+  }
+
+  /**
+   * Handle SelectCharacter (0xB5098D76) - client selects a character
+   */
+  async function handleSelectCharacter(
+    connSession: ConnectionSession,
+    data: Uint8Array,
+    clientKey: string,
+  ): Promise<void> {
+    console.log(`[ConnectionServer] SelectCharacter from ${clientKey}`);
+
+    if (!connSession.authenticated || !connSession.sessionToken) {
+      console.warn(
+        `[ConnectionServer] SelectCharacter from unauthenticated session ${clientKey}`,
+      );
+      sessionManager.disconnectSession(
+        connSession.soeSession,
+        DisconnectReason.Application,
+      );
+      return;
+    }
+
+    const message = deserializeSelectCharacter(data);
+    const characterId = message.characterId;
+
+    console.log(
+      `[ConnectionServer] Character ${characterId} selected by account ` +
+      `${connSession.accountId} from ${clientKey}`,
+    );
+
+    // Update the client session with the selected character
+    connSession.clientSession.characterId = characterId;
+    connSession.clientSession.state = SessionState.CharacterSelected;
+
+    // Update Redis session with characterId and game server info
+    try {
+      await sessionStore.updateSession(connSession.sessionToken, {
+        characterId,
+        lastActivity: Date.now(),
+        gameServer: {
+          address: connectionConfig.bindAddress ?? '127.0.0.1',
+          port: 44463,
+        },
+      });
+
+      // Route to game server via the routing handler
+      const routeResult = await routingHandler.routeToGameServer(
+        connSession.clientSession,
+        'tatooine', // Default scene; in production this would come from character data
+      );
+
+      if (routeResult.success && routeResult.gameServer) {
+        // Update Redis with the actual game server assignment
+        await sessionStore.updateSession(connSession.sessionToken, {
+          gameServer: {
+            address: routeResult.gameServer.address,
+            port: routeResult.gameServer.port,
+          },
+        });
+
+        console.log(
+          `[ConnectionServer] Character ${characterId} routed to game server ` +
+          `${routeResult.gameServer.address}:${routeResult.gameServer.port}`,
+        );
+      } else {
+        console.warn(
+          `[ConnectionServer] Failed to route character ${characterId}: ` +
+          `${routeResult.error ?? 'unknown error'}`,
+        );
+      }
+
+      // Publish zone request so the game server knows to expect this player
+      await pubsub.publish('connection:zone_request', {
+        type: 'zone_request',
+        accountId: connSession.accountId,
+        stationId: connSession.stationId,
+        characterId: characterId.toString(),
+        sessionToken: connSession.sessionToken,
+        gameServer: routeResult.gameServer,
+        timestamp: Date.now(),
+      });
+    } catch (error) {
+      console.error(
+        `[ConnectionServer] Error handling SelectCharacter for ${clientKey}:`,
+        error,
+      );
+    }
+  }
+
+  /**
+   * Clean up a connection session
+   */
+  async function cleanupConnectionSession(key: string): Promise<void> {
+    const connSession = connectionSessions.get(key);
+    if (connSession) {
+      // Clean up through the connection handler
+      await connectionHandler.handleDisconnect(
+        connSession.clientSession,
+        'session_disconnected',
+      );
+      connectionSessions.delete(key);
+    }
+  }
+
+  // -------------------------------------------------------
+  // Wire up SessionManager callbacks
+  // -------------------------------------------------------
+
+  // Set the send callback so SessionManager can transmit packets via UDP
+  sessionManager.setSendCallback((data, address, port) => {
+    udpServer.sendAsync(data, address, port);
+  });
+
+  // Handle new SOE sessions
+  sessionManager.on('session:connected', (session: Session) => {
+    const key = session.getKey();
+    console.log(`[ConnectionServer] SOE session connected: ${key}`);
+    getConnectionSession(session);
+  });
+
+  // Handle SOE session disconnections
+  sessionManager.on('session:disconnected', (session: Session, reason: number) => {
+    const key = session.getKey();
+    console.log(
+      `[ConnectionServer] SOE session disconnected: ${key}, reason: ${reason}`,
+    );
+    void cleanupConnectionSession(key);
+  });
+
+  // Handle received data (SWG messages delivered by SessionManager after
+  // SOE-level decryption, CRC validation, decompression, and reassembly)
+  sessionManager.on('data', (session: Session, data: Uint8Array) => {
+    void handleSwgMessage(session, data);
+  });
+
+  // Handle errors from SessionManager
+  sessionManager.on('error', (error: Error, session?: Session) => {
+    if (session) {
+      console.error(
+        `[ConnectionServer] SessionManager error for ${session.getKey()}:`,
+        error,
+      );
+    } else {
+      console.error('[ConnectionServer] SessionManager error:', error);
+    }
+  });
+
+  // Route all incoming UDP packets through SessionManager
   udpServer.onMessage((data, rinfo) => {
-    handlePacket(state, data, rinfo).catch((error) => {
-      console.error('[Server] Error handling packet:', error);
+    sessionManager.handlePacket(new Uint8Array(data), {
+      address: rinfo.address,
+      port: rinfo.port,
     });
   });
 
-  return {
-    start: () => startServer(state),
-    stop: () => stopServer(state),
-    getStats: () => getServerStats(state),
-  };
-}
-
-/**
- * Start the connection server
- */
-async function startServer(state: ServerState): Promise<void> {
-  const connectionConfig = state.config.connectionServer ?? {
-    port: 44455,
-    bindAddress: '0.0.0.0',
-    pingInterval: 30000,
-    disconnectTimeout: 60000,
-  };
-
-  console.log('[Server] Connecting to Redis...');
-  const redisClient = getRedisClient();
-  await redisClient.connect();
-  console.log('[Server] Redis connected');
-
-  // Initialize routing handler (subscribes to game server updates)
-  await state.routingHandler.initialize();
-
-  // Register some default game servers for testing
-  // In production, these would come from Redis or config
-  const defaultGameServer: GameServerInfo = {
-    serverId: 'gameserver-1',
-    address: '127.0.0.1',
-    port: 44463,
-    scenes: [
-      'tatooine',
-      'naboo',
-      'corellia',
-      'dantooine',
-      'dathomir',
-      'endor',
-      'lok',
-      'rori',
-      'talus',
-      'yavin4',
-      'tutorial',
-    ],
-    playerCount: 0,
-    maxPlayers: 3000,
-    status: GameServerStatus.Online,
-    lastHeartbeat: Date.now(),
-  };
-  state.routingHandler.registerGameServer(defaultGameServer);
-
-  // Subscribe to relevant pub/sub channels
-  await setupPubSubSubscriptions(state);
-
-  // Bind UDP server
-  console.log(`[Server] Binding UDP server to ${connectionConfig.bindAddress}:${connectionConfig.port}...`);
-  await state.udpServer.bind(connectionConfig.port, connectionConfig.bindAddress);
-  console.log('[Server] UDP server bound');
-
-  // Start periodic tasks
-  state.heartbeatInterval = setInterval(
-    () => runHeartbeatCheck(state),
-    connectionConfig.pingInterval
-  );
-
-  state.pruneInterval = setInterval(
-    () => runPruneTask(state),
-    60000 // Prune stale servers every minute
-  );
-
-  state.startTime = Date.now();
-  state.isRunning = true;
-
-  console.log(`[Server] Connection server started (id: ${state.serverId})`);
-}
-
-/**
- * Stop the connection server gracefully
- */
-async function stopServer(state: ServerState): Promise<void> {
-  if (!state.isRunning) {
-    return;
-  }
-
-  console.log('[Server] Shutting down...');
-  state.isRunning = false;
-
-  // Stop periodic tasks
-  if (state.heartbeatInterval) {
-    clearInterval(state.heartbeatInterval);
-    state.heartbeatInterval = null;
-  }
-
-  if (state.pruneInterval) {
-    clearInterval(state.pruneInterval);
-    state.pruneInterval = null;
-  }
-
-  // Publish shutdown notification
-  try {
-    const shutdownMessage: ServerShutdownMessage = {
-      type: 'server_shutdown',
-      serverId: state.serverId,
-      serverType: 'connection',
-      address: state.config.connectionServer?.bindAddress ?? '0.0.0.0',
-      port: state.config.connectionServer?.port ?? 44455,
-      timestamp: Date.now(),
-    };
-    await state.pubsub.publish('server:shutdown', shutdownMessage);
-  } catch (error) {
-    console.error('[Server] Failed to publish shutdown notification:', error);
-  }
-
-  // Disconnect all clients
-  await state.connectionHandler.cleanup();
-
-  // Clean up routing handler
-  await state.routingHandler.cleanup();
-
-  // Close pub/sub
-  await state.pubsub.close();
-
-  // Close UDP server
-  await state.udpServer.close();
-
-  // Disconnect Redis
-  const redisClient = getRedisClient();
-  await redisClient.disconnect();
-
-  console.log('[Server] Shutdown complete');
-}
-
-/**
- * Set up pub/sub subscriptions
- */
-async function setupPubSubSubscriptions(state: ServerState): Promise<void> {
-  // Subscribe to server shutdown notifications from other servers
-  await state.pubsub.subscribe('server:shutdown', (message: unknown) => {
-    const shutdown = message as ServerShutdownMessage;
-    if (shutdown.serverType === 'game') {
-      // A game server shut down - mark it offline
-      console.log(`[Server] Game server ${shutdown.serverId} shut down`);
-    }
+  // Handle UDP-level errors
+  udpServer.on('error', (error: Error) => {
+    console.error('[ConnectionServer] UDP error:', error);
   });
 
-  // Subscribe to broadcast messages
-  await state.pubsub.subscribe('broadcast:all', (message: unknown) => {
-    console.log('[Server] Received broadcast:', message);
-    // Could forward to connected clients
-  });
-}
+  // -------------------------------------------------------
+  // Pub/Sub subscriptions
+  // -------------------------------------------------------
 
-/**
- * Handle incoming UDP packet
- */
-async function handlePacket(
-  state: ServerState,
-  data: Buffer,
-  rinfo: RemoteInfo
-): Promise<void> {
-  if (data.length < 2) {
-    return; // Too short to be valid
+  async function setupPubSubSubscriptions(): Promise<void> {
+    // Subscribe to server shutdown notifications from other servers
+    await pubsub.subscribe('server:shutdown', (message: unknown) => {
+      const shutdown = message as ServerShutdownMessage;
+      if (shutdown.serverType === 'game') {
+        console.log(
+          `[ConnectionServer] Game server ${shutdown.serverId} shut down`,
+        );
+      }
+    });
+
+    // Subscribe to broadcast messages
+    await pubsub.subscribe('broadcast:all', (message: unknown) => {
+      console.log('[ConnectionServer] Received broadcast:', message);
+    });
   }
 
-  try {
-    const packet = deserialize(new Uint8Array(data));
-    await processPacket(state, packet, rinfo);
-  } catch (error) {
-    console.error(`[Server] Failed to deserialize packet from ${rinfo.address}:${rinfo.port}:`, error);
-  }
-}
+  // -------------------------------------------------------
+  // Periodic tasks
+  // -------------------------------------------------------
 
-/**
- * Process a deserialized SOE packet
- */
-async function processPacket(
-  state: ServerState,
-  packet: SoePacket,
-  rinfo: RemoteInfo
-): Promise<void> {
-  switch (packet.opcode) {
-    case SoeOpcode.SessionRequest:
-      await handleSessionRequest(state, packet as SessionRequestPacket, rinfo);
-      break;
-
-    case SoeOpcode.Disconnect:
-      await handleDisconnectPacket(state, rinfo);
-      break;
-
-    case SoeOpcode.Ping:
-      await handlePing(state, rinfo);
-      break;
-
-    case SoeOpcode.NetStatusRequest:
-      await handleNetStatusRequest(state, rinfo);
-      break;
-
-    case SoeOpcode.Data:
-      await handleDataPacket(state, packet as DataPacket, rinfo);
-      break;
-
-    case SoeOpcode.Ack:
-      // Acknowledgements - update session activity
-      await updateSessionActivity(state, rinfo);
-      break;
-
-    default:
-      // Unknown or unhandled opcode
-      console.log(`[Server] Unhandled opcode 0x${packet.opcode.toString(16)} from ${rinfo.address}:${rinfo.port}`);
-  }
-}
-
-/**
- * Handle session request (new connection)
- */
-async function handleSessionRequest(
-  state: ServerState,
-  packet: SessionRequestPacket,
-  rinfo: RemoteInfo
-): Promise<void> {
-  console.log(`[Server] Session request from ${rinfo.address}:${rinfo.port} (connId: ${packet.connectionId})`);
-
-  // Create new session
-  const session = state.connectionHandler.handleNewConnection(
-    packet.connectionId,
-    rinfo.address,
-    rinfo.port
-  );
-
-  // Generate CRC seed for this session
-  const crcSeed = Math.floor(Math.random() * 0xffffffff);
-
-  // Send session response
-  const response = createSessionResponse(
-    packet.connectionId,
-    crcSeed,
-    SoeProtocolDefaults.UDP_MAX_SIZE,
-    {
-      useCompression: true,
-      encryptionFlag: 0,
-    }
-  );
-
-  const responseData = serialize(response);
-  await state.udpServer.send(Buffer.from(responseData), rinfo.address, rinfo.port);
-
-  console.log(`[Server] Session established for ${rinfo.address}:${rinfo.port}`);
-}
-
-/**
- * Handle disconnect packet
- */
-async function handleDisconnectPacket(state: ServerState, rinfo: RemoteInfo): Promise<void> {
-  const session = state.connectionHandler.getSession(rinfo.address, rinfo.port);
-  if (session) {
-    await state.connectionHandler.handleDisconnect(session, 'client_disconnect');
-  }
-}
-
-/**
- * Handle ping packet
- */
-async function handlePing(state: ServerState, rinfo: RemoteInfo): Promise<void> {
-  await updateSessionActivity(state, rinfo);
-
-  // Send ping response
-  const pong = createPing();
-  const responseData = serialize(pong);
-  await state.udpServer.send(Buffer.from(responseData), rinfo.address, rinfo.port);
-}
-
-/**
- * Handle net status request
- */
-async function handleNetStatusRequest(state: ServerState, rinfo: RemoteInfo): Promise<void> {
-  await updateSessionActivity(state, rinfo);
-  // In a full implementation, we'd send a NetStatusResponse with actual statistics
-}
-
-/**
- * Handle data packet (contains SWG protocol messages)
- */
-async function handleDataPacket(
-  state: ServerState,
-  packet: DataPacket,
-  rinfo: RemoteInfo
-): Promise<void> {
-  const session = state.connectionHandler.getSession(rinfo.address, rinfo.port);
-  if (!session) {
-    console.log(`[Server] Data packet from unknown session ${rinfo.address}:${rinfo.port}`);
-    return;
+  function runHeartbeatCheck(): void {
+    if (!isRunning) return;
+    connectionHandler.disconnectIdleSessions().catch((error) => {
+      console.error('[ConnectionServer] Error in heartbeat check:', error);
+    });
   }
 
-  session.lastActivity = Date.now();
-
-  // The data payload contains SWG protocol messages
-  // In a full implementation, we'd parse the SWG message type and route accordingly
-  // For now, we'll handle basic message types
-
-  // The first bytes of the data indicate the SWG message type
-  // This is where session token validation and character selection would be handled
-
-  await handleSwgMessage(state, session, packet.data, rinfo);
-}
-
-/**
- * Handle SWG protocol message within a data packet
- */
-async function handleSwgMessage(
-  state: ServerState,
-  session: ClientSession,
-  data: Uint8Array,
-  rinfo: RemoteInfo
-): Promise<void> {
-  if (data.length < 4) {
-    return; // Too short for a valid SWG message
+  function runPruneTask(): void {
+    if (!isRunning) return;
+    routingHandler.pruneStaleServers();
   }
 
-  // SWG messages have a 4-byte type identifier
-  // In a full implementation, we'd use the message registry from @swg/protocol
-
-  // For demonstration, we'll handle token validation messages
-  // The client would send a token after session establishment
-
-  // Check session state and route message appropriately
-  switch (session.state) {
-    case SessionState.Connecting:
-      // Expecting session token for validation
-      await handleTokenValidation(state, session, data, rinfo);
-      break;
-
-    case SessionState.Authenticated:
-      // Expecting character selection
-      // In a full implementation, parse character selection message
-      console.log(`[Server] Received message from authenticated session ${session.accountId}`);
-      break;
-
-    case SessionState.CharacterSelected:
-    case SessionState.Routed:
-      // Forward to game server or handle game messages
-      console.log(`[Server] Received game message from ${session.accountId}`);
-      break;
-
-    default:
-      console.log(`[Server] Message in unexpected state: ${session.state}`);
-  }
-}
-
-/**
- * Handle token validation message
- */
-async function handleTokenValidation(
-  state: ServerState,
-  session: ClientSession,
-  data: Uint8Array,
-  rinfo: RemoteInfo
-): Promise<void> {
-  // In a real implementation, the token would be extracted from the SWG message format
-  // For now, we'll treat the data as a raw token string
-  const token = new TextDecoder().decode(data).trim();
-
-  if (!token || token.length === 0) {
-    console.log(`[Server] Empty token from ${rinfo.address}:${rinfo.port}`);
-    await disconnectClient(state, session, DisconnectReason.Application);
-    return;
-  }
-
-  // Validate the token
-  const result = await state.connectionHandler.validateSession(token);
-
-  if (!result.valid || !result.session) {
-    console.log(`[Server] Invalid token from ${rinfo.address}:${rinfo.port}: ${result.error}`);
-    await disconnectClient(state, session, DisconnectReason.Application);
-    return;
-  }
-
-  // Authenticate the session
-  await state.connectionHandler.authenticateSession(session, token, result.session);
-
-  console.log(`[Server] Session validated for account ${result.session.accountId}`);
-
-  // In a full implementation, we'd send a success message to the client
-  // and wait for character selection
-}
-
-/**
- * Disconnect a client
- */
-async function disconnectClient(
-  state: ServerState,
-  session: ClientSession,
-  reason: number
-): Promise<void> {
-  // Send disconnect packet
-  const disconnectPacket = createDisconnect(session.connectionId, reason);
-  const data = serialize(disconnectPacket);
-  await state.udpServer.send(Buffer.from(data), session.address, session.port);
-
-  // Clean up session
-  await state.connectionHandler.handleDisconnect(session, `reason_${reason}`);
-}
-
-/**
- * Update session activity timestamp
- */
-async function updateSessionActivity(state: ServerState, rinfo: RemoteInfo): Promise<void> {
-  const session = state.connectionHandler.getSession(rinfo.address, rinfo.port);
-  if (session) {
-    await state.connectionHandler.handleHeartbeat(session);
-  }
-}
-
-/**
- * Run periodic heartbeat check
- */
-function runHeartbeatCheck(state: ServerState): void {
-  if (!state.isRunning) return;
-
-  state.connectionHandler.disconnectIdleSessions().catch((error) => {
-    console.error('[Server] Error in heartbeat check:', error);
-  });
-}
-
-/**
- * Run periodic server prune task
- */
-function runPruneTask(state: ServerState): void {
-  if (!state.isRunning) return;
-
-  state.routingHandler.pruneStaleServers();
-}
-
-/**
- * Get server statistics
- */
-function getServerStats(state: ServerState): ConnectionServerStats {
-  const networkStats = state.udpServer.getStats();
+  // -------------------------------------------------------
+  // Server lifecycle
+  // -------------------------------------------------------
 
   return {
-    activeSessions: state.connectionHandler.getSessionCount(),
-    network: {
-      bytesReceived: networkStats.bytesReceived,
-      bytesSent: networkStats.bytesSent,
-      packetsReceived: networkStats.packetsReceived,
-      packetsSent: networkStats.packetsSent,
-      uptime: networkStats.uptime,
+    async start(): Promise<void> {
+      if (isRunning) {
+        throw new Error('Server is already running');
+      }
+
+      console.log('[ConnectionServer] Connecting to Redis...');
+      const redis = getRedisClient();
+      await redis.connect();
+      console.log('[ConnectionServer] Redis connected');
+
+      // Initialize routing handler (subscribes to game server updates)
+      await routingHandler.initialize();
+
+      // Register default game servers
+      const defaultGameServer: GameServerInfo = {
+        serverId: 'gameserver-1',
+        address: '127.0.0.1',
+        port: 44463,
+        scenes: [
+          'tatooine',
+          'naboo',
+          'corellia',
+          'dantooine',
+          'dathomir',
+          'endor',
+          'lok',
+          'rori',
+          'talus',
+          'yavin4',
+          'tutorial',
+        ],
+        playerCount: 0,
+        maxPlayers: 3000,
+        status: GameServerStatus.Online,
+        lastHeartbeat: Date.now(),
+      };
+      routingHandler.registerGameServer(defaultGameServer);
+
+      // Set up pub/sub subscriptions
+      await setupPubSubSubscriptions();
+
+      // Bind UDP server
+      const port = connectionConfig.port ?? 44455;
+      const bindAddress = connectionConfig.bindAddress ?? '0.0.0.0';
+
+      console.log(
+        `[ConnectionServer] Binding UDP server to ${bindAddress}:${port}...`,
+      );
+      await udpServer.bind(port, bindAddress);
+      console.log('[ConnectionServer] UDP server bound');
+
+      // Start SessionManager tick loop (handles timeouts & retransmissions)
+      sessionManager.start();
+
+      // Start periodic tasks
+      heartbeatInterval = setInterval(
+        () => runHeartbeatCheck(),
+        connectionConfig.pingInterval ?? 30000,
+      );
+
+      pruneInterval = setInterval(
+        () => runPruneTask(),
+        60000,
+      );
+
+      startTime = Date.now();
+      isRunning = true;
+
+      console.log(
+        `[ConnectionServer] Started on ${bindAddress}:${port} (id: ${serverId})`,
+      );
     },
-    startTime: state.startTime,
+
+    async stop(): Promise<void> {
+      if (!isRunning) {
+        return;
+      }
+
+      console.log('[ConnectionServer] Shutting down...');
+      isRunning = false;
+
+      // Stop periodic tasks
+      if (heartbeatInterval) {
+        clearInterval(heartbeatInterval);
+        heartbeatInterval = null;
+      }
+
+      if (pruneInterval) {
+        clearInterval(pruneInterval);
+        pruneInterval = null;
+      }
+
+      // Publish shutdown notification
+      try {
+        const shutdownMessage: ServerShutdownMessage = {
+          type: 'server_shutdown',
+          serverId,
+          serverType: 'connection',
+          address: connectionConfig.bindAddress ?? '0.0.0.0',
+          port: connectionConfig.port ?? 44455,
+          timestamp: Date.now(),
+        };
+        await pubsub.publish('server:shutdown', shutdownMessage);
+      } catch (error) {
+        console.error(
+          '[ConnectionServer] Failed to publish shutdown notification:',
+          error,
+        );
+      }
+
+      // Stop SessionManager (stops tick timer)
+      sessionManager.stop();
+
+      // Disconnect all SOE sessions gracefully
+      for (const session of sessionManager.getSessions()) {
+        sessionManager.disconnectSession(session, DisconnectReason.Application);
+      }
+
+      // Clean up all connection sessions
+      for (const key of connectionSessions.keys()) {
+        await cleanupConnectionSession(key);
+      }
+
+      // Destroy SessionManager (clears all internal state)
+      sessionManager.destroy();
+
+      // Clean up connection handler sessions
+      await connectionHandler.cleanup();
+
+      // Clean up routing handler
+      await routingHandler.cleanup();
+
+      // Close pub/sub
+      await pubsub.close();
+
+      // Close UDP server
+      await udpServer.close();
+
+      // Disconnect Redis
+      const redis = getRedisClient();
+      await redis.disconnect();
+
+      console.log('[ConnectionServer] Shutdown complete');
+    },
+
+    getStats(): ConnectionServerStats {
+      return {
+        activeSessions: sessionManager.getSessionCount(),
+        connectionSessions: connectionSessions.size,
+        startTime,
+      };
+    },
   };
 }

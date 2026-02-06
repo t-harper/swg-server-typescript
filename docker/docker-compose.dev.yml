@@ -1,90 +1,151 @@
-version: '3.8'
-
-# Development compose file with hot reload
-# Usage: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+# Star Wars Galaxies Server - Development Docker Compose Override
+# Development-specific configuration with hot reload and debugging
+#
+# Usage: docker compose -f docker-compose.yml -f docker-compose.dev.yml up
 
 services:
-  dev:
-    build:
-      context: ..
-      dockerfile: Dockerfile.dev
-    container_name: swg-dev
-    ports:
-      - "44453:44453/udp"
-      - "44455:44455/udp"
-    environment:
-      DB_HOST: mysql
-      DB_PORT: 3306
-      DB_USER: ${MYSQL_USER:-swg}
-      DB_PASSWORD: ${MYSQL_PASSWORD:-swgpass}
-      DB_NAME: ${MYSQL_DATABASE:-swg}
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-      NODE_ENV: development
-    volumes:
-      - ../packages:/app/packages
-      - ../apps:/app/apps
-      - ../tools:/app/tools
-      - ../tsconfig.json:/app/tsconfig.json
-      - ../turbo.json:/app/turbo.json
-    depends_on:
-      mysql:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    networks:
-      - swg-network
-    stdin_open: true
-    tty: true
+  # =============================================================================
+  # Infrastructure Services - Development Overrides
+  # =============================================================================
 
   mysql:
-    image: mysql:8.0
-    container_name: swg-mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-swgroot}
-      MYSQL_DATABASE: ${MYSQL_DATABASE:-swg}
-      MYSQL_USER: ${MYSQL_USER:-swg}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-swgpass}
+    # Persist data locally for development
+    volumes:
+      - ./data/mysql:/var/lib/mysql
+      - ./init-scripts/mysql:/docker-entrypoint-initdb.d:ro
+    # Expose port for local database tools
     ports:
       - "3306:3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
-      - ./init:/docker-entrypoint-initdb.d
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      timeout: 5s
-      retries: 10
-    networks:
-      - swg-network
 
   redis:
-    image: redis:7-alpine
-    container_name: swg-redis
+    # Persist data locally for development
+    volumes:
+      - ./data/redis:/data
     ports:
       - "6379:6379"
-    volumes:
-      - redis_data:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      timeout: 5s
-      retries: 10
-    networks:
-      - swg-network
+    # No password for development ease
+    command: redis-server --appendonly yes
 
+  # =============================================================================
+  # SWG Server Applications - Development Overrides
+  # =============================================================================
+
+  login-server:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.login-server
+      target: builder
+    environment:
+      NODE_ENV: development
+      LOG_LEVEL: debug
+      DEBUG: "swg:*"
+      REDIS_PASSWORD: ""
+    # Mount source for hot reload
+    volumes:
+      - ../apps/login-server/src:/app/apps/login-server/src:ro
+      - ../packages:/app/packages:ro
+      - ../tsconfig.json:/app/tsconfig.json:ro
+      - ./data/logs/login-server:/app/logs
+    # Override command for development with hot reload
+    command: ["node", "--import", "tsx", "--watch", "apps/login-server/src/index.ts"]
+    # Debug port
+    ports:
+      - "44453:44453/udp"
+      - "9229:9229"
+
+  connection-server:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.connection-server
+      target: builder
+    environment:
+      NODE_ENV: development
+      LOG_LEVEL: debug
+      DEBUG: "swg:*"
+      REDIS_PASSWORD: ""
+    volumes:
+      - ../apps/connection-server/src:/app/apps/connection-server/src:ro
+      - ../packages:/app/packages:ro
+      - ../tsconfig.json:/app/tsconfig.json:ro
+      - ./data/logs/connection-server:/app/logs
+    command: ["node", "--import", "tsx", "--watch", "apps/connection-server/src/index.ts"]
+    ports:
+      - "44455:44455/udp"
+      - "9230:9229"
+
+  chat-server:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.chat-server
+      target: builder
+    environment:
+      NODE_ENV: development
+      LOG_LEVEL: debug
+      DEBUG: "swg:*"
+      REDIS_PASSWORD: ""
+    volumes:
+      - ../apps/chat-server/src:/app/apps/chat-server/src:ro
+      - ../packages:/app/packages:ro
+      - ../tsconfig.json:/app/tsconfig.json:ro
+      - ./data/logs/chat-server:/app/logs
+    command: ["node", "--import", "tsx", "--watch", "apps/chat-server/src/index.ts"]
+    ports:
+      - "44462:44462/tcp"
+      - "9231:9229"
+
+  game-server:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.game-server
+      target: builder
+    environment:
+      NODE_ENV: development
+      LOG_LEVEL: debug
+      DEBUG: "swg:*"
+      REDIS_PASSWORD: ""
+    volumes:
+      - ../apps/game-server/src:/app/apps/game-server/src:ro
+      - ../packages:/app/packages:ro
+      - ../tsconfig.json:/app/tsconfig.json:ro
+      - ./data/logs/game-server:/app/logs
+      - ./data/game:/app/data
+    command: ["node", "--import", "tsx", "--watch", "apps/game-server/src/index.ts"]
+    ports:
+      - "44460:44460/udp"
+      - "9232:9229"
+    # Single instance for development
+    deploy:
+      mode: replicated
+      replicas: 1
+
+  # =============================================================================
+  # Development Tools
+  # =============================================================================
+
+  # Adminer for database management
   adminer:
-    image: adminer
+    image: adminer:latest
     container_name: swg-adminer
+    restart: unless-stopped
     ports:
       - "8080:8080"
+    environment:
+      ADMINER_DEFAULT_SERVER: mysql
     depends_on:
       - mysql
     networks:
       - swg-network
 
-volumes:
-  mysql_data:
-  redis_data:
-
-networks:
-  swg-network:
-    driver: bridge
+  # Redis Commander for Redis management
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: swg-redis-commander
+    restart: unless-stopped
+    environment:
+      REDIS_HOSTS: "local:redis:6379"
+    ports:
+      - "8081:8081"
+    depends_on:
+      - redis
+    networks:
+      - swg-network

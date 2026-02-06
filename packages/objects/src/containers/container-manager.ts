@@ -101,7 +101,7 @@ export class ContainerManager {
       container,
       registeredAt: Date.now(),
       parentContainerId,
-    };
+    } as void;
 
     this.containers.set(container.objectId, registration);
 

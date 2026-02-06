@@ -99,7 +99,7 @@ function generateLeetVariants(word: string): string[] {
 
   // For each character that has leet substitutions
   for (let i = 0; i < word.length; i++) {
-    const char = word[i].toLowerCase();
+    const char = word[i]!.toLowerCase();
     const subs = LEET_SUBSTITUTIONS[char];
 
     if (subs) {

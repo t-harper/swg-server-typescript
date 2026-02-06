@@ -414,35 +414,35 @@ export const Species: Record<string, SpeciesDefinition> = {
 export const TemplateCrcToSpecies: Map<number, { species: SpeciesDefinition; gender: GenderType }> =
   new Map([
     // Human
-    [0x446a2f0e, { species: Species.HUMAN, gender: Gender.MALE }],
-    [0x6b54352e, { species: Species.HUMAN, gender: Gender.FEMALE }],
+    [0x446a2f0e, { species: Species['HUMAN']!, gender: Gender.MALE }],
+    [0x6b54352e, { species: Species['HUMAN']!, gender: Gender.FEMALE }],
     // Rodian
-    [0x90d1bd87, { species: Species.RODIAN, gender: Gender.MALE }],
-    [0xce54f7f8, { species: Species.RODIAN, gender: Gender.FEMALE }],
+    [0x90d1bd87, { species: Species['RODIAN']!, gender: Gender.MALE }],
+    [0xce54f7f8, { species: Species['RODIAN']!, gender: Gender.FEMALE }],
     // Trandoshan
-    [0xea98d92e, { species: Species.TRANDOSHAN, gender: Gender.MALE }],
-    [0xdec49a14, { species: Species.TRANDOSHAN, gender: Gender.FEMALE }],
+    [0xea98d92e, { species: Species['TRANDOSHAN']!, gender: Gender.MALE }],
+    [0xdec49a14, { species: Species['TRANDOSHAN']!, gender: Gender.FEMALE }],
     // Mon Calamari
-    [0xa9f7b0eb, { species: Species.MON_CALAMARI, gender: Gender.MALE }],
-    [0x6c64b681, { species: Species.MON_CALAMARI, gender: Gender.FEMALE }],
+    [0xa9f7b0eb, { species: Species['MON_CALAMARI']!, gender: Gender.MALE }],
+    [0x6c64b681, { species: Species['MON_CALAMARI']!, gender: Gender.FEMALE }],
     // Wookiee
-    [0x5e0b6e4c, { species: Species.WOOKIEE, gender: Gender.MALE }],
-    [0x8b29badb, { species: Species.WOOKIEE, gender: Gender.FEMALE }],
+    [0x5e0b6e4c, { species: Species['WOOKIEE']!, gender: Gender.MALE }],
+    [0x8b29badb, { species: Species['WOOKIEE']!, gender: Gender.FEMALE }],
     // Bothan
-    [0x5bde10ad, { species: Species.BOTHAN, gender: Gender.MALE }],
-    [0xaa75ba0c, { species: Species.BOTHAN, gender: Gender.FEMALE }],
+    [0x5bde10ad, { species: Species['BOTHAN']!, gender: Gender.MALE }],
+    [0xaa75ba0c, { species: Species['BOTHAN']!, gender: Gender.FEMALE }],
     // Twi'lek
-    [0x69d96bba, { species: Species.TWILEK, gender: Gender.MALE }],
-    [0x205cc767, { species: Species.TWILEK, gender: Gender.FEMALE }],
+    [0x69d96bba, { species: Species['TWILEK']!, gender: Gender.MALE }],
+    [0x205cc767, { species: Species['TWILEK']!, gender: Gender.FEMALE }],
     // Zabrak
-    [0x77f0ad9f, { species: Species.ZABRAK, gender: Gender.MALE }],
-    [0x4f93fce9, { species: Species.ZABRAK, gender: Gender.FEMALE }],
+    [0x77f0ad9f, { species: Species['ZABRAK']!, gender: Gender.MALE }],
+    [0x4f93fce9, { species: Species['ZABRAK']!, gender: Gender.FEMALE }],
     // Ithorian
-    [0x4b20d56b, { species: Species.ITHORIAN, gender: Gender.MALE }],
-    [0x78ea01f5, { species: Species.ITHORIAN, gender: Gender.FEMALE }],
+    [0x4b20d56b, { species: Species['ITHORIAN']!, gender: Gender.MALE }],
+    [0x78ea01f5, { species: Species['ITHORIAN']!, gender: Gender.FEMALE }],
     // Sullustan
-    [0x86c0da0c, { species: Species.SULLUSTAN, gender: Gender.MALE }],
-    [0x9d7a1ef1, { species: Species.SULLUSTAN, gender: Gender.FEMALE }],
+    [0x86c0da0c, { species: Species['SULLUSTAN']!, gender: Gender.MALE }],
+    [0x9d7a1ef1, { species: Species['SULLUSTAN']!, gender: Gender.FEMALE }],
   ]);
 
 /**

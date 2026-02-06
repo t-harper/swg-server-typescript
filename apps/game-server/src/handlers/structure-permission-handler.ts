@@ -45,7 +45,7 @@ export interface PermissionSession {
 export interface PermissionHandlerResult {
   success: boolean;
   message: string;
-  errorCode?: PermissionErrorCode;
+  errorCode?: PermissionErrorCode | undefined;
   responseData?: Uint8Array;
 }
 
@@ -86,8 +86,8 @@ export interface StructurePermissionHandlerOptions {
 export class StructurePermissionHandler {
   private readonly permissionService: StructurePermissionService;
   private readonly sessions: Map<bigint, PermissionSession>;
-  private broadcastCallback?: BroadcastCallback;
-  private nameResolver?: NameResolverCallback;
+  private broadcastCallback?: BroadcastCallback | undefined;
+  private nameResolver?: NameResolverCallback | undefined;
   private readonly broadcastRadius: number;
 
   constructor(options: StructurePermissionHandlerOptions) {

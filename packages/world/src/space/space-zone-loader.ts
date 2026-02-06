@@ -12,8 +12,6 @@ import {
   ShipClass,
   type SpaceZoneConfig,
   type SpaceBounds,
-  type AsteroidField,
-  type Nebula,
   type SpaceStation,
   type HyperspaceRoute,
   type SpawnPoint,

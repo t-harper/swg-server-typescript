@@ -12,7 +12,7 @@ import { join } from 'path';
 export class ResourceTreeLoadError extends Error {
   constructor(
     message: string,
-    public readonly cause?: Error
+    public override readonly cause?: Error
   ) {
     super(message);
     this.name = 'ResourceTreeLoadError';

@@ -265,7 +265,7 @@ export class GuildObject {
       joinedAt: Date.now(),
       totalDonated: 0n,
       isOnline: false,
-    };
+    } as GuildOperationResult;
 
     this._members.set(member.characterId, newMember);
     this.markModified();
@@ -1056,7 +1056,7 @@ export class GuildObject {
       targetId,
       details,
       amount,
-    };
+    } as void;
 
     this._activityLog.unshift(entry);
 

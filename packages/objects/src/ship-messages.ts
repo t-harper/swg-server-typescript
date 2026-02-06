@@ -276,7 +276,7 @@ export function createShipDamageMessage(
     hullPercent,
     componentDamaged,
     newConditionState,
-  };
+  } as ShipDamageMessage;
 }
 
 // ============================================
@@ -383,7 +383,7 @@ export function createShipDockingResponseMessage(
     approved,
     dockingBay,
     errorMessage,
-  };
+  } as ShipDockingMessage;
 }
 
 /**
@@ -404,7 +404,7 @@ export function createShipDockingStateMessage(
     isRequest: false,
     approved: true,
     dockingBay,
-  };
+  } as ShipDockingMessage;
 }
 
 // ============================================
@@ -456,7 +456,7 @@ export function createShipWeaponFireMessage(
     hit,
     damage,
     weaponGroup,
-  };
+  } as ShipWeaponFireMessage;
 }
 
 // ============================================
@@ -504,7 +504,7 @@ export function createShipTargetUpdateMessage(
     targetFaction,
     targetDistance,
     targetHullPercent,
-  };
+  } as ShipTargetUpdateMessage;
 }
 
 // ============================================

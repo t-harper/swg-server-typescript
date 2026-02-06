@@ -110,8 +110,8 @@ export function parseLairTemplate(json: unknown): LairParseResult {
 
   // Parse spawn behavior
   let spawnBehavior: LairSpawnBehavior | undefined;
-  if (raw.spawnBehavior !== undefined) {
-    spawnBehavior = parseSpawnBehavior(raw.spawnBehavior as string);
+  if (raw['spawnBehavior'] !== undefined) {
+    spawnBehavior = parseSpawnBehavior(raw['spawnBehavior'] as string);
   }
 
   // Build the template

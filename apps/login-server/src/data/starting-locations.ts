@@ -378,7 +378,7 @@ export function getStartingLocationsByPlanet(planet: PlanetType): StartingLocati
  * Get the tutorial starting location
  */
 export function getTutorialLocation(): StartingLocation {
-  return StartingLocations.TUTORIAL;
+  return StartingLocations['TUTORIAL']!;
 }
 
 /**
@@ -402,7 +402,7 @@ export function isValidStartingLocation(locationId: string): boolean {
  * Get the default starting location (tutorial)
  */
 export function getDefaultStartingLocation(): StartingLocation {
-  return StartingLocations.TUTORIAL;
+  return StartingLocations['TUTORIAL']!;
 }
 
 /**

@@ -1313,3 +1313,12 @@ export {
   requiresPilotPrivilege,
   requiresGunnerPrivilege,
 } from './ship-messages.js';
+
+// Template CRC lookup system
+export {
+  calculateTemplateCrc,
+  TemplateCrc,
+  getTemplateCrc,
+  getTemplatePathFromCrc,
+  DEFAULT_PLAYER_TEMPLATE_CRC,
+} from './template-crc.js';

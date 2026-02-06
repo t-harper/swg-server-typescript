@@ -41,9 +41,9 @@ export interface PermissionOperationResult {
   /** Human-readable message */
   message: string;
   /** Error code if failed */
-  errorCode?: PermissionErrorCode;
+  errorCode?: PermissionErrorCode | undefined;
   /** Additional data */
-  data?: Record<string, unknown>;
+  data?: Record<string, unknown> | undefined;
 }
 
 /**
@@ -65,7 +65,7 @@ export interface EffectivePermissions {
   /** Is banned */
   isBanned: boolean;
   /** Raw permission set if on permission list */
-  permissions?: Set<BuildingPermission>;
+  permissions?: Set<BuildingPermission> | undefined;
 }
 
 /**

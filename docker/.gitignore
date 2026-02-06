@@ -1,0 +1,19 @@
+# Docker deployment gitignore
+
+# Environment files with actual secrets
+.env
+!.env.example
+
+# Secret files
+secrets/*.txt
+!secrets/.gitkeep
+
+# Local data directories
+data/
+
+# Log files
+*.log
+logs/
+
+# Docker build cache
+.docker-cache/

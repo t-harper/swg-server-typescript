@@ -92,7 +92,7 @@ export function createVendorBrowseMessage(
     pageSize,
     sortBy,
     sortOrder,
-  };
+  } as VendorBrowseMessage;
 }
 
 /**
@@ -171,7 +171,7 @@ export function createVendorBrowseResponse(
     maintenanceStatus,
     creditBalance,
     timestamp: Date.now(),
-  };
+  } as VendorBrowseResponseMessage;
 }
 
 // ============================================
@@ -248,7 +248,7 @@ export function createVendorBuyResponse(
     pricePaid,
     newBalance,
     timestamp: Date.now(),
-  };
+  } as VendorBuyResponseMessage;
 }
 
 // ============================================
@@ -286,7 +286,7 @@ export function createVendorAddItemMessage(
     itemId,
     price,
     description,
-  };
+  } as VendorAddItemMessage;
 }
 
 /**
@@ -329,7 +329,7 @@ export function createVendorAddItemResponse(
     inventoryCount,
     maxInventorySize,
     timestamp: Date.now(),
-  };
+  } as VendorAddItemResponseMessage;
 }
 
 // ============================================
@@ -398,7 +398,7 @@ export function createVendorRemoveItemResponse(
     itemId,
     inventoryCount,
     timestamp: Date.now(),
-  };
+  } as VendorRemoveItemResponseMessage;
 }
 
 // ============================================
@@ -471,7 +471,7 @@ export function createVendorWithdrawResponse(
     remainingBalance,
     playerBalance,
     timestamp: Date.now(),
-  };
+  } as VendorWithdrawResponseMessage;
 }
 
 // ============================================
@@ -513,7 +513,7 @@ export function createVendorStatusMessage(
     vendorName,
     description,
     searchEnabled,
-  };
+  } as VendorStatusMessage;
 }
 
 /**
@@ -560,7 +560,7 @@ export function createVendorStatusResponse(
     description,
     searchEnabled,
     timestamp: Date.now(),
-  };
+  } as VendorStatusResponseMessage;
 }
 
 // ============================================
@@ -633,7 +633,7 @@ export function createVendorUpdatePriceResponse(
     itemId,
     newPrice,
     timestamp: Date.now(),
-  };
+  } as VendorUpdatePriceResponseMessage;
 }
 
 // ============================================
@@ -702,7 +702,7 @@ export function createVendorAddMaintenanceResponse(
     maintenanceStatus,
     playerBalance,
     timestamp: Date.now(),
-  };
+  } as VendorAddMaintenanceResponseMessage;
 }
 
 // ============================================

@@ -152,7 +152,7 @@ export function createGuildCreateResponse(
     guildId,
     guildName,
     timestamp: Date.now(),
-  };
+  } as GuildCreateResponseMessage;
 }
 
 /**
@@ -209,7 +209,7 @@ export function createGuildDisbandResponse(
     success,
     errorMessage,
     timestamp: Date.now(),
-  };
+  } as GuildDisbandResponseMessage;
 }
 
 // ============================================
@@ -277,7 +277,7 @@ export function createGuildInviteResponse(
     success,
     errorMessage,
     timestamp: Date.now(),
-  };
+  } as GuildInviteResponseMessage;
 }
 
 /**
@@ -335,7 +335,7 @@ export function createGuildJoinResponse(
     guildName,
     rank,
     timestamp: Date.now(),
-  };
+  } as GuildJoinResponseMessage;
 }
 
 /**
@@ -385,7 +385,7 @@ export function createGuildLeaveResponse(
     success,
     errorMessage,
     timestamp: Date.now(),
-  };
+  } as GuildLeaveResponseMessage;
 }
 
 // ============================================
@@ -419,7 +419,7 @@ export function createGuildKickMessage(
     timestamp: Date.now(),
     targetId,
     reason,
-  };
+  } as GuildKickMessage;
 }
 
 /**
@@ -453,7 +453,7 @@ export function createGuildKickResponse(
     success,
     errorMessage,
     timestamp: Date.now(),
-  };
+  } as GuildKickResponseMessage;
 }
 
 /**
@@ -517,7 +517,7 @@ export function createGuildPromoteResponse(
     errorMessage,
     newRank,
     timestamp: Date.now(),
-  };
+  } as GuildPromoteResponseMessage;
 }
 
 /**
@@ -581,7 +581,7 @@ export function createGuildDemoteResponse(
     errorMessage,
     newRank,
     timestamp: Date.now(),
-  };
+  } as GuildDemoteResponseMessage;
 }
 
 // ============================================
@@ -642,7 +642,7 @@ export function createGuildSetMotdResponse(
     success,
     errorMessage,
     timestamp: Date.now(),
-  };
+  } as GuildSetMotdResponseMessage;
 }
 
 /**
@@ -743,7 +743,7 @@ export function createGuildDepositResponse(
     newBalance,
     playerBalance,
     timestamp: Date.now(),
-  };
+  } as GuildDepositResponseMessage;
 }
 
 /**
@@ -812,7 +812,7 @@ export function createGuildWithdrawResponse(
     newBalance,
     playerBalance,
     timestamp: Date.now(),
-  };
+  } as GuildWithdrawResponseMessage;
 }
 
 // ============================================
@@ -880,7 +880,7 @@ export function createGuildWarDeclareResponse(
     errorMessage,
     targetGuildName,
     timestamp: Date.now(),
-  };
+  } as GuildWarDeclareResponseMessage;
 }
 
 /**
@@ -940,7 +940,7 @@ export function createGuildWarAcceptResponse(
     success,
     errorMessage,
     timestamp: Date.now(),
-  };
+  } as GuildWarAcceptResponseMessage;
 }
 
 // ============================================
@@ -1008,7 +1008,7 @@ export function createGuildMemberListResponse(
     totalMembers: members.length,
     onlineMembers,
     timestamp: Date.now(),
-  };
+  } as GuildMemberListMessage;
 }
 
 /**
@@ -1109,7 +1109,7 @@ export function createGuildInfoResponse(
     wars,
     allyCount,
     timestamp: Date.now(),
-  };
+  } as GuildInfoMessage;
 }
 
 // ============================================

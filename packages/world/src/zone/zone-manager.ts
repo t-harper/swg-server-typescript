@@ -177,7 +177,7 @@ export class ZoneManager {
    * Loads zone data (static objects, regions, etc.).
    * Override this in production to load from database/files.
    */
-  protected async loadZoneData(zone: Zone, config: ZoneConfig): Promise<void> {
+  protected async loadZoneData(_zone: Zone, _config: ZoneConfig): Promise<void> {
     // Base implementation does nothing
     // Subclasses can override to load actual data
   }
@@ -411,7 +411,7 @@ export class ZoneManager {
     const status: ZoneLoadStatus[] = [];
 
     // Include all configured zones
-    for (const [sceneId, config] of Object.entries(ZONE_CONFIGS)) {
+    for (const [sceneId, _config] of Object.entries(ZONE_CONFIGS)) {
       const zone = this.zones.get(sceneId);
       status.push({
         sceneId,

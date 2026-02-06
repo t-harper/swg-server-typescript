@@ -370,7 +370,7 @@ export class PlayerVendor extends TangibleObject {
       price: Math.max(1, Math.floor(price)),
       description,
       listedAt: new Date(),
-    };
+    } as boolean;
 
     this.inventory.set(itemId, vendorItem);
     this.deltaTrackerVndr.trackChange(VndrProperty.INVENTORY, DeltaType.Add);

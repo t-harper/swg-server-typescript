@@ -3,6 +3,9 @@
  * Shared TypeScript interfaces and types for the SWG server
  */
 
+// Object Pooling System
+export * from './pooling/index.js';
+
 // Network Types
 export interface NetworkAddress {
   address: string;

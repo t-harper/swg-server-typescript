@@ -10,7 +10,7 @@
  */
 
 import type { ObjectId, Vector3 } from '@swg/shared-types';
-import type { SpaceZoneId, HyperspaceRoute } from '@swg/world/src/space/space-types.js';
+import type { SpaceZoneId, HyperspaceRoute } from '@swg/world';
 import { NavComputerStatus } from './hyperspace-types.js';
 
 // ============================================

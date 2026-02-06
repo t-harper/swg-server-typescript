@@ -308,7 +308,7 @@ export interface CitizenRecord {
   /** Timestamp when citizen joined */
   joinedAt: Date;
   /** Object ID of candidate voted for in current election */
-  votedFor?: ObjectId;
+  votedFor?: ObjectId | undefined;
 }
 
 /**

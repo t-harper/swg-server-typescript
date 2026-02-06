@@ -3,7 +3,7 @@
  * Provides a singleton Redis client with connection management
  */
 
-import Redis, { type RedisOptions } from 'ioredis';
+import { Redis, type RedisOptions } from 'ioredis';
 
 /**
  * Configuration options for the Redis client
@@ -11,7 +11,7 @@ import Redis, { type RedisOptions } from 'ioredis';
 export interface RedisClientConfig {
   host?: string;
   port?: number;
-  password?: string;
+  password?: string | undefined;
   db?: number;
   keyPrefix?: string;
   maxRetriesPerRequest?: number;
@@ -61,7 +61,7 @@ export class RedisClient {
       host: this.config.host,
       port: this.config.port,
       db: this.config.db,
-      keyPrefix: this.config.keyPrefix || undefined,
+      ...(this.config.keyPrefix ? { keyPrefix: this.config.keyPrefix } : {}),
       maxRetriesPerRequest: this.config.maxRetriesPerRequest,
       enableReadyCheck: this.config.enableReadyCheck,
       lazyConnect: this.config.lazyConnect,

@@ -6,6 +6,7 @@
 import {
   bigint,
   boolean,
+  customType,
   datetime,
   float,
   index,
@@ -13,9 +14,14 @@ import {
   mysqlTable,
   tinyint,
   varchar,
-  blob,
 } from 'drizzle-orm/mysql-core';
 import { relations, sql } from 'drizzle-orm';
+
+const blob = customType<{ data: Buffer; driverData: Buffer }>({
+  dataType() {
+    return 'blob';
+  },
+});
 
 /**
  * Objects table schema
@@ -67,13 +73,13 @@ export const objects = mysqlTable(
     /** Last update timestamp */
     updatedAt: datetime('updated_at').notNull().default(sql`CURRENT_TIMESTAMP`),
   },
-  (table) => [
-    index('idx_objects_template_crc').on(table.templateCrc),
-    index('idx_objects_type_id').on(table.typeId),
-    index('idx_objects_container_id').on(table.containerId),
-    index('idx_objects_scene_id').on(table.sceneId),
-    index('idx_objects_scene_position').on(table.sceneId, table.x, table.z),
-  ]
+  (table) => ({
+    templateCrcIdx: index('idx_objects_template_crc').on(table.templateCrc),
+    typeIdIdx: index('idx_objects_type_id').on(table.typeId),
+    containerIdIdx: index('idx_objects_container_id').on(table.containerId),
+    sceneIdIdx: index('idx_objects_scene_id').on(table.sceneId),
+    scenePositionIdx: index('idx_objects_scene_position').on(table.sceneId, table.x, table.z),
+  })
 );
 
 /**
@@ -163,11 +169,11 @@ export const objectCreatures = mysqlTable(
     /** Current target object ID */
     targetId: bigint('target_id', { mode: 'bigint' }),
   },
-  (table) => [
-    index('idx_object_creatures_species').on(table.speciesId),
-    index('idx_object_creatures_level').on(table.level),
-    index('idx_object_creatures_faction').on(table.faction),
-  ]
+  (table) => ({
+    speciesIdx: index('idx_object_creatures_species').on(table.speciesId),
+    levelIdx: index('idx_object_creatures_level').on(table.level),
+    factionIdx: index('idx_object_creatures_faction').on(table.faction),
+  })
 );
 
 /**
@@ -192,11 +198,11 @@ export const objectDirtyTracking = mysqlTable(
     /** Dirty properties JSON array */
     dirtyProperties: varchar('dirty_properties', { length: 1000 }),
   },
-  (table) => [
-    index('idx_dirty_tracking_base').on(table.baseObjectDirty),
-    index('idx_dirty_tracking_tangible').on(table.tangibleDirty),
-    index('idx_dirty_tracking_creature').on(table.creatureDirty),
-  ]
+  (table) => ({
+    baseDirtyIdx: index('idx_dirty_tracking_base').on(table.baseObjectDirty),
+    tangibleDirtyIdx: index('idx_dirty_tracking_tangible').on(table.tangibleDirty),
+    creatureDirtyIdx: index('idx_dirty_tracking_creature').on(table.creatureDirty),
+  })
 );
 
 /**

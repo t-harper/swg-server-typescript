@@ -38,7 +38,8 @@
   "dependencies": {
     "@swg/objects": "workspace:*",
     "@swg/protocol": "workspace:*",
-    "@swg/shared-types": "workspace:*"
+    "@swg/shared-types": "workspace:*",
+    "@swg/world": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.7.0",

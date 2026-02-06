@@ -52,7 +52,7 @@ export interface BulkLoadResult {
 export class QuestLoadError extends Error {
   constructor(
     message: string,
-    public readonly cause?: Error
+    public override readonly cause?: Error
   ) {
     super(message);
     this.name = 'QuestLoadError';

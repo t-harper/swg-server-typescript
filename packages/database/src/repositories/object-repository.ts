@@ -97,12 +97,12 @@ export class ObjectRepository {
 
       if (existing.length > 0) {
         // Update existing object
+        const updateData = updateTimestamp
+          ? { ...objectData, updatedAt: now }
+          : { ...objectData };
         await tx
           .update(objects)
-          .set({
-            ...objectData,
-            updatedAt: updateTimestamp ? now : undefined,
-          })
+          .set(updateData)
           .where(eq(objects.objectId, object.objectId));
       } else {
         // Insert new object
@@ -231,6 +231,7 @@ export class ObjectRepository {
     }
 
     const baseRow = baseRows[0];
+    if (!baseRow) return null;
     const row: ObjectWithRelations = { ...baseRow };
 
     // Load type-specific data
@@ -422,12 +423,12 @@ export class ObjectRepository {
           .limit(1);
 
         if (existing.length > 0) {
+          const updateData = updateTimestamp
+            ? { ...objectData, updatedAt: now }
+            : { ...objectData };
           await tx
             .update(objects)
-            .set({
-              ...objectData,
-              updatedAt: updateTimestamp ? now : undefined,
-            })
+            .set(updateData)
             .where(eq(objects.objectId, object.objectId));
         } else {
           const newObject: NewObject = {
@@ -531,6 +532,7 @@ export class ObjectRepository {
     }
 
     const row = rows[0];
+    if (!row) return null;
     return {
       objectId: row.objectId,
       baseObjectDirty: row.baseObjectDirty,
@@ -643,15 +645,26 @@ export class ObjectRepository {
     newContainerId: bigint | null,
     slotArrangement: number = -1
   ): Promise<void> {
-    await this.db
-      .update(objects)
-      .set({
-        containerId: newContainerId,
-        slotArrangement,
-        sceneId: newContainerId ? null : undefined,
-        updatedAt: new Date(),
-      })
-      .where(eq(objects.objectId, objectId));
+    if (newContainerId) {
+      await this.db
+        .update(objects)
+        .set({
+          containerId: newContainerId,
+          slotArrangement,
+          sceneId: null,
+          updatedAt: new Date(),
+        })
+        .where(eq(objects.objectId, objectId));
+    } else {
+      await this.db
+        .update(objects)
+        .set({
+          containerId: newContainerId,
+          slotArrangement,
+          updatedAt: new Date(),
+        })
+        .where(eq(objects.objectId, objectId));
+    }
   }
 
   /**

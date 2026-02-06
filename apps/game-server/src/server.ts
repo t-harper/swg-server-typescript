@@ -21,7 +21,25 @@ import {
   ZoneMessageOpcode,
   deserializeCmdSceneReady,
   isZoneMessageOpcode,
+  createCmdStartScene,
+  serializeCmdStartScene,
+  createSceneCreateObjectByCrc,
+  serializeSceneCreateObjectByCrc,
+  createSceneEndBaselines,
+  serializeSceneEndBaselines,
+  createServerTimeMessage,
+  serializeServerTimeMessage,
+  getTerrainFileName,
 } from '@swg/protocol/swg/messages/zone-messages.js';
+import {
+  ConnectionMessageOpcode,
+  deserializeClientIdMsg,
+} from '@swg/protocol/swg/messages/connection-messages.js';
+import {
+  PlayerObject as PlayerObjectClass,
+  TemplateCrc,
+} from '@swg/objects';
+import { Posture } from '@swg/protocol';
 
 import {
   MovementHandler,
@@ -29,6 +47,11 @@ import {
   type GameSession,
   type PlayerObject,
 } from './handlers/movement-handler.js';
+import {
+  sendCreatureBaselines,
+  sendPlayerBaselines,
+  type SendReliable,
+} from './services/baseline-sender.js';
 import {
   ZoneService,
   createZoneService,
@@ -75,10 +98,9 @@ export async function createServer(config: ServerConfig): Promise<GameServer> {
   const characterRepository = new CharacterRepository(db);
   const objectRepository = new ObjectRepository(db);
 
-  // Create session store
+  // Create session store (uses default prefix 'session:' matching all servers)
   const sessionStore = new SessionStore(redisClient, {
     defaultTtlSeconds: config.gameServer?.sessionTimeout ?? 3600,
-    keyPrefix: 'game:session:',
   });
 
   // Create zone service
@@ -135,6 +157,196 @@ export async function createServer(config: ServerConfig): Promise<GameServer> {
   }
 
   /**
+   * Handle ClientIdMsg - validates session token and initiates zone-in
+   */
+  async function handleClientIdMsg(
+    soeSession: Session,
+    data: Uint8Array
+  ): Promise<void> {
+    const clientKey = soeSession.getKey();
+    console.log(`[GameServer] ClientIdMsg from ${clientKey}`);
+
+    // Deserialize the message using the protocol deserializer
+    const message = deserializeClientIdMsg(data);
+
+    // Convert token bytes to hex string for Redis lookup
+    const token = Array.from(message.token)
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('');
+
+    // Validate session via Redis
+    const sessionData = await sessionStore.getSession(token);
+    if (!sessionData) {
+      console.log(`[GameServer] Invalid token from ${clientKey}`);
+      sessionManager.disconnectSession(soeSession, DisconnectReason.Application);
+      return;
+    }
+
+    const characterId = sessionData.characterId;
+    if (!characterId) {
+      console.log(`[GameServer] No character selected for ${clientKey}`);
+      sessionManager.disconnectSession(soeSession, DisconnectReason.Application);
+      return;
+    }
+
+    // Load character from database with all related data
+    const character = await characterRepository.findByIdWithRelations(characterId);
+    if (!character) {
+      console.log(`[GameServer] Character ${characterId} not found`);
+      sessionManager.disconnectSession(soeSession, DisconnectReason.Application);
+      return;
+    }
+
+    console.log(
+      `[GameServer] Loading character ${character.name} (${characterId}) for account ${sessionData.accountId}`
+    );
+
+    // Build in-memory CreatureObject / PlayerObject for baselines
+    const playerObj = new PlayerObjectClass(characterId, TemplateCrc.HUMAN_MALE);
+    playerObj.objectNameStfFile = 'string_name';
+    playerObj.objectNameStfName = character.name;
+    playerObj.sceneId = character.sceneId;
+    playerObj.position = {
+      x: character.x ?? 0,
+      y: character.y ?? 0,
+      z: character.z ?? 0,
+    };
+    playerObj.orientation = {
+      x: character.orientationX ?? 0,
+      y: character.orientationY ?? 0,
+      z: character.orientationZ ?? 0,
+      w: character.orientationW ?? 1,
+    };
+    playerObj.accountId = BigInt(sessionData.accountId);
+
+    // Populate skills from DB
+    if (character.skills) {
+      for (const skill of character.skills) {
+        playerObj.addSkill(skill.skillName);
+      }
+    }
+
+    // Populate experience from DB
+    if (character.experience) {
+      for (const xp of character.experience) {
+        playerObj.setExperience(xp.experienceType, xp.amount);
+      }
+    }
+
+    // Start a new play session
+    playerObj.startSession();
+
+    // Build the movement-handler PlayerObject (lightweight position tracker)
+    const movementPlayerObj: PlayerObject = {
+      objectId: characterId,
+      characterId,
+      name: character.name,
+      position: {
+        x: character.x ?? 0,
+        y: character.y ?? 0,
+        z: character.z ?? 0,
+      },
+      yaw: 0,
+      posture: Posture.UPRIGHT,
+      speed: 0,
+      movementState: movementHandler.getValidator().createInitialState(
+        { x: character.x ?? 0, y: character.y ?? 0, z: character.z ?? 0 },
+        1.0
+      ),
+      speciesModifier: 1.0,
+      zoneId: character.sceneId,
+      gridX: Math.floor((character.x ?? 0) / 64),
+      gridZ: Math.floor((character.z ?? 0) / 64),
+    };
+
+    // Create the send callback
+    const sendCallback = (packet: Uint8Array) => {
+      sessionManager.sendReliable(soeSession, packet);
+    };
+
+    // Create game session
+    const gameSession: GameSession = {
+      sessionId: soeSession.sessionId,
+      address: soeSession.clientAddress.address,
+      port: soeSession.clientAddress.port,
+      authenticated: true,
+      accountId: sessionData.accountId,
+      characterId,
+      player: movementPlayerObj,
+      sendCallback,
+    };
+
+    gameSessions.set(clientKey, gameSession);
+    playerObjects.set(characterId, movementPlayerObj);
+
+    // Register player with movement handler
+    movementHandler.registerPlayer(gameSession, movementPlayerObj);
+
+    // Send the zone-in packet sequence
+    await sendZoneInSequence(gameSession, playerObj, character, sendCallback);
+  }
+
+  /**
+   * Send the full zone-in packet sequence to the client
+   */
+  async function sendZoneInSequence(
+    gameSession: GameSession,
+    playerObj: PlayerObjectClass,
+    character: { sceneId: string; x: number; y: number; z: number; orientationX: number; orientationY: number; orientationZ: number; orientationW: number },
+    send: SendReliable
+  ): Promise<void> {
+    const objectId = playerObj.objectId;
+
+    console.log(
+      `[GameServer] Sending zone-in sequence for ${objectId} to ${character.sceneId} (${character.x}, ${character.y}, ${character.z})`
+    );
+
+    // 1. CmdStartScene - tells the client which terrain to load and where
+    const terrainFile = getTerrainFileName(character.sceneId);
+    const startScene = createCmdStartScene(
+      objectId,
+      terrainFile,
+      character.x,
+      character.y,
+      character.z,
+      playerObj.templateCrc,
+      BigInt(Math.floor(Date.now() / 1000))
+    );
+    send(serializeCmdStartScene(startScene));
+
+    // 2. SceneCreateObjectByCrc - create the player object in the scene
+    const createObject = createSceneCreateObjectByCrc(
+      objectId,
+      playerObj.templateCrc,
+      character.x,
+      character.y,
+      character.z,
+      character.orientationX,
+      character.orientationY,
+      character.orientationZ,
+      character.orientationW,
+      false // not hyperspace
+    );
+    send(serializeSceneCreateObjectByCrc(createObject));
+
+    // 3. CREO baselines (1, 3, 4, 6) - creature state
+    sendCreatureBaselines(playerObj, objectId, send);
+
+    // 4. PLAY baselines (3, 6, 8, 9) - player-specific state
+    sendPlayerBaselines(playerObj, objectId, send);
+
+    // 5. SceneEndBaselines - signals the client that all baselines are sent
+    const endBaselines = createSceneEndBaselines(objectId);
+    send(serializeSceneEndBaselines(endBaselines));
+
+    // 6. ServerTimeMessage - synchronize the server clock
+    const serverTime = createServerTimeMessage(BigInt(Math.floor(Date.now() / 1000)));
+    send(serializeServerTimeMessage(serverTime));
+
+    console.log(`[GameServer] Zone-in sequence sent for ${objectId}`);
+  }
+
+  /**
    * Handle SWG message received from client
    */
   async function handleSwgMessage(
@@ -146,6 +358,18 @@ export async function createServer(config: ServerConfig): Promise<GameServer> {
     if (data.length < 1) {
       console.warn(`[GameServer] SWG message too short from ${clientKey}`);
       return;
+    }
+
+    // Check for ClientIdMsg before requiring an authenticated session.
+    // This is the first message a client sends after connecting.
+    if (data.length >= 4) {
+      const view = new DataView(data.buffer, data.byteOffset, data.byteLength);
+      const opcode = view.getUint32(0, true);
+
+      if (opcode === ConnectionMessageOpcode.ClientIdMsg) {
+        await handleClientIdMsg(soeSession, data);
+        return;
+      }
     }
 
     const session = getGameSession(soeSession);
@@ -255,26 +479,26 @@ export async function createServer(config: ServerConfig): Promise<GameServer> {
   });
 
   // Handle new connections
-  sessionManager.on('session:connected', (session) => {
+  sessionManager.on('session:connected', (session: Session) => {
     const key = session.getKey();
     console.log(`[GameServer] Session connected: ${key}`);
     // Session will be fully initialized when player authenticates
   });
 
   // Handle disconnections
-  sessionManager.on('session:disconnected', (session, reason) => {
+  sessionManager.on('session:disconnected', (session: Session, reason: number) => {
     const key = session.getKey();
     console.log(`[GameServer] Session disconnected: ${key}, reason: ${reason}`);
     void cleanupGameSession(key);
   });
 
   // Handle received data (SWG messages)
-  sessionManager.on('data', (session, data) => {
+  sessionManager.on('data', (session: Session, data: Uint8Array) => {
     void handleSwgMessage(session, data);
   });
 
   // Handle errors
-  sessionManager.on('error', (error, session) => {
+  sessionManager.on('error', (error: Error, session?: Session) => {
     if (session) {
       console.error(`[GameServer] Error for session ${session.getKey()}:`, error);
     } else {

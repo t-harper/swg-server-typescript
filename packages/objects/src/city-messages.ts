@@ -195,7 +195,7 @@ export function createCityStatusMessage(
     treasury,
     foundedAt,
     timestamp: Date.now(),
-  };
+  } as CityStatusMessage;
 }
 
 // ============================================
@@ -264,7 +264,7 @@ export function createCityJoinResponse(
     cityName,
     citizenRank,
     timestamp: Date.now(),
-  };
+  } as CityJoinResponseMessage;
 }
 
 /**
@@ -318,7 +318,7 @@ export function createCityLeaveResponse(
     errorMessage,
     cityName,
     timestamp: Date.now(),
-  };
+  } as CityLeaveResponseMessage;
 }
 
 // ============================================
@@ -387,7 +387,7 @@ export function createCityVoteResponse(
     candidateId,
     candidateName,
     timestamp: Date.now(),
-  };
+  } as CityVoteResponseMessage;
 }
 
 /**
@@ -453,7 +453,7 @@ export function createCityElectionStatusMessage(
     hasVoted,
     winner,
     timestamp: Date.now(),
-  };
+  } as CityElectionStatusMessage;
 }
 
 // ============================================
@@ -487,7 +487,7 @@ export function createCityTaxMessage(
     taxType,
     newRate,
     timestamp: Date.now(),
-  };
+  } as CityTaxMessage;
 }
 
 /**
@@ -522,7 +522,7 @@ export function createCityTaxResponse(
     errorMessage,
     taxes,
     timestamp: Date.now(),
-  };
+  } as CityTaxResponseMessage;
 }
 
 // ============================================
@@ -568,7 +568,7 @@ export function createCityTreasuryMessage(
     treasuryOperation,
     amount,
     timestamp: Date.now(),
-  };
+  } as CityTreasuryMessage;
 }
 
 /**
@@ -615,7 +615,7 @@ export function createCityTreasuryResponse(
     balance,
     weeklyUpkeep,
     timestamp: Date.now(),
-  };
+  } as CityTreasuryResponseMessage;
 }
 
 // ============================================
@@ -696,7 +696,7 @@ export function createCityStructurePlaceResponse(
     structureType,
     maintenanceCost,
     timestamp: Date.now(),
-  };
+  } as CityStructurePlaceResponseMessage;
 }
 
 /**
@@ -757,7 +757,7 @@ export function createCityStructureRemoveResponse(
     errorMessage,
     structureId,
     timestamp: Date.now(),
-  };
+  } as CityStructureRemoveResponseMessage;
 }
 
 // ============================================
@@ -791,7 +791,7 @@ export function createCityCitizenListMessage(
     page,
     pageSize,
     timestamp: Date.now(),
-  };
+  } as CityCitizenListMessage;
 }
 
 /**
@@ -849,7 +849,7 @@ export function createCityCitizenListResponse(
     page,
     pageSize,
     timestamp: Date.now(),
-  };
+  } as CityCitizenListResponseMessage;
 }
 
 // ============================================
@@ -879,7 +879,7 @@ export function createCityBannerMessage(
     playerId,
     bannerData,
     timestamp: Date.now(),
-  };
+  } as CityBannerMessage;
 }
 
 /**
@@ -914,7 +914,7 @@ export function createCityBannerResponse(
     errorMessage,
     bannerData,
     timestamp: Date.now(),
-  };
+  } as CityBannerResponseMessage;
 }
 
 // ============================================

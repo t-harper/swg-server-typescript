@@ -45,7 +45,8 @@ import {
 import { type HamModifier, HamModifierManager } from './ham-modifiers.js';
 
 // Re-export types for convenience
-export { DamageResult, HealResult, HitLocation } from './damage-types.js';
+export type { DamageResult, HealResult } from './damage-types.js';
+export { HitLocation } from './damage-types.js';
 export { DeathType } from './incapacitation.js';
 
 /**
@@ -545,8 +546,8 @@ export class HamManager {
           state.incapState,
           DeathType.Normal,
           0n, // No specific killer
-          { x: creature.transform.position.x, y: creature.transform.position.y, z: creature.transform.position.z },
-          creature.zone,
+          { x: creature.position.x, y: creature.position.y, z: creature.position.z },
+          creature.sceneId,
           0, // XP loss calculation would need player XP
           currentTime
         );
@@ -559,8 +560,8 @@ export class HamManager {
         creature,
         state.incapState,
         0n, // Attacker ID would come from combat context
-        { x: creature.transform.position.x, y: creature.transform.position.y, z: creature.transform.position.z },
-        creature.zone,
+        { x: creature.position.x, y: creature.position.y, z: creature.position.z },
+        creature.sceneId,
         currentTime
       );
 
@@ -654,8 +655,8 @@ export class HamManager {
       target,
       state.incapState,
       attacker.objectId,
-      { x: target.transform.position.x, y: target.transform.position.y, z: target.transform.position.z },
-      target.zone,
+      { x: target.position.x, y: target.position.y, z: target.position.z },
+      target.sceneId,
       currentTime
     );
 

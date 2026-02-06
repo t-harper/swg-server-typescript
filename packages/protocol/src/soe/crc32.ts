@@ -38,7 +38,7 @@ initCrcTable();
  * @returns The 32-bit CRC value
  */
 export function calculateCrc32(data: Uint8Array, seed: number = 0): number {
-  let crc = CrcConfig.INITIAL_VALUE;
+  let crc: number = CrcConfig.INITIAL_VALUE;
 
   // Mix in the seed
   if (seed !== 0) {

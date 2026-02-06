@@ -1,58 +1,80 @@
-version: '3.8'
+# Star Wars Galaxies Server - Docker Compose Configuration
+# Full stack deployment for SWG server infrastructure
 
 services:
+  # =============================================================================
+  # Infrastructure Services
+  # =============================================================================
+
   mysql:
     image: mysql:8.0
     container_name: swg-mysql
+    restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-swgroot}
-      MYSQL_DATABASE: ${MYSQL_DATABASE:-swg}
-      MYSQL_USER: ${MYSQL_USER:-swg}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-swgpass}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-swg_root_password}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-swgemu}
+      MYSQL_USER: ${MYSQL_USER:-swgemu}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-swgemu_password}
     ports:
-      - "3306:3306"
+      - "${MYSQL_PORT:-3306}:3306"
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./init:/docker-entrypoint-initdb.d
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      timeout: 5s
-      retries: 10
+      - ./init-scripts/mysql:/docker-entrypoint-initdb.d:ro
     networks:
       - swg-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-swg_root_password}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   redis:
     image: redis:7-alpine
     container_name: swg-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-swg_redis_password}
     ports:
-      - "6379:6379"
+      - "${REDIS_PORT:-6379}:6379"
     volumes:
       - redis_data:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      timeout: 5s
-      retries: 10
     networks:
       - swg-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-swg_redis_password}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # =============================================================================
+  # SWG Server Applications
+  # =============================================================================
 
   login-server:
     build:
       context: ..
-      dockerfile: Dockerfile
-      target: login-server
-    container_name: swg-login
-    ports:
-      - "44453:44453/udp"
+      dockerfile: docker/Dockerfile.login-server
+    container_name: swg-login-server
+    restart: unless-stopped
     environment:
-      DB_HOST: mysql
-      DB_PORT: 3306
-      DB_USER: ${MYSQL_USER:-swg}
-      DB_PASSWORD: ${MYSQL_PASSWORD:-swgpass}
-      DB_NAME: ${MYSQL_DATABASE:-swg}
+      NODE_ENV: ${NODE_ENV:-production}
+      SERVER_TYPE: login-server
+      LOGIN_SERVER_PORT: 44453
+      # Database
+      DATABASE_HOST: mysql
+      DATABASE_PORT: 3306
+      DATABASE_NAME: ${MYSQL_DATABASE:-swgemu}
+      DATABASE_USER: ${MYSQL_USER:-swgemu}
+      DATABASE_PASSWORD: ${MYSQL_PASSWORD:-swgemu_password}
+      # Redis
       REDIS_HOST: redis
       REDIS_PORT: 6379
-      LOGIN_PORT: 44453
-      LOGIN_BIND: 0.0.0.0
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-swg_redis_password}
+      # Server Settings
+      SERVER_NAME: ${SERVER_NAME:-SWG Server}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    ports:
+      - "${LOGIN_SERVER_PORT:-44453}:44453/udp"
     depends_on:
       mysql:
         condition: service_healthy
@@ -60,25 +82,66 @@ services:
         condition: service_healthy
     networks:
       - swg-network
+    volumes:
+      - login_logs:/app/logs
 
   connection-server:
     build:
       context: ..
-      dockerfile: Dockerfile
-      target: connection-server
-    container_name: swg-connection
-    ports:
-      - "44455:44455/udp"
+      dockerfile: docker/Dockerfile.connection-server
+    container_name: swg-connection-server
+    restart: unless-stopped
     environment:
-      DB_HOST: mysql
-      DB_PORT: 3306
-      DB_USER: ${MYSQL_USER:-swg}
-      DB_PASSWORD: ${MYSQL_PASSWORD:-swgpass}
-      DB_NAME: ${MYSQL_DATABASE:-swg}
+      NODE_ENV: ${NODE_ENV:-production}
+      SERVER_TYPE: connection-server
+      CONNECTION_SERVER_PORT: 44455
+      # Redis
       REDIS_HOST: redis
       REDIS_PORT: 6379
-      CONNECTION_PORT: 44455
-      CONNECTION_BIND: 0.0.0.0
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-swg_redis_password}
+      # Server Settings
+      SERVER_NAME: ${SERVER_NAME:-SWG Server}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      # Game server discovery
+      GAME_SERVER_HOST: game-server
+      GAME_SERVER_BASE_PORT: 44460
+    ports:
+      - "${CONNECTION_SERVER_PORT:-44455}:44455/udp"
+    depends_on:
+      redis:
+        condition: service_healthy
+      login-server:
+        condition: service_started
+    networks:
+      - swg-network
+    volumes:
+      - connection_logs:/app/logs
+
+  chat-server:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.chat-server
+    container_name: swg-chat-server
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      SERVER_TYPE: chat-server
+      CHAT_SERVER_PORT: 44462
+      # Database
+      DATABASE_HOST: mysql
+      DATABASE_PORT: 3306
+      DATABASE_NAME: ${MYSQL_DATABASE:-swgemu}
+      DATABASE_USER: ${MYSQL_USER:-swgemu}
+      DATABASE_PASSWORD: ${MYSQL_PASSWORD:-swgemu_password}
+      # Redis
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-swg_redis_password}
+      # Server Settings
+      SERVER_NAME: ${SERVER_NAME:-SWG Server}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    ports:
+      - "${CHAT_SERVER_PORT:-44462}:44462/tcp"
     depends_on:
       mysql:
         condition: service_healthy
@@ -86,21 +149,84 @@ services:
         condition: service_healthy
     networks:
       - swg-network
+    volumes:
+      - chat_logs:/app/logs
 
-  adminer:
-    image: adminer
-    container_name: swg-adminer
+  game-server:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.game-server
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      SERVER_TYPE: game-server
+      GAME_SERVER_PORT: 44460
+      # Database
+      DATABASE_HOST: mysql
+      DATABASE_PORT: 3306
+      DATABASE_NAME: ${MYSQL_DATABASE:-swgemu}
+      DATABASE_USER: ${MYSQL_USER:-swgemu}
+      DATABASE_PASSWORD: ${MYSQL_PASSWORD:-swgemu_password}
+      # Redis
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-swg_redis_password}
+      # Server Settings
+      SERVER_NAME: ${SERVER_NAME:-SWG Server}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      # Chat server
+      CHAT_SERVER_HOST: chat-server
+      CHAT_SERVER_PORT: 44462
+      # Connection server
+      CONNECTION_SERVER_HOST: connection-server
+      CONNECTION_SERVER_PORT: 44455
     ports:
-      - "8080:8080"
+      - "44460-44469:44460/udp"
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      chat-server:
+        condition: service_started
+      connection-server:
+        condition: service_started
     networks:
       - swg-network
+    volumes:
+      - game_logs:/app/logs
+      - game_data:/app/data
+    deploy:
+      mode: replicated
+      replicas: 1
 
-volumes:
-  mysql_data:
-  redis_data:
+# =============================================================================
+# Networks
+# =============================================================================
 
 networks:
   swg-network:
     driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16
+
+# =============================================================================
+# Volumes
+# =============================================================================
+
+volumes:
+  mysql_data:
+    driver: local
+  redis_data:
+    driver: local
+  login_logs:
+    driver: local
+  connection_logs:
+    driver: local
+  chat_logs:
+    driver: local
+  game_logs:
+    driver: local
+  game_data:
+    driver: local

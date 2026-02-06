@@ -27,3 +27,15 @@ export * from './force-power-effects.js';
 
 // Force-related messages
 export * from './force-messages.js';
+
+// Lightsaber types and definitions
+export * from './lightsaber-types.js';
+
+// Crystal attunement system
+export * from './crystal-attunement.js';
+
+// Lightsaber crafting system
+export * from './lightsaber-crafting.js';
+
+// Lightsaber network messages
+export * from './lightsaber-messages.js';

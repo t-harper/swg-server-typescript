@@ -18,7 +18,7 @@ import {
 export class SkillLoadError extends Error {
   constructor(
     message: string,
-    public readonly cause?: Error
+    public override readonly cause?: Error
   ) {
     super(message);
     this.name = 'SkillLoadError';

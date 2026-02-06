@@ -48,7 +48,7 @@ export interface PlayerObject {
   name: string;
   position: Position;
   yaw: number;
-  cellId?: bigint; // If inside a cell
+  cellId?: bigint | undefined; // If inside a cell
   posture: PostureType;
   speed: number;
   movementState: PlayerMovementState;
@@ -489,6 +489,14 @@ export class MovementHandler {
    */
   public getPlayerCount(): number {
     return this.playersByObjectId.size;
+  }
+
+  /**
+   * Get the movement validator instance
+   * Useful for creating initial movement state for new players
+   */
+  public getValidator(): MovementValidator {
+    return this.validator;
   }
 }
 

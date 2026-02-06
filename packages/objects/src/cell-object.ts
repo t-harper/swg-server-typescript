@@ -344,7 +344,7 @@ export class CellObject extends SceneObject {
    */
   clearPermissionOverrides(): void {
     if (this.permissionOverride && this.permissionOverride.size > 0) {
-      this.permissionOverride = undefined;
+      delete this.permissionOverride;
       this.markModified();
     }
   }
@@ -385,8 +385,7 @@ export class CellObject extends SceneObject {
       buildingId: this.buildingId.toString(),
       cellName: this._cellName,
       contents: Array.from(this.contents).map((id) => id.toString()),
-      portals: Array.from(this.portals.entries()).map(([id, portal]) => ({
-        portalId: id,
+      portals: Array.from(this.portals.entries()).map(([, portal]) => ({
         ...portal,
       })),
       floorplan: { ...this.floorplan },

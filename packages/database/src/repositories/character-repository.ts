@@ -26,9 +26,9 @@ import { SceneObject } from '@swg/objects';
  * Character with related data
  */
 export interface CharacterWithRelations extends Character {
-  appearance?: CharacterAppearance;
-  skills?: CharacterSkill[];
-  experience?: CharacterExperience[];
+  appearance?: CharacterAppearance | undefined;
+  skills?: CharacterSkill[] | undefined;
+  experience?: CharacterExperience[] | undefined;
 }
 
 /**

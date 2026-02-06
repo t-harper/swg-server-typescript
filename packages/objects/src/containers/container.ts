@@ -551,7 +551,7 @@ export class Container extends TangibleObject {
       slot,
       arrangementIndex: this._nextArrangementIndex++,
       addedAt: Date.now(),
-    };
+    } as TransferResult;
 
     // Add to contents
     this._contents.set(itemId, containedItem);

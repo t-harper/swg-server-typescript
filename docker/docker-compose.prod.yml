@@ -1,0 +1,222 @@
+# Star Wars Galaxies Server - Production Docker Compose Override
+# Production-specific configuration with resource limits and security
+
+services:
+  # =============================================================================
+  # Infrastructure Services - Production Overrides
+  # =============================================================================
+
+  mysql:
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql_root_password
+      MYSQL_PASSWORD_FILE: /run/secrets/mysql_password
+    secrets:
+      - mysql_root_password
+      - mysql_password
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: 4G
+        reservations:
+          cpus: "1"
+          memory: 2G
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "5"
+
+  redis:
+    restart: always
+    command: >
+      redis-server
+      --appendonly yes
+      --maxmemory 512mb
+      --maxmemory-policy allkeys-lru
+    secrets:
+      - redis_password
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+        reservations:
+          cpus: "0.5"
+          memory: 512M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
+
+  # =============================================================================
+  # SWG Server Applications - Production Overrides
+  # =============================================================================
+
+  login-server:
+    restart: always
+    environment:
+      NODE_ENV: production
+      LOG_LEVEL: ${LOG_LEVEL:-warn}
+      DATABASE_PASSWORD_FILE: /run/secrets/mysql_password
+      REDIS_PASSWORD_FILE: /run/secrets/redis_password
+    secrets:
+      - mysql_password
+      - redis_password
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+        reservations:
+          cpus: "0.5"
+          memory: 512M
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "5"
+        labels: "service,environment"
+    labels:
+      - "service=login-server"
+      - "environment=production"
+
+  connection-server:
+    restart: always
+    environment:
+      NODE_ENV: production
+      LOG_LEVEL: ${LOG_LEVEL:-warn}
+      REDIS_PASSWORD_FILE: /run/secrets/redis_password
+    secrets:
+      - redis_password
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+        reservations:
+          cpus: "0.5"
+          memory: 512M
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "5"
+        labels: "service,environment"
+    labels:
+      - "service=connection-server"
+      - "environment=production"
+
+  chat-server:
+    restart: always
+    environment:
+      NODE_ENV: production
+      LOG_LEVEL: ${LOG_LEVEL:-warn}
+      DATABASE_PASSWORD_FILE: /run/secrets/mysql_password
+      REDIS_PASSWORD_FILE: /run/secrets/redis_password
+    secrets:
+      - mysql_password
+      - redis_password
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+        reservations:
+          cpus: "0.5"
+          memory: 512M
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "5"
+        labels: "service,environment"
+    labels:
+      - "service=chat-server"
+      - "environment=production"
+
+  game-server:
+    restart: always
+    environment:
+      NODE_ENV: production
+      LOG_LEVEL: ${LOG_LEVEL:-warn}
+      DATABASE_PASSWORD_FILE: /run/secrets/mysql_password
+      REDIS_PASSWORD_FILE: /run/secrets/redis_password
+    secrets:
+      - mysql_password
+      - redis_password
+    deploy:
+      mode: replicated
+      replicas: ${GAME_SERVER_REPLICAS:-2}
+      resources:
+        limits:
+          cpus: "2"
+          memory: 4G
+        reservations:
+          cpus: "1"
+          memory: 2G
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 3
+        window: 180s
+      update_config:
+        parallelism: 1
+        delay: 30s
+        failure_action: rollback
+        order: stop-first
+      rollback_config:
+        parallelism: 1
+        delay: 10s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200m"
+        max-file: "10"
+        labels: "service,environment"
+    labels:
+      - "service=game-server"
+      - "environment=production"
+
+# =============================================================================
+# Secrets Configuration
+# =============================================================================
+
+secrets:
+  mysql_root_password:
+    file: ./secrets/mysql_root_password.txt
+  mysql_password:
+    file: ./secrets/mysql_password.txt
+  redis_password:
+    file: ./secrets/redis_password.txt
+
+# =============================================================================
+# Production Network Configuration
+# =============================================================================
+
+networks:
+  swg-network:
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.enable_icc: "true"
+      com.docker.network.bridge.enable_ip_masquerade: "true"
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16

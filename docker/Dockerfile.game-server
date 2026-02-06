@@ -1,0 +1,117 @@
+# Game Server Dockerfile
+# Handles game world simulation and player interactions
+
+# Build stage - compile TypeScript
+FROM node:22-alpine AS builder
+
+RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
+
+WORKDIR /app
+
+# Copy package files for dependency installation
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
+COPY apps/game-server/package.json ./apps/game-server/
+COPY packages/config/package.json ./packages/config/
+COPY packages/database/package.json ./packages/database/
+COPY packages/game-logic/package.json ./packages/game-logic/
+COPY packages/protocol/package.json ./packages/protocol/
+COPY packages/redis/package.json ./packages/redis/
+COPY packages/shared-types/package.json ./packages/shared-types/
+COPY packages/world/package.json ./packages/world/
+COPY packages/objects/package.json ./packages/objects/
+COPY packages/ai/package.json ./packages/ai/
+
+# Install dependencies
+RUN pnpm install --frozen-lockfile
+
+# Copy source code
+COPY apps/game-server ./apps/game-server
+COPY packages/config ./packages/config
+COPY packages/database ./packages/database
+COPY packages/game-logic ./packages/game-logic
+COPY packages/protocol ./packages/protocol
+COPY packages/redis ./packages/redis
+COPY packages/shared-types ./packages/shared-types
+COPY packages/world ./packages/world
+COPY packages/objects ./packages/objects
+COPY packages/ai ./packages/ai
+COPY tsconfig.json ./
+
+# Build the application
+RUN pnpm --filter @swg/game-server build
+
+# Production stage
+FROM node:22-alpine AS production
+
+RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
+
+# Install runtime dependencies
+RUN apk add --no-cache \
+    dumb-init \
+    curl \
+    bash \
+    netcat-openbsd \
+    && rm -rf /var/cache/apk/*
+
+# Create non-root user
+RUN addgroup -g 1001 -S swg && \
+    adduser -u 1001 -S swg -G swg
+
+WORKDIR /app
+
+# Copy package files for production dependencies
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY apps/game-server/package.json ./apps/game-server/
+COPY packages/config/package.json ./packages/config/
+COPY packages/database/package.json ./packages/database/
+COPY packages/game-logic/package.json ./packages/game-logic/
+COPY packages/protocol/package.json ./packages/protocol/
+COPY packages/redis/package.json ./packages/redis/
+COPY packages/shared-types/package.json ./packages/shared-types/
+COPY packages/world/package.json ./packages/world/
+COPY packages/objects/package.json ./packages/objects/
+COPY packages/ai/package.json ./packages/ai/
+
+# Install production dependencies only
+RUN pnpm install --frozen-lockfile --prod
+
+# Copy built application from builder stage
+COPY --from=builder /app/apps/game-server/dist ./apps/game-server/dist
+COPY --from=builder /app/packages/config/dist ./packages/config/dist
+COPY --from=builder /app/packages/database/dist ./packages/database/dist
+COPY --from=builder /app/packages/game-logic/dist ./packages/game-logic/dist
+COPY --from=builder /app/packages/protocol/dist ./packages/protocol/dist
+COPY --from=builder /app/packages/redis/dist ./packages/redis/dist
+COPY --from=builder /app/packages/shared-types/dist ./packages/shared-types/dist
+COPY --from=builder /app/packages/world/dist ./packages/world/dist
+COPY --from=builder /app/packages/objects/dist ./packages/objects/dist
+COPY --from=builder /app/packages/ai/dist ./packages/ai/dist
+
+# Copy scripts
+COPY --chmod=755 docker/scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY --chmod=755 docker/scripts/healthcheck.sh /usr/local/bin/healthcheck.sh
+
+# Create directories
+RUN mkdir -p /app/logs /app/data && \
+    chown -R swg:swg /app
+
+# Environment
+ENV NODE_ENV=production
+ENV SERVER_TYPE=game-server
+ENV GAME_SERVER_PORT=44460
+
+# Expose dynamic UDP port (can be configured via environment)
+EXPOSE 44460/udp
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD /usr/local/bin/healthcheck.sh game-server ${GAME_SERVER_PORT:-44460}
+
+# Labels
+LABEL org.opencontainers.image.title="SWG Game Server"
+LABEL org.opencontainers.image.description="Star Wars Galaxies Game Server"
+
+USER swg
+
+ENTRYPOINT ["/usr/bin/dumb-init", "--", "/usr/local/bin/entrypoint.sh"]
+CMD ["node", "apps/game-server/dist/index.js"]

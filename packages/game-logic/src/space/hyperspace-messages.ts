@@ -13,7 +13,7 @@
  */
 
 import type { ObjectId } from '@swg/shared-types';
-import type { SpaceZoneId } from '@swg/world/src/space/space-types.js';
+import type { SpaceZoneId } from '@swg/world';
 import {
   HyperspaceState,
   EmergencyExitReason,

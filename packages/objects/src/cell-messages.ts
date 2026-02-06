@@ -84,7 +84,7 @@ export function createCellEnterMessage(
     portalId,
     fromCellIndex,
     timestamp: Date.now(),
-  };
+  } as CellEnterMessage;
 }
 
 /**
@@ -132,7 +132,7 @@ export function createCellEnterResponse(
     contents,
     lighting,
     timestamp: Date.now(),
-  };
+  } as CellEnterResponseMessage;
 }
 
 /**
@@ -166,7 +166,7 @@ export function createCellLeaveMessage(
     portalId,
     toCellIndex,
     timestamp: Date.now(),
-  };
+  } as CellLeaveMessage;
 }
 
 /**
@@ -200,7 +200,7 @@ export function createCellLeaveResponse(
     success,
     errorMessage,
     timestamp: Date.now(),
-  };
+  } as CellLeaveResponseMessage;
 }
 
 // ============================================
@@ -286,7 +286,7 @@ export function createCellPortalStateMessage(
     isLocked,
     changedBy,
     timestamp: Date.now(),
-  };
+  } as CellPortalStateMessage;
 }
 
 // ============================================
@@ -349,7 +349,7 @@ export function createCellPermissionMessage(
     isPublic,
     permissionOverrides,
     timestamp: Date.now(),
-  };
+  } as CellPermissionMessage;
 }
 
 /**
@@ -392,7 +392,7 @@ export function createCellPermissionResponse(
     isPublic,
     permissionOverrides,
     timestamp: Date.now(),
-  };
+  } as CellPermissionResponseMessage;
 }
 
 // ============================================

@@ -131,7 +131,7 @@ export function createShipComponentInstallResponse(
     errorMessage,
     errorCode,
     timestamp: Date.now(),
-  };
+  } as ShipComponentInstallResponseMessage;
 }
 
 // ============================================
@@ -211,7 +211,7 @@ export function createShipComponentRemoveResponse(
     errorMessage,
     errorCode,
     timestamp: Date.now(),
-  };
+  } as ShipComponentRemoveResponseMessage;
 }
 
 // ============================================
@@ -405,7 +405,7 @@ export function createShipComponentDamageMessage(
     componentDestroyed,
     newEfficiency,
     timestamp: Date.now(),
-  };
+  } as ShipComponentDamageMessage;
 }
 
 // ============================================
@@ -501,7 +501,7 @@ export function createShipComponentRepairResponse(
     newHitpoints,
     newEfficiency,
     timestamp: Date.now(),
-  };
+  } as ShipComponentRepairResponseMessage;
 }
 
 // ============================================
@@ -589,7 +589,7 @@ export function createShipComponentInfoResponse(
     errorMessage,
     componentData,
     timestamp: Date.now(),
-  };
+  } as ShipComponentInfoResponseMessage;
 }
 
 // ============================================

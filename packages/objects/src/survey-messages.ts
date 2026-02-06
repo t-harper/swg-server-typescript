@@ -138,7 +138,7 @@ export function createSurveyResultMessage(
     resourceId,
     resourceName,
     timestamp: Date.now(),
-  };
+  } as SurveyResultMessage;
 }
 
 /**
@@ -188,7 +188,7 @@ export function createResourceListMessage(
     planetId,
     resourceGroup,
     timestamp: Date.now(),
-  };
+  } as ResourceListMessage;
 }
 
 /**
@@ -348,7 +348,7 @@ export function createWaypointCreatedMessage(
     success,
     errorMessage,
     timestamp: Date.now(),
-  };
+  } as WaypointCreatedMessage;
 }
 
 /**
@@ -373,7 +373,7 @@ export function createSurveyCancelMessage(
     playerId,
     timestamp: Date.now(),
     reason,
-  };
+  } as SurveyCancelMessage;
 }
 
 /**

@@ -17,7 +17,7 @@
  * - WEAO6: Attack mods, powerups, condition (server data)
  */
 
-import type { ObjectId, CrcValue } from '@swg/shared-types';
+import type { ObjectId, CrcValue, Vector3 } from '@swg/shared-types';
 import { TangibleObject, DamageType } from './tangible-object.js';
 import { ObjectType } from './scene-object.js';
 import { DeltaTracker, DeltaType } from './deltas.js';
@@ -348,9 +348,17 @@ export class WeaponObject extends TangibleObject {
   }
 
   /**
-   * Check if a target is within range
+   * Check if a target is within range (weapon-specific: checks against weapon min/max range)
    */
-  isInRange(distance: number): boolean {
+  override isInRange(other: Vector3, range: number): boolean {
+    const distance = this.distanceTo(other);
+    return distance >= this.minRange && distance <= this.maxRange;
+  }
+
+  /**
+   * Check if a given distance value is within weapon range
+   */
+  isDistanceInRange(distance: number): boolean {
     return distance >= this.minRange && distance <= this.maxRange;
   }
 

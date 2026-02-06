@@ -359,7 +359,7 @@ export function calculateXpLoss(totalXp: number, deathType: DeathType): number {
   }
 
   // Standard XP loss
-  let lossPercent = IncapConfig.XP_LOSS_PERCENTAGE;
+  let lossPercent: number = IncapConfig.XP_LOSS_PERCENTAGE;
 
   // Deathblow has higher XP loss
   if (deathType === DeathType.Deathblow) {

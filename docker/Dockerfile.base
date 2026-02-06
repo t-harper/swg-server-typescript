@@ -1,0 +1,46 @@
+# Base image for all SWG server applications
+# Provides Node.js 22 LTS with pnpm and common dependencies
+
+FROM node:22-alpine AS base
+
+# Install pnpm globally
+RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
+
+# Install common dependencies
+RUN apk add --no-cache \
+    dumb-init \
+    curl \
+    bash \
+    netcat-openbsd \
+    && rm -rf /var/cache/apk/*
+
+# Create non-root user for security
+RUN addgroup -g 1001 -S swg && \
+    adduser -u 1001 -S swg -G swg
+
+# Set working directory
+WORKDIR /app
+
+# Create necessary directories with proper permissions
+RUN mkdir -p /app/logs /app/data && \
+    chown -R swg:swg /app
+
+# Copy entrypoint and healthcheck scripts
+COPY --chmod=755 docker/scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY --chmod=755 docker/scripts/healthcheck.sh /usr/local/bin/healthcheck.sh
+
+# Environment variables
+ENV NODE_ENV=production
+ENV PNPM_HOME=/pnpm
+ENV PATH="$PNPM_HOME:$PATH"
+
+# Labels
+LABEL org.opencontainers.image.source="https://github.com/swg-source/swg-source-js"
+LABEL org.opencontainers.image.description="Star Wars Galaxies Server - TypeScript Implementation"
+LABEL org.opencontainers.image.vendor="SWG Source"
+
+# Default user
+USER swg
+
+# Use dumb-init as PID 1 for proper signal handling
+ENTRYPOINT ["/usr/bin/dumb-init", "--"]

@@ -126,7 +126,7 @@ export class CityObject {
   // ============================================
 
   /** Current active election, if any */
-  currentElection?: CityElection;
+  currentElection?: CityElection | undefined;
 
   // ============================================
   // Timestamps
@@ -171,7 +171,7 @@ export class CityObject {
 
     // Start as an outpost
     this.rank = CityRank.Outpost;
-    this.radius = CITY_RANK_RADIUS[CityRank.Outpost];
+    this.radius = CITY_RANK_RADIUS[CityRank.Outpost as CityRank];
     this.specialization = CitySpecialization.None;
 
     // Founder becomes mayor

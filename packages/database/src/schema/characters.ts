@@ -5,7 +5,7 @@
 
 import {
   bigint,
-  blob,
+  customType,
   datetime,
   float,
   index,
@@ -15,6 +15,12 @@ import {
   varchar,
 } from 'drizzle-orm/mysql-core';
 import { relations } from 'drizzle-orm';
+
+const blob = customType<{ data: Buffer; driverData: Buffer }>({
+  dataType() {
+    return 'blob';
+  },
+});
 import { accounts } from './accounts.js';
 
 /**
@@ -40,11 +46,11 @@ export const characters = mysqlTable(
     createdAt: datetime('created_at').notNull().default(new Date()),
     lastSaved: datetime('last_saved'),
   },
-  (table) => [
-    index('idx_characters_account_id').on(table.accountId),
-    index('idx_characters_name').on(table.name),
-    index('idx_characters_scene_id').on(table.sceneId),
-  ]
+  (table) => ({
+    accountIdIdx: index('idx_characters_account_id').on(table.accountId),
+    nameIdx: index('idx_characters_name').on(table.name),
+    sceneIdIdx: index('idx_characters_scene_id').on(table.sceneId),
+  })
 );
 
 /**
@@ -72,11 +78,11 @@ export const characterSkills = mysqlTable(
     skillName: varchar('skill_name', { length: 100 }).notNull(),
     acquiredAt: datetime('acquired_at').notNull().default(new Date()),
   },
-  (table) => [
-    primaryKey({ columns: [table.characterId, table.skillName] }),
-    index('idx_character_skills_character_id').on(table.characterId),
-    index('idx_character_skills_skill_name').on(table.skillName),
-  ]
+  (table) => ({
+    pk: primaryKey({ columns: [table.characterId, table.skillName] }),
+    characterIdIdx: index('idx_character_skills_character_id').on(table.characterId),
+    skillNameIdx: index('idx_character_skills_skill_name').on(table.skillName),
+  })
 );
 
 /**
@@ -92,11 +98,11 @@ export const characterExperience = mysqlTable(
     experienceType: varchar('experience_type', { length: 50 }).notNull(),
     amount: int('amount').notNull().default(0),
   },
-  (table) => [
-    primaryKey({ columns: [table.characterId, table.experienceType] }),
-    index('idx_character_experience_character_id').on(table.characterId),
-    index('idx_character_experience_type').on(table.experienceType),
-  ]
+  (table) => ({
+    pk: primaryKey({ columns: [table.characterId, table.experienceType] }),
+    characterIdIdx: index('idx_character_experience_character_id').on(table.characterId),
+    experienceTypeIdx: index('idx_character_experience_type').on(table.experienceType),
+  })
 );
 
 /**

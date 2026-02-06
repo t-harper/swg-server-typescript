@@ -206,7 +206,7 @@ export class CharacterCreationHandler {
 
     // Split into first and last name
     const nameParts = trimmedName.split(/\s+/);
-    const firstName = nameParts[0];
+    const firstName = nameParts[0]!;
     const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
 
     // Validate first name length
@@ -366,7 +366,7 @@ export class CharacterCreationHandler {
 
     let count = 1;
     for (let i = 1; i < str.length; i++) {
-      if (str[i].toLowerCase() === str[i - 1].toLowerCase()) {
+      if (str[i]!.toLowerCase() === str[i - 1]!.toLowerCase()) {
         count++;
         if (count > NameValidation.MAX_CONSECUTIVE_IDENTICAL) {
           return true;
@@ -564,7 +564,7 @@ export class CharacterCreationHandler {
           )
         ),
         error: CharacterNameError.DECLINED_CANT_CREATE_AVATAR,
-        errorMessage: speciesResult.error,
+        ...(speciesResult.error !== undefined && { errorMessage: speciesResult.error }),
       };
     }
 
@@ -596,7 +596,7 @@ export class CharacterCreationHandler {
           )
         ),
         error: CharacterNameError.DECLINED_CANT_CREATE_AVATAR,
-        errorMessage: professionResult.error,
+        ...(professionResult.error !== undefined && { errorMessage: professionResult.error }),
       };
     }
 
@@ -615,7 +615,7 @@ export class CharacterCreationHandler {
           )
         ),
         error: CharacterNameError.DECLINED_CANT_CREATE_AVATAR,
-        errorMessage: locationResult.error,
+        ...(locationResult.error !== undefined && { errorMessage: locationResult.error }),
       };
     }
 
@@ -634,7 +634,7 @@ export class CharacterCreationHandler {
           )
         ),
         error: CharacterNameError.DECLINED_CANT_CREATE_AVATAR,
-        errorMessage: customizationResult.error,
+        ...(customizationResult.error !== undefined && { errorMessage: customizationResult.error }),
       };
     }
 
@@ -746,7 +746,7 @@ export class CharacterCreationHandler {
   public handleRandomName(message: ClientRandomNameRequest): Uint8Array {
     // Extract species from template name
     const speciesId = this.extractSpeciesFromTemplate(message.templateName);
-    const syllables = NAME_SYLLABLES[speciesId] || NAME_SYLLABLES.default;
+    const syllables = NAME_SYLLABLES[speciesId] ?? NAME_SYLLABLES['default']!;
 
     // Generate a random name
     const firstName = this.generateRandomNamePart(syllables);
@@ -788,7 +788,7 @@ export class CharacterCreationHandler {
     middle: string[];
     last: string[];
   }): string {
-    const randomFrom = (arr: string[]): string => arr[Math.floor(Math.random() * arr.length)];
+    const randomFrom = (arr: string[]): string => arr[Math.floor(Math.random() * arr.length)]!;
 
     // 2-3 syllables
     const syllableCount = Math.random() < 0.5 ? 2 : 3;

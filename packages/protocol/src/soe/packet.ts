@@ -518,37 +518,39 @@ function serializeFatalErrorResponse(): Uint8Array {
 export function serialize(packet: SoePacket): Uint8Array {
   switch (packet.opcode) {
     case SoeOpcode.SessionRequest:
-      return serializeSessionRequest(packet);
+      return serializeSessionRequest(packet as SessionRequestPacket);
     case SoeOpcode.SessionResponse:
-      return serializeSessionResponse(packet);
+      return serializeSessionResponse(packet as SessionResponsePacket);
     case SoeOpcode.MultiPacket:
-      return serializeMultiPacket(packet);
+      return serializeMultiPacket(packet as MultiPacket);
     case SoeOpcode.Disconnect:
-      return serializeDisconnect(packet);
+      return serializeDisconnect(packet as DisconnectPacket);
     case SoeOpcode.Ping:
       return serializePing();
     case SoeOpcode.NetStatusRequest:
-      return serializeNetStatusRequest(packet);
+      return serializeNetStatusRequest(packet as NetStatusRequestPacket);
     case SoeOpcode.NetStatusResponse:
-      return serializeNetStatusResponse(packet);
+      return serializeNetStatusResponse(packet as NetStatusResponsePacket);
     case SoeOpcode.Data:
-      return serializeData(packet);
+      return serializeData(packet as DataPacket);
     case SoeOpcode.DataFragment:
-      return serializeDataFragment(packet);
+      return serializeDataFragment(packet as DataFragmentPacket);
     case SoeOpcode.OutOfOrder:
-      return serializeOutOfOrder(packet);
+      return serializeOutOfOrder(packet as OutOfOrderPacket);
     case SoeOpcode.Ack:
-      return serializeAck(packet);
+      return serializeAck(packet as AckPacket);
     case SoeOpcode.FatalError:
       return serializeFatalError();
     case SoeOpcode.FatalErrorResponse:
       return serializeFatalErrorResponse();
-    default:
+    default: {
       // For unknown packets, return raw data if available
-      if ('rawData' in packet) {
-        return packet.rawData;
+      const unknown = packet as UnknownPacket;
+      if (unknown.rawData) {
+        return unknown.rawData;
       }
-      throw new Error(`Cannot serialize unknown packet type: ${getOpcodeName(packet.opcode)}`);
+      throw new Error(`Cannot serialize unknown packet type: ${getOpcodeName(unknown.opcode)}`);
+    }
   }
 }
 

@@ -234,13 +234,13 @@ export function serializeStnoBaseline3(station: CraftingStation): Uint8Array {
   variableCount++;
 
   // 9: Placed position (X, Y, Z as floats)
-  writer.writeFloat32LE(station.placedPosition.x);
-  writer.writeFloat32LE(station.placedPosition.y);
-  writer.writeFloat32LE(station.placedPosition.z);
+  writer.writeFloatLE(station.placedPosition.x);
+  writer.writeFloatLE(station.placedPosition.y);
+  writer.writeFloatLE(station.placedPosition.z);
   variableCount++;
 
   // 10: Rotation (radians)
-  writer.writeFloat32LE(station.rotation);
+  writer.writeFloatLE(station.rotation);
   variableCount++;
 
   // 11: Placed in cell (0 = world)

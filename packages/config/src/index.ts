@@ -41,6 +41,8 @@ export type LoginServerConfig = z.infer<typeof loginServerConfigSchema>;
 export const connectionServerConfigSchema = z.object({
   port: z.number().default(44455),
   bindAddress: z.string().default('0.0.0.0'),
+  /** Public address advertised to clients (defaults to bindAddress) */
+  publicAddress: z.string().optional(),
   maxConnections: z.number().default(3000),
   pingInterval: z.number().default(30000), // ms
   disconnectTimeout: z.number().default(60000), // ms
@@ -65,6 +67,8 @@ export type GameServerConfig = z.infer<typeof gameServerConfigSchema>;
 export const serverConfigSchema = z.object({
   clusterId: z.string().default('swg'),
   clusterName: z.string().default('SWG Server'),
+  clusterIdNumeric: z.number().default(1),
+  maxCharsPerAccount: z.number().default(2),
   database: databaseConfigSchema,
   redis: redisConfigSchema,
   loginServer: loginServerConfigSchema.optional(),
@@ -75,10 +79,8 @@ export const serverConfigSchema = z.object({
 export type ServerConfig = z.infer<typeof serverConfigSchema>;
 
 // Load configuration from environment variables
-export function loadConfigFromEnv(): Partial<ServerConfig> {
-  return {
-    clusterId: process.env['SWG_CLUSTER_ID'],
-    clusterName: process.env['SWG_CLUSTER_NAME'],
+export function loadConfigFromEnv(): Record<string, unknown> {
+  const config: Record<string, unknown> = {
     database: {
       host: process.env['DB_HOST'] ?? 'localhost',
       port: parseInt(process.env['DB_PORT'] ?? '3306', 10),
@@ -93,7 +95,32 @@ export function loadConfigFromEnv(): Partial<ServerConfig> {
       password: process.env['REDIS_PASSWORD'],
       db: parseInt(process.env['REDIS_DB'] ?? '0', 10),
     },
+    connectionServer: {
+      port: process.env['CONNECTION_SERVER_PORT']
+        ? parseInt(process.env['CONNECTION_SERVER_PORT'], 10)
+        : 44455,
+      bindAddress: process.env['CONNECTION_SERVER_BIND'] ?? '0.0.0.0',
+      publicAddress: process.env['CONNECTION_SERVER_PUBLIC_ADDRESS'],
+      maxConnections: parseInt(process.env['CONNECTION_MAX_CONNECTIONS'] ?? '3000', 10),
+      pingInterval: parseInt(process.env['CONNECTION_PING_INTERVAL'] ?? '30000', 10),
+      disconnectTimeout: parseInt(process.env['CONNECTION_DISCONNECT_TIMEOUT'] ?? '60000', 10),
+    },
   };
+
+  if (process.env['SWG_CLUSTER_ID']) {
+    config['clusterId'] = process.env['SWG_CLUSTER_ID'];
+  }
+  if (process.env['SWG_CLUSTER_NAME']) {
+    config['clusterName'] = process.env['SWG_CLUSTER_NAME'];
+  }
+  if (process.env['SWG_CLUSTER_ID_NUMERIC']) {
+    config['clusterIdNumeric'] = parseInt(process.env['SWG_CLUSTER_ID_NUMERIC'], 10);
+  }
+  if (process.env['SWG_MAX_CHARS_PER_ACCOUNT']) {
+    config['maxCharsPerAccount'] = parseInt(process.env['SWG_MAX_CHARS_PER_ACCOUNT'], 10);
+  }
+
+  return config;
 }
 
 // Validate and parse configuration

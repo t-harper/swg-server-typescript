@@ -313,7 +313,7 @@ export function createSuccessResult(
     targetContainerId,
     slot,
     previousSlot,
-  };
+  } as TransferResult;
 }
 
 /**
@@ -333,7 +333,7 @@ export function createFailureResult(
     itemId,
     sourceContainerId,
     targetContainerId,
-  };
+  } as TransferResult;
 }
 
 /**

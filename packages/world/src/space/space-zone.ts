@@ -556,7 +556,7 @@ export class SpaceZone {
     x: number,
     y: number,
     z: number,
-    shipRadius: number = 10
+    _shipRadius: number = 10
   ): CollisionResult {
     // Check asteroid field collisions
     for (const field of this.asteroidFields) {

@@ -3,12 +3,10 @@
  * Represents a single zone (planet or space region) in the game world
  */
 
-import type { ObjectId, Vector3 } from '@swg/shared-types';
+import type { Vector3 } from '@swg/shared-types';
 import { QuadTree, type Spatial } from '../spatial/quad-tree.js';
 import {
   BoundingBox,
-  fromCenterRadius,
-  createBoundingBox,
 } from '../spatial/bounding-box.js';
 import type { TerrainInfo, ZoneConfig, ZoneProperties } from './zone-config.js';
 

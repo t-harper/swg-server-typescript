@@ -65,11 +65,11 @@ export function initDb(config: DatabaseConfig): Database {
     user: config.user,
     password: config.password,
     database: config.database,
-    connectionLimit: config.connectionLimit ?? DEFAULT_CONFIG.connectionLimit,
-    waitForConnections: config.waitForConnections ?? DEFAULT_CONFIG.waitForConnections,
-    queueLimit: config.queueLimit ?? DEFAULT_CONFIG.queueLimit,
-    enableKeepAlive: config.enableKeepAlive ?? DEFAULT_CONFIG.enableKeepAlive,
-    keepAliveInitialDelay: config.keepAliveInitialDelay ?? DEFAULT_CONFIG.keepAliveInitialDelay,
+    connectionLimit: config.connectionLimit ?? DEFAULT_CONFIG.connectionLimit ?? 10,
+    waitForConnections: config.waitForConnections ?? DEFAULT_CONFIG.waitForConnections ?? true,
+    queueLimit: config.queueLimit ?? DEFAULT_CONFIG.queueLimit ?? 0,
+    enableKeepAlive: config.enableKeepAlive ?? DEFAULT_CONFIG.enableKeepAlive ?? true,
+    keepAliveInitialDelay: config.keepAliveInitialDelay ?? DEFAULT_CONFIG.keepAliveInitialDelay ?? 10000,
   };
 
   pool = mysql.createPool(poolConfig);

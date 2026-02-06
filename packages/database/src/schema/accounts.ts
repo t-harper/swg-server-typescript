@@ -40,11 +40,11 @@ export const accounts = mysqlTable(
     createdAt: datetime('created_at').notNull().default(new Date()),
     lastLogin: datetime('last_login'),
   },
-  (table) => [
-    index('idx_accounts_username').on(table.username),
-    index('idx_accounts_station_id').on(table.stationId),
-    index('idx_accounts_status').on(table.status),
-  ]
+  (table) => ({
+    usernameIdx: index('idx_accounts_username').on(table.username),
+    stationIdIdx: index('idx_accounts_station_id').on(table.stationId),
+    statusIdx: index('idx_accounts_status').on(table.status),
+  })
 );
 
 /**

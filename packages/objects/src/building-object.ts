@@ -100,7 +100,7 @@ export class BuildingObject extends TangibleObject {
   buildingType: BuildingType;
 
   /** Owner character ID */
-  ownerId: ObjectId;
+  override ownerId: ObjectId;
 
   /** Owner character name for display */
   ownerName: string;
@@ -217,7 +217,7 @@ export class BuildingObject extends TangibleObject {
     // Initialize state
     this.conditionState = StructureConditionState.Good;
     this.placedAt = new Date();
-    this.sign = undefined;
+    delete this.sign;
 
     // Initialize delta trackers
     this.deltaTrackerBuio3 = new DeltaTracker();
@@ -273,11 +273,13 @@ export class BuildingObject extends TangibleObject {
   /**
    * Set the building owner
    */
-  setOwner(ownerId: ObjectId, ownerName: string): void {
+  override setOwner(ownerId: ObjectId, ownerName?: string): void {
     this.ownerId = ownerId;
-    this.ownerName = ownerName;
+    if (ownerName !== undefined) {
+      this.ownerName = ownerName;
+      this.deltaTrackerBuio3.trackChange(BuioProperty.OWNER_NAME, DeltaType.Change);
+    }
     this.deltaTrackerBuio3.trackChange(BuioProperty.OWNER_ID, DeltaType.Change);
-    this.deltaTrackerBuio3.trackChange(BuioProperty.OWNER_NAME, DeltaType.Change);
     this.markModified();
   }
 
@@ -862,7 +864,11 @@ export class BuildingObject extends TangibleObject {
       };
     }
 
-    this.sign = text;
+    if (text !== undefined) {
+      this.sign = text;
+    } else {
+      delete this.sign;
+    }
     this.deltaTrackerBuio3.trackChange(BuioProperty.SIGN_TEXT, DeltaType.Change);
     this.markModified();
 
@@ -952,7 +958,11 @@ export class BuildingObject extends TangibleObject {
     target.isPublic = this.isPublic;
     target.conditionState = this.conditionState;
     target.placedAt = new Date(this.placedAt);
-    target.sign = this.sign;
+    if (this.sign !== undefined) {
+      target.sign = this.sign;
+    } else {
+      delete target.sign;
+    }
 
     // Copy cells
     target.cells = new Map(this.cells);

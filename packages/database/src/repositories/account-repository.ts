@@ -19,7 +19,7 @@ const BCRYPT_SALT_ROUNDS = 12;
 export interface CreateAccountData {
   username: string;
   password: string;
-  stationId?: bigint;
+  stationId?: bigint | undefined;
 }
 
 /**
@@ -89,7 +89,7 @@ export class AccountRepository {
     const newAccount: NewAccount = {
       username: data.username,
       passwordHash,
-      stationId: data.stationId,
+      ...(data.stationId !== undefined ? { stationId: data.stationId } : {}),
       status: 'active',
       createdAt: new Date(),
     };

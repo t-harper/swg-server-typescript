@@ -1,0 +1,101 @@
+# Chat Server Dockerfile
+# Handles player chat, mail, and messaging
+
+# Build stage - compile TypeScript
+FROM node:22-alpine AS builder
+
+RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
+
+WORKDIR /app
+
+# Copy package files for dependency installation
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
+COPY apps/chat-server/package.json ./apps/chat-server/
+COPY packages/config/package.json ./packages/config/
+COPY packages/database/package.json ./packages/database/
+COPY packages/protocol/package.json ./packages/protocol/
+COPY packages/redis/package.json ./packages/redis/
+COPY packages/shared-types/package.json ./packages/shared-types/
+
+# Install dependencies
+RUN pnpm install --frozen-lockfile
+
+# Copy source code
+COPY apps/chat-server ./apps/chat-server
+COPY packages/config ./packages/config
+COPY packages/database ./packages/database
+COPY packages/protocol ./packages/protocol
+COPY packages/redis ./packages/redis
+COPY packages/shared-types ./packages/shared-types
+COPY tsconfig.json ./
+
+# Build the application
+RUN pnpm --filter @swg/chat-server build
+
+# Production stage
+FROM node:22-alpine AS production
+
+RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
+
+# Install runtime dependencies
+RUN apk add --no-cache \
+    dumb-init \
+    curl \
+    bash \
+    netcat-openbsd \
+    && rm -rf /var/cache/apk/*
+
+# Create non-root user
+RUN addgroup -g 1001 -S swg && \
+    adduser -u 1001 -S swg -G swg
+
+WORKDIR /app
+
+# Copy package files for production dependencies
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY apps/chat-server/package.json ./apps/chat-server/
+COPY packages/config/package.json ./packages/config/
+COPY packages/database/package.json ./packages/database/
+COPY packages/protocol/package.json ./packages/protocol/
+COPY packages/redis/package.json ./packages/redis/
+COPY packages/shared-types/package.json ./packages/shared-types/
+
+# Install production dependencies only
+RUN pnpm install --frozen-lockfile --prod
+
+# Copy built application from builder stage
+COPY --from=builder /app/apps/chat-server/dist ./apps/chat-server/dist
+COPY --from=builder /app/packages/config/dist ./packages/config/dist
+COPY --from=builder /app/packages/database/dist ./packages/database/dist
+COPY --from=builder /app/packages/protocol/dist ./packages/protocol/dist
+COPY --from=builder /app/packages/redis/dist ./packages/redis/dist
+COPY --from=builder /app/packages/shared-types/dist ./packages/shared-types/dist
+
+# Copy scripts
+COPY --chmod=755 docker/scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY --chmod=755 docker/scripts/healthcheck.sh /usr/local/bin/healthcheck.sh
+
+# Create directories
+RUN mkdir -p /app/logs /app/data && \
+    chown -R swg:swg /app
+
+# Environment
+ENV NODE_ENV=production
+ENV SERVER_TYPE=chat-server
+ENV CHAT_SERVER_PORT=44462
+
+# Expose port for internal chat communications
+EXPOSE 44462/tcp
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+    CMD /usr/local/bin/healthcheck.sh chat-server ${CHAT_SERVER_PORT:-44462}
+
+# Labels
+LABEL org.opencontainers.image.title="SWG Chat Server"
+LABEL org.opencontainers.image.description="Star Wars Galaxies Chat Server"
+
+USER swg
+
+ENTRYPOINT ["/usr/bin/dumb-init", "--", "/usr/local/bin/entrypoint.sh"]
+CMD ["node", "apps/chat-server/dist/index.js"]

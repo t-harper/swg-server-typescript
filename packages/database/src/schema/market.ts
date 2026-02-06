@@ -70,30 +70,30 @@ export const marketAuctions = mysqlTable(
     /** Listing status: active, sold, expired, cancelled */
     status: varchar('status', { length: 16 }).default('active'),
   },
-  (table) => [
+  (table) => ({
     // Seller lookups - find all listings by a seller
-    index('idx_market_auctions_seller_id').on(table.sellerId),
+    sellerIdIdx: index('idx_market_auctions_seller_id').on(table.sellerId),
     // Category searches - filter by item type
-    index('idx_market_auctions_category').on(table.itemCategory),
+    categoryIdx: index('idx_market_auctions_category').on(table.itemCategory),
     // Planet/region searches - location filtering
-    index('idx_market_auctions_planet_id').on(table.planetId),
-    index('idx_market_auctions_planet_region').on(table.planetId, table.regionId),
+    planetIdIdx: index('idx_market_auctions_planet_id').on(table.planetId),
+    planetRegionIdx: index('idx_market_auctions_planet_region').on(table.planetId, table.regionId),
     // Expiration processing - batch expire old listings
-    index('idx_market_auctions_expires_at').on(table.expiresAt),
-    index('idx_market_auctions_status_expires').on(table.status, table.expiresAt),
+    expiresAtIdx: index('idx_market_auctions_expires_at').on(table.expiresAt),
+    statusExpiresIdx: index('idx_market_auctions_status_expires').on(table.status, table.expiresAt),
     // Price range queries
-    index('idx_market_auctions_price').on(table.price),
+    priceIdx: index('idx_market_auctions_price').on(table.price),
     // Combined search: category + planet + price (common bazaar search)
-    index('idx_market_auctions_category_planet_price').on(
+    categoryPlanetPriceIdx: index('idx_market_auctions_category_planet_price').on(
       table.itemCategory,
       table.planetId,
       table.price
     ),
     // Vendor listings lookup
-    index('idx_market_auctions_vendor_id').on(table.vendorId),
+    vendorIdIdx: index('idx_market_auctions_vendor_id').on(table.vendorId),
     // Item template lookup for price history
-    index('idx_market_auctions_template_crc').on(table.itemTemplateCrc),
-  ]
+    templateCrcIdx: index('idx_market_auctions_template_crc').on(table.itemTemplateCrc),
+  })
 );
 
 /**
@@ -118,16 +118,16 @@ export const marketBids = mysqlTable(
     /** Whether this is currently the winning bid */
     isWinning: boolean('is_winning').default(false),
   },
-  (table) => [
+  (table) => ({
     // Find all bids for an auction
-    index('idx_market_bids_auction_id').on(table.auctionId),
+    auctionIdIdx: index('idx_market_bids_auction_id').on(table.auctionId),
     // Find all bids by a bidder
-    index('idx_market_bids_bidder_id').on(table.bidderId),
+    bidderIdIdx: index('idx_market_bids_bidder_id').on(table.bidderId),
     // Find winning bids
-    index('idx_market_bids_auction_winning').on(table.auctionId, table.isWinning),
+    auctionWinningIdx: index('idx_market_bids_auction_winning').on(table.auctionId, table.isWinning),
     // Bid amount ordering
-    index('idx_market_bids_auction_amount').on(table.auctionId, table.amount),
-  ]
+    auctionAmountIdx: index('idx_market_bids_auction_amount').on(table.auctionId, table.amount),
+  })
 );
 
 /**
@@ -154,23 +154,23 @@ export const marketSaleHistory = mysqlTable(
     /** When the sale completed */
     soldAt: timestamp('sold_at').defaultNow(),
   },
-  (table) => [
+  (table) => ({
     // Find sales by seller
-    index('idx_market_sale_history_seller_id').on(table.sellerId),
+    sellerIdIdx: index('idx_market_sale_history_seller_id').on(table.sellerId),
     // Find sales by buyer
-    index('idx_market_sale_history_buyer_id').on(table.buyerId),
+    buyerIdIdx: index('idx_market_sale_history_buyer_id').on(table.buyerId),
     // Price history by item template
-    index('idx_market_sale_history_template_crc').on(table.itemTemplateCrc),
+    templateCrcIdx: index('idx_market_sale_history_template_crc').on(table.itemTemplateCrc),
     // Category analytics
-    index('idx_market_sale_history_category').on(table.itemCategory),
+    categoryIdx: index('idx_market_sale_history_category').on(table.itemCategory),
     // Time-based queries for analytics
-    index('idx_market_sale_history_sold_at').on(table.soldAt),
+    soldAtIdx: index('idx_market_sale_history_sold_at').on(table.soldAt),
     // Combined template + time for price trends
-    index('idx_market_sale_history_template_sold').on(
+    templateSoldIdx: index('idx_market_sale_history_template_sold').on(
       table.itemTemplateCrc,
       table.soldAt
     ),
-  ]
+  })
 );
 
 /**
@@ -191,16 +191,16 @@ export const vendorInventory = mysqlTable(
     /** When the item was added to vendor */
     addedAt: timestamp('added_at').defaultNow(),
   },
-  (table) => [
+  (table) => ({
     // Composite primary key
-    primaryKey({ columns: [table.vendorId, table.itemId] }),
+    pk: primaryKey({ columns: [table.vendorId, table.itemId] }),
     // Find all items on a vendor
-    index('idx_vendor_inventory_vendor_id').on(table.vendorId),
+    vendorIdIdx: index('idx_vendor_inventory_vendor_id').on(table.vendorId),
     // Find which vendor has an item
-    index('idx_vendor_inventory_item_id').on(table.itemId),
+    itemIdIdx: index('idx_vendor_inventory_item_id').on(table.itemId),
     // Price ordering for vendor display
-    index('idx_vendor_inventory_vendor_price').on(table.vendorId, table.price),
-  ]
+    vendorPriceIdx: index('idx_vendor_inventory_vendor_price').on(table.vendorId, table.price),
+  })
 );
 
 /**

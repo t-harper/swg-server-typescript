@@ -9,6 +9,7 @@ import {
   SoeOpcode,
   SoeProtocolDefaults,
   DisconnectReason,
+  type DisconnectReasonType,
   CrcConfig,
   getOpcodeName,
 } from './constants.js';
@@ -829,7 +830,7 @@ export class SessionManager extends EventEmitter {
   /**
    * Disconnect a session gracefully
    */
-  disconnectSession(session: Session, reason: number = DisconnectReason.Application): void {
+  disconnectSession(session: Session, reason: DisconnectReasonType = DisconnectReason.Application): void {
     if (session.state === SessionState.Disconnected) {
       return;
     }

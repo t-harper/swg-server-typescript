@@ -224,42 +224,36 @@ export class MarketRepository {
       conditions.push(eq(marketAuctions.isAuction, filters.isAuction));
     }
 
-    // Build the base query
-    let query = this.db
-      .select()
-      .from(marketAuctions)
-      .where(and(...conditions));
-
-    // Apply sorting
+    // Determine sort column
     const sortOrder = filters.sortOrder ?? 'asc';
     const sortFn = sortOrder === 'asc' ? asc : desc;
 
+    let orderByColumn;
     switch (filters.sortBy) {
       case 'price':
-        query = query.orderBy(sortFn(marketAuctions.price));
+        orderByColumn = sortFn(marketAuctions.price);
         break;
       case 'listedAt':
-        query = query.orderBy(sortFn(marketAuctions.listedAt));
+        orderByColumn = sortFn(marketAuctions.listedAt);
         break;
       case 'expiresAt':
-        query = query.orderBy(sortFn(marketAuctions.expiresAt));
+        orderByColumn = sortFn(marketAuctions.expiresAt);
         break;
       case 'itemName':
-        query = query.orderBy(sortFn(marketAuctions.itemName));
+        orderByColumn = sortFn(marketAuctions.itemName);
         break;
       default:
-        // Default sort by listing date descending (newest first)
-        query = query.orderBy(desc(marketAuctions.listedAt));
+        orderByColumn = desc(marketAuctions.listedAt);
     }
 
-    // Apply pagination
-    if (filters.limit !== undefined) {
-      query = query.limit(filters.limit);
-    }
-
-    if (filters.offset !== undefined) {
-      query = query.offset(filters.offset);
-    }
+    // Build the query
+    const query = this.db
+      .select()
+      .from(marketAuctions)
+      .where(and(...conditions))
+      .orderBy(orderByColumn)
+      .limit(filters.limit ?? 1000)
+      .offset(filters.offset ?? 0);
 
     return query;
   }
@@ -409,21 +403,24 @@ export class MarketRepository {
         .limit(1);
 
       // Verify bid is higher than current winning bid or starting price
-      const minimumBid =
-        currentWinning.length > 0
-          ? currentWinning[0].amount + 1
-          : auction[0].price;
+      const currentWinningBid = currentWinning[0];
+      const auctionRow = auction[0];
+      if (!auctionRow) return null;
+
+      const minimumBid = currentWinningBid
+        ? currentWinningBid.amount + 1
+        : auctionRow.price;
 
       if (data.amount < minimumBid) {
         return null;
       }
 
       // Mark previous winning bid as not winning
-      if (currentWinning.length > 0) {
+      if (currentWinningBid) {
         await tx
           .update(marketBids)
           .set({ isWinning: false })
-          .where(eq(marketBids.bidId, currentWinning[0].bidId));
+          .where(eq(marketBids.bidId, currentWinningBid.bidId));
       }
 
       // Insert new bid
@@ -538,6 +535,9 @@ export class MarketRepository {
       }
 
       const auction = auctions[0];
+      if (!auction) {
+        return { success: false, error: 'Auction not found' };
+      }
 
       // Mark auction as sold
       await tx

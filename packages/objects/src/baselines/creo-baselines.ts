@@ -19,6 +19,8 @@ import {
   CreoProperty,
   type EquipmentSlotType,
   type CreatureBuff,
+  type PostureType,
+  type LocomotionType,
 } from '../creature-object.js';
 
 /** CREO type identifier (CRC of "CREO") */
@@ -782,7 +784,7 @@ export function deserializeCreoBaseline3(obj: CreatureObject, data: Uint8Array):
   const variableCount = reader.readUInt16LE();
 
   if (variableCount >= 1) {
-    obj.posture = reader.readUInt8();
+    obj.posture = reader.readUInt8() as PostureType;
   }
 
   if (variableCount >= 2) {
@@ -923,7 +925,7 @@ export function deserializeCreoBaseline4(obj: CreatureObject, data: Uint8Array):
   }
 
   if (variableCount >= 21) {
-    obj.locomotion = reader.readUInt8();
+    obj.locomotion = reader.readUInt8() as LocomotionType;
   }
 
   if (variableCount >= 22) {

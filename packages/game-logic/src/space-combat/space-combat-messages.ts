@@ -30,45 +30,45 @@ import {
  */
 export const SpaceCombatMessageOpcode = {
   /** Client request to fire weapon */
-  WeaponFire: 0xsc001001,
+  WeaponFire: 0x5c001001,
   /** Server response to weapon fire */
-  WeaponFireResponse: 0xsc001002,
+  WeaponFireResponse: 0x5c001002,
   /** Server notification of projectile spawn */
-  ProjectileSpawn: 0xsc001003,
+  ProjectileSpawn: 0x5c001003,
   /** Server update of projectile position */
-  ProjectileUpdate: 0xsc001004,
+  ProjectileUpdate: 0x5c001004,
   /** Server notification of projectile despawn */
-  ProjectileDespawn: 0xsc001005,
+  ProjectileDespawn: 0x5c001005,
   /** Server notification of missile tracking update */
-  MissileTracking: 0xsc001006,
+  MissileTracking: 0x5c001006,
   /** Client request to deploy countermeasure */
-  CountermeasureDeploy: 0xsc001007,
+  CountermeasureDeploy: 0x5c001007,
   /** Server response to countermeasure deploy */
-  CountermeasureDeployResponse: 0xsc001008,
+  CountermeasureDeployResponse: 0x5c001008,
   /** Server notification of countermeasure active */
-  CountermeasureActive: 0xsc001009,
+  CountermeasureActive: 0x5c001009,
   /** Client request to acquire target lock */
-  TargetLockRequest: 0xsc00100a,
+  TargetLockRequest: 0x5c00100a,
   /** Server update on target lock status */
-  TargetLockUpdate: 0xsc00100b,
+  TargetLockUpdate: 0x5c00100b,
   /** Server notification of ship being hit */
-  ShipHit: 0xsc00100c,
+  ShipHit: 0x5c00100c,
   /** Server notification of critical hit */
-  CriticalHit: 0xsc00100d,
+  CriticalHit: 0x5c00100d,
   /** Server notification of component damage */
-  ComponentDamage: 0xsc00100e,
+  ComponentDamage: 0x5c00100e,
   /** Server notification of ship destruction */
-  ShipDestruction: 0xsc00100f,
+  ShipDestruction: 0x5c00100f,
   /** Server update of ship damage state */
-  ShipDamageUpdate: 0xsc001010,
+  ShipDamageUpdate: 0x5c001010,
   /** Client request to launch missile */
-  MissileLaunch: 0xsc001011,
+  MissileLaunch: 0x5c001011,
   /** Server notification of missile lock warning */
-  MissileLockWarning: 0xsc001012,
+  MissileLockWarning: 0x5c001012,
   /** Client request to fire turret */
-  TurretFire: 0xsc001013,
+  TurretFire: 0x5c001013,
   /** Server notification of turret status */
-  TurretStatus: 0xsc001014,
+  TurretStatus: 0x5c001014,
 } as const;
 
 export type SpaceCombatMessageOpcodeType =

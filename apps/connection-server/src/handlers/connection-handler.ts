@@ -71,7 +71,7 @@ export interface PlayerDisconnectedMessage {
   type: 'player_disconnected';
   accountId: number;
   stationId: number;
-  characterId?: string;
+  characterId?: string | undefined;
   reason: string;
   timestamp: number;
 }

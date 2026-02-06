@@ -13,7 +13,6 @@ import {
   GCWRegionStatus,
   type FactionRank,
   type FactionPerk,
-  type FactionItem,
   getFactionName,
   getStatusName,
 } from './faction-types.js';

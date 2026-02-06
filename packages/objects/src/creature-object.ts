@@ -150,6 +150,8 @@ export const CreatureState = {
   SHIP_INTERIOR: 1n << 32n,
   /** Piloting POB ship */
   PILOTING_POB_SHIP: 1n << 33n,
+  /** Incapacitated */
+  INCAPACITATED: 1n << 34n,
 } as const;
 
 export type CreatureStateType = bigint;

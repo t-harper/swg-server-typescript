@@ -83,7 +83,7 @@ export class ArmorObject extends TangibleObject {
   // ============================================
 
   /** Armor rating (base protection class) */
-  armorRating: ArmorRatingType;
+  override armorRating: ArmorRatingType;
 
   // ============================================
   // Damage Type Effectiveness (0-1)
@@ -252,8 +252,6 @@ export class ArmorObject extends TangibleObject {
   setArmorRating(rating: ArmorRatingType): void {
     if (this.armorRating !== rating) {
       this.armorRating = rating;
-      // Also update the base class armor rating for compatibility
-      super.armorRating = rating;
       this.deltaTrackerArmo3.trackChange(ArmoProperty.ARMOR_RATING, DeltaType.Change);
       this.markModified();
     }

@@ -134,7 +134,7 @@ export function createGroupInviteResponseMessage(
     accepted,
     inviterId,
     errorMessage,
-  };
+  } as GroupInviteResponseMessage;
 }
 
 // ============================================
@@ -188,7 +188,7 @@ export function createGroupJoinMessage(
     lootThreshold,
     formation,
     isRaid,
-  };
+  } as GroupJoinMessage;
 }
 
 // ============================================
@@ -226,7 +226,7 @@ export function createGroupLeaveMessage(
     leaverId,
     leaverName,
     reason,
-  };
+  } as GroupLeaveMessage;
 }
 
 // ============================================
@@ -260,7 +260,7 @@ export function createGroupDisbandMessage(
     timestamp: Date.now(),
     memberIds,
     reason,
-  };
+  } as GroupDisbandMessage;
 }
 
 // ============================================
@@ -298,7 +298,7 @@ export function createGroupKickMessage(
     kickedId,
     kickedName,
     reason,
-  };
+  } as GroupKickMessage;
 }
 
 // ============================================
@@ -386,7 +386,7 @@ export function createGroupLootRuleMessage(
     lootThreshold,
     lootMasterId,
     lootMasterName,
-  };
+  } as GroupLootRuleMessage;
 }
 
 // ============================================
@@ -486,7 +486,7 @@ export function createGroupChatMessage(
     senderName,
     message,
     isRaidChat,
-  };
+  } as GroupChatMessage;
 }
 
 // ============================================
@@ -584,7 +584,7 @@ export function createGroupConvertToRaidMessage(
     timestamp: Date.now(),
     success,
     errorMessage,
-  };
+  } as GroupConvertToRaidMessage;
 }
 
 // ============================================

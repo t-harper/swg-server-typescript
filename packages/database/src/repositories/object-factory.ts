@@ -47,7 +47,7 @@ export interface ObjectFactoryConfig {
  * Converts database rows to typed SceneObject instances
  */
 export class ObjectFactory {
-  private templateLoader?: TemplateLoader;
+  private templateLoader?: TemplateLoader | undefined;
   private templateCache: Map<CrcValue, TemplateData | null> = new Map();
 
   constructor(config: ObjectFactoryConfig = {}) {

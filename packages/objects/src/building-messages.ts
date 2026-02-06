@@ -141,7 +141,7 @@ export function createStructurePlaceResponse(
     lotsConsumed,
     remainingLots,
     timestamp: Date.now(),
-  };
+  } as StructurePlaceResponseMessage;
 }
 
 // ============================================
@@ -226,7 +226,7 @@ export function createStructurePermissionListResponse(
     requesterIsOwner,
     requesterIsAdmin,
     timestamp: Date.now(),
-  };
+  } as StructurePermissionListResponseMessage;
 }
 
 // ============================================
@@ -288,7 +288,7 @@ export function createStructurePermissionUpdateMessage(
     targetName,
     permissions,
     isPublic,
-  };
+  } as StructurePermissionUpdateMessage;
 }
 
 /**
@@ -331,7 +331,7 @@ export function createStructurePermissionUpdateResponse(
     permissionListSize,
     banListSize,
     timestamp: Date.now(),
-  };
+  } as StructurePermissionUpdateResponseMessage;
 }
 
 // ============================================
@@ -436,7 +436,7 @@ export function createStructureStatusResponse(
     sign,
     placedAt,
     timestamp: Date.now(),
-  };
+  } as StructureStatusResponseMessage;
 }
 
 // ============================================
@@ -513,7 +513,7 @@ export function createStructurePayMaintenanceResponse(
     daysRemaining,
     playerBalance,
     timestamp: Date.now(),
-  };
+  } as StructurePayMaintenanceResponseMessage;
 }
 
 // ============================================
@@ -582,7 +582,7 @@ export function createStructurePackResponse(
     lotsReturned,
     newLotCount,
     timestamp: Date.now(),
-  };
+  } as StructurePackResponseMessage;
 }
 
 // ============================================
@@ -651,7 +651,7 @@ export function createStructureDestroyResponse(
     lotsReturned,
     newLotCount,
     timestamp: Date.now(),
-  };
+  } as StructureDestroyResponseMessage;
 }
 
 // ============================================
@@ -716,7 +716,7 @@ export function createStructureSignResponse(
     errorMessage,
     signText,
     timestamp: Date.now(),
-  };
+  } as StructureSignResponseMessage;
 }
 
 // ============================================
@@ -789,7 +789,7 @@ export function createStructureTransferResponse(
     newOwnerId,
     newOwnerName,
     timestamp: Date.now(),
-  };
+  } as StructureTransferResponseMessage;
 }
 
 // ============================================

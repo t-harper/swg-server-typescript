@@ -26,6 +26,12 @@ import {
   deserializeClientVerifyAndLockNameRequest,
   deserializeClientRandomNameRequest,
 } from '@swg/protocol/swg/messages/character-creation.js';
+import {
+  serializeLoginEnumCluster,
+  serializeLoginClusterStatus,
+  createLoginEnumCluster,
+  createLoginClusterStatus,
+} from '@swg/protocol/swg/messages/login-cluster-messages.js';
 
 import { UdpServer, createUdpServer, type RemoteEndpoint } from './network/udp-server.js';
 import {
@@ -82,7 +88,13 @@ export async function createServer(config: ServerConfig): Promise<LoginServer> {
   console.log('[LoginServer] Database initialized');
 
   // Initialize Redis
-  const redisClient = getRedisClient(config.redis);
+  const redisConfig = {
+    host: config.redis.host,
+    port: config.redis.port,
+    db: config.redis.db,
+    ...(config.redis.password !== undefined && { password: config.redis.password }),
+  };
+  const redisClient = getRedisClient(redisConfig);
   await redisClient.connect();
   console.log('[LoginServer] Redis connected');
 
@@ -90,10 +102,9 @@ export async function createServer(config: ServerConfig): Promise<LoginServer> {
   const accountRepository = new AccountRepository(db);
   const characterRepository = new CharacterRepository(db);
 
-  // Create session store
+  // Create session store (uses default prefix 'session:' matching all servers)
   const sessionStore = new SessionStore(redisClient, {
     defaultTtlSeconds: config.loginServer?.sessionTimeout ?? 3600,
-    keyPrefix: 'login:session:',
   });
 
   // Create handlers
@@ -205,6 +216,40 @@ export async function createServer(config: ServerConfig): Promise<LoginServer> {
 
           // Send response using reliable delivery
           sessionManager.sendReliable(soeSession, result.response);
+
+          if (result.success && result.session) {
+            // Send cluster enumeration
+            const maxChars = config.maxCharsPerAccount ?? 2;
+            const clusterConfig = {
+              clusterId: config.clusterIdNumeric ?? serverId,
+              clusterName: config.clusterName ?? 'SWG Server',
+              connectionServerAddress: config.connectionServer?.publicAddress ?? config.connectionServer?.bindAddress ?? '127.0.0.1',
+              connectionServerPort: config.connectionServer?.port ?? 44455,
+            };
+
+            const enumCluster = createLoginEnumCluster(
+              [{ clusterId: clusterConfig.clusterId, clusterName: clusterConfig.clusterName }],
+              maxChars
+            );
+            sessionManager.sendReliable(soeSession, serializeLoginEnumCluster(enumCluster));
+
+            const clusterStatus = createLoginClusterStatus([{
+              clusterId: clusterConfig.clusterId,
+              connectionServerAddress: clusterConfig.connectionServerAddress,
+              connectionServerPort: clusterConfig.connectionServerPort,
+              pingPort: clusterConfig.connectionServerPort,
+              populationOnline: 0,
+              populationStatusLoaded: 0,
+              maxCharactersPerAccount: maxChars,
+              timeZone: 0,
+              status: 2, // 2 = online/up
+              notRecommended: false,
+              onlinePlayerLimit: 3000,
+              onlineFreeTrialLimit: 3000,
+            }]);
+            sessionManager.sendReliable(soeSession, serializeLoginClusterStatus(clusterStatus));
+          }
+
           break;
         }
 
@@ -297,26 +342,26 @@ export async function createServer(config: ServerConfig): Promise<LoginServer> {
   });
 
   // Handle new connections
-  sessionManager.on('session:connected', (session) => {
+  sessionManager.on('session:connected', (session: Session) => {
     const key = session.getKey();
     console.log(`[LoginServer] Session connected: ${key}`);
     getLoginSession(session);
   });
 
   // Handle disconnections
-  sessionManager.on('session:disconnected', (session, reason) => {
+  sessionManager.on('session:disconnected', (session: Session, reason: number) => {
     const key = session.getKey();
     console.log(`[LoginServer] Session disconnected: ${key}, reason: ${reason}`);
     void cleanupLoginSession(key);
   });
 
   // Handle received data (SWG messages)
-  sessionManager.on('data', (session, data) => {
+  sessionManager.on('data', (session: Session, data: Uint8Array) => {
     void handleSwgMessage(session, data);
   });
 
   // Handle errors
-  sessionManager.on('error', (error, session) => {
+  sessionManager.on('error', (error: Error, session?: Session) => {
     if (session) {
       console.error(`[LoginServer] Error for session ${session.getKey()}:`, error);
     } else {

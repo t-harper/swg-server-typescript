@@ -18,6 +18,8 @@ import {
   PlayProperty,
   type Waypoint,
   type QuestState,
+  type AdminLevelType,
+  type CraftingStageType,
 } from '../player-object.js';
 
 /** PLAY type identifier (CRC of "PLAY") */
@@ -738,7 +740,7 @@ export function deserializePlayBaseline6(obj: PlayerObject, data: Uint8Array): v
   const variableCount = reader.readUInt16LE();
 
   if (variableCount >= 1) {
-    obj.adminLevel = reader.readUInt8();
+    obj.adminLevel = reader.readUInt8() as AdminLevelType;
   }
 
   if (variableCount >= 2) {
@@ -765,7 +767,7 @@ export function deserializePlayBaseline6(obj: PlayerObject, data: Uint8Array): v
   }
 
   if (variableCount >= 4) {
-    obj.craftingStage = reader.readUInt32LE();
+    obj.craftingStage = reader.readUInt32LE() as CraftingStageType;
   }
 
   if (variableCount >= 5) {
