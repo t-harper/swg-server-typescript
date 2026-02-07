@@ -159,6 +159,296 @@ export interface CppAvatarRecord {
 
 export type CppAvatarList = CppAvatarRecord[];
 
+// --- Login cluster types ---
+
+export interface CppLoginEnumClusterData {
+  m_clusterId: number;
+  m_clusterName: string;
+  m_timeZone: number;
+}
+
+export interface CppLoginClusterStatusData {
+  m_clusterId: number;
+  m_connectionServerAddress: string;
+  m_connectionServerPort: number;
+  m_connectionServerPingPort: number;
+  m_populationOnline: number;
+  m_populationOnlineStatus: number;
+  m_maxCharactersPerAccount: number;
+  m_timeZone: number;
+  m_status: number;
+  m_dontRecommend: boolean;
+  m_onlinePlayerLimit: number;
+  m_onlineFreeTrialLimit: number;
+}
+
+export interface CppLoginClusterStatusExData {
+  m_clusterId: number;
+  m_branch: string;
+  m_networkVersion: string;
+  m_version: number;
+  m_reserved1: number;
+  m_reserved2: number;
+  m_reserved3: number;
+  m_reserved4: number;
+}
+
+// --- Map/survey types ---
+
+export interface CppMapLocation {
+  locationId: bigint;
+  locationName: string;
+  x: number;
+  y: number;
+  category: number;
+  subCategory: number;
+  flags: number;
+}
+
+export interface CppSurveyDataItem {
+  x: number;
+  y: number;
+  z: number;
+  efficiency: number;
+}
+
+export interface CppResourceListDataItem {
+  resourceName: string;
+  resourceId: bigint;
+  parentClassName: string;
+}
+
+// --- Auction/market types ---
+
+export interface CppSearchCondition {
+  attributeNameCrc: number;
+  requiredAttribute: boolean;
+  comparison: number;
+  intMin?: number;
+  intMax?: number;
+  floatMin?: number;
+  floatMax?: number;
+  stringValue?: string;
+}
+
+export interface CppAuctionLocation {
+  locationId: bigint;
+  locationNameLength: number;
+  locationName: string;
+  ownerId: bigint;
+  salesTax: number;
+  salesTaxBankId: bigint;
+  emptyDate: number;
+  lastAccessDate: number;
+  inactiveDate: number;
+  status: number;
+  searchEnabled: boolean;
+  entranceCharge: number;
+}
+
+export interface CppMarketAuction {
+  itemId: bigint;
+  ownerId: bigint;
+  creatorId: bigint;
+  locationId: bigint;
+  minBid: number;
+  buyNowPrice: number;
+  auctionTimer: number;
+  oobLength: number;
+  oob: string;
+  userDescriptionLength: number;
+  userDescription: string;
+  category: number;
+  itemTemplateId: number;
+  itemNameLength: number;
+  itemName: string;
+  itemTimer: number;
+  active: number;
+  itemSize: number;
+}
+
+export interface CppMarketAuctionAttribute {
+  itemId: bigint;
+  attributeName: string;
+  attributeValue: string;
+}
+
+export interface CppMarketAuctionBid {
+  itemId: bigint;
+  bidderId: bigint;
+  bid: number;
+  maxProxyBid: number;
+}
+
+export interface CppPalettizedItemDataHeader {
+  itemId: bigint;
+  itemNameKey: number;
+  highBid: number;
+  timer: number;
+  buyNowPrice: number;
+  locationKey: number;
+  ownerId: bigint;
+  ownerNameKey: number;
+  highBidderId: bigint;
+  highBidderNameKey: number;
+  maxProxyBid: number;
+  myBid: number;
+  itemType: number;
+  resourceContainerClassCrc: number;
+  flags: number;
+  entranceCharge: number;
+}
+
+export interface CppAuctionQueryResponseData {
+  auctionId: bigint;
+  location: string;
+  ownerId: bigint;
+  minBid: number;
+  timer: number;
+  itemId: bigint;
+  soldFlag: number;
+  highBidderId: bigint;
+  itemType: number;
+  resourceContainerClassCrc: number;
+  itemQuantity: number;
+  itemTimer: number;
+  highBid: number;
+  highBidMaxProxy: number;
+}
+
+// --- Game utility types ---
+
+export type CppAttributePair = [string, string];
+
+export interface CppBatchBaselinesMessageData {
+  networkId: bigint;
+  objectType: number;
+  packageId: number;
+  package: Uint8Array;
+}
+
+export interface CppCharacterListMessageData {
+  name: string;
+  objectTemplate: string;
+  characterId: bigint;
+  containerId: bigint;
+  location: string;
+  coordinates: CppVector3;
+}
+
+export interface CppChardata {
+  name: string;
+  objectTemplateId: number;
+  networkId: bigint;
+  clusterId: number;
+  characterType: number;
+}
+
+export interface CppChunk {
+  process: number;
+  nodeX: number;
+  nodeZ: number;
+}
+
+export interface CppStructureListMessageData {
+  objectTemplate: string;
+  structureId: bigint;
+  location: string;
+  coordinates: CppVector3;
+  deleted: number;
+}
+
+// --- Customer service types ---
+
+export interface CppChatLogEntry {
+  from: string;
+  to: string;
+  channel: string;
+  message: string;
+  time: number;
+}
+
+export interface CppCustomerServiceCategory {
+  categoryName: string;
+  categoryId: number;
+  subCategories: CppCustomerServiceCategory[];
+  isBugType: boolean;
+  isServiceType: boolean;
+}
+
+export interface CppCustomerServiceComment {
+  ticketId: number;
+  commentId: number;
+  fromCsr: boolean;
+  comment: string;
+  commentorName: string;
+}
+
+export interface CppCustomerServiceTicket {
+  categoryId: number;
+  subCategoryId: number;
+  characterName: string;
+  details: string;
+  language: string;
+  ticketId: number;
+  modifiedDate: bigint;
+  read: boolean;
+  closed: boolean;
+}
+
+export interface CppCustomerServiceSearchResult {
+  title: string;
+  id: string;
+  matchPercent: number;
+}
+
+// --- Metrics/planet/AI types ---
+
+export interface CppMetricsPair {
+  label: string;
+  value: number;
+  description: string;
+  persistData: boolean;
+  summary: boolean;
+}
+
+export interface CppAIPathInfoNodeInfo {
+  node: number;
+  state: number;
+}
+
+export interface CppResourceTypeData {
+  networkId: bigint;
+  name: string;
+  depletedTimestamp: number;
+  parentClass: string;
+  attributes: Array<[string, number]>;
+  fractalSeeds: Array<[bigint, number]>;
+}
+
+export interface CppPlanetNodeStatusMessageData {
+  x: number;
+  z: number;
+  loaded: boolean;
+  servers: number[];
+  subscriptionCounts: number[];
+}
+
+export interface CppPlanetObjectStatusMessageData {
+  objectId: bigint;
+  x: number;
+  z: number;
+  authoritativeServer: number;
+  interestRadius: number;
+  deleteObject: number;
+  objectTypeTag: number;
+  level: number;
+  hibernating: boolean;
+  templateCrc: number;
+  aiActivity: number;
+  creationType: number;
+}
+
 export interface CppWirePacket {
   name: string;
   opcode: number;
@@ -1092,6 +1382,763 @@ function writeAvatarList(writer: BufferWriter, value: unknown, context: string):
   }
 }
 
+// --- LoginEnumCluster::ClusterData ---
+
+function readLoginEnumClusterData(reader: BufferReader): CppLoginEnumClusterData {
+  return {
+    m_clusterId: reader.readUInt32LE(),
+    m_clusterName: readArchiveString(reader),
+    m_timeZone: reader.readInt32LE(),
+  };
+}
+
+function writeLoginEnumClusterData(writer: BufferWriter, value: unknown, context: string): void {
+  const data = ensureObject(value, context) as Partial<CppLoginEnumClusterData>;
+  writer.writeUInt32LE(ensureNumber(data.m_clusterId, `${context}.m_clusterId`));
+  writeArchiveString(writer, ensureString(data.m_clusterName, `${context}.m_clusterName`));
+  writer.writeInt32LE(ensureNumber(data.m_timeZone, `${context}.m_timeZone`));
+}
+
+// --- LoginClusterStatus::ClusterData ---
+
+function readLoginClusterStatusData(reader: BufferReader): CppLoginClusterStatusData {
+  return {
+    m_clusterId: reader.readUInt32LE(),
+    m_connectionServerAddress: readArchiveString(reader),
+    m_connectionServerPort: reader.readUInt16LE(),
+    m_connectionServerPingPort: reader.readUInt16LE(),
+    m_populationOnline: reader.readInt32LE(),
+    m_populationOnlineStatus: reader.readInt32LE(),
+    m_maxCharactersPerAccount: reader.readInt32LE(),
+    m_timeZone: reader.readInt32LE(),
+    m_status: reader.readInt32LE(),
+    m_dontRecommend: reader.readUInt8() !== 0,
+    m_onlinePlayerLimit: reader.readUInt32LE(),
+    m_onlineFreeTrialLimit: reader.readUInt32LE(),
+  };
+}
+
+function writeLoginClusterStatusData(writer: BufferWriter, value: unknown, context: string): void {
+  const data = ensureObject(value, context) as Partial<CppLoginClusterStatusData>;
+  writer.writeUInt32LE(ensureNumber(data.m_clusterId, `${context}.m_clusterId`));
+  writeArchiveString(writer, ensureString(data.m_connectionServerAddress, `${context}.m_connectionServerAddress`));
+  writer.writeUInt16LE(ensureNumber(data.m_connectionServerPort, `${context}.m_connectionServerPort`));
+  writer.writeUInt16LE(ensureNumber(data.m_connectionServerPingPort, `${context}.m_connectionServerPingPort`));
+  writer.writeInt32LE(ensureNumber(data.m_populationOnline, `${context}.m_populationOnline`));
+  writer.writeInt32LE(ensureNumber(data.m_populationOnlineStatus, `${context}.m_populationOnlineStatus`));
+  writer.writeInt32LE(ensureNumber(data.m_maxCharactersPerAccount, `${context}.m_maxCharactersPerAccount`));
+  writer.writeInt32LE(ensureNumber(data.m_timeZone, `${context}.m_timeZone`));
+  writer.writeInt32LE(ensureNumber(data.m_status, `${context}.m_status`));
+  writer.writeUInt8(ensureBoolean(data.m_dontRecommend, `${context}.m_dontRecommend`) ? 1 : 0);
+  writer.writeUInt32LE(ensureNumber(data.m_onlinePlayerLimit, `${context}.m_onlinePlayerLimit`));
+  writer.writeUInt32LE(ensureNumber(data.m_onlineFreeTrialLimit, `${context}.m_onlineFreeTrialLimit`));
+}
+
+// --- LoginClusterStatusEx::ClusterData ---
+
+function readLoginClusterStatusExData(reader: BufferReader): CppLoginClusterStatusExData {
+  return {
+    m_clusterId: reader.readUInt32LE(),
+    m_branch: readArchiveString(reader),
+    m_networkVersion: readArchiveString(reader),
+    m_version: reader.readUInt32LE(),
+    m_reserved1: reader.readUInt32LE(),
+    m_reserved2: reader.readUInt32LE(),
+    m_reserved3: reader.readUInt32LE(),
+    m_reserved4: reader.readUInt32LE(),
+  };
+}
+
+function writeLoginClusterStatusExData(writer: BufferWriter, value: unknown, context: string): void {
+  const data = ensureObject(value, context) as Partial<CppLoginClusterStatusExData>;
+  writer.writeUInt32LE(ensureNumber(data.m_clusterId, `${context}.m_clusterId`));
+  writeArchiveString(writer, ensureString(data.m_branch, `${context}.m_branch`));
+  writeArchiveString(writer, ensureString(data.m_networkVersion, `${context}.m_networkVersion`));
+  writer.writeUInt32LE(ensureNumber(data.m_version, `${context}.m_version`));
+  writer.writeUInt32LE(ensureNumber(data.m_reserved1, `${context}.m_reserved1`));
+  writer.writeUInt32LE(ensureNumber(data.m_reserved2, `${context}.m_reserved2`));
+  writer.writeUInt32LE(ensureNumber(data.m_reserved3, `${context}.m_reserved3`));
+  writer.writeUInt32LE(ensureNumber(data.m_reserved4, `${context}.m_reserved4`));
+}
+
+// --- MapLocation ---
+
+function readMapLocation(reader: BufferReader): CppMapLocation {
+  return {
+    locationId: reader.readUInt64LE(),
+    locationName: reader.readUnicodeStringWithLength(),
+    x: reader.readFloatLE(),
+    y: reader.readFloatLE(),
+    category: reader.readUInt8(),
+    subCategory: reader.readUInt8(),
+    flags: reader.readUInt8(),
+  };
+}
+
+function writeMapLocation(writer: BufferWriter, value: unknown, context: string): void {
+  const data = ensureObject(value, context) as Partial<CppMapLocation>;
+  writer.writeUInt64LE(ensureBigInt(data.locationId, `${context}.locationId`));
+  writer.writeUnicodeStringWithLength(ensureString(data.locationName, `${context}.locationName`));
+  writer.writeFloatLE(ensureNumber(data.x, `${context}.x`));
+  writer.writeFloatLE(ensureNumber(data.y, `${context}.y`));
+  writer.writeUInt8(ensureNumber(data.category, `${context}.category`));
+  writer.writeUInt8(ensureNumber(data.subCategory, `${context}.subCategory`));
+  writer.writeUInt8(ensureNumber(data.flags, `${context}.flags`));
+}
+
+// --- SurveyMessage::DataItem ---
+
+function readSurveyDataItem(reader: BufferReader): CppSurveyDataItem {
+  return {
+    x: reader.readFloatLE(),
+    y: reader.readFloatLE(),
+    z: reader.readFloatLE(),
+    efficiency: reader.readFloatLE(),
+  };
+}
+
+function writeSurveyDataItem(writer: BufferWriter, value: unknown, context: string): void {
+  const data = ensureObject(value, context) as Partial<CppSurveyDataItem>;
+  writer.writeFloatLE(ensureNumber(data.x, `${context}.x`));
+  writer.writeFloatLE(ensureNumber(data.y, `${context}.y`));
+  writer.writeFloatLE(ensureNumber(data.z, `${context}.z`));
+  writer.writeFloatLE(ensureNumber(data.efficiency, `${context}.efficiency`));
+}
+
+// --- ResourceListForSurveyMessage::DataItem ---
+
+function readResourceListDataItem(reader: BufferReader): CppResourceListDataItem {
+  return {
+    resourceName: readArchiveString(reader),
+    resourceId: reader.readUInt64LE(),
+    parentClassName: readArchiveString(reader),
+  };
+}
+
+function writeResourceListDataItem(writer: BufferWriter, value: unknown, context: string): void {
+  const data = ensureObject(value, context) as Partial<CppResourceListDataItem>;
+  writeArchiveString(writer, ensureString(data.resourceName, `${context}.resourceName`));
+  writer.writeUInt64LE(ensureBigInt(data.resourceId, `${context}.resourceId`));
+  writeArchiveString(writer, ensureString(data.parentClassName, `${context}.parentClassName`));
+}
+
+// --- SearchCondition (conditional serialization) ---
+
+function readSearchCondition(reader: BufferReader): CppSearchCondition {
+  const attributeNameCrc = reader.readUInt32LE();
+  const requiredAttribute = reader.readUInt8() !== 0;
+  const comparison = reader.readInt8();
+  const result: CppSearchCondition = { attributeNameCrc, requiredAttribute, comparison };
+  if (comparison === 0) {
+    result.intMin = reader.readInt32LE();
+    result.intMax = reader.readInt32LE();
+  } else if (comparison === 1) {
+    result.floatMin = reader.readDoubleLE();
+    result.floatMax = reader.readDoubleLE();
+  } else if (comparison >= 2 && comparison <= 5) {
+    result.stringValue = readArchiveString(reader);
+  }
+  return result;
+}
+
+function writeSearchCondition(writer: BufferWriter, value: unknown, context: string): void {
+  const data = ensureObject(value, context) as Partial<CppSearchCondition>;
+  writer.writeUInt32LE(ensureNumber(data.attributeNameCrc, `${context}.attributeNameCrc`));
+  writer.writeUInt8(ensureBoolean(data.requiredAttribute, `${context}.requiredAttribute`) ? 1 : 0);
+  const comparison = ensureNumber(data.comparison, `${context}.comparison`);
+  writer.writeInt8(comparison);
+  if (comparison === 0) {
+    writer.writeInt32LE(ensureNumber(data.intMin, `${context}.intMin`));
+    writer.writeInt32LE(ensureNumber(data.intMax, `${context}.intMax`));
+  } else if (comparison === 1) {
+    writer.writeDoubleLE(ensureNumber(data.floatMin, `${context}.floatMin`));
+    writer.writeDoubleLE(ensureNumber(data.floatMax, `${context}.floatMax`));
+  } else if (comparison >= 2 && comparison <= 5) {
+    writeArchiveString(writer, ensureString(data.stringValue, `${context}.stringValue`));
+  }
+}
+
+// --- AuctionLocation ---
+
+function readAuctionLocation(reader: BufferReader): CppAuctionLocation {
+  return {
+    locationId: reader.readUInt64LE(),
+    locationNameLength: reader.readInt32LE(),
+    locationName: readArchiveString(reader),
+    ownerId: reader.readUInt64LE(),
+    salesTax: reader.readInt32LE(),
+    salesTaxBankId: reader.readUInt64LE(),
+    emptyDate: reader.readInt32LE(),
+    lastAccessDate: reader.readInt32LE(),
+    inactiveDate: reader.readInt32LE(),
+    status: reader.readInt32LE(),
+    searchEnabled: reader.readUInt8() !== 0,
+    entranceCharge: reader.readInt32LE(),
+  };
+}
+
+function writeAuctionLocation(writer: BufferWriter, value: unknown, context: string): void {
+  const data = ensureObject(value, context) as Partial<CppAuctionLocation>;
+  writer.writeUInt64LE(ensureBigInt(data.locationId, `${context}.locationId`));
+  writer.writeInt32LE(ensureNumber(data.locationNameLength, `${context}.locationNameLength`));
+  writeArchiveString(writer, ensureString(data.locationName, `${context}.locationName`));
+  writer.writeUInt64LE(ensureBigInt(data.ownerId, `${context}.ownerId`));
+  writer.writeInt32LE(ensureNumber(data.salesTax, `${context}.salesTax`));
+  writer.writeUInt64LE(ensureBigInt(data.salesTaxBankId, `${context}.salesTaxBankId`));
+  writer.writeInt32LE(ensureNumber(data.emptyDate, `${context}.emptyDate`));
+  writer.writeInt32LE(ensureNumber(data.lastAccessDate, `${context}.lastAccessDate`));
+  writer.writeInt32LE(ensureNumber(data.inactiveDate, `${context}.inactiveDate`));
+  writer.writeInt32LE(ensureNumber(data.status, `${context}.status`));
+  writer.writeUInt8(ensureBoolean(data.searchEnabled, `${context}.searchEnabled`) ? 1 : 0);
+  writer.writeInt32LE(ensureNumber(data.entranceCharge, `${context}.entranceCharge`));
+}
+
+// --- MarketAuction ---
+
+function readMarketAuction(reader: BufferReader): CppMarketAuction {
+  return {
+    itemId: reader.readUInt64LE(),
+    ownerId: reader.readUInt64LE(),
+    creatorId: reader.readUInt64LE(),
+    locationId: reader.readUInt64LE(),
+    minBid: reader.readInt32LE(),
+    buyNowPrice: reader.readInt32LE(),
+    auctionTimer: reader.readInt32LE(),
+    oobLength: reader.readInt32LE(),
+    oob: readArchiveString(reader),
+    userDescriptionLength: reader.readInt32LE(),
+    userDescription: reader.readUnicodeStringWithLength(),
+    category: reader.readInt32LE(),
+    itemTemplateId: reader.readInt32LE(),
+    itemNameLength: reader.readInt32LE(),
+    itemName: reader.readUnicodeStringWithLength(),
+    itemTimer: reader.readInt32LE(),
+    active: reader.readInt32LE(),
+    itemSize: reader.readInt32LE(),
+  };
+}
+
+function writeMarketAuction(writer: BufferWriter, value: unknown, context: string): void {
+  const data = ensureObject(value, context) as Partial<CppMarketAuction>;
+  writer.writeUInt64LE(ensureBigInt(data.itemId, `${context}.itemId`));
+  writer.writeUInt64LE(ensureBigInt(data.ownerId, `${context}.ownerId`));
+  writer.writeUInt64LE(ensureBigInt(data.creatorId, `${context}.creatorId`));
+  writer.writeUInt64LE(ensureBigInt(data.locationId, `${context}.locationId`));
+  writer.writeInt32LE(ensureNumber(data.minBid, `${context}.minBid`));
+  writer.writeInt32LE(ensureNumber(data.buyNowPrice, `${context}.buyNowPrice`));
+  writer.writeInt32LE(ensureNumber(data.auctionTimer, `${context}.auctionTimer`));
+  writer.writeInt32LE(ensureNumber(data.oobLength, `${context}.oobLength`));
+  writeArchiveString(writer, ensureString(data.oob, `${context}.oob`));
+  writer.writeInt32LE(ensureNumber(data.userDescriptionLength, `${context}.userDescriptionLength`));
+  writer.writeUnicodeStringWithLength(ensureString(data.userDescription, `${context}.userDescription`));
+  writer.writeInt32LE(ensureNumber(data.category, `${context}.category`));
+  writer.writeInt32LE(ensureNumber(data.itemTemplateId, `${context}.itemTemplateId`));
+  writer.writeInt32LE(ensureNumber(data.itemNameLength, `${context}.itemNameLength`));
+  writer.writeUnicodeStringWithLength(ensureString(data.itemName, `${context}.itemName`));
+  writer.writeInt32LE(ensureNumber(data.itemTimer, `${context}.itemTimer`));
+  writer.writeInt32LE(ensureNumber(data.active, `${context}.active`));
+  writer.writeInt32LE(ensureNumber(data.itemSize, `${context}.itemSize`));
+}
+
+// --- MarketAuctionAttribute ---
+
+function readMarketAuctionAttribute(reader: BufferReader): CppMarketAuctionAttribute {
+  return {
+    itemId: reader.readUInt64LE(),
+    attributeName: readArchiveString(reader),
+    attributeValue: reader.readUnicodeStringWithLength(),
+  };
+}
+
+function writeMarketAuctionAttribute(writer: BufferWriter, value: unknown, context: string): void {
+  const data = ensureObject(value, context) as Partial<CppMarketAuctionAttribute>;
+  writer.writeUInt64LE(ensureBigInt(data.itemId, `${context}.itemId`));
+  writeArchiveString(writer, ensureString(data.attributeName, `${context}.attributeName`));
+  writer.writeUnicodeStringWithLength(ensureString(data.attributeValue, `${context}.attributeValue`));
+}
+
+// --- MarketAuctionBid ---
+
+function readMarketAuctionBid(reader: BufferReader): CppMarketAuctionBid {
+  return {
+    itemId: reader.readUInt64LE(),
+    bidderId: reader.readUInt64LE(),
+    bid: reader.readInt32LE(),
+    maxProxyBid: reader.readInt32LE(),
+  };
+}
+
+function writeMarketAuctionBid(writer: BufferWriter, value: unknown, context: string): void {
+  const data = ensureObject(value, context) as Partial<CppMarketAuctionBid>;
+  writer.writeUInt64LE(ensureBigInt(data.itemId, `${context}.itemId`));
+  writer.writeUInt64LE(ensureBigInt(data.bidderId, `${context}.bidderId`));
+  writer.writeInt32LE(ensureNumber(data.bid, `${context}.bid`));
+  writer.writeInt32LE(ensureNumber(data.maxProxyBid, `${context}.maxProxyBid`));
+}
+
+// --- Auction::PalettizedItemDataHeader ---
+
+function readPalettizedItemDataHeader(reader: BufferReader): CppPalettizedItemDataHeader {
+  return {
+    itemId: reader.readUInt64LE(),
+    itemNameKey: reader.readUInt8(),
+    highBid: reader.readInt32LE(),
+    timer: reader.readInt32LE(),
+    buyNowPrice: reader.readInt32LE(),
+    locationKey: reader.readUInt16LE(),
+    ownerId: reader.readUInt64LE(),
+    ownerNameKey: reader.readUInt16LE(),
+    highBidderId: reader.readUInt64LE(),
+    highBidderNameKey: reader.readUInt16LE(),
+    maxProxyBid: reader.readInt32LE(),
+    myBid: reader.readInt32LE(),
+    itemType: reader.readInt32LE(),
+    resourceContainerClassCrc: reader.readInt32LE(),
+    flags: reader.readInt32LE(),
+    entranceCharge: reader.readInt32LE(),
+  };
+}
+
+function writePalettizedItemDataHeader(writer: BufferWriter, value: unknown, context: string): void {
+  const data = ensureObject(value, context) as Partial<CppPalettizedItemDataHeader>;
+  writer.writeUInt64LE(ensureBigInt(data.itemId, `${context}.itemId`));
+  writer.writeUInt8(ensureNumber(data.itemNameKey, `${context}.itemNameKey`));
+  writer.writeInt32LE(ensureNumber(data.highBid, `${context}.highBid`));
+  writer.writeInt32LE(ensureNumber(data.timer, `${context}.timer`));
+  writer.writeInt32LE(ensureNumber(data.buyNowPrice, `${context}.buyNowPrice`));
+  writer.writeUInt16LE(ensureNumber(data.locationKey, `${context}.locationKey`));
+  writer.writeUInt64LE(ensureBigInt(data.ownerId, `${context}.ownerId`));
+  writer.writeUInt16LE(ensureNumber(data.ownerNameKey, `${context}.ownerNameKey`));
+  writer.writeUInt64LE(ensureBigInt(data.highBidderId, `${context}.highBidderId`));
+  writer.writeUInt16LE(ensureNumber(data.highBidderNameKey, `${context}.highBidderNameKey`));
+  writer.writeInt32LE(ensureNumber(data.maxProxyBid, `${context}.maxProxyBid`));
+  writer.writeInt32LE(ensureNumber(data.myBid, `${context}.myBid`));
+  writer.writeInt32LE(ensureNumber(data.itemType, `${context}.itemType`));
+  writer.writeInt32LE(ensureNumber(data.resourceContainerClassCrc, `${context}.resourceContainerClassCrc`));
+  writer.writeInt32LE(ensureNumber(data.flags, `${context}.flags`));
+  writer.writeInt32LE(ensureNumber(data.entranceCharge, `${context}.entranceCharge`));
+}
+
+// --- AuctionData (AuctionQueryResponseMessage) ---
+
+function readAuctionQueryResponseData(reader: BufferReader): CppAuctionQueryResponseData {
+  return {
+    auctionId: reader.readInt64LE(),
+    location: readArchiveString(reader),
+    ownerId: reader.readInt64LE(),
+    minBid: reader.readInt32LE(),
+    timer: reader.readInt32LE(),
+    itemId: reader.readInt64LE(),
+    soldFlag: reader.readInt32LE(),
+    highBidderId: reader.readInt64LE(),
+    itemType: reader.readInt32LE(),
+    resourceContainerClassCrc: reader.readInt32LE(),
+    itemQuantity: reader.readInt16LE(),
+    itemTimer: reader.readInt32LE(),
+    highBid: reader.readInt32LE(),
+    highBidMaxProxy: reader.readInt32LE(),
+  };
+}
+
+function writeAuctionQueryResponseData(writer: BufferWriter, value: unknown, context: string): void {
+  const data = ensureObject(value, context) as Partial<CppAuctionQueryResponseData>;
+  writer.writeInt64LE(ensureBigInt(data.auctionId, `${context}.auctionId`));
+  writeArchiveString(writer, ensureString(data.location, `${context}.location`));
+  writer.writeInt64LE(ensureBigInt(data.ownerId, `${context}.ownerId`));
+  writer.writeInt32LE(ensureNumber(data.minBid, `${context}.minBid`));
+  writer.writeInt32LE(ensureNumber(data.timer, `${context}.timer`));
+  writer.writeInt64LE(ensureBigInt(data.itemId, `${context}.itemId`));
+  writer.writeInt32LE(ensureNumber(data.soldFlag, `${context}.soldFlag`));
+  writer.writeInt64LE(ensureBigInt(data.highBidderId, `${context}.highBidderId`));
+  writer.writeInt32LE(ensureNumber(data.itemType, `${context}.itemType`));
+  writer.writeInt32LE(ensureNumber(data.resourceContainerClassCrc, `${context}.resourceContainerClassCrc`));
+  writer.writeInt16LE(ensureNumber(data.itemQuantity, `${context}.itemQuantity`));
+  writer.writeInt32LE(ensureNumber(data.itemTimer, `${context}.itemTimer`));
+  writer.writeInt32LE(ensureNumber(data.highBid, `${context}.highBid`));
+  writer.writeInt32LE(ensureNumber(data.highBidMaxProxy, `${context}.highBidMaxProxy`));
+}
+
+// --- AttributePair (std::pair<std::string, Unicode::String>) ---
+
+function readAttributePair(reader: BufferReader): CppAttributePair {
+  return [readArchiveString(reader), reader.readUnicodeStringWithLength()];
+}
+
+function writeAttributePair(writer: BufferWriter, value: unknown, context: string): void {
+  const tuple = ensureArray(value, context);
+  if (tuple.length !== 2) {
+    throw new CppWireCodecError(`${context}: expected pair tuple length 2`);
+  }
+  writeArchiveString(writer, ensureString(tuple[0], `${context}[0]`));
+  writer.writeUnicodeStringWithLength(ensureString(tuple[1], `${context}[1]`));
+}
+
+// --- BatchBaselinesMessageData ---
+
+function readBatchBaselinesMessageData(reader: BufferReader): CppBatchBaselinesMessageData {
+  return {
+    networkId: reader.readUInt64LE(),
+    objectType: reader.readUInt32LE(),
+    packageId: reader.readInt8(),
+    package: readByteStream(reader),
+  };
+}
+
+function writeBatchBaselinesMessageData(writer: BufferWriter, value: unknown, context: string): void {
+  const data = ensureObject(value, context) as Partial<CppBatchBaselinesMessageData>;
+  writer.writeUInt64LE(ensureBigInt(data.networkId, `${context}.networkId`));
+  writer.writeUInt32LE(ensureNumber(data.objectType, `${context}.objectType`));
+  writer.writeInt8(ensureNumber(data.packageId, `${context}.packageId`));
+  writeByteStream(writer, data.package, `${context}.package`);
+}
+
+// --- CharacterListMessageData ---
+
+function readCharacterListMessageData(reader: BufferReader): CppCharacterListMessageData {
+  return {
+    name: reader.readUnicodeStringWithLength(),
+    objectTemplate: readArchiveString(reader),
+    characterId: reader.readUInt64LE(),
+    containerId: reader.readUInt64LE(),
+    location: readArchiveString(reader),
+    coordinates: readVector3(reader),
+  };
+}
+
+function writeCharacterListMessageData(writer: BufferWriter, value: unknown, context: string): void {
+  const data = ensureObject(value, context) as Partial<CppCharacterListMessageData>;
+  writer.writeUnicodeStringWithLength(ensureString(data.name, `${context}.name`));
+  writeArchiveString(writer, ensureString(data.objectTemplate, `${context}.objectTemplate`));
+  writer.writeUInt64LE(ensureBigInt(data.characterId, `${context}.characterId`));
+  writer.writeUInt64LE(ensureBigInt(data.containerId, `${context}.containerId`));
+  writeArchiveString(writer, ensureString(data.location, `${context}.location`));
+  writeVector3(writer, data.coordinates, `${context}.coordinates`);
+}
+
+// --- Chardata (EnumerateCharacterId) ---
+
+function readChardata(reader: BufferReader): CppChardata {
+  return {
+    name: reader.readUnicodeStringWithLength(),
+    objectTemplateId: reader.readInt32LE(),
+    networkId: reader.readUInt64LE(),
+    clusterId: reader.readUInt32LE(),
+    characterType: reader.readInt32LE(),
+  };
+}
+
+function writeChardata(writer: BufferWriter, value: unknown, context: string): void {
+  const data = ensureObject(value, context) as Partial<CppChardata>;
+  writer.writeUnicodeStringWithLength(ensureString(data.name, `${context}.name`));
+  writer.writeInt32LE(ensureNumber(data.objectTemplateId, `${context}.objectTemplateId`));
+  writer.writeUInt64LE(ensureBigInt(data.networkId, `${context}.networkId`));
+  writer.writeUInt32LE(ensureNumber(data.clusterId, `${context}.clusterId`));
+  writer.writeInt32LE(ensureNumber(data.characterType, `${context}.characterType`));
+}
+
+// --- Chunk ---
+
+function readChunk(reader: BufferReader): CppChunk {
+  return {
+    process: reader.readUInt32LE(),
+    nodeX: reader.readInt32LE(),
+    nodeZ: reader.readInt32LE(),
+  };
+}
+
+function writeChunk(writer: BufferWriter, value: unknown, context: string): void {
+  const data = ensureObject(value, context) as Partial<CppChunk>;
+  writer.writeUInt32LE(ensureNumber(data.process, `${context}.process`));
+  writer.writeInt32LE(ensureNumber(data.nodeX, `${context}.nodeX`));
+  writer.writeInt32LE(ensureNumber(data.nodeZ, `${context}.nodeZ`));
+}
+
+// --- StructureListMessageData ---
+
+function readStructureListMessageData(reader: BufferReader): CppStructureListMessageData {
+  return {
+    objectTemplate: readArchiveString(reader),
+    structureId: reader.readUInt64LE(),
+    location: readArchiveString(reader),
+    coordinates: readVector3(reader),
+    deleted: reader.readInt32LE(),
+  };
+}
+
+function writeStructureListMessageData(writer: BufferWriter, value: unknown, context: string): void {
+  const data = ensureObject(value, context) as Partial<CppStructureListMessageData>;
+  writeArchiveString(writer, ensureString(data.objectTemplate, `${context}.objectTemplate`));
+  writer.writeUInt64LE(ensureBigInt(data.structureId, `${context}.structureId`));
+  writeArchiveString(writer, ensureString(data.location, `${context}.location`));
+  writeVector3(writer, data.coordinates, `${context}.coordinates`);
+  writer.writeInt32LE(ensureNumber(data.deleted, `${context}.deleted`));
+}
+
+// --- ChatLogEntry ---
+
+function readChatLogEntry(reader: BufferReader): CppChatLogEntry {
+  return {
+    from: reader.readUnicodeStringWithLength(),
+    to: reader.readUnicodeStringWithLength(),
+    channel: reader.readUnicodeStringWithLength(),
+    message: reader.readUnicodeStringWithLength(),
+    time: reader.readInt32LE(),
+  };
+}
+
+function writeChatLogEntry(writer: BufferWriter, value: unknown, context: string): void {
+  const data = ensureObject(value, context) as Partial<CppChatLogEntry>;
+  writer.writeUnicodeStringWithLength(ensureString(data.from, `${context}.from`));
+  writer.writeUnicodeStringWithLength(ensureString(data.to, `${context}.to`));
+  writer.writeUnicodeStringWithLength(ensureString(data.channel, `${context}.channel`));
+  writer.writeUnicodeStringWithLength(ensureString(data.message, `${context}.message`));
+  writer.writeInt32LE(ensureNumber(data.time, `${context}.time`));
+}
+
+// --- CustomerServiceCategory (recursive) ---
+
+function readCustomerServiceCategory(reader: BufferReader): CppCustomerServiceCategory {
+  const categoryName = reader.readUnicodeStringWithLength();
+  const categoryId = reader.readInt32LE();
+  const subCount = reader.readInt32LE();
+  const subCategories: CppCustomerServiceCategory[] = [];
+  for (let i = 0; i < subCount; i += 1) {
+    subCategories.push(readCustomerServiceCategory(reader));
+  }
+  const isBugType = reader.readUInt8() !== 0;
+  const isServiceType = reader.readUInt8() !== 0;
+  return { categoryName, categoryId, subCategories, isBugType, isServiceType };
+}
+
+function writeCustomerServiceCategory(writer: BufferWriter, value: unknown, context: string): void {
+  const data = ensureObject(value, context) as Partial<CppCustomerServiceCategory>;
+  writer.writeUnicodeStringWithLength(ensureString(data.categoryName, `${context}.categoryName`));
+  writer.writeInt32LE(ensureNumber(data.categoryId, `${context}.categoryId`));
+  const subCategories = ensureArray(data.subCategories, `${context}.subCategories`);
+  writer.writeInt32LE(subCategories.length);
+  for (let i = 0; i < subCategories.length; i += 1) {
+    writeCustomerServiceCategory(writer, subCategories[i], `${context}.subCategories[${i}]`);
+  }
+  writer.writeUInt8(ensureBoolean(data.isBugType, `${context}.isBugType`) ? 1 : 0);
+  writer.writeUInt8(ensureBoolean(data.isServiceType, `${context}.isServiceType`) ? 1 : 0);
+}
+
+// --- CustomerServiceComment ---
+
+function readCustomerServiceComment(reader: BufferReader): CppCustomerServiceComment {
+  return {
+    ticketId: reader.readUInt32LE(),
+    commentId: reader.readUInt32LE(),
+    fromCsr: reader.readUInt8() !== 0,
+    comment: reader.readUnicodeStringWithLength(),
+    commentorName: readArchiveString(reader),
+  };
+}
+
+function writeCustomerServiceComment(writer: BufferWriter, value: unknown, context: string): void {
+  const data = ensureObject(value, context) as Partial<CppCustomerServiceComment>;
+  writer.writeUInt32LE(ensureNumber(data.ticketId, `${context}.ticketId`));
+  writer.writeUInt32LE(ensureNumber(data.commentId, `${context}.commentId`));
+  writer.writeUInt8(ensureBoolean(data.fromCsr, `${context}.fromCsr`) ? 1 : 0);
+  writer.writeUnicodeStringWithLength(ensureString(data.comment, `${context}.comment`));
+  writeArchiveString(writer, ensureString(data.commentorName, `${context}.commentorName`));
+}
+
+// --- CustomerServiceTicket ---
+
+function readCustomerServiceTicket(reader: BufferReader): CppCustomerServiceTicket {
+  return {
+    categoryId: reader.readUInt32LE(),
+    subCategoryId: reader.readUInt32LE(),
+    characterName: readArchiveString(reader),
+    details: reader.readUnicodeStringWithLength(),
+    language: readArchiveString(reader),
+    ticketId: reader.readUInt32LE(),
+    modifiedDate: reader.readInt64LE(),
+    read: reader.readUInt8() !== 0,
+    closed: reader.readUInt8() !== 0,
+  };
+}
+
+function writeCustomerServiceTicket(writer: BufferWriter, value: unknown, context: string): void {
+  const data = ensureObject(value, context) as Partial<CppCustomerServiceTicket>;
+  writer.writeUInt32LE(ensureNumber(data.categoryId, `${context}.categoryId`));
+  writer.writeUInt32LE(ensureNumber(data.subCategoryId, `${context}.subCategoryId`));
+  writeArchiveString(writer, ensureString(data.characterName, `${context}.characterName`));
+  writer.writeUnicodeStringWithLength(ensureString(data.details, `${context}.details`));
+  writeArchiveString(writer, ensureString(data.language, `${context}.language`));
+  writer.writeUInt32LE(ensureNumber(data.ticketId, `${context}.ticketId`));
+  writer.writeInt64LE(ensureBigInt(data.modifiedDate, `${context}.modifiedDate`));
+  writer.writeUInt8(ensureBoolean(data.read, `${context}.read`) ? 1 : 0);
+  writer.writeUInt8(ensureBoolean(data.closed, `${context}.closed`) ? 1 : 0);
+}
+
+// --- CustomerServiceSearchResult ---
+
+function readCustomerServiceSearchResult(reader: BufferReader): CppCustomerServiceSearchResult {
+  return {
+    title: reader.readUnicodeStringWithLength(),
+    id: readArchiveString(reader),
+    matchPercent: reader.readInt16LE(),
+  };
+}
+
+function writeCustomerServiceSearchResult(writer: BufferWriter, value: unknown, context: string): void {
+  const data = ensureObject(value, context) as Partial<CppCustomerServiceSearchResult>;
+  writer.writeUnicodeStringWithLength(ensureString(data.title, `${context}.title`));
+  writeArchiveString(writer, ensureString(data.id, `${context}.id`));
+  writer.writeInt16LE(ensureNumber(data.matchPercent, `${context}.matchPercent`));
+}
+
+// --- MetricsPair ---
+
+function readMetricsPair(reader: BufferReader): CppMetricsPair {
+  return {
+    label: readArchiveString(reader),
+    value: reader.readInt32LE(),
+    description: readArchiveString(reader),
+    persistData: reader.readUInt8() !== 0,
+    summary: reader.readUInt8() !== 0,
+  };
+}
+
+function writeMetricsPair(writer: BufferWriter, value: unknown, context: string): void {
+  const data = ensureObject(value, context) as Partial<CppMetricsPair>;
+  writeArchiveString(writer, ensureString(data.label, `${context}.label`));
+  writer.writeInt32LE(ensureNumber(data.value, `${context}.value`));
+  writeArchiveString(writer, ensureString(data.description, `${context}.description`));
+  writer.writeUInt8(ensureBoolean(data.persistData, `${context}.persistData`) ? 1 : 0);
+  writer.writeUInt8(ensureBoolean(data.summary, `${context}.summary`) ? 1 : 0);
+}
+
+// --- AIPathInfo_NodeInfo ---
+
+function readAIPathInfoNodeInfo(reader: BufferReader): CppAIPathInfoNodeInfo {
+  return {
+    node: reader.readInt32LE(),
+    state: reader.readUInt8(),
+  };
+}
+
+function writeAIPathInfoNodeInfo(writer: BufferWriter, value: unknown, context: string): void {
+  const data = ensureObject(value, context) as Partial<CppAIPathInfoNodeInfo>;
+  writer.writeInt32LE(ensureNumber(data.node, `${context}.node`));
+  writer.writeUInt8(ensureNumber(data.state, `${context}.state`));
+}
+
+// --- AddResourceTypeMessageNamespace::ResourceTypeData ---
+
+function readResourceTypeData(reader: BufferReader): CppResourceTypeData {
+  const networkId = reader.readUInt64LE();
+  const name = readArchiveString(reader);
+  const depletedTimestamp = reader.readUInt32LE();
+  const parentClass = readArchiveString(reader);
+  const attrCount = reader.readInt32LE();
+  const attributes: Array<[string, number]> = [];
+  for (let i = 0; i < attrCount; i += 1) {
+    attributes.push([readArchiveString(reader), reader.readInt32LE()]);
+  }
+  const seedCount = reader.readInt32LE();
+  const fractalSeeds: Array<[bigint, number]> = [];
+  for (let i = 0; i < seedCount; i += 1) {
+    fractalSeeds.push([reader.readUInt64LE(), reader.readInt32LE()]);
+  }
+  return { networkId, name, depletedTimestamp, parentClass, attributes, fractalSeeds };
+}
+
+function writeResourceTypeData(writer: BufferWriter, value: unknown, context: string): void {
+  const data = ensureObject(value, context) as Partial<CppResourceTypeData>;
+  writer.writeUInt64LE(ensureBigInt(data.networkId, `${context}.networkId`));
+  writeArchiveString(writer, ensureString(data.name, `${context}.name`));
+  writer.writeUInt32LE(ensureNumber(data.depletedTimestamp, `${context}.depletedTimestamp`));
+  writeArchiveString(writer, ensureString(data.parentClass, `${context}.parentClass`));
+  const attributes = ensureArray(data.attributes, `${context}.attributes`);
+  writer.writeInt32LE(attributes.length);
+  for (let i = 0; i < attributes.length; i += 1) {
+    const pair = ensureArray(attributes[i], `${context}.attributes[${i}]`);
+    writeArchiveString(writer, ensureString(pair[0], `${context}.attributes[${i}][0]`));
+    writer.writeInt32LE(ensureNumber(pair[1], `${context}.attributes[${i}][1]`));
+  }
+  const fractalSeeds = ensureArray(data.fractalSeeds, `${context}.fractalSeeds`);
+  writer.writeInt32LE(fractalSeeds.length);
+  for (let i = 0; i < fractalSeeds.length; i += 1) {
+    const pair = ensureArray(fractalSeeds[i], `${context}.fractalSeeds[${i}]`);
+    writer.writeUInt64LE(ensureBigInt(pair[0], `${context}.fractalSeeds[${i}][0]`));
+    writer.writeInt32LE(ensureNumber(pair[1], `${context}.fractalSeeds[${i}][1]`));
+  }
+}
+
+// --- PlanetNodeStatusMessageData (nested AutoArray) ---
+
+function readPlanetNodeStatusMessageData(reader: BufferReader): CppPlanetNodeStatusMessageData {
+  const x = reader.readInt32LE();
+  const z = reader.readInt32LE();
+  const loaded = reader.readUInt8() !== 0;
+  const serverCount = reader.readInt32LE();
+  const servers: number[] = [];
+  for (let i = 0; i < serverCount; i += 1) {
+    servers.push(reader.readUInt32LE());
+  }
+  const subCount = reader.readInt32LE();
+  const subscriptionCounts: number[] = [];
+  for (let i = 0; i < subCount; i += 1) {
+    subscriptionCounts.push(reader.readInt32LE());
+  }
+  return { x, z, loaded, servers, subscriptionCounts };
+}
+
+function writePlanetNodeStatusMessageData(writer: BufferWriter, value: unknown, context: string): void {
+  const data = ensureObject(value, context) as Partial<CppPlanetNodeStatusMessageData>;
+  writer.writeInt32LE(ensureNumber(data.x, `${context}.x`));
+  writer.writeInt32LE(ensureNumber(data.z, `${context}.z`));
+  writer.writeUInt8(ensureBoolean(data.loaded, `${context}.loaded`) ? 1 : 0);
+  const servers = ensureArray(data.servers, `${context}.servers`);
+  writer.writeInt32LE(servers.length);
+  for (let i = 0; i < servers.length; i += 1) {
+    writer.writeUInt32LE(ensureNumber(servers[i], `${context}.servers[${i}]`));
+  }
+  const subscriptionCounts = ensureArray(data.subscriptionCounts, `${context}.subscriptionCounts`);
+  writer.writeInt32LE(subscriptionCounts.length);
+  for (let i = 0; i < subscriptionCounts.length; i += 1) {
+    writer.writeInt32LE(ensureNumber(subscriptionCounts[i], `${context}.subscriptionCounts[${i}]`));
+  }
+}
+
+// --- PlanetObjectStatusMessageData ---
+
+function readPlanetObjectStatusMessageData(reader: BufferReader): CppPlanetObjectStatusMessageData {
+  return {
+    objectId: reader.readUInt64LE(),
+    x: reader.readInt32LE(),
+    z: reader.readInt32LE(),
+    authoritativeServer: reader.readUInt32LE(),
+    interestRadius: reader.readInt32LE(),
+    deleteObject: reader.readInt32LE(),
+    objectTypeTag: reader.readInt32LE(),
+    level: reader.readInt32LE(),
+    hibernating: reader.readUInt8() !== 0,
+    templateCrc: reader.readUInt32LE(),
+    aiActivity: reader.readInt32LE(),
+    creationType: reader.readInt32LE(),
+  };
+}
+
+function writePlanetObjectStatusMessageData(writer: BufferWriter, value: unknown, context: string): void {
+  const data = ensureObject(value, context) as Partial<CppPlanetObjectStatusMessageData>;
+  writer.writeUInt64LE(ensureBigInt(data.objectId, `${context}.objectId`));
+  writer.writeInt32LE(ensureNumber(data.x, `${context}.x`));
+  writer.writeInt32LE(ensureNumber(data.z, `${context}.z`));
+  writer.writeUInt32LE(ensureNumber(data.authoritativeServer, `${context}.authoritativeServer`));
+  writer.writeInt32LE(ensureNumber(data.interestRadius, `${context}.interestRadius`));
+  writer.writeInt32LE(ensureNumber(data.deleteObject, `${context}.deleteObject`));
+  writer.writeInt32LE(ensureNumber(data.objectTypeTag, `${context}.objectTypeTag`));
+  writer.writeInt32LE(ensureNumber(data.level, `${context}.level`));
+  writer.writeUInt8(ensureBoolean(data.hibernating, `${context}.hibernating`) ? 1 : 0);
+  writer.writeUInt32LE(ensureNumber(data.templateCrc, `${context}.templateCrc`));
+  writer.writeInt32LE(ensureNumber(data.aiActivity, `${context}.aiActivity`));
+  writer.writeInt32LE(ensureNumber(data.creationType, `${context}.creationType`));
+}
+
 function createBuiltinCustomTypeCodecs(): Record<string, CppCustomTypeCodec> {
   return {
     Vector: {
@@ -1200,6 +2247,126 @@ function createBuiltinCustomTypeCodecs(): Record<string, CppCustomTypeCodec> {
     ValueType: {
       read: readRawTail,
       write: writeRawTail,
+    },
+    'LoginEnumCluster::ClusterData': {
+      read: readLoginEnumClusterData,
+      write: writeLoginEnumClusterData,
+    },
+    'LoginClusterStatus::ClusterData': {
+      read: readLoginClusterStatusData,
+      write: writeLoginClusterStatusData,
+    },
+    'LoginClusterStatusEx::ClusterData': {
+      read: readLoginClusterStatusExData,
+      write: writeLoginClusterStatusExData,
+    },
+    MapLocation: {
+      read: readMapLocation,
+      write: writeMapLocation,
+    },
+    'SurveyMessage::DataItem': {
+      read: readSurveyDataItem,
+      write: writeSurveyDataItem,
+    },
+    'ResourceListForSurveyMessage::DataItem': {
+      read: readResourceListDataItem,
+      write: writeResourceListDataItem,
+    },
+    SearchCondition: {
+      read: readSearchCondition,
+      write: writeSearchCondition,
+    },
+    'AuctionQueryHeadersMessage::SearchCondition': {
+      read: readSearchCondition,
+      write: writeSearchCondition,
+    },
+    AuctionLocation: {
+      read: readAuctionLocation,
+      write: writeAuctionLocation,
+    },
+    MarketAuction: {
+      read: readMarketAuction,
+      write: writeMarketAuction,
+    },
+    MarketAuctionAttribute: {
+      read: readMarketAuctionAttribute,
+      write: writeMarketAuctionAttribute,
+    },
+    MarketAuctionBid: {
+      read: readMarketAuctionBid,
+      write: writeMarketAuctionBid,
+    },
+    'Auction::PalettizedItemDataHeader': {
+      read: readPalettizedItemDataHeader,
+      write: writePalettizedItemDataHeader,
+    },
+    AuctionData: {
+      read: readAuctionQueryResponseData,
+      write: writeAuctionQueryResponseData,
+    },
+    AttributePair: {
+      read: readAttributePair,
+      write: writeAttributePair,
+    },
+    BatchBaselinesMessageData: {
+      read: readBatchBaselinesMessageData,
+      write: writeBatchBaselinesMessageData,
+    },
+    CharacterListMessageData: {
+      read: readCharacterListMessageData,
+      write: writeCharacterListMessageData,
+    },
+    Chardata: {
+      read: readChardata,
+      write: writeChardata,
+    },
+    Chunk: {
+      read: readChunk,
+      write: writeChunk,
+    },
+    StructureListMessageData: {
+      read: readStructureListMessageData,
+      write: writeStructureListMessageData,
+    },
+    ChatLogEntry: {
+      read: readChatLogEntry,
+      write: writeChatLogEntry,
+    },
+    CustomerServiceCategory: {
+      read: readCustomerServiceCategory,
+      write: writeCustomerServiceCategory,
+    },
+    CustomerServiceComment: {
+      read: readCustomerServiceComment,
+      write: writeCustomerServiceComment,
+    },
+    CustomerServiceTicket: {
+      read: readCustomerServiceTicket,
+      write: writeCustomerServiceTicket,
+    },
+    CustomerServiceSearchResult: {
+      read: readCustomerServiceSearchResult,
+      write: writeCustomerServiceSearchResult,
+    },
+    MetricsPair: {
+      read: readMetricsPair,
+      write: writeMetricsPair,
+    },
+    AIPathInfo_NodeInfo: {
+      read: readAIPathInfoNodeInfo,
+      write: writeAIPathInfoNodeInfo,
+    },
+    'AddResourceTypeMessageNamespace::ResourceTypeData': {
+      read: readResourceTypeData,
+      write: writeResourceTypeData,
+    },
+    PlanetNodeStatusMessageData: {
+      read: readPlanetNodeStatusMessageData,
+      write: writePlanetNodeStatusMessageData,
+    },
+    PlanetObjectStatusMessageData: {
+      read: readPlanetObjectStatusMessageData,
+      write: writePlanetObjectStatusMessageData,
     },
   };
 }

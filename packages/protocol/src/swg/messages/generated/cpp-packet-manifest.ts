@@ -1038,7 +1038,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_data",
         "archiveContainer": "AutoArray",
         "cppType": "AddResourceTypeMessageNamespace::ResourceTypeData",
-        "tsType": "unknown[]",
+        "tsType": "{ networkId: bigint; name: string; depletedTimestamp: number; parentClass: string; attributes: [string, number][]; fractalSeeds: [bigint, number][] }[]",
         "source": "addVariable"
       }
     ],
@@ -1366,7 +1366,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_nodes",
         "archiveContainer": "AutoArray",
         "cppType": "AIPathInfo_NodeInfo",
-        "tsType": "unknown[]",
+        "tsType": "{ node: number; state: number }[]",
         "source": "addVariable"
       }
     ],
@@ -1487,7 +1487,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_data",
         "archiveContainer": "AutoArray",
         "cppType": "AttributePair",
-        "tsType": "unknown[]",
+        "tsType": "[string, string][]",
         "source": "addVariable"
       },
       {
@@ -1598,7 +1598,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_advancedSearch",
         "archiveContainer": "AutoList",
         "cppType": "SearchCondition",
-        "tsType": "unknown[]",
+        "tsType": "{ attributeNameCrc: number; requiredAttribute: boolean; comparison: number; intMin?: number; intMax?: number; floatMin?: number; floatMax?: number; stringValue?: string }[]",
         "source": "addVariable"
       },
       {
@@ -1679,7 +1679,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_palettizedAuctionData",
         "archiveContainer": "AutoArray",
         "cppType": "Auction::PalettizedItemDataHeader",
-        "tsType": "unknown[]",
+        "tsType": "{ itemId: bigint; itemNameKey: number; highBid: number; timer: number; buyNowPrice: number; locationKey: number; ownerId: bigint; ownerNameKey: number; highBidderId: bigint; highBidderNameKey: number; maxProxyBid: number; myBid: number; itemType: number; resourceContainerClassCrc: number; flags: number; entranceCharge: number }[]",
         "source": "addVariable"
       },
       {
@@ -1775,7 +1775,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_auctionData",
         "archiveContainer": "AutoArray",
         "cppType": "AuctionData",
-        "tsType": "unknown[]",
+        "tsType": "{ auctionId: bigint; location: string; ownerId: bigint; minBid: number; timer: number; itemId: bigint; soldFlag: number; highBidderId: bigint; itemType: number; resourceContainerClassCrc: number; itemQuantity: number; itemTimer: number; highBid: number; highBidMaxProxy: number }[]",
         "source": "addVariable"
       }
     ],
@@ -2052,7 +2052,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_data",
         "archiveContainer": "AutoVariable",
         "cppType": "std::vector<BatchBaselinesMessageData>",
-        "tsType": "unknown[]",
+        "tsType": "{ networkId: bigint; objectType: number; packageId: number; package: Uint8Array }[]",
         "source": "addVariable"
       }
     ],
@@ -2934,7 +2934,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_data",
         "archiveContainer": "AutoArray",
         "cppType": "CharacterListMessageData",
-        "tsType": "unknown[]",
+        "tsType": "{ name: string; objectTemplate: string; characterId: bigint; containerId: bigint; location: string; coordinates: { x: number; y: number; z: number } }[]",
         "source": "addVariable"
       },
       {
@@ -4908,7 +4908,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "logEntries",
         "archiveContainer": "AutoArray",
         "cppType": "ChatLogEntry",
-        "tsType": "unknown[]",
+        "tsType": "{ from: string; to: string; channel: string; message: string; time: number }[]",
         "source": "addVariable"
       },
       {
@@ -10823,7 +10823,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_data",
         "archiveContainer": "AutoArray",
         "cppType": "Chardata",
-        "tsType": "unknown[]",
+        "tsType": "{ name: string; objectTemplateId: number; networkId: bigint; clusterId: number; characterType: number }[]",
         "source": "addVariable"
       }
     ],
@@ -12208,7 +12208,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_auctionLocations",
         "archiveContainer": "AutoList",
         "cppType": "AuctionLocation",
-        "tsType": "unknown[]",
+        "tsType": "{ locationId: bigint; locationNameLength: number; locationName: string; ownerId: bigint; salesTax: number; salesTaxBankId: bigint; emptyDate: number; lastAccessDate: number; inactiveDate: number; status: number; searchEnabled: boolean; entranceCharge: number }[]",
         "source": "addVariable"
       }
     ],
@@ -12386,7 +12386,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_comments",
         "archiveContainer": "AutoArray",
         "cppType": "CustomerServiceComment",
-        "tsType": "unknown[]",
+        "tsType": "{ ticketId: number; commentId: number; fromCsr: boolean; comment: string; commentorName: string }[]",
         "source": "addVariable"
       }
     ],
@@ -12629,21 +12629,21 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_mapLocationsStatic",
         "archiveContainer": "AutoArray",
         "cppType": "MapLocation",
-        "tsType": "unknown[]",
+        "tsType": "{ locationId: bigint; locationName: string; x: number; y: number; category: number; subCategory: number; flags: number }[]",
         "source": "addVariable"
       },
       {
         "name": "m_mapLocationsDynamic",
         "archiveContainer": "AutoArray",
         "cppType": "MapLocation",
-        "tsType": "unknown[]",
+        "tsType": "{ locationId: bigint; locationName: string; x: number; y: number; category: number; subCategory: number; flags: number }[]",
         "source": "addVariable"
       },
       {
         "name": "m_mapLocationsPersist",
         "archiveContainer": "AutoArray",
         "cppType": "MapLocation",
-        "tsType": "unknown[]",
+        "tsType": "{ locationId: bigint; locationName: string; x: number; y: number; category: number; subCategory: number; flags: number }[]",
         "source": "addVariable"
       },
       {
@@ -12691,7 +12691,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_attributes",
         "archiveContainer": "AutoList",
         "cppType": "MarketAuctionAttribute",
-        "tsType": "unknown[]",
+        "tsType": "{ itemId: bigint; attributeName: string; attributeValue: string }[]",
         "source": "addVariable"
       }
     ],
@@ -12718,7 +12718,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_marketAuctionBids",
         "archiveContainer": "AutoList",
         "cppType": "MarketAuctionBid",
-        "tsType": "unknown[]",
+        "tsType": "{ itemId: bigint; bidderId: bigint; bid: number; maxProxyBid: number }[]",
         "source": "addVariable"
       }
     ],
@@ -12745,7 +12745,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_auctions",
         "archiveContainer": "AutoList",
         "cppType": "MarketAuction",
-        "tsType": "unknown[]",
+        "tsType": "{ itemId: bigint; ownerId: bigint; creatorId: bigint; locationId: bigint; minBid: number; buyNowPrice: number; auctionTimer: number; oobLength: number; oob: string; userDescriptionLength: number; userDescription: string; category: number; itemTemplateId: number; itemNameLength: number; itemName: string; itemTimer: number; active: number; itemSize: number }[]",
         "source": "addVariable"
       }
     ],
@@ -12937,7 +12937,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_tickets",
         "archiveContainer": "AutoArray",
         "cppType": "CustomerServiceTicket",
-        "tsType": "unknown[]",
+        "tsType": "{ categoryId: number; subCategoryId: number; characterName: string; details: string; language: string; ticketId: number; modifiedDate: bigint; read: boolean; closed: boolean }[]",
         "source": "addVariable"
       }
     ],
@@ -14159,8 +14159,8 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
       {
         "name": "m_data",
         "archiveContainer": "AutoArray",
-        "cppType": "ClusterData",
-        "tsType": "unknown[]",
+        "cppType": "LoginClusterStatus::ClusterData",
+        "tsType": "{ m_clusterId: number; m_connectionServerAddress: string; m_connectionServerPort: number; m_connectionServerPingPort: number; m_populationOnline: number; m_populationOnlineStatus: number; m_maxCharactersPerAccount: number; m_timeZone: number; m_status: number; m_dontRecommend: boolean; m_onlinePlayerLimit: number; m_onlineFreeTrialLimit: number }[]",
         "source": "addVariable"
       }
     ],
@@ -14184,8 +14184,8 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
       {
         "name": "m_data",
         "archiveContainer": "AutoArray",
-        "cppType": "ClusterData",
-        "tsType": "unknown[]",
+        "cppType": "LoginClusterStatusEx::ClusterData",
+        "tsType": "{ m_clusterId: number; m_branch: string; m_networkVersion: string; m_version: number; m_reserved1: number; m_reserved2: number; m_reserved3: number; m_reserved4: number }[]",
         "source": "addVariable"
       }
     ],
@@ -14362,8 +14362,8 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
       {
         "name": "m_data",
         "archiveContainer": "AutoArray",
-        "cppType": "ClusterData",
-        "tsType": "unknown[]",
+        "cppType": "LoginEnumCluster::ClusterData",
+        "tsType": "{ m_clusterId: number; m_clusterName: string; m_timeZone: number }[]",
         "source": "addVariable"
       },
       {
@@ -15090,7 +15090,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_data",
         "archiveContainer": "AutoArray",
         "cppType": "MetricsPair",
-        "tsType": "unknown[]",
+        "tsType": "{ label: string; value: number; description: string; persistData: boolean; summary: boolean }[]",
         "source": "addVariable"
       }
     ],
@@ -17257,7 +17257,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_data",
         "archiveContainer": "AutoArray",
         "cppType": "PlanetNodeStatusMessageData",
-        "tsType": "unknown[]",
+        "tsType": "{ x: number; z: number; loaded: boolean; servers: number[]; subscriptionCounts: number[] }[]",
         "source": "addVariable"
       }
     ],
@@ -17318,7 +17318,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_data",
         "archiveContainer": "AutoArray",
         "cppType": "PlanetObjectStatusMessageData",
-        "tsType": "unknown[]",
+        "tsType": "{ objectId: bigint; x: number; z: number; authoritativeServer: number; interestRadius: number; deleteObject: number; objectTypeTag: number; level: number; hibernating: boolean; templateCrc: number; aiActivity: number; creationType: number }[]",
         "source": "addVariable"
       }
     ],
@@ -18187,7 +18187,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_advancedSearch",
         "archiveContainer": "AutoList",
         "cppType": "AuctionQueryHeadersMessage::SearchCondition",
-        "tsType": "unknown[]",
+        "tsType": "{ attributeNameCrc: number; requiredAttribute: boolean; comparison: number; intMin?: number; intMax?: number; floatMin?: number; floatMax?: number; stringValue?: string }[]",
         "source": "addVariable"
       },
       {
@@ -18795,7 +18795,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_categories",
         "archiveContainer": "AutoArray",
         "cppType": "CustomerServiceCategory",
-        "tsType": "unknown[]",
+        "tsType": "{ categoryName: string; categoryId: number; subCategories: unknown[]; isBugType: boolean; isServiceType: boolean }[]",
         "source": "addVariable"
       }
     ],
@@ -18822,7 +18822,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_chunks",
         "archiveContainer": "AutoArray",
         "cppType": "Chunk",
-        "tsType": "unknown[]",
+        "tsType": "{ process: number; nodeX: number; nodeZ: number }[]",
         "source": "addVariable"
       },
       {
@@ -19269,8 +19269,8 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
       {
         "name": "m_data",
         "archiveContainer": "AutoArray",
-        "cppType": "DataItem",
-        "tsType": "unknown[]",
+        "cppType": "ResourceListForSurveyMessage::DataItem",
+        "tsType": "{ resourceName: string; resourceId: bigint; parentClassName: string }[]",
         "source": "addVariable"
       },
       {
@@ -19787,7 +19787,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_searchResults",
         "archiveContainer": "AutoArray",
         "cppType": "CustomerServiceSearchResult",
-        "tsType": "unknown[]",
+        "tsType": "{ title: string; id: string; matchPercent: number }[]",
         "source": "addVariable"
       }
     ],
@@ -20863,7 +20863,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_data",
         "archiveContainer": "AutoArray",
         "cppType": "StructureListMessageData",
-        "tsType": "unknown[]",
+        "tsType": "{ objectTemplate: string; structureId: bigint; location: string; coordinates: { x: number; y: number; z: number }; deleted: number }[]",
         "source": "addVariable"
       },
       {
@@ -21070,8 +21070,8 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
       {
         "name": "m_data",
         "archiveContainer": "AutoArray",
-        "cppType": "DataItem",
-        "tsType": "unknown[]",
+        "cppType": "SurveyMessage::DataItem",
+        "tsType": "{ x: number; y: number; z: number; efficiency: number }[]",
         "source": "addVariable"
       }
     ],

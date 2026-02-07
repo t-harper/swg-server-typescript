@@ -3,7 +3,7 @@
 This document is generated from local source code and config files only:
 - TypeScript repo: `swg-source-js`
 - Reference C++ repo: `../swg-source-docker`
-- Generated at: `2026-02-07T11:24:21.031Z`
+- Generated at: `2026-02-07T17:54:15.534Z`
 
 ## Packet Parity Summary
 
@@ -943,7 +943,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0x3b4532ce`
 - Serialized length model: minimum `4` bytes + variable payload
 - Fields (order):
-  - `m_data`: `AddResourceTypeMessageNamespace::ResourceTypeData` via `AutoArray` -> `unknown[]` (addVariable)
+  - `m_data`: `AddResourceTypeMessageNamespace::ResourceTypeData` via `AutoArray` -> `{ networkId: bigint; name: string; depletedTimestamp: number; parentClass: string; attributes: [string, number][]; fractalSeeds: [bigint, number][] }[]` (addVariable)
 
 ### AdjustAccountFeatureIdRequest
 - Status: ✅ Implemented
@@ -1007,7 +1007,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Serialized length model: minimum `12` bytes + variable payload
 - Fields (order):
   - `m_objectId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
-  - `m_nodes`: `AIPathInfo_NodeInfo` via `AutoArray` -> `unknown[]` (addVariable)
+  - `m_nodes`: `AIPathInfo_NodeInfo` via `AutoArray` -> `{ node: number; state: number }[]` (addVariable)
 
 ### AppendCommentMessage
 - Status: ✅ Implemented
@@ -1037,7 +1037,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Fields (order):
   - `m_networkId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_staticItemName`: `std::string` via `AutoVariable` -> `string` (addVariable)
-  - `m_data`: `AttributePair` via `AutoArray` -> `unknown[]` (addVariable)
+  - `m_data`: `AttributePair` via `AutoArray` -> `[string, string][]` (addVariable)
   - `m_revision`: `int` via `AutoVariable` -> `number` (addVariable)
 
 ### AuctionQueryHeadersMessage
@@ -1057,7 +1057,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
   - `m_priceFilterMin`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_priceFilterMax`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_priceFilterIncludesFee`: `bool` via `AutoVariable` -> `boolean` (addVariable)
-  - `m_advancedSearch`: `SearchCondition` via `AutoList` -> `unknown[]` (addVariable)
+  - `m_advancedSearch`: `SearchCondition` via `AutoList` -> `{ attributeNameCrc: number; requiredAttribute: boolean; comparison: number; intMin?: number; intMax?: number; floatMin?: number; floatMax?: number; stringValue?: string }[]` (addVariable)
   - `m_advancedSearchMatchAllAny`: `int8` via `AutoVariable` -> `number` (addVariable)
   - `m_container`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_myVendorsOnly`: `bool` via `AutoVariable` -> `boolean` (addVariable)
@@ -1073,7 +1073,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
   - `m_typeFlag`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_stringPalette`: `std::string` via `AutoArray` -> `string[]` (addVariable)
   - `m_wideStringPalette`: `Unicode::String` via `AutoArray` -> `string[]` (addVariable)
-  - `m_palettizedAuctionData`: `Auction::PalettizedItemDataHeader` via `AutoArray` -> `unknown[]` (addVariable)
+  - `m_palettizedAuctionData`: `Auction::PalettizedItemDataHeader` via `AutoArray` -> `{ itemId: bigint; itemNameKey: number; highBid: number; timer: number; buyNowPrice: number; locationKey: number; ownerId: bigint; ownerNameKey: number; highBidderId: bigint; highBidderNameKey: number; maxProxyBid: number; myBid: number; itemType: number; resourceContainerClassCrc: number; flags: number; entranceCharge: number }[]` (addVariable)
   - `m_queryOffset`: `uint16` via `AutoVariable` -> `number` (addVariable)
   - `m_hasMorePages`: `bool` via `AutoVariable` -> `boolean` (addVariable)
 
@@ -1095,7 +1095,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Fields (order):
   - `m_requestId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_typeFlag`: `int` via `AutoVariable` -> `number` (addVariable)
-  - `m_auctionData`: `AuctionData` via `AutoArray` -> `unknown[]` (addVariable)
+  - `m_auctionData`: `AuctionData` via `AutoArray` -> `{ auctionId: bigint; location: string; ownerId: bigint; minBid: number; timer: number; itemId: bigint; soldFlag: number; highBidderId: bigint; itemType: number; resourceContainerClassCrc: number; itemQuantity: number; itemTimer: number; highBid: number; highBidMaxProxy: number }[]` (addVariable)
 
 ### AuthTransferClientMessage
 - Status: ✅ Implemented
@@ -1147,7 +1147,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0x74792d5e`
 - Serialized length model: minimum `4` bytes + variable payload
 - Fields (order):
-  - `m_data`: `std::vector<BatchBaselinesMessageData>` via `AutoVariable` -> `unknown[]` (addVariable)
+  - `m_data`: `std::vector<BatchBaselinesMessageData>` via `AutoVariable` -> `{ networkId: bigint; objectType: number; packageId: number; package: Uint8Array }[]` (addVariable)
 
 ### BeginTradeMessage
 - Status: ✅ Implemented
@@ -1365,7 +1365,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0x2ab42c64`
 - Serialized length model: minimum `8` bytes + variable payload
 - Fields (order):
-  - `m_data`: `CharacterListMessageData` via `AutoArray` -> `unknown[]` (addVariable)
+  - `m_data`: `CharacterListMessageData` via `AutoArray` -> `{ name: string; objectTemplate: string; characterId: bigint; containerId: bigint; location: string; coordinates: { x: number; y: number; z: number } }[]` (addVariable)
   - `m_accountNumber`: `uint32` via `AutoVariable` -> `number` (addVariable)
 
 ### CharacterNamesMessage
@@ -1838,7 +1838,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0xed546792`
 - Serialized length model: minimum `8` bytes + variable payload
 - Fields (order):
-  - `logEntries`: `ChatLogEntry` via `AutoArray` -> `unknown[]` (addVariable)
+  - `logEntries`: `ChatLogEntry` via `AutoArray` -> `{ from: string; to: string; channel: string; message: string; time: number }[]` (addVariable)
   - `sequence`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
 
 ### ChatOnSendInstantMessage
@@ -3208,7 +3208,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0x65ea4574`
 - Serialized length model: minimum `4` bytes + variable payload
 - Fields (order):
-  - `m_data`: `Chardata` via `AutoArray` -> `unknown[]` (addVariable)
+  - `m_data`: `Chardata` via `AutoArray` -> `{ name: string; objectTemplateId: number; networkId: bigint; clusterId: number; characterType: number }[]` (addVariable)
 
 ### EnumerateServers
 - Status: ✅ Implemented
@@ -3563,7 +3563,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0x98ef63ca`
 - Serialized length model: minimum `4` bytes + variable payload
 - Fields (order):
-  - `m_auctionLocations`: `AuctionLocation` via `AutoList` -> `unknown[]` (addVariable)
+  - `m_auctionLocations`: `AuctionLocation` via `AutoList` -> `{ locationId: bigint; locationNameLength: number; locationName: string; ownerId: bigint; salesTax: number; salesTaxBankId: bigint; emptyDate: number; lastAccessDate: number; inactiveDate: number; status: number; searchEnabled: boolean; entranceCharge: number }[]` (addVariable)
 
 ### GetCharacterIdReplyMessage
 - Status: ✅ Implemented
@@ -3605,7 +3605,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Serialized length model: minimum `8` bytes + variable payload
 - Fields (order):
   - `m_result`: `int32` via `AutoVariable` -> `number` (addVariable)
-  - `m_comments`: `CustomerServiceComment` via `AutoArray` -> `unknown[]` (addVariable)
+  - `m_comments`: `CustomerServiceComment` via `AutoArray` -> `{ ticketId: number; commentId: number; fromCsr: boolean; comment: string; commentorName: string }[]` (addVariable)
 
 ### GetDeletedItemsReplyMessage
 - Status: ✅ Implemented
@@ -3661,9 +3661,9 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Serialized length model: minimum `26` bytes + variable payload
 - Fields (order):
   - `m_planetName`: `std::string` via `AutoVariable` -> `string` (addVariable)
-  - `m_mapLocationsStatic`: `MapLocation` via `AutoArray` -> `unknown[]` (addVariable)
-  - `m_mapLocationsDynamic`: `MapLocation` via `AutoArray` -> `unknown[]` (addVariable)
-  - `m_mapLocationsPersist`: `MapLocation` via `AutoArray` -> `unknown[]` (addVariable)
+  - `m_mapLocationsStatic`: `MapLocation` via `AutoArray` -> `{ locationId: bigint; locationName: string; x: number; y: number; category: number; subCategory: number; flags: number }[]` (addVariable)
+  - `m_mapLocationsDynamic`: `MapLocation` via `AutoArray` -> `{ locationId: bigint; locationName: string; x: number; y: number; category: number; subCategory: number; flags: number }[]` (addVariable)
+  - `m_mapLocationsPersist`: `MapLocation` via `AutoArray` -> `{ locationId: bigint; locationName: string; x: number; y: number; category: number; subCategory: number; flags: number }[]` (addVariable)
   - `m_versionStatic`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_versionDynamic`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_versionPersist`: `int` via `AutoVariable` -> `number` (addVariable)
@@ -3674,7 +3674,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0x089d3d5b`
 - Serialized length model: minimum `4` bytes + variable payload
 - Fields (order):
-  - `m_attributes`: `MarketAuctionAttribute` via `AutoList` -> `unknown[]` (addVariable)
+  - `m_attributes`: `MarketAuctionAttribute` via `AutoList` -> `{ itemId: bigint; attributeName: string; attributeValue: string }[]` (addVariable)
 
 ### GetMarketAuctionBidsMessage
 - Status: ✅ Implemented
@@ -3682,7 +3682,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0x8648e93e`
 - Serialized length model: minimum `4` bytes + variable payload
 - Fields (order):
-  - `m_marketAuctionBids`: `MarketAuctionBid` via `AutoList` -> `unknown[]` (addVariable)
+  - `m_marketAuctionBids`: `MarketAuctionBid` via `AutoList` -> `{ itemId: bigint; bidderId: bigint; bid: number; maxProxyBid: number }[]` (addVariable)
 
 ### GetMarketAuctionsMessage
 - Status: ✅ Implemented
@@ -3690,7 +3690,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0x454fe683`
 - Serialized length model: minimum `4` bytes + variable payload
 - Fields (order):
-  - `m_auctions`: `MarketAuction` via `AutoList` -> `unknown[]` (addVariable)
+  - `m_auctions`: `MarketAuction` via `AutoList` -> `{ itemId: bigint; ownerId: bigint; creatorId: bigint; locationId: bigint; minBid: number; buyNowPrice: number; auctionTimer: number; oobLength: number; oob: string; userDescriptionLength: number; userDescription: string; category: number; itemTemplateId: number; itemNameLength: number; itemName: string; itemTimer: number; active: number; itemSize: number }[]` (addVariable)
 
 ### GetMoneyFromOfflineObjectMessage
 - Status: ✅ Implemented
@@ -3734,7 +3734,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Fields (order):
   - `m_result`: `int32` via `AutoVariable` -> `number` (addVariable)
   - `m_totalNumTickets`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
-  - `m_tickets`: `CustomerServiceTicket` via `AutoArray` -> `unknown[]` (addVariable)
+  - `m_tickets`: `CustomerServiceTicket` via `AutoArray` -> `{ categoryId: number; subCategoryId: number; characterName: string; details: string; language: string; ticketId: number; modifiedDate: bigint; read: boolean; closed: boolean }[]` (addVariable)
 
 ### GetVendorOwnerMessage
 - Status: ✅ Implemented
@@ -4035,7 +4035,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0x3436aeb6`
 - Serialized length model: minimum `4` bytes + variable payload
 - Fields (order):
-  - `m_data`: `ClusterData` via `AutoArray` -> `unknown[]` (addVariable)
+  - `m_data`: `LoginClusterStatus::ClusterData` via `AutoArray` -> `{ m_clusterId: number; m_connectionServerAddress: string; m_connectionServerPort: number; m_connectionServerPingPort: number; m_populationOnline: number; m_populationOnlineStatus: number; m_maxCharactersPerAccount: number; m_timeZone: number; m_status: number; m_dontRecommend: boolean; m_onlinePlayerLimit: number; m_onlineFreeTrialLimit: number }[]` (addVariable)
 
 ### LoginClusterStatusEx
 - Status: ✅ Implemented
@@ -4043,7 +4043,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0xfa5b4b5a`
 - Serialized length model: minimum `4` bytes + variable payload
 - Fields (order):
-  - `m_data`: `ClusterData` via `AutoArray` -> `unknown[]` (addVariable)
+  - `m_data`: `LoginClusterStatusEx::ClusterData` via `AutoArray` -> `{ m_clusterId: number; m_branch: string; m_networkVersion: string; m_version: number; m_reserved1: number; m_reserved2: number; m_reserved3: number; m_reserved4: number }[]` (addVariable)
 
 ### LoginConnectionServerAddress
 - Status: ✅ Implemented
@@ -4085,7 +4085,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0xc11c63b9`
 - Serialized length model: minimum `8` bytes + variable payload
 - Fields (order):
-  - `m_data`: `ClusterData` via `AutoArray` -> `unknown[]` (addVariable)
+  - `m_data`: `LoginEnumCluster::ClusterData` via `AutoArray` -> `{ m_clusterId: number; m_clusterName: string; m_timeZone: number }[]` (addVariable)
   - `m_maxCharactersPerAccount`: `int` via `AutoVariable` -> `number` (addVariable)
 
 ### LoginIncorrectClientId
@@ -4243,7 +4243,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0x1d4c62a0`
 - Serialized length model: minimum `4` bytes + variable payload
 - Fields (order):
-  - `m_data`: `MetricsPair` via `AutoArray` -> `unknown[]` (addVariable)
+  - `m_data`: `MetricsPair` via `AutoArray` -> `{ label: string; value: number; description: string; persistData: boolean; summary: boolean }[]` (addVariable)
 
 ### MetricsInitiationMessage
 - Status: ✅ Implemented
@@ -4715,7 +4715,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0x5e2e0cd6`
 - Serialized length model: minimum `4` bytes + variable payload
 - Fields (order):
-  - `m_data`: `PlanetNodeStatusMessageData` via `AutoArray` -> `unknown[]` (addVariable)
+  - `m_data`: `PlanetNodeStatusMessageData` via `AutoArray` -> `{ x: number; z: number; loaded: boolean; servers: number[]; subscriptionCounts: number[] }[]` (addVariable)
 
 ### PlanetObjectIdMessage
 - Status: ✅ Implemented
@@ -4732,7 +4732,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0x62689eb0`
 - Serialized length model: minimum `4` bytes + variable payload
 - Fields (order):
-  - `m_data`: `PlanetObjectStatusMessageData` via `AutoArray` -> `unknown[]` (addVariable)
+  - `m_data`: `PlanetObjectStatusMessageData` via `AutoArray` -> `{ objectId: bigint; x: number; z: number; authoritativeServer: number; interestRadius: number; deleteObject: number; objectTypeTag: number; level: number; hibernating: boolean; templateCrc: number; aiActivity: number; creationType: number }[]` (addVariable)
 
 ### PlanetRemoveObject
 - Status: ✅ Implemented
@@ -4942,7 +4942,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
   - `m_priceFilterMin`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_priceFilterMax`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_priceFilterIncludesFee`: `bool` via `AutoVariable` -> `boolean` (addVariable)
-  - `m_advancedSearch`: `AuctionQueryHeadersMessage::SearchCondition` via `AutoList` -> `unknown[]` (addVariable)
+  - `m_advancedSearch`: `AuctionQueryHeadersMessage::SearchCondition` via `AutoList` -> `{ attributeNameCrc: number; requiredAttribute: boolean; comparison: number; intMin?: number; intMax?: number; floatMin?: number; floatMax?: number; stringValue?: string }[]` (addVariable)
   - `m_advancedSearchMatchAllAny`: `int8` via `AutoVariable` -> `number` (addVariable)
   - `m_searchStringPlanet`: `std::string` via `AutoVariable` -> `string` (addVariable)
   - `m_searchStringRegion`: `std::string` via `AutoVariable` -> `string` (addVariable)
@@ -5100,7 +5100,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Serialized length model: minimum `8` bytes + variable payload
 - Fields (order):
   - `m_result`: `int32` via `AutoVariable` -> `number` (addVariable)
-  - `m_categories`: `CustomerServiceCategory` via `AutoArray` -> `unknown[]` (addVariable)
+  - `m_categories`: `CustomerServiceCategory` via `AutoArray` -> `{ categoryName: string; categoryId: number; subCategories: unknown[]; isBugType: boolean; isServiceType: boolean }[]` (addVariable)
 
 ### RequestChunkMessage
 - Status: ✅ Implemented
@@ -5108,7 +5108,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0xd17e56e2`
 - Serialized length model: minimum `6` bytes + variable payload
 - Fields (order):
-  - `m_chunks`: `Chunk` via `AutoArray` -> `unknown[]` (addVariable)
+  - `m_chunks`: `Chunk` via `AutoArray` -> `{ process: number; nodeX: number; nodeZ: number }[]` (addVariable)
   - `m_sceneId`: `std::string` via `AutoVariable` -> `string` (addVariable)
 
 ### RequestGalaxyLoopTimes
@@ -5224,7 +5224,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0x8a64b1d5`
 - Serialized length model: minimum `14` bytes + variable payload
 - Fields (order):
-  - `m_data`: `DataItem` via `AutoArray` -> `unknown[]` (addVariable)
+  - `m_data`: `ResourceListForSurveyMessage::DataItem` via `AutoArray` -> `{ resourceName: string; resourceId: bigint; parentClassName: string }[]` (addVariable)
   - `m_surveyType`: `std::string` via `AutoVariable` -> `string` (addVariable)
   - `m_surveyToolId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
 
@@ -5352,7 +5352,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Serialized length model: minimum `8` bytes + variable payload
 - Fields (order):
   - `m_result`: `int32` via `AutoVariable` -> `number` (addVariable)
-  - `m_searchResults`: `CustomerServiceSearchResult` via `AutoArray` -> `unknown[]` (addVariable)
+  - `m_searchResults`: `CustomerServiceSearchResult` via `AutoArray` -> `{ title: string; id: string; matchPercent: number }[]` (addVariable)
 
 ### SelectCharacter
 - Status: ✅ Implemented
@@ -5607,7 +5607,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0xc16c1699`
 - Serialized length model: minimum `20` bytes + variable payload
 - Fields (order):
-  - `m_data`: `StructureListMessageData` via `AutoArray` -> `unknown[]` (addVariable)
+  - `m_data`: `StructureListMessageData` via `AutoArray` -> `{ objectTemplate: string; structureId: bigint; location: string; coordinates: { x: number; y: number; z: number }; deleted: number }[]` (addVariable)
   - `m_toolId`: `uint32` via `AutoVariable` -> `number` (addVariable)
   - `m_loginServerId`: `uint32` via `AutoVariable` -> `number` (addVariable)
   - `m_characterId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
@@ -5663,7 +5663,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0x877f79ac`
 - Serialized length model: minimum `4` bytes + variable payload
 - Fields (order):
-  - `m_data`: `DataItem` via `AutoArray` -> `unknown[]` (addVariable)
+  - `m_data`: `SurveyMessage::DataItem` via `AutoArray` -> `{ x: number; y: number; z: number; efficiency: number }[]` (addVariable)
 
 ### SynchronizeScriptVarDeltasMessage
 - Status: ✅ Implemented
