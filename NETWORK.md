@@ -1,16 +1,16 @@
 # NETWORK
 
-This document is generated from local source code and config files only:
+This document is manually maintained and verified against local source code and config files:
 - TypeScript repo: `swg-source-js`
 - Reference C++ repo: `../swg-source-docker`
-- Generated at: `2026-02-07T09:07:44.139Z`
+- Verified at: `2026-02-07T09:34:49.582Z`
 
 ## Packet Parity Summary
 
-- Total C++ `GameNetworkMessage` packets discovered: **525**
+- Total C++ `GameNetworkMessage` packets discovered: **526**
 - Implemented packet interfaces in `swg-source-js`: **218**
-- Missing packet interfaces in `swg-source-js`: **307**
-- Coverage: **41.52%**
+- Missing packet interfaces in `swg-source-js`: **308**
+- Coverage: **41.44%**
 
 ## Transport Layer (SOE UDP) from `UdpLibrary`
 
@@ -179,6 +179,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 | `processIcmpErrorsDuringNegotiating` | `false` |
 | `connectAttemptDelay` | `1000` |
 | `reliableOverflowBytes` | `0` |
+| `bindIpAddress` | `0-filled (memset)` |
 | `userSuppliedEncryptExpansionBytes` | `0` |
 | `userSuppliedEncryptExpansionBytes2` | `0` |
 | `simulateIncomingByteRate` | `0` |
@@ -254,9 +255,11 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 | Type | Key | Default |
 | --- | --- | --- |
 | `INT` | `backupGatewayServerPort` | `15150` |
+| `STRING` | `backupGatewayServerIP` | `"localhost"` |
 | `STRING` | `clusterName` | `"devcluster"` |
 | `STRING` | `centralServerAddress` | `"localhost"` |
 | `INT` | `centralServerPort` | `61232` |
+| `STRING` | `gatewayServerIP` | `"localhost"` |
 | `INT` | `gatewayServerPort` | `5001` |
 | `INT` | `roomInactivityTimeout` | `60 * 60 * 24 * 3` |
 | `INT` | `roomUnpopulatedTimeout` | `60 * 5` |
@@ -373,6 +376,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 | `INT` | `pingServicePort` | `44460` |
 | `INT` | `httpServicePort` | `44490` |
 | `STRING` | `DSN` | `"loginserver"` |
+| `STRING` | `privateIpMask` | `"127.0.0.1"` |
 | `STRING` | `databaseUID` | `"loginserver"` |
 | `STRING` | `databasePWD` | `"loginserver"` |
 | `STRING` | `databaseProtocol` | `"OCI"` |
@@ -468,15 +472,26 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 
 | File | Section | Key | Value | Line |
 | --- | --- | --- | --- | --- |
+| `../swg-source-docker/docker-compose.yml` | `global` | `ports[0]` | `"1521:1521"` | 10 |
+| `../swg-source-docker/docker-compose.yml` | `global` | `ports[1]` | `"5500:5500"` | 11 |
+| `../swg-source-docker/docker-compose.yml` | `global` | `- ORACLE_SID` | `FREE` | 13 |
+| `../swg-source-docker/docker-compose.yml` | `global` | `- ORACLE_PDB` | `FREEPDB1` | 14 |
 | `../swg-source-docker/docker-compose.yml` | `global` | `- ORACLE_PWD` | `swg` | 15 |
+| `../swg-source-docker/docker-compose.yml` | `global` | `- ORACLE_CHARACTERSET` | `AL32UTF8` | 16 |
 | `../swg-source-docker/docker-compose.yml` | `global` | `- DB_HOST` | `swg-oracle-db` | 41 |
 | `../swg-source-docker/docker-compose.yml` | `global` | `- DB_PORT` | `1521` | 42 |
 | `../swg-source-docker/docker-compose.yml` | `global` | `- DB_SERVICE` | `FREEPDB1` | 43 |
+| `../swg-source-docker/docker-compose.yml` | `global` | `- DB_USER` | `swg` | 44 |
+| `../swg-source-docker/docker-compose.yml` | `global` | `- DB_PASSWORD` | `swg` | 45 |
 | `../swg-source-docker/docker-compose.yml` | `global` | `- CLUSTER_NAME` | `${CLUSTER_NAME:-swg}` | 46 |
+| `../swg-source-docker/docker-compose.yml` | `global` | `network_mode` | `host` | 69 |
 | `../swg-source-docker/docker-compose.yml` | `global` | `- DB_HOST` | `localhost` | 72 |
 | `../swg-source-docker/docker-compose.yml` | `global` | `- DB_PORT` | `1521` | 73 |
 | `../swg-source-docker/docker-compose.yml` | `global` | `- DB_SERVICE` | `FREEPDB1` | 74 |
+| `../swg-source-docker/docker-compose.yml` | `global` | `- DB_USER` | `swg` | 75 |
+| `../swg-source-docker/docker-compose.yml` | `global` | `- DB_PASSWORD` | `swg` | 76 |
 | `../swg-source-docker/docker-compose.yml` | `global` | `- CLUSTER_NAME` | `${CLUSTER_NAME:-swg}` | 77 |
+| `../swg-source-docker/docker-compose.yml` | `global` | `- SERVER_IP` | `${SERVER_IP:-127.0.0.1}` | 78 |
 | `../swg-source-docker/swg-main/exe/shared/servercommon.cfg` | `dbProcess` | `useTemplates` | `1` | 31 |
 | `../swg-source-docker/swg-main/exe/shared/servercommon.cfg` | `LoginPing` | `passthroughMode` | `false` | 34 |
 | `../swg-source-docker/swg-main/exe/shared/servercommon.cfg` | `SharedNetwork` | `reservedPort` | `61232` | 37 |
@@ -725,7 +740,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Status: ✅ Implemented
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/SecureTradeMessages.h`
 - Derived CRC/opcode hint: `0x9ca80f98`
-- Fields: *(none parsed; packet may still carry behavior/state in implementation)*
+- Fields: none (zero serialized fields in C++: constructors call no addVariable).
 
 ### AcceptAuctionMessage
 - Status: ✅ Implemented
@@ -738,7 +753,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Status: ✅ Implemented
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/SecureTradeMessages.h`
 - Derived CRC/opcode hint: `0xb131ca17`
-- Fields: *(none parsed; packet may still carry behavior/state in implementation)*
+- Fields: none (zero serialized fields in C++: constructors call no addVariable).
 
 ### AddItemFailedMessage
 - Status: ✅ Implemented
@@ -799,7 +814,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Fields (order):
   - `m_networkId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_staticItemName`: `std::string` via `AutoVariable` -> `string` (addVariable)
-  - `m_data`: `AttributePair` via `AutoArray` -> `unknown` (addVariable)
+  - `m_data`: `AttributePair` via `AutoArray` -> `AttributePair[]` (addVariable)
   - `m_revision`: `int` via `AutoVariable` -> `number` (addVariable)
 
 ### AuctionQueryHeadersMessage
@@ -818,7 +833,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
   - `m_priceFilterMin`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_priceFilterMax`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_priceFilterIncludesFee`: `bool` via `AutoVariable` -> `boolean` (addVariable)
-  - `m_advancedSearch`: `SearchCondition` via `AutoList` -> `unknown` (addVariable)
+  - `m_advancedSearch`: `SearchCondition` via `AutoList` -> `SearchCondition[]` (addVariable)
   - `m_advancedSearchMatchAllAny`: `int8` via `AutoVariable` -> `number` (addVariable)
   - `m_container`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_myVendorsOnly`: `bool` via `AutoVariable` -> `boolean` (addVariable)
@@ -831,9 +846,9 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Fields (order):
   - `m_requestId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_typeFlag`: `int` via `AutoVariable` -> `number` (addVariable)
-  - `m_stringPalette`: `std::string` via `AutoArray` -> `string` (addVariable)
-  - `m_wideStringPalette`: `Unicode::String` via `AutoArray` -> `string` (addVariable)
-  - `m_palettizedAuctionData`: `Auction::PalettizedItemDataHeader` via `AutoArray` -> `unknown` (addVariable)
+  - `m_stringPalette`: `std::string` via `AutoArray` -> `string[]` (addVariable)
+  - `m_wideStringPalette`: `Unicode::String` via `AutoArray` -> `string[]` (addVariable)
+  - `m_palettizedAuctionData`: `Auction::PalettizedItemDataHeader` via `AutoArray` -> `Auction::PalettizedItemDataHeader[]` (addVariable)
   - `m_queryOffset`: `uint16` via `AutoVariable` -> `number` (addVariable)
   - `m_hasMorePages`: `bool` via `AutoVariable` -> `boolean` (addVariable)
 
@@ -843,16 +858,16 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0x68a75f0c`
 - Fields (order):
   - `target`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
-  - `typeId`: `Tag` via `AutoVariable` -> `unknown` (addVariable)
+  - `typeId`: `Tag` via `AutoVariable` -> `number` (addVariable)
   - `packageId`: `unsigned char` via `AutoVariable` -> `number` (addVariable)
-  - `package`: `Archive::ByteStream` via `AutoVariable` -> `unknown` (addVariable)
+  - `package`: `Archive::ByteStream` via `AutoVariable` -> `Uint8Array` (addVariable)
 
 ### BatchBaselinesMessage
 - Status: ✅ Implemented
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/common/BatchBaselinesMessage.h`
 - Derived CRC/opcode hint: `0x74792d5e`
 - Fields (order):
-  - `m_data`: `std::vector<BatchBaselinesMessageData>` via `AutoVariable` -> `unknown[]` (addVariable)
+  - `m_data`: `std::vector<BatchBaselinesMessageData>` via `AutoVariable` -> `BatchBaselinesMessageData[]` (addVariable)
 
 ### BeginTradeMessage
 - Status: ✅ Implemented
@@ -865,7 +880,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Status: ✅ Implemented
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/SecureTradeMessages.h`
 - Derived CRC/opcode hint: `0xe7491df5`
-- Fields: *(none parsed; packet may still carry behavior/state in implementation)*
+- Fields: none (zero serialized fields in C++: constructors call no addVariable).
 
 ### BidAuctionMessage
 - Status: ✅ Implemented
@@ -924,11 +939,11 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Fields (order):
   - `m_bornDate`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_played`: `int` via `AutoVariable` -> `number` (addVariable)
-  - `m_bindLocation`: `Vector` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_bindLocation`: `Vector` via `AutoVariable` -> `Vector` (addVariable)
   - `m_bindPlanet`: `std::string` via `AutoVariable` -> `string` (addVariable)
-  - `m_bankLocation`: `Vector` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_bankLocation`: `Vector` via `AutoVariable` -> `Vector` (addVariable)
   - `m_bankPlanet`: `std::string` via `AutoVariable` -> `string` (addVariable)
-  - `m_residenceLocation`: `Vector` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_residenceLocation`: `Vector` via `AutoVariable` -> `Vector` (addVariable)
   - `m_residencePlanet`: `std::string` via `AutoVariable` -> `string` (addVariable)
   - `m_citizensOf`: `std::string` via `AutoVariable` -> `string` (addVariable)
   - `m_spouseName`: `Unicode::String` via `AutoVariable` -> `string` (addVariable)
@@ -939,7 +954,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatAddFriend.h`
 - Derived CRC/opcode hint: `0x6c002d13`
 - Fields (order):
-  - `characterName`: `ChatAvatarId` via `AutoVariable` -> `unknown` (addVariable)
+  - `characterName`: `ChatAvatarId` via `AutoVariable` -> `ChatAvatarId` (addVariable)
   - `sequence`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
 
 ### ChatAddModeratorToRoom
@@ -947,7 +962,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatAddModeratorToRoom.h`
 - Derived CRC/opcode hint: `0x90bde76f`
 - Fields (order):
-  - `avatarId`: `ChatAvatarId` via `AutoVariable` -> `unknown` (addVariable)
+  - `avatarId`: `ChatAvatarId` via `AutoVariable` -> `ChatAvatarId` (addVariable)
   - `roomName`: `std::string` via `AutoVariable` -> `string` (addVariable)
   - `sequenceId`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
 
@@ -956,7 +971,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatBanAvatarFromRoom.h`
 - Derived CRC/opcode hint: `0xd9fa0194`
 - Fields (order):
-  - `avatarId`: `ChatAvatarId` via `AutoVariable` -> `unknown` (addVariable)
+  - `avatarId`: `ChatAvatarId` via `AutoVariable` -> `ChatAvatarId` (addVariable)
   - `roomName`: `std::string` via `AutoVariable` -> `string` (addVariable)
   - `sequence`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
 
@@ -965,8 +980,8 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatChangeFriendStatus.h`
 - Derived CRC/opcode hint: `0xf22eb811`
 - Fields (order):
-  - `characterName`: `ChatAvatarId` via `AutoVariable` -> `unknown` (addVariable)
-  - `friendName`: `ChatAvatarId` via `AutoVariable` -> `unknown` (addVariable)
+  - `characterName`: `ChatAvatarId` via `AutoVariable` -> `ChatAvatarId` (addVariable)
+  - `friendName`: `ChatAvatarId` via `AutoVariable` -> `ChatAvatarId` (addVariable)
   - `sequence`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
   - `add`: `bool` via `AutoVariable` -> `boolean` (addVariable)
 
@@ -975,8 +990,8 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatChangeIgnoreStatus.h`
 - Derived CRC/opcode hint: `0xd6f40538`
 - Fields (order):
-  - `characterName`: `ChatAvatarId` via `AutoVariable` -> `unknown` (addVariable)
-  - `friendName`: `ChatAvatarId` via `AutoVariable` -> `unknown` (addVariable)
+  - `characterName`: `ChatAvatarId` via `AutoVariable` -> `ChatAvatarId` (addVariable)
+  - `friendName`: `ChatAvatarId` via `AutoVariable` -> `ChatAvatarId` (addVariable)
   - `sequence`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
   - `ignore`: `bool` via `AutoVariable` -> `boolean` (addVariable)
 
@@ -1044,7 +1059,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatFriendsListUpdate.h`
 - Derived CRC/opcode hint: `0x6cd2fcd8`
 - Fields (order):
-  - `characterName`: `ChatAvatarId` via `AutoVariable` -> `unknown` (addVariable)
+  - `characterName`: `ChatAvatarId` via `AutoVariable` -> `ChatAvatarId` (addVariable)
   - `isOnline`: `bool` via `AutoVariable` -> `boolean` (addVariable)
 
 ### ChatGetFriendsList
@@ -1052,21 +1067,21 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatGetFriendsList.h`
 - Derived CRC/opcode hint: `0x351c5dfe`
 - Fields (order):
-  - `characterName`: `ChatAvatarId` via `AutoVariable` -> `unknown` (addVariable)
+  - `characterName`: `ChatAvatarId` via `AutoVariable` -> `ChatAvatarId` (addVariable)
 
 ### ChatGetIgnoreList
 - Status: ✅ Implemented
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatGetIgnoreList.h`
 - Derived CRC/opcode hint: `0x54da3095`
 - Fields (order):
-  - `characterName`: `ChatAvatarId` via `AutoVariable` -> `unknown` (addVariable)
+  - `characterName`: `ChatAvatarId` via `AutoVariable` -> `ChatAvatarId` (addVariable)
 
 ### ChatInstantMessageToCharacter
 - Status: ✅ Implemented
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatInstantMessageToCharacter.h`
 - Derived CRC/opcode hint: `0x84bb21f7`
 - Fields (order):
-  - `characterName`: `ChatAvatarId` via `AutoVariable` -> `unknown` (addVariable)
+  - `characterName`: `ChatAvatarId` via `AutoVariable` -> `ChatAvatarId` (addVariable)
   - `message`: `Unicode::String` via `AutoVariable` -> `string` (addVariable)
   - `outOfBand`: `Unicode::String` via `AutoVariable` -> `string` (addVariable)
   - `sequence`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
@@ -1076,7 +1091,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatInstantMessageToClient.h`
 - Derived CRC/opcode hint: `0x3c565ced`
 - Fields (order):
-  - `fromName`: `ChatAvatarId` via `AutoVariable` -> `unknown` (addVariable)
+  - `fromName`: `ChatAvatarId` via `AutoVariable` -> `ChatAvatarId` (addVariable)
   - `message`: `Unicode::String` via `AutoVariable` -> `string` (addVariable)
   - `outOfBand`: `Unicode::String` via `AutoVariable` -> `string` (addVariable)
 
@@ -1085,7 +1100,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatInviteAvatarToRoom.h`
 - Derived CRC/opcode hint: `0x7273ecd3`
 - Fields (order):
-  - `avatarId`: `ChatAvatarId` via `AutoVariable` -> `unknown` (addVariable)
+  - `avatarId`: `ChatAvatarId` via `AutoVariable` -> `ChatAvatarId` (addVariable)
   - `roomName`: `std::string` via `AutoVariable` -> `string` (addVariable)
 
 ### ChatInviteGroupMembersToRoom
@@ -1094,16 +1109,16 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0x2c0430f0`
 - Fields (order):
   - `invitorNetworkId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
-  - `groupLeaderId`: `ChatAvatarId` via `AutoVariable` -> `unknown` (addVariable)
+  - `groupLeaderId`: `ChatAvatarId` via `AutoVariable` -> `ChatAvatarId` (addVariable)
   - `roomName`: `std::string` via `AutoVariable` -> `string` (addVariable)
-  - `invitedMembers`: `NetworkId` via `AutoArray` -> `bigint` (addVariable)
+  - `invitedMembers`: `NetworkId` via `AutoArray` -> `bigint[]` (addVariable)
 
 ### ChatInviteGroupToRoom
 - Status: ✅ Implemented
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatInviteGroupToRoom.h`
 - Derived CRC/opcode hint: `0x01b5c536`
 - Fields (order):
-  - `avatarId`: `ChatAvatarId` via `AutoVariable` -> `unknown` (addVariable)
+  - `avatarId`: `ChatAvatarId` via `AutoVariable` -> `ChatAvatarId` (addVariable)
   - `roomName`: `std::string` via `AutoVariable` -> `string` (addVariable)
 
 ### ChatKickAvatarFromRoom
@@ -1111,7 +1126,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatKickAvatarFromRoom.h`
 - Derived CRC/opcode hint: `0xe0bce25b`
 - Fields (order):
-  - `m_avatarId`: `ChatAvatarId` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_avatarId`: `ChatAvatarId` via `AutoVariable` -> `ChatAvatarId` (addVariable)
   - `m_roomName`: `std::string` via `AutoVariable` -> `string` (addVariable)
 
 ### ChatMessageFromGame
@@ -1140,8 +1155,8 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatOnAddModeratorToRoom.h`
 - Derived CRC/opcode hint: `0x36a03858`
 - Fields (order):
-  - `avatarId`: `ChatAvatarId` via `AutoVariable` -> `unknown` (addVariable)
-  - `granterId`: `ChatAvatarId` via `AutoVariable` -> `unknown` (addVariable)
+  - `avatarId`: `ChatAvatarId` via `AutoVariable` -> `ChatAvatarId` (addVariable)
+  - `granterId`: `ChatAvatarId` via `AutoVariable` -> `ChatAvatarId` (addVariable)
   - `resultCode`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
   - `roomName`: `std::string` via `AutoVariable` -> `string` (addVariable)
   - `sequenceId`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
@@ -1152,8 +1167,8 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0x5a38538d`
 - Fields (order):
   - `roomName`: `std::string` via `AutoVariable` -> `string` (addVariable)
-  - `banner`: `ChatAvatarId` via `AutoVariable` -> `unknown` (addVariable)
-  - `bannee`: `ChatAvatarId` via `AutoVariable` -> `unknown` (addVariable)
+  - `banner`: `ChatAvatarId` via `AutoVariable` -> `ChatAvatarId` (addVariable)
+  - `bannee`: `ChatAvatarId` via `AutoVariable` -> `ChatAvatarId` (addVariable)
   - `result`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
   - `sequence`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
 
@@ -1163,7 +1178,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0x54336726`
 - Fields (order):
   - `character`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
-  - `friendName`: `ChatAvatarId` via `AutoVariable` -> `unknown` (addVariable)
+  - `friendName`: `ChatAvatarId` via `AutoVariable` -> `ChatAvatarId` (addVariable)
   - `sequence`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
   - `add`: `bool` via `AutoVariable` -> `boolean` (addVariable)
   - `resultCode`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
@@ -1174,7 +1189,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0x70e9da0f`
 - Fields (order):
   - `character`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
-  - `ignoreName`: `ChatAvatarId` via `AutoVariable` -> `unknown` (addVariable)
+  - `ignoreName`: `ChatAvatarId` via `AutoVariable` -> `ChatAvatarId` (addVariable)
   - `sequence`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
   - `ignore`: `bool` via `AutoVariable` -> `boolean` (addVariable)
   - `resultCode`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
@@ -1183,7 +1198,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Status: ✅ Implemented
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatOnConnectAvatar.h`
 - Derived CRC/opcode hint: `0xd72fe9be`
-- Fields: *(none parsed; packet may still carry behavior/state in implementation)*
+- Fields: none (zero serialized fields in C++: constructors call no addVariable).
 
 ### ChatOnCreateRoom
 - Status: ✅ Implemented
@@ -1191,7 +1206,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0x35d7cc9f`
 - Fields (order):
   - `resultCode`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
-  - `roomData`: `ChatRoomData` via `AutoVariable` -> `unknown` (addVariable)
+  - `roomData`: `ChatRoomData` via `AutoVariable` -> `ChatRoomData` (addVariable)
   - `sequence`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
 
 ### ChatOnDeleteAllPersistentMessages
@@ -1207,7 +1222,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatOnDestroyRoom.h`
 - Derived CRC/opcode hint: `0xe8ec5877`
 - Fields (order):
-  - `destroyer`: `ChatAvatarId` via `AutoVariable` -> `unknown` (addVariable)
+  - `destroyer`: `ChatAvatarId` via `AutoVariable` -> `ChatAvatarId` (addVariable)
   - `resultCode`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
   - `roomId`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
   - `sequence`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
@@ -1217,7 +1232,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatOnEnteredRoom.h`
 - Derived CRC/opcode hint: `0xe69bdc0a`
 - Fields (order):
-  - `characterName`: `ChatAvatarId` via `AutoVariable` -> `unknown` (addVariable)
+  - `characterName`: `ChatAvatarId` via `AutoVariable` -> `ChatAvatarId` (addVariable)
   - `result`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
   - `roomId`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
   - `sequence`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
@@ -1228,7 +1243,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0xe97ab594`
 - Fields (order):
   - `character`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
-  - `friends`: `ChatAvatarId` via `AutoArray` -> `unknown` (addVariable)
+  - `friends`: `ChatAvatarId` via `AutoArray` -> `ChatAvatarId[]` (addVariable)
 
 ### ChatOnGetIgnoreList
 - Status: ✅ Implemented
@@ -1236,7 +1251,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0xf8c275b0`
 - Fields (order):
   - `character`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
-  - `ignores`: `ChatAvatarId` via `AutoArray` -> `unknown` (addVariable)
+  - `ignores`: `ChatAvatarId` via `AutoArray` -> `ChatAvatarId[]` (addVariable)
 
 ### ChatOnInviteGroupToRoom
 - Status: ✅ Implemented
@@ -1244,8 +1259,8 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0x8277972f`
 - Fields (order):
   - `roomName`: `std::string` via `AutoVariable` -> `string` (addVariable)
-  - `invitor`: `ChatAvatarId` via `AutoVariable` -> `unknown` (addVariable)
-  - `invitee`: `ChatAvatarId` via `AutoVariable` -> `unknown` (addVariable)
+  - `invitor`: `ChatAvatarId` via `AutoVariable` -> `ChatAvatarId` (addVariable)
+  - `invitee`: `ChatAvatarId` via `AutoVariable` -> `ChatAvatarId` (addVariable)
   - `result`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
 
 ### ChatOnInviteToRoom
@@ -1254,8 +1269,8 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0x493fe74a`
 - Fields (order):
   - `roomName`: `std::string` via `AutoVariable` -> `string` (addVariable)
-  - `invitor`: `ChatAvatarId` via `AutoVariable` -> `unknown` (addVariable)
-  - `invitee`: `ChatAvatarId` via `AutoVariable` -> `unknown` (addVariable)
+  - `invitor`: `ChatAvatarId` via `AutoVariable` -> `ChatAvatarId` (addVariable)
+  - `invitee`: `ChatAvatarId` via `AutoVariable` -> `ChatAvatarId` (addVariable)
   - `result`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
 
 ### ChatOnKickAvatarFromRoom
@@ -1263,8 +1278,8 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatOnKickAvatarFromRoom.h`
 - Derived CRC/opcode hint: `0x46a13d6c`
 - Fields (order):
-  - `avatarId`: `ChatAvatarId` via `AutoVariable` -> `unknown` (addVariable)
-  - `removerId`: `ChatAvatarId` via `AutoVariable` -> `unknown` (addVariable)
+  - `avatarId`: `ChatAvatarId` via `AutoVariable` -> `ChatAvatarId` (addVariable)
+  - `removerId`: `ChatAvatarId` via `AutoVariable` -> `ChatAvatarId` (addVariable)
   - `resultCode`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
   - `roomName`: `std::string` via `AutoVariable` -> `string` (addVariable)
 
@@ -1273,7 +1288,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatOnLeaveRoom.h`
 - Derived CRC/opcode hint: `0x60b5098b`
 - Fields (order):
-  - `characterName`: `ChatAvatarId` via `AutoVariable` -> `unknown` (addVariable)
+  - `characterName`: `ChatAvatarId` via `AutoVariable` -> `ChatAvatarId` (addVariable)
   - `resultCode`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
   - `roomId`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
   - `sequence`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
@@ -1283,7 +1298,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatOnReceiveRoomInvitation.h`
 - Derived CRC/opcode hint: `0xc17eb06d`
 - Fields (order):
-  - `invitorAvatar`: `ChatAvatarId` via `AutoVariable` -> `unknown` (addVariable)
+  - `invitorAvatar`: `ChatAvatarId` via `AutoVariable` -> `ChatAvatarId` (addVariable)
   - `roomName`: `std::string` via `AutoVariable` -> `string` (addVariable)
 
 ### ChatOnRemoveModeratorFromRoom
@@ -1291,8 +1306,8 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatOnRemoveModeratorFromRoom.h`
 - Derived CRC/opcode hint: `0x1342fc47`
 - Fields (order):
-  - `avatarId`: `ChatAvatarId` via `AutoVariable` -> `unknown` (addVariable)
-  - `removerId`: `ChatAvatarId` via `AutoVariable` -> `unknown` (addVariable)
+  - `avatarId`: `ChatAvatarId` via `AutoVariable` -> `ChatAvatarId` (addVariable)
+  - `removerId`: `ChatAvatarId` via `AutoVariable` -> `ChatAvatarId` (addVariable)
   - `resultCode`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
   - `roomName`: `std::string` via `AutoVariable` -> `string` (addVariable)
   - `sequenceId`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
@@ -1302,7 +1317,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatOnRequestLog.h`
 - Derived CRC/opcode hint: `0xed546792`
 - Fields (order):
-  - `logEntries`: `ChatLogEntry` via `AutoArray` -> `unknown` (addVariable)
+  - `logEntries`: `ChatLogEntry` via `AutoArray` -> `ChatLogEntry[]` (addVariable)
   - `sequence`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
 
 ### ChatOnSendInstantMessage
@@ -1343,8 +1358,8 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0xbaf9b815`
 - Fields (order):
   - `roomName`: `std::string` via `AutoVariable` -> `string` (addVariable)
-  - `banner`: `ChatAvatarId` via `AutoVariable` -> `unknown` (addVariable)
-  - `bannee`: `ChatAvatarId` via `AutoVariable` -> `unknown` (addVariable)
+  - `banner`: `ChatAvatarId` via `AutoVariable` -> `ChatAvatarId` (addVariable)
+  - `bannee`: `ChatAvatarId` via `AutoVariable` -> `ChatAvatarId` (addVariable)
   - `result`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
   - `sequence`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
 
@@ -1354,8 +1369,8 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0xbe33c7e8`
 - Fields (order):
   - `roomName`: `std::string` via `AutoVariable` -> `string` (addVariable)
-  - `invitor`: `ChatAvatarId` via `AutoVariable` -> `unknown` (addVariable)
-  - `invitee`: `ChatAvatarId` via `AutoVariable` -> `unknown` (addVariable)
+  - `invitor`: `ChatAvatarId` via `AutoVariable` -> `ChatAvatarId` (addVariable)
+  - `invitee`: `ChatAvatarId` via `AutoVariable` -> `ChatAvatarId` (addVariable)
   - `result`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
   - `sequence`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
 
@@ -1364,7 +1379,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatPersistentMessageToClient.h`
 - Derived CRC/opcode hint: `0x08485e17`
 - Fields (order):
-  - `data`: `Data` via `AutoVariable` -> `unknown` (addVariable)
+  - `data`: `Data` via `AutoVariable` -> `Data` (addVariable)
 
 ### ChatPersistentMessageToServer
 - Status: ✅ Implemented
@@ -1375,7 +1390,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
   - `outOfBand`: `Unicode::String` via `AutoVariable` -> `string` (addVariable)
   - `sequence`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
   - `subject`: `Unicode::String` via `AutoVariable` -> `string` (addVariable)
-  - `toCharacterName`: `ChatAvatarId` via `AutoVariable` -> `unknown` (addVariable)
+  - `toCharacterName`: `ChatAvatarId` via `AutoVariable` -> `ChatAvatarId` (addVariable)
 
 ### ChatPutAvatarInRoom
 - Status: ✅ Implemented
@@ -1400,19 +1415,19 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatQueryRoomResults.h`
 - Derived CRC/opcode hint: `0xc4de864e`
 - Fields (order):
-  - `avatars`: `ChatAvatarId` via `AutoArray` -> `unknown` (addVariable)
-  - `invitees`: `ChatAvatarId` via `AutoArray` -> `unknown` (addVariable)
-  - `moderators`: `ChatAvatarId` via `AutoArray` -> `unknown` (addVariable)
-  - `banned`: `ChatAvatarId` via `AutoArray` -> `unknown` (addVariable)
+  - `avatars`: `ChatAvatarId` via `AutoArray` -> `ChatAvatarId[]` (addVariable)
+  - `invitees`: `ChatAvatarId` via `AutoArray` -> `ChatAvatarId[]` (addVariable)
+  - `moderators`: `ChatAvatarId` via `AutoArray` -> `ChatAvatarId[]` (addVariable)
+  - `banned`: `ChatAvatarId` via `AutoArray` -> `ChatAvatarId[]` (addVariable)
   - `sequence`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
-  - `roomData`: `ChatRoomData` via `AutoVariable` -> `unknown` (addVariable)
+  - `roomData`: `ChatRoomData` via `AutoVariable` -> `ChatRoomData` (addVariable)
 
 ### ChatRemoveAvatarFromRoom
 - Status: ✅ Implemented
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatRemoveAvatarFromRoom.h`
 - Derived CRC/opcode hint: `0x493e3ffa`
 - Fields (order):
-  - `avatarId`: `ChatAvatarId` via `AutoVariable` -> `unknown` (addVariable)
+  - `avatarId`: `ChatAvatarId` via `AutoVariable` -> `ChatAvatarId` (addVariable)
   - `roomName`: `std::string` via `AutoVariable` -> `string` (addVariable)
 
 ### ChatRemoveFriend
@@ -1420,14 +1435,14 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatRemoveFriend.h`
 - Derived CRC/opcode hint: `0xc7d647a2`
 - Fields (order):
-  - `characterName`: `ChatAvatarId` via `AutoVariable` -> `unknown` (addVariable)
+  - `characterName`: `ChatAvatarId` via `AutoVariable` -> `ChatAvatarId` (addVariable)
 
 ### ChatRemoveModeratorFromRoom
 - Status: ✅ Implemented
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatRemoveModeratorFromRoom.h`
 - Derived CRC/opcode hint: `0x8a3f8e04`
 - Fields (order):
-  - `avatarId`: `ChatAvatarId` via `AutoVariable` -> `unknown` (addVariable)
+  - `avatarId`: `ChatAvatarId` via `AutoVariable` -> `ChatAvatarId` (addVariable)
   - `roomName`: `std::string` via `AutoVariable` -> `string` (addVariable)
   - `sequenceId`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
 
@@ -1451,21 +1466,21 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Status: ✅ Implemented
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatRequestRoomList.h`
 - Derived CRC/opcode hint: `0x4c3d2cfa`
-- Fields: *(none parsed; packet may still carry behavior/state in implementation)*
+- Fields: none (zero serialized fields in C++: constructors call no addVariable).
 
 ### ChatRoomList
 - Status: ✅ Implemented
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatRoomList.h`
 - Derived CRC/opcode hint: `0x70deb197`
 - Fields (order):
-  - `roomData`: `ChatRoomData` via `AutoArray` -> `unknown` (addVariable)
+  - `roomData`: `ChatRoomData` via `AutoArray` -> `ChatRoomData[]` (addVariable)
 
 ### ChatRoomMessage
 - Status: ✅ Implemented
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatRoomMessage.h`
 - Derived CRC/opcode hint: `0xcd4ce444`
 - Fields (order):
-  - `fromName`: `ChatAvatarId` via `AutoVariable` -> `unknown` (addVariable)
+  - `fromName`: `ChatAvatarId` via `AutoVariable` -> `ChatAvatarId` (addVariable)
   - `fromRoom`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
   - `message`: `Unicode::String` via `AutoVariable` -> `string` (addVariable)
   - `outOfBand`: `Unicode::String` via `AutoVariable` -> `string` (addVariable)
@@ -1501,7 +1516,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatUnbanAvatarFromRoom.h`
 - Derived CRC/opcode hint: `0x4c8f94a9`
 - Fields (order):
-  - `avatarId`: `ChatAvatarId` via `AutoVariable` -> `unknown` (addVariable)
+  - `avatarId`: `ChatAvatarId` via `AutoVariable` -> `ChatAvatarId` (addVariable)
   - `roomName`: `std::string` via `AutoVariable` -> `string` (addVariable)
   - `sequence`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
 
@@ -1510,7 +1525,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatUninviteFromRoom.h`
 - Derived CRC/opcode hint: `0xfc8d01f1`
 - Fields (order):
-  - `avatar`: `ChatAvatarId` via `AutoVariable` -> `unknown` (addVariable)
+  - `avatar`: `ChatAvatarId` via `AutoVariable` -> `ChatAvatarId` (addVariable)
   - `roomName`: `std::string` via `AutoVariable` -> `string` (addVariable)
   - `sequence`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
 
@@ -1539,7 +1554,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0xd5899226`
 - Fields (order):
   - `m_gameBitsToClear`: `uint32` via `AutoVariable` -> `number` (addVariable)
-  - `token`: `unsigned char` via `AutoArray` -> `number` (addVariable)
+  - `token`: `unsigned char` via `AutoArray` -> `number[]` (addVariable)
   - `version`: `std::string` via `AutoVariable` -> `string` (addVariable)
 
 ### ClientMfdStatusUpdateMessage
@@ -1549,7 +1564,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Fields (order):
   - `m_sceneName`: `std::string` via `AutoVariable` -> `string` (addVariable)
   - `m_sourceId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
-  - `m_worldCoordinates`: `Vector` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_worldCoordinates`: `Vector` via `AutoVariable` -> `Vector` (addVariable)
 
 ### ClientNotificationBoxMessage
 - Status: ✅ Implemented
@@ -1597,7 +1612,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Fields (order):
   - `m_creatureTemplate`: `std::string` via `AutoVariable` -> `string` (addVariable)
   - `m_name`: `Unicode::String` via `AutoVariable` -> `string` (addVariable)
-  - `m_errorMessage`: `StringId` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_errorMessage`: `StringId` via `AutoVariable` -> `StringId` (addVariable)
 
 ### ClientVerifyAndLockNameRequest
 - Status: ✅ Implemented
@@ -1613,13 +1628,13 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0x9b2c6ba7`
 - Fields (order):
   - `m_characterName`: `Unicode::String` via `AutoVariable` -> `string` (addVariable)
-  - `m_errorMessage`: `StringId` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_errorMessage`: `StringId` via `AutoVariable` -> `StringId` (addVariable)
 
 ### CmdSceneReady
 - Status: ✅ Implemented
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/CommandChannelMessages.h`
 - Derived CRC/opcode hint: `0x43fd1c22`
-- Fields: *(none parsed; packet may still carry behavior/state in implementation)*
+- Fields: none (zero serialized fields in C++: constructors call no addVariable).
 
 ### CmdStartScene
 - Status: ✅ Implemented
@@ -1629,7 +1644,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
   - `disableWorldSnapshot`: `bool` via `AutoVariable` -> `boolean` (addVariable)
   - `objectId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `sceneName`: `std::string` via `AutoVariable` -> `string` (addVariable)
-  - `startPosition`: `Vector` via `AutoVariable` -> `unknown` (addVariable)
+  - `startPosition`: `Vector` via `AutoVariable` -> `Vector` (addVariable)
   - `startYaw`: `float` via `AutoVariable` -> `number` (addVariable)
   - `templateName`: `std::string` via `AutoVariable` -> `string` (addVariable)
   - `timeSeconds`: `int64` via `AutoVariable` -> `bigint` (addVariable)
@@ -1693,7 +1708,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/CreateClientPathMessage.h`
 - Derived CRC/opcode hint: `0x71957628`
 - Fields (order):
-  - `m_pointList`: `Vector` via `AutoArray` -> `unknown` (addVariable)
+  - `m_pointList`: `Vector` via `AutoArray` -> `Vector[]` (addVariable)
 
 ### CreateClientProjectileLocationToObjectMessage
 - Status: ✅ Implemented
@@ -1701,7 +1716,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0x3643d394`
 - Fields (order):
   - `m_weaponObjectTemplateName`: `std::string` via `AutoVariable` -> `string` (addVariable)
-  - `m_startLocation`: `Vector` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_startLocation`: `Vector` via `AutoVariable` -> `Vector` (addVariable)
   - `m_targetId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_targetHardpoint`: `std::string` via `AutoVariable` -> `string` (addVariable)
   - `m_startCell`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
@@ -1737,7 +1752,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
   - `m_sourceId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_sourceHardpoint`: `std::string` via `AutoVariable` -> `string` (addVariable)
   - `m_startCell`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
-  - `m_targetLocation`: `Vector` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_targetLocation`: `Vector` via `AutoVariable` -> `Vector` (addVariable)
   - `m_speed`: `float` via `AutoVariable` -> `number` (addVariable)
   - `m_expiration`: `float` via `AutoVariable` -> `number` (addVariable)
   - `m_trail`: `bool` via `AutoVariable` -> `boolean` (addVariable)
@@ -1781,8 +1796,8 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
   - `m_missileId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_source`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_target`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
-  - `m_sourceLocation`: `Vector` via `AutoVariable` -> `unknown` (addVariable)
-  - `m_targetLocation`: `Vector` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_sourceLocation`: `Vector` via `AutoVariable` -> `Vector` (addVariable)
+  - `m_targetLocation`: `Vector` via `AutoVariable` -> `Vector` (addVariable)
   - `m_impactTime`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_missileTypeId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_weaponId`: `int` via `AutoVariable` -> `number` (addVariable)
@@ -1793,7 +1808,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/CreateNebulaLightningMessage.h`
 - Derived CRC/opcode hint: `0x65f27987`
 - Fields (order):
-  - `m_nebulaLightningData`: `NebulaLightningData` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_nebulaLightningData`: `NebulaLightningData` via `AutoVariable` -> `NebulaLightningData` (addVariable)
 
 ### CreateProjectileMessage
 - Status: ✅ Implemented
@@ -1804,8 +1819,8 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
   - `m_weaponIndex`: `int8` via `AutoVariable` -> `number` (addVariable)
   - `m_projectileIndex`: `int8` via `AutoVariable` -> `number` (addVariable)
   - `m_targetedComponent`: `int8` via `AutoVariable` -> `number` (addVariable)
-  - `m_startPosition_p`: `PackedPosition` via `AutoVariable` -> `unknown` (addVariable)
-  - `m_direction_p`: `PackedPosition` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_startPosition_p`: `PackedPosition` via `AutoVariable` -> `PackedPosition` (addVariable)
+  - `m_direction_p`: `PackedPosition` via `AutoVariable` -> `PackedPosition` (addVariable)
   - `m_syncStampLong`: `uint32` via `AutoVariable` -> `number` (addVariable)
 
 ### CreateTicketMessage
@@ -1852,21 +1867,21 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0x12862153`
 - Fields (order):
   - `target`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
-  - `typeId`: `Tag` via `AutoVariable` -> `unknown` (addVariable)
+  - `typeId`: `Tag` via `AutoVariable` -> `number` (addVariable)
   - `packageId`: `unsigned char` via `AutoVariable` -> `number` (addVariable)
-  - `package`: `Archive::ByteStream` via `AutoVariable` -> `unknown` (addVariable)
+  - `package`: `Archive::ByteStream` via `AutoVariable` -> `Uint8Array` (addVariable)
 
 ### DenyTradeMessage
 - Status: ✅ Implemented
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/SecureTradeMessages.h`
 - Derived CRC/opcode hint: `0x6ec28670`
-- Fields: *(none parsed; packet may still carry behavior/state in implementation)*
+- Fields: none (zero serialized fields in C++: constructors call no addVariable).
 
 ### DestroyClientPathMessage
 - Status: ✅ Implemented
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/DestroyClientPathMessage.h`
 - Derived CRC/opcode hint: `0xa75e85eb`
-- Fields: *(none parsed; packet may still carry behavior/state in implementation)*
+- Fields: none (zero serialized fields in C++: constructors call no addVariable).
 
 ### DestroyShipComponentMessage
 - Status: ✅ Implemented
@@ -1889,7 +1904,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Status: ✅ Implemented
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/customerService/DisconnectPlayerMessage.h`
 - Derived CRC/opcode hint: `0x9e56eba2`
-- Fields: *(none parsed; packet may still carry behavior/state in implementation)*
+- Fields: none (zero serialized fields in C++: constructors call no addVariable).
 
 ### DisconnectPlayerResponseMessage
 - Status: ✅ Implemented
@@ -1920,7 +1935,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/ClientCentralMessages.h`
 - Derived CRC/opcode hint: `0x65ea4574`
 - Fields (order):
-  - `m_data`: `Chardata` via `AutoArray` -> `unknown` (addVariable)
+  - `m_data`: `Chardata` via `AutoArray` -> `Chardata[]` (addVariable)
 
 ### ErrorMessage
 - Status: ✅ Implemented
@@ -1943,14 +1958,14 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/ExpertiseRequestMessage.h`
 - Derived CRC/opcode hint: `0xc19085d5`
 - Fields (order):
-  - `m_addExpertisesList`: `std::string` via `AutoArray` -> `string` (addVariable)
+  - `m_addExpertisesList`: `std::string` via `AutoArray` -> `string[]` (addVariable)
   - `m_clearAllExpertisesFirst`: `bool` via `AutoVariable` -> `boolean` (addVariable)
 
 ### FactionRequestMessage
 - Status: ✅ Implemented
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/FactionRequestMessage.h`
 - Derived CRC/opcode hint: `0xc1b03b81`
-- Fields: *(none parsed; packet may still carry behavior/state in implementation)*
+- Fields: none (zero serialized fields in C++: constructors call no addVariable).
 
 ### FactionResponseMessage
 - Status: ✅ Implemented
@@ -1960,8 +1975,8 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
   - `m_factionRebelValue`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_factionImperialValue`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_factionCriminalValue`: `int` via `AutoVariable` -> `number` (addVariable)
-  - `m_npcFactionNameList`: `std::string` via `AutoArray` -> `string` (addVariable)
-  - `m_npcFactionValueList`: `float` via `AutoArray` -> `number` (addVariable)
+  - `m_npcFactionNameList`: `std::string` via `AutoArray` -> `string[]` (addVariable)
+  - `m_npcFactionValueList`: `float` via `AutoArray` -> `number[]` (addVariable)
 
 ### FrameEndMessage
 - Status: ✅ Implemented
@@ -2008,7 +2023,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/GetAuctionDetailsResponse.h`
 - Derived CRC/opcode hint: `0xfe0e644b`
 - Fields (order):
-  - `m_details`: `Auction::ItemDataDetails` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_details`: `Auction::ItemDataDetails` via `AutoVariable` -> `Auction::ItemDataDetails` (addVariable)
 
 ### GetCommentsMessage
 - Status: ✅ Implemented
@@ -2023,7 +2038,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0xeadb08ca`
 - Fields (order):
   - `m_result`: `int32` via `AutoVariable` -> `number` (addVariable)
-  - `m_comments`: `CustomerServiceComment` via `AutoArray` -> `unknown` (addVariable)
+  - `m_comments`: `CustomerServiceComment` via `AutoArray` -> `CustomerServiceComment[]` (addVariable)
 
 ### GetMapLocationsMessage
 - Status: ✅ Implemented
@@ -2041,9 +2056,9 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0x9f80464c`
 - Fields (order):
   - `m_planetName`: `std::string` via `AutoVariable` -> `string` (addVariable)
-  - `m_mapLocationsStatic`: `MapLocation` via `AutoArray` -> `unknown` (addVariable)
-  - `m_mapLocationsDynamic`: `MapLocation` via `AutoArray` -> `unknown` (addVariable)
-  - `m_mapLocationsPersist`: `MapLocation` via `AutoArray` -> `unknown` (addVariable)
+  - `m_mapLocationsStatic`: `MapLocation` via `AutoArray` -> `MapLocation[]` (addVariable)
+  - `m_mapLocationsDynamic`: `MapLocation` via `AutoArray` -> `MapLocation[]` (addVariable)
+  - `m_mapLocationsPersist`: `MapLocation` via `AutoArray` -> `MapLocation[]` (addVariable)
   - `m_versionStatic`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_versionDynamic`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_versionPersist`: `int` via `AutoVariable` -> `number` (addVariable)
@@ -2064,7 +2079,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Fields (order):
   - `m_result`: `int32` via `AutoVariable` -> `number` (addVariable)
   - `m_totalNumTickets`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
-  - `m_tickets`: `CustomerServiceTicket` via `AutoArray` -> `unknown` (addVariable)
+  - `m_tickets`: `CustomerServiceTicket` via `AutoArray` -> `CustomerServiceTicket[]` (addVariable)
 
 ### GiveMoneyMessage
 - Status: ✅ Implemented
@@ -2093,7 +2108,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Status: ✅ Implemented
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/HeartBeat.h`
 - Derived CRC/opcode hint: `0xa16cf9af`
-- Fields: *(none parsed; packet may still carry behavior/state in implementation)*
+- Fields: none (zero serialized fields in C++: constructors call no addVariable).
 
 ### HyperspaceMessage
 - Status: ✅ Implemented
@@ -2134,7 +2149,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/clientLoginServer/ClientLoginMessages.h`
 - Derived CRC/opcode hint: `0xaab296c6`
 - Fields (order):
-  - `token`: `unsigned char` via `AutoArray` -> `number` (addVariable)
+  - `token`: `unsigned char` via `AutoArray` -> `number[]` (addVariable)
   - `stationId`: `uint32` via `AutoVariable` -> `number` (addVariable)
   - `m_username`: `std::string` via `AutoVariable` -> `string` (addVariable)
 
@@ -2143,21 +2158,21 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/clientLoginServer/LoginClusterStatus.h`
 - Derived CRC/opcode hint: `0x3436aeb6`
 - Fields (order):
-  - `m_data`: `ClusterData` via `AutoArray` -> `unknown` (addVariable)
+  - `m_data`: `ClusterData` via `AutoArray` -> `ClusterData[]` (addVariable)
 
 ### LoginClusterStatusEx
 - Status: ✅ Implemented
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/clientLoginServer/LoginClusterStatusEx.h`
 - Derived CRC/opcode hint: `0xfa5b4b5a`
 - Fields (order):
-  - `m_data`: `ClusterData` via `AutoArray` -> `unknown` (addVariable)
+  - `m_data`: `ClusterData` via `AutoArray` -> `ClusterData[]` (addVariable)
 
 ### LoginEnumCluster
 - Status: ✅ Implemented
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/clientLoginServer/LoginEnumCluster.h`
 - Derived CRC/opcode hint: `0xc11c63b9`
 - Fields (order):
-  - `m_data`: `ClusterData` via `AutoArray` -> `unknown` (addVariable)
+  - `m_data`: `ClusterData` via `AutoArray` -> `ClusterData[]` (addVariable)
   - `m_maxCharactersPerAccount`: `int` via `AutoVariable` -> `number` (addVariable)
 
 ### LoginIncorrectClientId
@@ -2172,7 +2187,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Status: ✅ Implemented
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/LogoutMessage.h`
 - Derived CRC/opcode hint: `0x42fd19dd`
-- Fields: *(none parsed; packet may still carry behavior/state in implementation)*
+- Fields: none (zero serialized fields in C++: constructors call no addVariable).
 
 ### MessageRegionListCircleResponse
 - Status: ✅ Implemented
@@ -2218,7 +2233,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Status: ✅ Implemented
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/MessageRegionListRequest.h`
 - Derived CRC/opcode hint: `0x821a4c5d`
-- Fields: *(none parsed; packet may still carry behavior/state in implementation)*
+- Fields: none (zero serialized fields in C++: constructors call no addVariable).
 
 ### MessageRegionListResponse
 - Status: ✅ Implemented
@@ -2310,7 +2325,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
   - `flags`: `uint32` via `AutoVariable` -> `number` (addVariable)
   - `message`: `int32` via `AutoVariable` -> `number` (addVariable)
   - `networkId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
-  - `value`: `real` via `AutoVariable` -> `unknown` (addVariable)
+  - `value`: `real` via `AutoVariable` -> `number` (addVariable)
 
 ### ParametersMessage
 - Status: ✅ Implemented
@@ -2334,10 +2349,10 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0x4d32541f`
 - Fields (order):
   - `m_planetName`: `std::string` via `AutoVariable` -> `string` (addVariable)
-  - `m_travelPointNameList`: `std::string` via `AutoArray` -> `string` (addVariable)
-  - `m_travelPointPointList`: `Vector` via `AutoArray` -> `unknown` (addVariable)
-  - `m_travelPointCostList`: `int` via `AutoArray` -> `number` (addVariable)
-  - `m_travelPointInterplanetaryList`: `bool` via `AutoArray` -> `boolean` (addVariable)
+  - `m_travelPointNameList`: `std::string` via `AutoArray` -> `string[]` (addVariable)
+  - `m_travelPointPointList`: `Vector` via `AutoArray` -> `Vector[]` (addVariable)
+  - `m_travelPointCostList`: `int` via `AutoArray` -> `number[]` (addVariable)
+  - `m_travelPointInterplanetaryList`: `bool` via `AutoArray` -> `boolean[]` (addVariable)
   - `m_sequenceId`: `int` via `AutoVariable` -> `number` (addVariable)
 
 ### PlayClientEffectLocMessage
@@ -2370,7 +2385,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0x4f5e09b6`
 - Fields (order):
   - `m_effectName`: `std::string` via `AutoVariable` -> `string` (addVariable)
-  - `m_transform`: `Transform` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_transform`: `Transform` via `AutoVariable` -> `Transform` (addVariable)
   - `m_objectId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_label`: `std::string` via `AutoVariable` -> `string` (addVariable)
 
@@ -2403,14 +2418,14 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0x90302f79`
 - Fields (order):
   - `m_eventName`: `std::string` via `AutoVariable` -> `string` (addVariable)
-  - `m_transform`: `Transform` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_transform`: `Transform` via `AutoVariable` -> `Transform` (addVariable)
   - `m_objectId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
 
 ### PlayerMoneyRequest
 - Status: ✅ Implemented
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/PlayerMoneyRequest.h`
 - Derived CRC/opcode hint: `0x9d105aa1`
-- Fields: *(none parsed; packet may still carry behavior/state in implementation)*
+- Fields: none (zero serialized fields in C++: constructors call no addVariable).
 
 ### PlayerMoneyResponse
 - Status: ✅ Implemented
@@ -2424,7 +2439,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Status: ✅ Implemented
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/ClientCentralMessages.h`
 - Derived CRC/opcode hint: `0xb6f405c7`
-- Fields: *(none parsed; packet may still carry behavior/state in implementation)*
+- Fields: none (zero serialized fields in C++: constructors call no addVariable).
 
 ### RemoveItemMessage
 - Status: ✅ Implemented
@@ -2446,13 +2461,13 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0x61148fd4`
 - Fields (order):
   - `m_result`: `int32` via `AutoVariable` -> `number` (addVariable)
-  - `m_categories`: `CustomerServiceCategory` via `AutoArray` -> `unknown` (addVariable)
+  - `m_categories`: `CustomerServiceCategory` via `AutoArray` -> `CustomerServiceCategory[]` (addVariable)
 
 ### RequestGalaxyLoopTimes
 - Status: ✅ Implemented
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/RequestGalaxyLoopTimes.h`
 - Derived CRC/opcode hint: `0x7d842d68`
-- Fields: *(none parsed; packet may still carry behavior/state in implementation)*
+- Fields: none (zero serialized fields in C++: constructors call no addVariable).
 
 ### RetrieveAuctionItemMessage
 - Status: ✅ Implemented
@@ -2476,7 +2491,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0xfe89ddea`
 - Fields (order):
   - `m_networkId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
-  - `m_transform`: `Transform` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_transform`: `Transform` via `AutoVariable` -> `Transform` (addVariable)
   - `m_templateCrc`: `uint32` via `AutoVariable` -> `number` (addVariable)
   - `m_hyperspace`: `bool` via `AutoVariable` -> `boolean` (addVariable)
 
@@ -2486,7 +2501,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0x1f73d501`
 - Fields (order):
   - `m_networkId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
-  - `m_transform`: `Transform` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_transform`: `Transform` via `AutoVariable` -> `Transform` (addVariable)
   - `m_templateName`: `std::string` via `AutoVariable` -> `string` (addVariable)
   - `m_hyperspace`: `bool` via `AutoVariable` -> `boolean` (addVariable)
 
@@ -2519,7 +2534,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0x7cbc8f67`
 - Fields (order):
   - `m_result`: `int32` via `AutoVariable` -> `number` (addVariable)
-  - `m_searchResults`: `CustomerServiceSearchResult` via `AutoArray` -> `unknown` (addVariable)
+  - `m_searchResults`: `CustomerServiceSearchResult` via `AutoArray` -> `CustomerServiceSearchResult[]` (addVariable)
 
 ### SelectCharacter
 - Status: ✅ Implemented
@@ -2541,7 +2556,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0x486356ea`
 - Fields (order):
   - `m_index`: `int` via `AutoVariable` -> `number` (addVariable)
-  - `m_windVelocity_w`: `Vector` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_windVelocity_w`: `Vector` via `AutoVariable` -> `Vector` (addVariable)
 
 ### SetTransformMessage
 - Status: ✅ Implemented
@@ -2549,7 +2564,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0x808914ec`
 - Fields (order):
   - `m_id`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
-  - `m_transform`: `Transform` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_transform`: `Transform` via `AutoVariable` -> `Transform` (addVariable)
   - `m_cellId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
 
 ### ShipUpdateTransformCollisionMessage
@@ -2558,8 +2573,8 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0x763648d0`
 - Fields (order):
   - `m_networkId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
-  - `m_transform`: `Transform` via `AutoVariable` -> `unknown` (addVariable)
-  - `m_velocity`: `Vector` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_transform`: `Transform` via `AutoVariable` -> `Transform` (addVariable)
+  - `m_velocity`: `Vector` via `AutoVariable` -> `Vector` (addVariable)
   - `m_syncStampLong`: `uint32` via `AutoVariable` -> `number` (addVariable)
 
 ### ShipUpdateTransformMessage
@@ -2568,11 +2583,11 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0x76026fb9`
 - Fields (order):
   - `m_shipId`: `uint16` via `AutoVariable` -> `number` (addVariable)
-  - `m_transform`: `PackedTransform` via `AutoVariable` -> `unknown` (addVariable)
-  - `m_velocity`: `PackedVelocity` via `AutoVariable` -> `unknown` (addVariable)
-  - `m_yawRate`: `PackedRotationRate` via `AutoVariable` -> `unknown` (addVariable)
-  - `m_pitchRate`: `PackedRotationRate` via `AutoVariable` -> `unknown` (addVariable)
-  - `m_rollRate`: `PackedRotationRate` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_transform`: `PackedTransform` via `AutoVariable` -> `PackedTransform` (addVariable)
+  - `m_velocity`: `PackedVelocity` via `AutoVariable` -> `PackedVelocity` (addVariable)
+  - `m_yawRate`: `PackedRotationRate` via `AutoVariable` -> `PackedRotationRate` (addVariable)
+  - `m_pitchRate`: `PackedRotationRate` via `AutoVariable` -> `PackedRotationRate` (addVariable)
+  - `m_rollRate`: `PackedRotationRate` via `AutoVariable` -> `PackedRotationRate` (addVariable)
   - `m_syncStampLong`: `uint32` via `AutoVariable` -> `number` (addVariable)
 
 ### SlowDownEffectMessage
@@ -2614,7 +2629,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/SuiCreatePageMessage.h`
 - Derived CRC/opcode hint: `0xd44b7259`
 - Fields (order):
-  - `m_pageData`: `SuiPageData` via `AutoDeltaVariable` -> `unknown` (addVariable)
+  - `m_pageData`: `SuiPageData` via `AutoDeltaVariable` -> `SuiPageData` (addVariable)
 
 ### SuiEventNotification
 - Status: ✅ Implemented
@@ -2630,19 +2645,19 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/SuiUpdatePageMessage.h`
 - Derived CRC/opcode hint: `0x5f3342f6`
 - Fields (order):
-  - `m_pageData`: `SuiPageData` via `AutoDeltaVariable` -> `unknown` (addVariable)
+  - `m_pageData`: `SuiPageData` via `AutoDeltaVariable` -> `SuiPageData` (addVariable)
 
 ### TradeCompleteMessage
 - Status: ✅ Implemented
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/SecureTradeMessages.h`
 - Derived CRC/opcode hint: `0xc542038b`
-- Fields: *(none parsed; packet may still carry behavior/state in implementation)*
+- Fields: none (zero serialized fields in C++: constructors call no addVariable).
 
 ### UnAcceptTransactionMessage
 - Status: ✅ Implemented
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/SecureTradeMessages.h`
 - Derived CRC/opcode hint: `0xe81e4382`
-- Fields: *(none parsed; packet may still carry behavior/state in implementation)*
+- Fields: none (zero serialized fields in C++: constructors call no addVariable).
 
 ### UpdateCellPermissionMessage
 - Status: ✅ Implemented
@@ -2691,14 +2706,14 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Status: ✅ Implemented
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/SecureTradeMessages.h`
 - Derived CRC/opcode hint: `0x9ae247ee`
-- Fields: *(none parsed; packet may still carry behavior/state in implementation)*
+- Fields: none (zero serialized fields in C++: constructors call no addVariable).
 
 ### WhoListMessage
 - Status: ✅ Implemented
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/WhoListMessage.h`
 - Derived CRC/opcode hint: `0x9ba0d09f`
 - Fields (order):
-  - `m_data`: `Unicode::String` via `AutoArray` -> `string` (addVariable)
+  - `m_data`: `Unicode::String` via `AutoArray` -> `string[]` (addVariable)
 
 ## Missing Packet List (TypeScript absent)
 
@@ -2706,7 +2721,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Status: ❌ Missing
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/centralGameServer/CentralGameServerMessages.h`
 - Derived CRC/opcode hint: `0x1b877422`
-- Fields: *(none parsed)*
+- Fields: none (zero serialized fields in C++: constructors call no addVariable).
 
 ### AcceptAuctionResponseMessage
 - Status: ❌ Missing
@@ -2721,7 +2736,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/AcceptHighBidMessage.h`
 - Derived CRC/opcode hint: `0x85dfb334`
 - Fields (order):
-  - `m_responseId`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_responseId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_trackId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_auctionId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_playerId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
@@ -2734,7 +2749,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
   - `m_requester`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_gameServer`: `uint32` via `AutoVariable` -> `number` (addVariable)
   - `m_target`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
-  - `m_targetStationId`: `StationId` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_targetStationId`: `StationId` via `AutoVariable` -> `number` (addVariable)
   - `m_gameCode`: `uint32` via `AutoVariable` -> `number` (addVariable)
   - `m_requestReason`: `int8` via `AutoVariable` -> `number` (addVariable)
 
@@ -2746,13 +2761,13 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
   - `m_requester`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_gameServer`: `uint32` via `AutoVariable` -> `number` (addVariable)
   - `m_target`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
-  - `m_targetStationId`: `StationId` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_targetStationId`: `StationId` via `AutoVariable` -> `number` (addVariable)
   - `m_gameCode`: `uint32` via `AutoVariable` -> `number` (addVariable)
   - `m_requestReason`: `int8` via `AutoVariable` -> `number` (addVariable)
   - `m_resultCode`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
   - `m_resultCameFromSession`: `bool` via `AutoVariable` -> `boolean` (addVariable)
-  - `m_featureIds`: `std::map<uint32, int>` via `AutoVariable` -> `Record<string, unknown>` (addVariable)
-  - `m_sessionFeatureIdsData`: `std::map<uint32, std::string>` via `AutoVariable` -> `Record<string, unknown>` (addVariable)
+  - `m_featureIds`: `std::map<uint32, int>` via `AutoVariable` -> `Map<number, number>` (addVariable)
+  - `m_sessionFeatureIdsData`: `std::map<uint32, std::string>` via `AutoVariable` -> `Map<number, string>` (addVariable)
   - `m_sessionResultString`: `std::string` via `AutoVariable` -> `string` (addVariable)
   - `m_sessionResultText`: `std::string` via `AutoVariable` -> `string` (addVariable)
 
@@ -2761,7 +2776,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/AddAuctionMessage.h`
 - Derived CRC/opcode hint: `0x4172a001`
 - Fields (order):
-  - `m_responseId`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_responseId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_trackId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_ownerId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_ownerName`: `std::string` via `AutoVariable` -> `string` (addVariable)
@@ -2778,7 +2793,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
   - `m_flags`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_userDescriptionLength`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_userDescription`: `Unicode::String` via `AutoVariable` -> `string` (addVariable)
-  - `m_attributes`: `std::pair<std::string, Unicode::String>` via `AutoArray` -> `[string, string]` (addVariable)
+  - `m_attributes`: `std::pair<std::string, Unicode::String>` via `AutoArray` -> `[string, string][]` (addVariable)
   - `m_itemSize`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_vendorLimit`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_vendorItemLimit`: `int` via `AutoVariable` -> `number` (addVariable)
@@ -2788,7 +2803,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/AddBidMessage.h`
 - Derived CRC/opcode hint: `0x5b3cf104`
 - Fields (order):
-  - `m_responseId`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_responseId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_trackId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_auctionId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_playerId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
@@ -2812,7 +2827,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/AddImmediateAuctionMessage.h`
 - Derived CRC/opcode hint: `0x7d9df69a`
 - Fields (order):
-  - `m_responseId`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_responseId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_trackId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_ownerId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_ownerName`: `std::string` via `AutoVariable` -> `string` (addVariable)
@@ -2829,7 +2844,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
   - `m_flags`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_userDescriptionLength`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_userDescription`: `Unicode::String` via `AutoVariable` -> `string` (addVariable)
-  - `m_attributes`: `std::pair<std::string, Unicode::String>` via `AutoArray` -> `[string, string]` (addVariable)
+  - `m_attributes`: `std::pair<std::string, Unicode::String>` via `AutoArray` -> `[string, string][]` (addVariable)
   - `m_itemSize`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_vendorLimit`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_vendorItemLimit`: `int` via `AutoVariable` -> `number` (addVariable)
@@ -2849,7 +2864,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/gameGameServer/AddResourceTypeMessage.h`
 - Derived CRC/opcode hint: `0x3b4532ce`
 - Fields (order):
-  - `m_data`: `AddResourceTypeMessageNamespace::ResourceTypeData` via `AutoArray` -> `unknown` (addVariable)
+  - `m_data`: `AddResourceTypeMessageNamespace::ResourceTypeData` via `AutoArray` -> `AddResourceTypeMessageNamespace::ResourceTypeData[]` (addVariable)
 
 ### AdjustAccountFeatureIdRequest
 - Status: ❌ Missing
@@ -2860,7 +2875,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
   - `m_gameServer`: `uint32` via `AutoVariable` -> `number` (addVariable)
   - `m_targetPlayer`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_targetPlayerDescription`: `std::string` via `AutoVariable` -> `string` (addVariable)
-  - `m_targetStationId`: `StationId` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_targetStationId`: `StationId` via `AutoVariable` -> `number` (addVariable)
   - `m_targetItem`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_targetItemDescription`: `std::string` via `AutoVariable` -> `string` (addVariable)
   - `m_gameCode`: `uint32` via `AutoVariable` -> `number` (addVariable)
@@ -2876,7 +2891,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
   - `m_gameServer`: `uint32` via `AutoVariable` -> `number` (addVariable)
   - `m_targetPlayer`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_targetPlayerDescription`: `std::string` via `AutoVariable` -> `string` (addVariable)
-  - `m_targetStationId`: `StationId` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_targetStationId`: `StationId` via `AutoVariable` -> `number` (addVariable)
   - `m_targetItem`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_targetItemDescription`: `std::string` via `AutoVariable` -> `string` (addVariable)
   - `m_gameCode`: `uint32` via `AutoVariable` -> `number` (addVariable)
@@ -2898,8 +2913,8 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
   - `m_locationY`: `float` via `AutoVariable` -> `number` (addVariable)
   - `m_locationZ`: `float` via `AutoVariable` -> `number` (addVariable)
   - `m_parent`: `int` via `AutoVariable` -> `number` (addVariable)
-  - `m_children`: `int` via `AutoArray` -> `number` (addVariable)
-  - `m_siblings`: `int` via `AutoArray` -> `number` (addVariable)
+  - `m_children`: `int` via `AutoArray` -> `number[]` (addVariable)
+  - `m_siblings`: `int` via `AutoArray` -> `number[]` (addVariable)
   - `m_type`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_level`: `int` via `AutoVariable` -> `number` (addVariable)
 
@@ -2909,7 +2924,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0xca1daab6`
 - Fields (order):
   - `m_objectId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
-  - `m_nodes`: `AIPathInfo_NodeInfo` via `AutoArray` -> `unknown` (addVariable)
+  - `m_nodes`: `AIPathInfo_NodeInfo` via `AutoArray` -> `AIPathInfo_NodeInfo[]` (addVariable)
 
 ### AuctionQueryMessage
 - Status: ❌ Missing
@@ -2927,7 +2942,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Fields (order):
   - `m_requestId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_typeFlag`: `int` via `AutoVariable` -> `number` (addVariable)
-  - `m_auctionData`: `AuctionData` via `AutoArray` -> `unknown` (addVariable)
+  - `m_auctionData`: `AuctionData` via `AutoArray` -> `AuctionData[]` (addVariable)
 
 ### AuthTransferClientMessage
 - Status: ❌ Missing
@@ -2942,18 +2957,18 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
   - `m_ipAddr`: `std::string` via `AutoVariable` -> `string` (addVariable)
   - `m_secure`: `bool` via `AutoVariable` -> `boolean` (addVariable)
   - `m_stationId`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
-  - `m_observedObjects`: `NetworkId` via `AutoArray` -> `bigint` (addVariable)
+  - `m_observedObjects`: `NetworkId` via `AutoArray` -> `bigint[]` (addVariable)
   - `m_gameFeatures`: `uint32` via `AutoVariable` -> `number` (addVariable)
   - `m_subscriptionFeatures`: `uint32` via `AutoVariable` -> `number` (addVariable)
-  - `m_accountFeatureIds`: `std::map<uint32, int>` via `AutoVariable` -> `Record<string, unknown>` (addVariable)
+  - `m_accountFeatureIds`: `std::map<uint32, int>` via `AutoVariable` -> `Map<number, number>` (addVariable)
   - `m_entitlementTotalTime`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
   - `m_entitlementEntitledTime`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
   - `m_entitlementTotalTimeSinceLastLogin`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
   - `m_entitlementEntitledTimeSinceLastLogin`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
   - `m_buddyPoints`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_sourceServerPid`: `uint32` via `AutoVariable` -> `number` (addVariable)
-  - `m_consumedRewardEvents`: `std::pair<NetworkId, std::string>` via `AutoArray` -> `bigint` (addVariable)
-  - `m_claimedRewardItems`: `std::pair<NetworkId, std::string>` via `AutoArray` -> `bigint` (addVariable)
+  - `m_consumedRewardEvents`: `std::pair<NetworkId, std::string>` via `AutoArray` -> `[bigint, string][]` (addVariable)
+  - `m_claimedRewardItems`: `std::pair<NetworkId, std::string>` via `AutoArray` -> `[bigint, string][]` (addVariable)
   - `m_usingAdminLogin`: `bool` via `AutoVariable` -> `boolean` (addVariable)
   - `m_combatSpamFilter`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_combatSpamRangeSquaredFilter`: `int` via `AutoVariable` -> `number` (addVariable)
@@ -2974,14 +2989,14 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/gameGameServer/BountyHunterTargetListMessage.h`
 - Derived CRC/opcode hint: `0x7d0218ae`
 - Fields (order):
-  - `m_targetList`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_targetList`: `std::vector< std::pair< NetworkId, NetworkId > >` via `AutoVariable` -> `[bigint, bigint][]` (addVariable)
 
 ### BountyHunterTargetMessage
 - Status: ❌ Missing
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/gameGameServer/BountyHunterTargetMessage.h`
 - Derived CRC/opcode hint: `0x4c00e2b1`
 - Fields (order):
-  - `m_objectId`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_objectId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_targetId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
 
 ### CancelAuctionMessage
@@ -2989,7 +3004,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/CancelAuctionMessage.h`
 - Derived CRC/opcode hint: `0x509e0f24`
 - Fields (order):
-  - `m_responseId`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_responseId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_trackId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_auctionId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_playerId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
@@ -3001,7 +3016,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Fields (order):
   - `m_appearanceData`: `std::string` via `AutoVariable` -> `string` (addVariable)
   - `m_cellId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
-  - `m_coordinates`: `Vector` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_coordinates`: `Vector` via `AutoVariable` -> `Vector` (addVariable)
   - `m_characterName`: `Unicode::String` via `AutoVariable` -> `string` (addVariable)
   - `m_planetName`: `std::string` via `AutoVariable` -> `string` (addVariable)
   - `m_stationId`: `uint32` via `AutoVariable` -> `number` (addVariable)
@@ -3069,7 +3084,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Status: ❌ Missing
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/centralGameServer/CentralPingMessage.h`
 - Derived CRC/opcode hint: `0xf9d4e7fa`
-- Fields: *(none parsed)*
+- Fields: none (zero serialized fields in C++: constructors call no addVariable).
 
 ### CentralPlanetServerConnect
 - Status: ❌ Missing
@@ -3092,7 +3107,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/centralGameServer/CharacterListMessage.h`
 - Derived CRC/opcode hint: `0x2ab42c64`
 - Fields (order):
-  - `m_data`: `CharacterListMessageData` via `AutoArray` -> `unknown` (addVariable)
+  - `m_data`: `CharacterListMessageData` via `AutoArray` -> `CharacterListMessageData[]` (addVariable)
   - `m_accountNumber`: `uint32` via `AutoVariable` -> `number` (addVariable)
 
 ### CharacterNamesMessage
@@ -3100,12 +3115,12 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/gameGameServer/CharacterNamesMessage.h`
 - Derived CRC/opcode hint: `0x4a986bb2`
 - Fields (order):
-  - `m_ids`: `NetworkId` via `AutoArray` -> `bigint` (addVariable)
-  - `m_stationIds`: `int` via `AutoArray` -> `number` (addVariable)
-  - `m_names`: `std::string` via `AutoArray` -> `string` (addVariable)
-  - `m_fullNames`: `std::string` via `AutoArray` -> `string` (addVariable)
-  - `m_createTimes`: `int` via `AutoArray` -> `number` (addVariable)
-  - `m_loginTimes`: `int` via `AutoArray` -> `number` (addVariable)
+  - `m_ids`: `NetworkId` via `AutoArray` -> `bigint[]` (addVariable)
+  - `m_stationIds`: `int` via `AutoArray` -> `number[]` (addVariable)
+  - `m_names`: `std::string` via `AutoArray` -> `string[]` (addVariable)
+  - `m_fullNames`: `std::string` via `AutoArray` -> `string[]` (addVariable)
+  - `m_createTimes`: `int` via `AutoArray` -> `number[]` (addVariable)
+  - `m_loginTimes`: `int` via `AutoArray` -> `number[]` (addVariable)
 
 ### CharacterTransferStatusMessage
 - Status: ❌ Missing
@@ -3147,7 +3162,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/centralGameServer/ChunkCompleteMessage.h`
 - Derived CRC/opcode hint: `0xd4edc601`
 - Fields (order):
-  - `m_chunks`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_chunks`: `std::pair<int, int>` via `AutoArray` -> `[number, number][]` (addVariable)
 
 ### ChunkObjectListMessage
 - Status: ❌ Missing
@@ -3155,7 +3170,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0xf6df9f36`
 - Fields (order):
   - `m_process`: `uint32` via `AutoVariable` -> `number` (addVariable)
-  - `m_ids`: `NetworkId` via `AutoArray` -> `bigint` (addVariable)
+  - `m_ids`: `NetworkId` via `AutoArray` -> `bigint[]` (addVariable)
 
 ### ClaimRewardsMessage
 - Status: ❌ Missing
@@ -3163,12 +3178,12 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0xb139f85c`
 - Fields (order):
   - `m_gameServer`: `uint32` via `AutoVariable` -> `number` (addVariable)
-  - `m_stationId`: `StationId` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_stationId`: `StationId` via `AutoVariable` -> `number` (addVariable)
   - `m_player`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_rewardEvent`: `std::string` via `AutoVariable` -> `string` (addVariable)
   - `m_consumeEvent`: `bool` via `AutoVariable` -> `boolean` (addVariable)
-  - `m_accountUniqueItems`: `std::string` via `AutoArray` -> `string` (addVariable)
-  - `m_additionalItems`: `std::string` via `AutoArray` -> `string` (addVariable)
+  - `m_accountUniqueItems`: `std::string` via `AutoArray` -> `string[]` (addVariable)
+  - `m_additionalItems`: `std::string` via `AutoArray` -> `string[]` (addVariable)
   - `m_accountFeatureId`: `uint32` via `AutoVariable` -> `number` (addVariable)
   - `m_consumeAccountFeatureId`: `bool` via `AutoVariable` -> `boolean` (addVariable)
   - `m_accountFeatureIdOldValue`: `std::string` via `AutoVariable` -> `string` (addVariable)
@@ -3180,11 +3195,11 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0xf7b0daec`
 - Fields (order):
   - `m_gameServer`: `uint32` via `AutoVariable` -> `number` (addVariable)
-  - `m_stationId`: `StationId` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_stationId`: `StationId` via `AutoVariable` -> `number` (addVariable)
   - `m_player`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_rewardEvent`: `std::string` via `AutoVariable` -> `string` (addVariable)
-  - `m_accountUniqueItems`: `std::string` via `AutoArray` -> `string` (addVariable)
-  - `m_additionalItems`: `std::string` via `AutoArray` -> `string` (addVariable)
+  - `m_accountUniqueItems`: `std::string` via `AutoArray` -> `string[]` (addVariable)
+  - `m_additionalItems`: `std::string` via `AutoArray` -> `string[]` (addVariable)
   - `m_accountFeatureId`: `uint32` via `AutoVariable` -> `number` (addVariable)
   - `m_consumeAccountFeatureId`: `bool` via `AutoVariable` -> `boolean` (addVariable)
   - `m_previousAccountFeatureIdCount`: `int` via `AutoVariable` -> `number` (addVariable)
@@ -3196,7 +3211,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/CleanupInvalidItemRetrievalMessage.h`
 - Derived CRC/opcode hint: `0x2beeb2e9`
 - Fields (order):
-  - `m_responseId`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_responseId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_trackId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_itemId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
 
@@ -3206,7 +3221,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0xdf333c6e`
 - Fields (order):
   - `m_name`: `Unicode::String` via `AutoVariable` -> `string` (addVariable)
-  - `m_errorMessage`: `StringId` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_errorMessage`: `StringId` via `AutoVariable` -> `StringId` (addVariable)
 
 ### ClientCreateCharacterSuccess
 - Status: ❌ Missing
@@ -3219,7 +3234,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Status: ❌ Missing
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/CloseHolocronMessage.h`
 - Derived CRC/opcode hint: `0xc0938a9d`
-- Fields: *(none parsed)*
+- Fields: none (zero serialized fields in C++: constructors call no addVariable).
 
 ### ClusterWideDataGetElementMessage
 - Status: ❌ Missing
@@ -3240,8 +3255,8 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
   - `m_elementNameRegex`: `std::string` via `AutoVariable` -> `string` (addVariable)
   - `m_requestId`: `uint32` via `AutoVariable` -> `number` (addVariable)
   - `m_lockKey`: `uint32` via `AutoVariable` -> `number` (addVariable)
-  - `m_elementNameList`: `std::string` via `AutoArray` -> `string` (addVariable)
-  - `m_elementDictionaryList`: `ValueDictionary` via `AutoArray` -> `unknown` (addVariable)
+  - `m_elementNameList`: `std::string` via `AutoArray` -> `string[]` (addVariable)
+  - `m_elementDictionaryList`: `ValueDictionary` via `AutoArray` -> `ValueDictionary[]` (addVariable)
 
 ### ClusterWideDataReleaseLockMessage
 - Status: ❌ Missing
@@ -3267,7 +3282,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Fields (order):
   - `m_managerName`: `std::string` via `AutoVariable` -> `string` (addVariable)
   - `m_elementNameRegex`: `std::string` via `AutoVariable` -> `string` (addVariable)
-  - `m_dictionary`: `ValueDictionary` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_dictionary`: `ValueDictionary` via `AutoVariable` -> `ValueDictionary` (addVariable)
   - `m_replaceDictionary`: `bool` via `AutoVariable` -> `boolean` (addVariable)
   - `m_autoRemove`: `bool` via `AutoVariable` -> `boolean` (addVariable)
   - `m_lockKey`: `uint32` via `AutoVariable` -> `number` (addVariable)
@@ -3277,7 +3292,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/commoditiesSwgDatabase/CMCreateAuctionBidMessage.h`
 - Derived CRC/opcode hint: `0xd016ea8d`
 - Fields (order):
-  - `m_itemId`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_itemId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_bidderId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_bid`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_maxProxyBid`: `int` via `AutoVariable` -> `number` (addVariable)
@@ -3287,13 +3302,13 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/commoditiesSwgDatabase/CMCreateAuctionMessage.h`
 - Derived CRC/opcode hint: `0x5d13287d`
 - Fields (order):
-  - `m_creatorId`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_creatorId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_minimumBid`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_auctionTimer`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_buyNowPrice`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_userDescriptionLength`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_userDescription`: `Unicode::String` via `AutoVariable` -> `string` (addVariable)
-  - `m_attributes`: `std::pair<std::string, Unicode::String>` via `AutoArray` -> `[string, string]` (addVariable)
+  - `m_attributes`: `std::pair<std::string, Unicode::String>` via `AutoArray` -> `[string, string][]` (addVariable)
   - `m_locationId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_itemId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_itemType`: `int` via `AutoVariable` -> `number` (addVariable)
@@ -3310,7 +3325,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/commoditiesSwgDatabase/CMCreateLocationMessage.h`
 - Derived CRC/opcode hint: `0x204fd8c8`
 - Fields (order):
-  - `m_locationId`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_locationId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_locationString`: `std::string` via `AutoVariable` -> `string` (addVariable)
   - `m_ownerId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_salesTax`: `int` via `AutoVariable` -> `number` (addVariable)
@@ -3327,21 +3342,21 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/commoditiesSwgDatabase/CMDeleteAuctionMessage.h`
 - Derived CRC/opcode hint: `0x80f56d35`
 - Fields (order):
-  - `m_itemId`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_itemId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
 
 ### CMDeleteLocationMessage
 - Status: ❌ Missing
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/commoditiesSwgDatabase/CMDeleteLocationMessage.h`
 - Derived CRC/opcode hint: `0xe65c5df2`
 - Fields (order):
-  - `m_locationId`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_locationId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
 
 ### CMUpdateAuctionMessage
 - Status: ❌ Missing
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/commoditiesSwgDatabase/CMUpdateAuctionMessage.h`
 - Derived CRC/opcode hint: `0x3d2715f7`
 - Fields (order):
-  - `m_itemId`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_itemId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_ownerId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_flags`: `int` via `AutoVariable` -> `number` (addVariable)
 
@@ -3350,7 +3365,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/commoditiesSwgDatabase/CMUpdateLocationMessage.h`
 - Derived CRC/opcode hint: `0xb8d7945f`
 - Fields (order):
-  - `m_locationId`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_locationId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_ownerId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_locationString`: `std::string` via `AutoVariable` -> `string` (addVariable)
   - `m_salesTax`: `int` via `AutoVariable` -> `number` (addVariable)
@@ -3372,9 +3387,9 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 ### CommoditiesLoadDoneMessage
 - Status: ❌ Missing
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/commoditiesSwgDatabase/CommoditiesLoadDoneMessage.h`
-- Derived CRC/opcode hint: `0x48842a81`
+- Derived CRC/opcode hint: `0x07a76171`
 - Fields (order):
-  - `m_auctionLocationsCount`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_auctionLocationsCount`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_marketAuctionsCount`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_marketAuctionAttributesCount`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_marketAuctionBidsCount`: `int` via `AutoVariable` -> `number` (addVariable)
@@ -3409,7 +3424,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Fields (order):
   - `stationId`: `uint32` via `AutoVariable` -> `number` (addVariable)
   - `m_name`: `Unicode::String` via `AutoVariable` -> `string` (addVariable)
-  - `m_errorMessage`: `StringId` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_errorMessage`: `StringId` via `AutoVariable` -> `StringId` (addVariable)
   - `m_optionalDetailedErrorMessage`: `std::string` via `AutoVariable` -> `string` (addVariable)
 
 ### ConnectionCreateCharacterSuccess
@@ -3425,7 +3440,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/centralConnectionServer/CentralConnectionServerMessages.h`
 - Derived CRC/opcode hint: `0x2058a4e0`
 - Fields (order):
-  - `key`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `key`: `KeyShare::Key` via `AutoVariableKeyShare` -> `KeyShare::Key` (addVariable)
 
 ### ConnectionRandomNameRequest
 - Status: ❌ Missing
@@ -3481,7 +3496,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `game/shared/library/swgSharedNetworkMessages/src/shared/consent/ConsentRequestMessage.h`
 - Derived CRC/opcode hint: `0x99dcb094`
 - Fields (order):
-  - `m_question`: `ProsePackage` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_question`: `ProsePackage` via `AutoVariable` -> `ProsePackage` (addVariable)
   - `m_id`: `int` via `AutoVariable` -> `number` (addVariable)
 
 ### ControlAssumed
@@ -3492,7 +3507,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
   - `m_oid`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_sceneName`: `std::string` via `AutoVariable` -> `string` (addVariable)
   - `m_skipLoadScreen`: `bool` via `AutoVariable` -> `boolean` (addVariable)
-  - `m_startPosition`: `Vector` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_startPosition`: `Vector` via `AutoVariable` -> `Vector` (addVariable)
   - `m_startYaw`: `float` via `AutoVariable` -> `number` (addVariable)
   - `m_templateName`: `std::string` via `AutoVariable` -> `string` (addVariable)
   - `m_timeSeconds`: `int64` via `AutoVariable` -> `bigint` (addVariable)
@@ -3569,8 +3584,8 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/gameGameServer/CreateGroupMessage.h`
 - Derived CRC/opcode hint: `0x4e652ea3`
 - Fields (order):
-  - `m_leader`: `GroupMemberParam` via `AutoVariable` -> `unknown` (addVariable)
-  - `m_members`: `std::vector<GroupMemberParam>` via `AutoVariable` -> `unknown[]` (addVariable)
+  - `m_leader`: `GroupMemberParam` via `AutoVariable` -> `GroupMemberParam` (addVariable)
+  - `m_members`: `std::vector<GroupMemberParam>` via `AutoVariable` -> `GroupMemberParam[]` (addVariable)
 
 ### CreateNewObjectMessage
 - Status: ❌ Missing
@@ -3580,7 +3595,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
   - `m_id`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_process`: `uint32` via `AutoVariable` -> `number` (addVariable)
   - `m_scene`: `std::string` via `AutoVariable` -> `string` (addVariable)
-  - `m_pos`: `Vector` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_pos`: `Vector` via `AutoVariable` -> `Vector` (addVariable)
 
 ### CreateObjectByCrcMessage
 - Status: ❌ Missing
@@ -3589,7 +3604,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Fields (order):
   - `m_id`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_crc`: `uint32` via `AutoVariable` -> `number` (addVariable)
-  - `m_objType`: `Tag` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_objType`: `Tag` via `AutoVariable` -> `number` (addVariable)
   - `m_createAuthoritative`: `bool` via `AutoVariable` -> `boolean` (addVariable)
   - `m_container`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
 
@@ -3606,7 +3621,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/CreateVendorMarketMessage.h`
 - Derived CRC/opcode hint: `0x1e687b02`
 - Fields (order):
-  - `m_responseId`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_responseId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_trackId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_ownerId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_location`: `std::string` via `AutoVariable` -> `string` (addVariable)
@@ -3662,7 +3677,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0x5ff5569c`
 - Fields (order):
   - `m_objectId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
-  - `m_stationId`: `StationId` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_stationId`: `StationId` via `AutoVariable` -> `number` (addVariable)
   - `m_characterName`: `Unicode::String` via `AutoVariable` -> `string` (addVariable)
   - `m_templateId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_jedi`: `bool` via `AutoVariable` -> `boolean` (addVariable)
@@ -3671,7 +3686,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Status: ❌ Missing
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/centralGameServer/CentralGameServerMessages.h`
 - Derived CRC/opcode hint: `0x1e32bdff`
-- Fields: *(none parsed)*
+- Fields: none (zero serialized fields in C++: constructors call no addVariable).
 
 ### DBCSRequestMessage
 - Status: ❌ Missing
@@ -3690,7 +3705,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/AIDebuggingMessages.h`
 - Derived CRC/opcode hint: `0xd0cdaa62`
 - Fields (order):
-  - `m_transform`: `Transform` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_transform`: `Transform` via `AutoVariable` -> `Transform` (addVariable)
   - `m_cellId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
 
 ### DeleteAuctionLocationMessage
@@ -3698,7 +3713,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/DeleteAuctionLocationMessage.h`
 - Derived CRC/opcode hint: `0x8eb26b80`
 - Fields (order):
-  - `m_responseId`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_responseId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_trackId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_locationId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_whoRequested`: `std::string` via `AutoVariable` -> `string` (addVariable)
@@ -3708,7 +3723,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/DestroyVendorMarketMessage.h`
 - Derived CRC/opcode hint: `0xad27b09b`
 - Fields (order):
-  - `m_responseId`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_responseId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_trackId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_ownerId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_ownerName`: `std::string` via `AutoVariable` -> `string` (addVariable)
@@ -3794,7 +3809,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0x77331b83`
 - Fields (order):
   - `m_prosePackage`: `Unicode::String` via `AutoVariable` -> `string` (addVariable)
-  - `m_location`: `Vector` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_location`: `Vector` via `AutoVariable` -> `Vector` (addVariable)
   - `m_radius`: `float` via `AutoVariable` -> `number` (addVariable)
   - `m_notifyImperial`: `bool` via `AutoVariable` -> `boolean` (addVariable)
   - `m_notifyRebel`: `bool` via `AutoVariable` -> `boolean` (addVariable)
@@ -3813,7 +3828,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0x52327235`
 - Fields (order):
   - `m_gameServer`: `uint32` via `AutoVariable` -> `number` (addVariable)
-  - `m_stationId`: `StationId` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_stationId`: `StationId` via `AutoVariable` -> `number` (addVariable)
   - `m_player`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
 
 ### FeatureIdTransactionResponse
@@ -3823,14 +3838,14 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Fields (order):
   - `m_gameServer`: `uint32` via `AutoVariable` -> `number` (addVariable)
   - `m_player`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
-  - `m_transactions`: `std::map<std::string, int>` via `AutoVariable` -> `Record<string, unknown>` (addVariable)
+  - `m_transactions`: `std::map<std::string, int>` via `AutoVariable` -> `Map<string, number>` (addVariable)
 
 ### FeatureIdTransactionSyncUpdate
 - Status: ❌ Missing
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/centralGameServer/FeatureIdTransactionSyncUpdate.h`
 - Derived CRC/opcode hint: `0x30cd6d44`
 - Fields (order):
-  - `m_stationId`: `StationId` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_stationId`: `StationId` via `AutoVariable` -> `number` (addVariable)
   - `m_player`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_itemId`: `std::string` via `AutoVariable` -> `string` (addVariable)
   - `m_adjustment`: `int` via `AutoVariable` -> `number` (addVariable)
@@ -3866,9 +3881,9 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/gameConnectionServer/GameConnectionServerMessages.h`
 - Derived CRC/opcode hint: `0x82f667db`
 - Fields (order):
-  - `distributionList`: `NetworkId` via `AutoArray` -> `bigint` (addVariable)
+  - `distributionList`: `NetworkId` via `AutoArray` -> `bigint[]` (addVariable)
   - `reliable`: `bool` via `AutoVariable` -> `boolean` (addVariable)
-  - `byteStream`: `Archive::ByteStream` via `AutoVariable` -> `unknown` (addVariable)
+  - `byteStream`: `Archive::ByteStream` via `AutoVariable` -> `Uint8Array` (addVariable)
 
 ### GameCreateCharacterFailed
 - Status: ❌ Missing
@@ -3877,7 +3892,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Fields (order):
   - `m_stationId`: `uint32` via `AutoVariable` -> `number` (addVariable)
   - `m_name`: `Unicode::String` via `AutoVariable` -> `string` (addVariable)
-  - `m_errorMessage`: `StringId` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_errorMessage`: `StringId` via `AutoVariable` -> `StringId` (addVariable)
   - `m_optionalDetailedErrorMessage`: `std::string` via `AutoVariable` -> `string` (addVariable)
 
 ### GameGameServerConnect
@@ -3894,12 +3909,12 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Status: ❌ Missing
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/gameGameServer/GameServerConnectAck.h`
 - Derived CRC/opcode hint: `0x6f2ebf37`
-- Fields: *(none parsed)*
+- Fields: none (zero serialized fields in C++: constructors call no addVariable).
 
 ### GameServerCSRequestMessage
 - Status: ❌ Missing
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/centralGameServer/GameServerCSRequestMessage.h`
-- Derived CRC/opcode hint: `0x5910ee03`
+- Derived CRC/opcode hint: `0x1a75d634`
 - Fields (order):
   - `m_accountId`: `uint32` via `AutoVariable` -> `number` (addVariable)
   - `m_command`: `std::string` via `AutoVariable` -> `string` (addVariable)
@@ -3912,7 +3927,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 ### GameServerCSResponseMessage
 - Status: ❌ Missing
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/centralGameServer/GameServerCSResponseMessage.h`
-- Derived CRC/opcode hint: `0xfe156d71`
+- Derived CRC/opcode hint: `0x24b95695`
 - Fields (order):
   - `m_accountId`: `uint32` via `AutoVariable` -> `number` (addVariable)
   - `m_response`: `std::string` via `AutoVariable` -> `string` (addVariable)
@@ -3950,7 +3965,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0x9367176d`
 - Fields (order):
   - `m_online`: `bool` via `AutoVariable` -> `boolean` (addVariable)
-  - `m_serverInfo`: `ServerInfo` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_serverInfo`: `ServerInfo` via `AutoVariable` -> `ServerInfo` (addVariable)
 
 ### GameServerUniverseLoadedMessage
 - Status: ❌ Missing
@@ -3972,21 +3987,21 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Status: ❌ Missing
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/gameTaskManager/GameTaskManagerMessages.h`
 - Derived CRC/opcode hint: `0xaabe6a82`
-- Fields: *(none parsed)*
+- Fields: none (zero serialized fields in C++: constructors call no addVariable).
 
 ### GenericValueTypeMessage
 - Status: ❌ Missing
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/common/GenericValueTypeMessage.h`
 - Derived CRC/opcode hint: `0x20b4b3c7`
 - Fields (order):
-  - `value`: `ValueType` via `AutoVariable` -> `unknown` (declarationOnly)
+  - `value`: `ValueType` via `AutoVariable` -> `ValueType` (declarationOnly)
 
 ### GetAuctionLocationsMessage
 - Status: ❌ Missing
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/commoditiesSwgDatabase/GetAuctionLocationsMessage.h`
 - Derived CRC/opcode hint: `0x98ef63ca`
 - Fields (order):
-  - `m_auctionLocations`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_auctionLocations`: `AuctionLocation` via `AutoList` -> `AuctionLocation[]` (addVariable)
 
 ### GetCharacterIdReplyMessage
 - Status: ❌ Missing
@@ -4028,7 +4043,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/GetItemDetailsMessage.h`
 - Derived CRC/opcode hint: `0x3ea0cd21`
 - Fields (order):
-  - `m_responseId`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_responseId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_trackId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_auctionId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_playerId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
@@ -4038,7 +4053,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/GetItemMessage.h`
 - Derived CRC/opcode hint: `0x1db6ce02`
 - Fields (order):
-  - `m_responseId`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_responseId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_trackId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_itemId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_playerId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
@@ -4049,21 +4064,21 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/commoditiesSwgDatabase/GetMarketAuctionAttributesMessage.h`
 - Derived CRC/opcode hint: `0x089d3d5b`
 - Fields (order):
-  - `m_attributes`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_attributes`: `MarketAuctionAttribute` via `AutoList` -> `MarketAuctionAttribute[]` (addVariable)
 
 ### GetMarketAuctionBidsMessage
 - Status: ❌ Missing
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/commoditiesSwgDatabase/GetMarketAuctionBidsMessage.h`
 - Derived CRC/opcode hint: `0x8648e93e`
 - Fields (order):
-  - `m_marketAuctionBids`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_marketAuctionBids`: `MarketAuctionBid` via `AutoList` -> `MarketAuctionBid[]` (addVariable)
 
 ### GetMarketAuctionsMessage
 - Status: ❌ Missing
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/commoditiesSwgDatabase/GetMarketAuctionsMessage.h`
 - Derived CRC/opcode hint: `0x454fe683`
 - Fields (order):
-  - `m_auctions`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_auctions`: `MarketAuction` via `AutoList` -> `MarketAuction[]` (addVariable)
 
 ### GetMoneyFromOfflineObjectMessage
 - Status: ❌ Missing
@@ -4083,7 +4098,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/GetPlayerVendorCountMessage.h`
 - Derived CRC/opcode hint: `0xd8717daa`
 - Fields (order):
-  - `m_responseId`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_responseId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_trackId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_playerId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
 
@@ -4092,7 +4107,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/GetVendorOwnerMessage.h`
 - Derived CRC/opcode hint: `0x76aaf946`
 - Fields (order):
-  - `m_responseId`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_responseId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_trackId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_ownerId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_location`: `std::string` via `AutoVariable` -> `string` (addVariable)
@@ -4102,7 +4117,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/GetVendorValueMessage.h`
 - Derived CRC/opcode hint: `0xb9b230e9`
 - Fields (order):
-  - `m_responseId`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_responseId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_trackId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_location`: `std::string` via `AutoVariable` -> `string` (addVariable)
 
@@ -4119,7 +4134,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0x2c6da47f`
 - Fields (order):
   - `category`: `std::string` via `AutoVariable` -> `string` (addVariable)
-  - `commandsProvided`: `std::string` via `AutoArray` -> `string` (addVariable)
+  - `commandsProvided`: `std::string` via `AutoArray` -> `string[]` (addVariable)
   - `description`: `std::string` via `AutoVariable` -> `string` (addVariable)
   - `name`: `std::string` via `AutoVariable` -> `string` (addVariable)
   - `discipline`: `std::string` via `AutoVariable` -> `string` (addVariable)
@@ -4129,7 +4144,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/ItemMovedMessage.h`
 - Derived CRC/opcode hint: `0x7113f28f`
 - Fields (order):
-  - `m_playerId`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_playerId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_locationNameLength`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_locationName`: `std::string` via `AutoVariable` -> `string` (addVariable)
 
@@ -4144,9 +4159,9 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 ### LoadCommoditiesMessage
 - Status: ❌ Missing
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/commoditiesSwgDatabase/LoadCommoditiesMessage.h`
-- Derived CRC/opcode hint: `0xf197c845`
+- Derived CRC/opcode hint: `0xcb3a0cf5`
 - Fields (order):
-  - `m_payload`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_payload`: `int` via `AutoVariable` -> `number` (addVariable)
 
 ### LoadContainedObjectMessage
 - Status: ❌ Missing
@@ -4176,7 +4191,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/gameGameServer/LoadStructureMessage.h`
 - Derived CRC/opcode hint: `0xd7feaaa4`
 - Fields (order):
-  - `m_structureId`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_structureId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_whoRequested`: `std::string` via `AutoVariable` -> `string` (addVariable)
 
 ### LoadUniverseMessage
@@ -4194,11 +4209,11 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
   - `m_targetId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_responseId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_responsePid`: `uint32` via `AutoVariable` -> `number` (addVariable)
-  - `m_position_w`: `Vector` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_position_w`: `Vector` via `AutoVariable` -> `Vector` (addVariable)
   - `m_scene`: `std::string` via `AutoVariable` -> `string` (addVariable)
   - `m_sharedTemplateName`: `std::string` via `AutoVariable` -> `string` (addVariable)
   - `m_targetPid`: `uint32` via `AutoVariable` -> `number` (addVariable)
-  - `m_containers`: `std::vector<NetworkId>` via `AutoVariable` -> `bigint` (addVariable)
+  - `m_containers`: `std::vector<NetworkId>` via `AutoVariable` -> `bigint[]` (addVariable)
   - `m_isAthoritative`: `bool` via `AutoVariable` -> `boolean` (addVariable)
   - `m_residenceOf`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
 
@@ -4211,7 +4226,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
   - `m_responseId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_responsePid`: `uint32` via `AutoVariable` -> `number` (addVariable)
   - `m_scene`: `std::string` via `AutoVariable` -> `string` (addVariable)
-  - `m_position_w`: `Vector` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_position_w`: `Vector` via `AutoVariable` -> `Vector` (addVariable)
   - `m_targetPid`: `uint32` via `AutoVariable` -> `number` (addVariable)
 
 ### LocateStructureMessage
@@ -4219,7 +4234,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/gameGameServer/LocateStructureMessage.h`
 - Derived CRC/opcode hint: `0x50334cb5`
 - Fields (order):
-  - `m_structureId`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_structureId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_x`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_z`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_sceneId`: `std::string` via `AutoVariable` -> `string` (addVariable)
@@ -4295,7 +4310,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/loginCentralServer/LoginCreateCharacterAckMessage.h`
 - Derived CRC/opcode hint: `0x498f4c04`
 - Fields (order):
-  - `m_stationId`: `StationId` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_stationId`: `StationId` via `AutoVariable` -> `number` (addVariable)
   - `m_characterNetworkId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
 
 ### LoginCreateCharacterMessage
@@ -4303,7 +4318,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/loginCentralServer/LoginCreateCharacterMessage.h`
 - Derived CRC/opcode hint: `0x67f36fbf`
 - Fields (order):
-  - `m_stationId`: `StationId` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_stationId`: `StationId` via `AutoVariable` -> `number` (addVariable)
   - `m_characterName`: `Unicode::String` via `AutoVariable` -> `string` (addVariable)
   - `m_characterObjectId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_templateId`: `int` via `AutoVariable` -> `number` (addVariable)
@@ -4314,7 +4329,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/loginCentralServer/LoginKeyPush.h`
 - Derived CRC/opcode hint: `0xfcdd24d1`
 - Fields (order):
-  - `key`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `key`: `KeyShare::Key` via `AutoVariableKeyShare` -> `KeyShare::Key` (addVariable)
 
 ### LoginRestoreCharacterMessage
 - Status: ❌ Missing
@@ -4323,7 +4338,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Fields (order):
   - `m_whoRequested`: `std::string` via `AutoVariable` -> `string` (addVariable)
   - `m_characterId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
-  - `m_account`: `StationId` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_account`: `StationId` via `AutoVariable` -> `number` (addVariable)
   - `m_characterName`: `Unicode::String` via `AutoVariable` -> `string` (addVariable)
   - `m_templateId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_jedi`: `bool` via `AutoVariable` -> `boolean` (addVariable)
@@ -4334,7 +4349,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0xdae77ab7`
 - Fields (order):
   - `m_upgradeType`: `int` via `AutoVariable` -> `number` (addVariable)
-  - `m_stationId`: `StationId` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_stationId`: `StationId` via `AutoVariable` -> `number` (addVariable)
   - `m_character`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_replyToObject`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_replyMessage`: `std::string` via `AutoVariable` -> `string` (addVariable)
@@ -4364,7 +4379,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/centralGameServer/MessageToMessage.h`
 - Derived CRC/opcode hint: `0xd9cd0336`
 - Fields (order):
-  - `m_data`: `MessageToPayload` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_data`: `MessageToPayload` via `AutoVariable` -> `MessageToPayload` (addVariable)
   - `m_sourceServerPid`: `uint32` via `AutoVariable` -> `number` (addVariable)
 
 ### MetricsDataMessage
@@ -4372,7 +4387,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/metricsMessages/MetricsDataMessage.h`
 - Derived CRC/opcode hint: `0x1d4c62a0`
 - Fields (order):
-  - `m_data`: `MetricsPair` via `AutoArray` -> `unknown` (addVariable)
+  - `m_data`: `MetricsPair` via `AutoArray` -> `MetricsPair[]` (addVariable)
 
 ### MetricsInitiationMessage
 - Status: ❌ Missing
@@ -4412,7 +4427,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
   - `m_secure`: `bool` via `AutoVariable` -> `boolean` (addVariable)
   - `m_skipLoadScreen`: `bool` via `AutoVariable` -> `boolean` (addVariable)
   - `m_stationId`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
-  - `m_observedObjects`: `NetworkId` via `AutoArray` -> `bigint` (addVariable)
+  - `m_observedObjects`: `NetworkId` via `AutoArray` -> `bigint[]` (addVariable)
   - `m_gameFeatures`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
   - `m_subscriptionFeatures`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
   - `m_entitlementTotalTime`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
@@ -4420,8 +4435,8 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
   - `m_entitlementTotalTimeSinceLastLogin`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
   - `m_entitlementEntitledTimeSinceLastLogin`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
   - `m_buddyPoints`: `int` via `AutoVariable` -> `number` (addVariable)
-  - `m_consumedRewardEvents`: `std::pair<NetworkId, std::string>` via `AutoArray` -> `bigint` (addVariable)
-  - `m_claimedRewardItems`: `std::pair<NetworkId, std::string>` via `AutoArray` -> `bigint` (addVariable)
+  - `m_consumedRewardEvents`: `std::pair<NetworkId, std::string>` via `AutoArray` -> `[bigint, string][]` (addVariable)
+  - `m_claimedRewardItems`: `std::pair<NetworkId, std::string>` via `AutoArray` -> `[bigint, string][]` (addVariable)
   - `m_usingAdminLogin`: `bool` via `AutoVariable` -> `boolean` (addVariable)
   - `m_canSkipTutorial`: `bool` via `AutoVariable` -> `boolean` (addVariable)
   - `m_sendToStarport`: `bool` via `AutoVariable` -> `boolean` (addVariable)
@@ -4447,7 +4462,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/OnAcceptHighBidMessage.h`
 - Derived CRC/opcode hint: `0xa3bb5afb`
 - Fields (order):
-  - `m_responseId`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_responseId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_trackId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_itemId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_playerId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
@@ -4458,7 +4473,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/OnAddAuctionMessage.h`
 - Derived CRC/opcode hint: `0x5084b943`
 - Fields (order):
-  - `m_responseId`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_responseId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_trackId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_itemId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_ownerId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
@@ -4472,7 +4487,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/OnAddBidMessage.h`
 - Derived CRC/opcode hint: `0x53581b50`
 - Fields (order):
-  - `m_responseId`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_responseId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_trackId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_itemId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_ownerId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
@@ -4493,7 +4508,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/OnAuctionExpiredMessage.h`
 - Derived CRC/opcode hint: `0x5299f57c`
 - Fields (order):
-  - `m_responseId`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_responseId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_trackId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_ownerId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_sold`: `bool` via `AutoVariable` -> `boolean` (addVariable)
@@ -4512,7 +4527,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/OnCancelAuctionMessage.h`
 - Derived CRC/opcode hint: `0x76fae6eb`
 - Fields (order):
-  - `m_responseId`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_responseId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_trackId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_itemId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_playerId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
@@ -4526,7 +4541,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/OnCleanupInvalidItemRetrievalMessage.h`
 - Derived CRC/opcode hint: `0x0c918398`
 - Fields (order):
-  - `m_responseId`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_responseId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_trackId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_itemId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_playerId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
@@ -4538,7 +4553,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/OnCreateVendorMarketMessage.h`
 - Derived CRC/opcode hint: `0x38d41f76`
 - Fields (order):
-  - `m_responseId`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_responseId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_trackId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_ownerId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_location`: `std::string` via `AutoVariable` -> `string` (addVariable)
@@ -4549,7 +4564,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/OnGetItemDetailsMessage.h`
 - Derived CRC/opcode hint: `0xd8ecf973`
 - Fields (order):
-  - `m_responseId`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_responseId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_trackId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_itemId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_playerId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
@@ -4557,7 +4572,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
   - `m_userDescription`: `Unicode::String` via `AutoVariable` -> `string` (addVariable)
   - `m_oobLength`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_oobData`: `Unicode::String` via `AutoVariable` -> `string` (addVariable)
-  - `m_attributes`: `std::pair<std::string, Unicode::String>` via `AutoArray` -> `[string, string]` (addVariable)
+  - `m_attributes`: `std::pair<std::string, Unicode::String>` via `AutoArray` -> `[string, string][]` (addVariable)
   - `m_resultCode`: `int` via `AutoVariable` -> `number` (addVariable)
 
 ### OnGetItemMessage
@@ -4565,7 +4580,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/OnGetItemMessage.h`
 - Derived CRC/opcode hint: `0x5f5477ba`
 - Fields (order):
-  - `m_responseId`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_responseId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_trackId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_itemId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_playerId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
@@ -4577,18 +4592,18 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/OnGetPlayerVendorCountMessage.h`
 - Derived CRC/opcode hint: `0xf142e230`
 - Fields (order):
-  - `m_responseId`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_responseId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_trackId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_playerId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_vendorCount`: `int` via `AutoVariable` -> `number` (addVariable)
-  - `m_vendorList`: `std::vector<NetworkId>` via `AutoVariable` -> `bigint` (addVariable)
+  - `m_vendorList`: `std::vector<NetworkId>` via `AutoVariable` -> `bigint[]` (addVariable)
 
 ### OnGetVendorOwnerMessage
 - Status: ❌ Missing
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/OnGetVendorOwnerMessage.h`
 - Derived CRC/opcode hint: `0x90e6cd14`
 - Fields (order):
-  - `m_responseId`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_responseId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_trackId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_ownerId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_location`: `std::string` via `AutoVariable` -> `string` (addVariable)
@@ -4600,7 +4615,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/OnGetVendorValueMessage.h`
 - Derived CRC/opcode hint: `0x5ffe04bb`
 - Fields (order):
-  - `m_responseId`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_responseId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_trackId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_location`: `std::string` via `AutoVariable` -> `string` (addVariable)
   - `m_value`: `int` via `AutoVariable` -> `number` (addVariable)
@@ -4610,7 +4625,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/OnItemExpiredMessage.h`
 - Derived CRC/opcode hint: `0xc9bb63b5`
 - Fields (order):
-  - `m_responseId`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_responseId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_trackId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_ownerId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_itemId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
@@ -4624,7 +4639,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/OnPermanentAuctionPurchasedMessage.h`
 - Derived CRC/opcode hint: `0xa5610dc1`
 - Fields (order):
-  - `m_responseId`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_responseId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_trackId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_ownerId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_buyerId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
@@ -4633,19 +4648,19 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
   - `m_location`: `std::string` via `AutoVariable` -> `string` (addVariable)
   - `m_itemNameLength`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_itemName`: `Unicode::String` via `AutoVariable` -> `string` (addVariable)
-  - `m_attributes`: `std::pair<std::string, Unicode::String>` via `AutoArray` -> `[string, string]` (addVariable)
+  - `m_attributes`: `std::pair<std::string, Unicode::String>` via `AutoArray` -> `[string, string][]` (addVariable)
 
 ### OnQueryAuctionHeadersMessage
 - Status: ❌ Missing
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/OnQueryAuctionHeadersMessage.h`
 - Derived CRC/opcode hint: `0x3a3f0de2`
 - Fields (order):
-  - `m_responseId`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_responseId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_trackId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_playerId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_queryType`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_numAuctions`: `int` via `AutoVariable` -> `number` (addVariable)
-  - `m_auctionData`: `ADV` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_auctionData`: `ADV` via `AutoVariable` -> `ADV` (addVariable)
   - `m_resultCode`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_queryOffset`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
   - `m_hasMorePages`: `bool` via `AutoVariable` -> `boolean` (addVariable)
@@ -4655,7 +4670,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/OnQueryVendorItemCountReplyMessage.h`
 - Derived CRC/opcode hint: `0x457382d4`
 - Fields (order):
-  - `m_responseId`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_responseId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_vendorId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_vendorItemCount`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_searchEnabled`: `bool` via `AutoVariable` -> `boolean` (addVariable)
@@ -4665,7 +4680,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/OnUpdateVendorSearchOptionMessage.h`
 - Derived CRC/opcode hint: `0xd7d0ec98`
 - Fields (order):
-  - `m_playerId`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_playerId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_enabled`: `bool` via `AutoVariable` -> `boolean` (addVariable)
 
 ### OnVendorRefuseItemMessage
@@ -4673,7 +4688,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/OnVendorRefuseItemMessage.h`
 - Derived CRC/opcode hint: `0xbe5b6131`
 - Fields (order):
-  - `m_responseId`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_responseId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_trackId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_itemId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_vendorId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
@@ -4692,8 +4707,8 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `game/shared/library/swgSharedNetworkMessages/src/shared/permissionList/PermissionListCreateMessage.h`
 - Derived CRC/opcode hint: `0x52f364b8`
 - Fields (order):
-  - `m_currentMembers`: `Unicode::String` via `AutoArray` -> `string` (addVariable)
-  - `m_nearbyPeople`: `Unicode::String` via `AutoArray` -> `string` (addVariable)
+  - `m_currentMembers`: `Unicode::String` via `AutoArray` -> `string[]` (addVariable)
+  - `m_nearbyPeople`: `Unicode::String` via `AutoArray` -> `string[]` (addVariable)
   - `m_listName`: `Unicode::String` via `AutoVariable` -> `string` (addVariable)
 
 ### PermissionListModifyMessage
@@ -4725,7 +4740,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/planetWatch/PlanetNodeStatusMessage.h`
 - Derived CRC/opcode hint: `0x5e2e0cd6`
 - Fields (order):
-  - `m_data`: `PlanetNodeStatusMessageData` via `AutoArray` -> `unknown` (addVariable)
+  - `m_data`: `PlanetNodeStatusMessageData` via `AutoArray` -> `PlanetNodeStatusMessageData[]` (addVariable)
 
 ### PlanetObjectIdMessage
 - Status: ❌ Missing
@@ -4740,7 +4755,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/planetWatch/PlanetObjectStatusMessage.h`
 - Derived CRC/opcode hint: `0x62689eb0`
 - Fields (order):
-  - `m_data`: `PlanetObjectStatusMessageData` via `AutoArray` -> `unknown` (addVariable)
+  - `m_data`: `PlanetObjectStatusMessageData` via `AutoArray` -> `PlanetObjectStatusMessageData[]` (addVariable)
 
 ### PlanetRemoveObject
 - Status: ❌ Missing
@@ -4779,14 +4794,14 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/PopulateMissionBrowserMessage.h`
 - Derived CRC/opcode hint: `0x88d9885c`
 - Fields (order):
-  - `m_missions`: `NetworkId` via `AutoArray` -> `bigint` (addVariable)
+  - `m_missions`: `NetworkId` via `AutoArray` -> `bigint[]` (addVariable)
 
 ### PopulationListMessage
 - Status: ❌ Missing
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/centralGameServer/PopulationListMessage.h`
 - Derived CRC/opcode hint: `0x2286ec30`
 - Fields (order):
-  - `m_list`: `PopulationList` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_list`: `PopulationList` via `AutoVariable` -> `PopulationList` (addVariable)
 
 ### PreloadFinishedMessage
 - Status: ❌ Missing
@@ -4816,7 +4831,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/QueryAuctionHeadersMessage.h`
 - Derived CRC/opcode hint: `0x04fe82b0`
 - Fields (order):
-  - `m_responseId`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_responseId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_trackId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_playerId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_vendorId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
@@ -4829,7 +4844,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
   - `m_priceFilterMin`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_priceFilterMax`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_priceFilterIncludesFee`: `bool` via `AutoVariable` -> `boolean` (addVariable)
-  - `m_advancedSearch`: `AuctionQueryHeadersMessage::SearchCondition` via `AutoList` -> `unknown` (addVariable)
+  - `m_advancedSearch`: `AuctionQueryHeadersMessage::SearchCondition` via `AutoList` -> `AuctionQueryHeadersMessage::SearchCondition[]` (addVariable)
   - `m_advancedSearchMatchAllAny`: `int8` via `AutoVariable` -> `number` (addVariable)
   - `m_searchStringPlanet`: `std::string` via `AutoVariable` -> `string` (addVariable)
   - `m_searchStringRegion`: `std::string` via `AutoVariable` -> `string` (addVariable)
@@ -4843,7 +4858,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/QueryVendorItemCountMessage.h`
 - Derived CRC/opcode hint: `0x6eac2a3e`
 - Fields (order):
-  - `m_responseId`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_responseId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_trackId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_vendorId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
 
@@ -4863,7 +4878,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
   - `m_stationId`: `uint32` via `AutoVariable` -> `number` (addVariable)
   - `m_creatureTemplate`: `std::string` via `AutoVariable` -> `string` (addVariable)
   - `m_name`: `Unicode::String` via `AutoVariable` -> `string` (addVariable)
-  - `m_errorMessage`: `StringId` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_errorMessage`: `StringId` via `AutoVariable` -> `StringId` (addVariable)
 
 ### ReleaseAuthoritativeMessage
 - Status: ❌ Missing
@@ -4885,13 +4900,13 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Status: ❌ Missing
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/gameGameServer/ReloadAdminTableMessage.h`
 - Derived CRC/opcode hint: `0x3c50149a`
-- Fields: *(none parsed)*
+- Fields: none (zero serialized fields in C++: constructors call no addVariable).
 
 ### ReloadCommandTableMessage
 - Status: ❌ Missing
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/gameGameServer/ReloadCommandTableMessage.h`
 - Derived CRC/opcode hint: `0x813441ea`
-- Fields: *(none parsed)*
+- Fields: none (zero serialized fields in C++: constructors call no addVariable).
 
 ### ReloadDatatableMessage
 - Status: ❌ Missing
@@ -4949,7 +4964,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/centralGameServer/RequestChunkMessage.h`
 - Derived CRC/opcode hint: `0xd17e56e2`
 - Fields (order):
-  - `m_chunks`: `Chunk` via `AutoArray` -> `unknown` (addVariable)
+  - `m_chunks`: `Chunk` via `AutoArray` -> `Chunk[]` (addVariable)
   - `m_sceneId`: `std::string` via `AutoVariable` -> `string` (addVariable)
 
 ### RequestGameServerForLoginMessage
@@ -4961,7 +4976,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
   - `m_characterId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_containerId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_scene`: `std::string` via `AutoVariable` -> `string` (addVariable)
-  - `m_coordinates`: `Vector` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_coordinates`: `Vector` via `AutoVariable` -> `Vector` (addVariable)
   - `m_forCtsSourceCharacter`: `bool` via `AutoVariable` -> `boolean` (addVariable)
 
 ### RequestObjectMessage
@@ -4996,8 +5011,8 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
   - `m_oid`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_sceneName`: `std::string` via `AutoVariable` -> `string` (addVariable)
   - `m_sourceGameServer`: `uint32` via `AutoVariable` -> `number` (addVariable)
-  - `m_position_p`: `Vector` via `AutoVariable` -> `unknown` (addVariable)
-  - `m_position_w`: `Vector` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_position_p`: `Vector` via `AutoVariable` -> `Vector` (addVariable)
+  - `m_position_w`: `Vector` via `AutoVariable` -> `Vector` (addVariable)
   - `m_containerId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_containerName`: `std::string` via `AutoVariable` -> `string` (addVariable)
   - `m_scriptCallback`: `std::string` via `AutoVariable` -> `string` (addVariable)
@@ -5046,7 +5061,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `game/shared/library/swgSharedNetworkMessages/src/shared/survey/ResourceListForSurveyMessage.h`
 - Derived CRC/opcode hint: `0x8a64b1d5`
 - Fields (order):
-  - `m_data`: `DataItem` via `AutoArray` -> `unknown` (addVariable)
+  - `m_data`: `DataItem` via `AutoArray` -> `DataItem[]` (addVariable)
   - `m_surveyType`: `std::string` via `AutoVariable` -> `string` (addVariable)
   - `m_surveyToolId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
 
@@ -5089,8 +5104,8 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
   - `m_oid`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_sceneName`: `std::string` via `AutoVariable` -> `string` (addVariable)
   - `m_sourceGameServer`: `uint32` via `AutoVariable` -> `number` (addVariable)
-  - `m_position_p`: `Vector` via `AutoVariable` -> `unknown` (addVariable)
-  - `m_position_w`: `Vector` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_position_p`: `Vector` via `AutoVariable` -> `Vector` (addVariable)
+  - `m_position_w`: `Vector` via `AutoVariable` -> `Vector` (addVariable)
   - `m_containerId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_containerName`: `std::string` via `AutoVariable` -> `string` (addVariable)
   - `m_scriptCallback`: `std::string` via `AutoVariable` -> `string` (addVariable)
@@ -5101,7 +5116,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/loginCentralServer/ServerDeleteCharacterMessage.h`
 - Derived CRC/opcode hint: `0x3c2b2151`
 - Fields (order):
-  - `m_stationId`: `StationId` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_stationId`: `StationId` via `AutoVariable` -> `number` (addVariable)
   - `m_characterId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_loginServerId`: `uint32` via `AutoVariable` -> `number` (addVariable)
 
@@ -5122,7 +5137,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
   - `m_sceneChange`: `bool` via `AutoVariable` -> `boolean` (addVariable)
   - `m_handlingCrash`: `bool` via `AutoVariable` -> `boolean` (addVariable)
   - `m_goalCell`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
-  - `m_goalTransform`: `Transform` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_goalTransform`: `Transform` via `AutoVariable` -> `Transform` (addVariable)
   - `m_goalIsValid`: `bool` via `AutoVariable` -> `boolean` (addVariable)
 
 ### SetConnectionServerPublic
@@ -5137,7 +5152,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/SetEntranceChargeMessage.h`
 - Derived CRC/opcode hint: `0x2970990c`
 - Fields (order):
-  - `m_responseId`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_responseId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_trackId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_vendorId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_entranceCharge`: `int` via `AutoVariable` -> `number` (addVariable)
@@ -5147,7 +5162,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/SetGameTimeMessage.h`
 - Derived CRC/opcode hint: `0x7feb61fd`
 - Fields (order):
-  - `m_responseId`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_responseId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_trackId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_gameTime`: `int` via `AutoVariable` -> `number` (addVariable)
 
@@ -5174,7 +5189,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/SetSalesTaxMessage.h`
 - Derived CRC/opcode hint: `0x456d250e`
 - Fields (order):
-  - `m_responseId`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_responseId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_trackId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_salesTax`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_bankId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
@@ -5209,7 +5224,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/gameStationPlayersCollector/SPCharacterProfileMessage.h`
 - Derived CRC/opcode hint: `0x7a3e1b23`
 - Fields (order):
-  - `m_clusterName`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_clusterName`: `std::string` via `AutoVariable` -> `string` (addVariable)
   - `m_characterId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_characterName`: `std::string` via `AutoVariable` -> `string` (addVariable)
   - `m_objectName`: `std::string` via `AutoVariable` -> `string` (addVariable)
@@ -5230,14 +5245,14 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Status: ❌ Missing
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/StomachRequestMessage.h`
 - Derived CRC/opcode hint: `0xb75dd5d7`
-- Fields: *(none parsed)*
+- Fields: none (zero serialized fields in C++: constructors call no addVariable).
 
 ### StructureListMessage
 - Status: ❌ Missing
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/centralGameServer/StructureListMessage.h`
 - Derived CRC/opcode hint: `0xc16c1699`
 - Fields (order):
-  - `m_data`: `StructureListMessageData` via `AutoArray` -> `unknown` (addVariable)
+  - `m_data`: `StructureListMessageData` via `AutoArray` -> `StructureListMessageData[]` (addVariable)
   - `m_toolId`: `uint32` via `AutoVariable` -> `number` (addVariable)
   - `m_loginServerId`: `uint32` via `AutoVariable` -> `number` (addVariable)
   - `m_characterId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
@@ -5247,9 +5262,9 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/gameGameServer/StructuresForPurgeMessage.h`
 - Derived CRC/opcode hint: `0x9e837e1a`
 - Fields (order):
-  - `m_stationId`: `StationId` via `AutoVariable` -> `unknown` (addVariable)
-  - `m_structures`: `std::pair<NetworkId, NetworkId>` via `AutoArray` -> `bigint` (addVariable)
-  - `m_vendors`: `std::pair<NetworkId, std::pair<NetworkId, Unicode::String> >` via `AutoArray` -> `bigint` (addVariable)
+  - `m_stationId`: `StationId` via `AutoVariable` -> `number` (addVariable)
+  - `m_structures`: `std::pair<NetworkId, NetworkId>` via `AutoArray` -> `[bigint, bigint][]` (addVariable)
+  - `m_vendors`: `std::pair<NetworkId, std::pair<NetworkId, Unicode::String> >` via `AutoArray` -> `[bigint, [bigint, string]][]` (addVariable)
   - `m_warnOnly`: `bool` via `AutoVariable` -> `boolean` (addVariable)
 
 ### SUIMessage
@@ -5264,7 +5279,14 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `game/shared/library/swgSharedNetworkMessages/src/shared/survey/SurveyMessage.h`
 - Derived CRC/opcode hint: `0x877f79ac`
 - Fields (order):
-  - `m_data`: `DataItem` via `AutoArray` -> `unknown` (addVariable)
+  - `m_data`: `DataItem` via `AutoArray` -> `DataItem[]` (addVariable)
+
+### SystemAssignedProcessId
+- Status: ❌ Missing
+- C++ headers: `engine/server/library/serverUtility/src/shared/SystemAssignedProcessId.h`
+- Derived CRC/opcode hint: `0x58c07f21`
+- Fields (order):
+  - `m_id`: `unsigned long` via `AutoVariable` -> `number` (addVariable)
 
 ### SynchronizeScriptVarDeltasMessage
 - Status: ❌ Missing
@@ -5304,7 +5326,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/TaskEnumCluster.h`
 - Derived CRC/opcode hint: `0x8f4efa4f`
 - Fields (order):
-  - `clusterNames`: `std::string` via `AutoArray` -> `string` (addVariable)
+  - `clusterNames`: `std::string` via `AutoArray` -> `string[]` (addVariable)
 
 ### TaskEnumProcesses
 - Status: ❌ Missing
@@ -5312,9 +5334,9 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0xc6a76016`
 - Fields (order):
   - `hostAddress`: `std::string` via `AutoVariable` -> `string` (addVariable)
-  - `commandLines`: `std::string` via `AutoArray` -> `string` (addVariable)
-  - `loadedOnStartup`: `bool` via `AutoArray` -> `boolean` (addVariable)
-  - `pids`: `uint32` via `AutoArray` -> `number` (addVariable)
+  - `commandLines`: `std::string` via `AutoArray` -> `string[]` (addVariable)
+  - `loadedOnStartup`: `bool` via `AutoArray` -> `boolean[]` (addVariable)
+  - `pids`: `uint32` via `AutoArray` -> `number[]` (addVariable)
 
 ### TaskKillProcess
 - Status: ❌ Missing
@@ -5337,7 +5359,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Status: ❌ Missing
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/gameTaskManager/GameTaskManagerMessages.h`
 - Derived CRC/opcode hint: `0xd1926a07`
-- Fields: *(none parsed)*
+- Fields: none (zero serialized fields in C++: constructors call no addVariable).
 
 ### TaskSpawnProcess
 - Status: ❌ Missing
@@ -5372,9 +5394,9 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Fields (order):
   - `m_actorId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_sceneId`: `std::string` via `AutoVariable` -> `string` (addVariable)
-  - `m_position_w`: `Vector` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_position_w`: `Vector` via `AutoVariable` -> `Vector` (addVariable)
   - `m_containerId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
-  - `m_position_p`: `Vector` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_position_p`: `Vector` via `AutoVariable` -> `Vector` (addVariable)
 
 ### TeleportToMessage
 - Status: ❌ Missing
@@ -5403,14 +5425,14 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
   - `m_oid`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_gameServerId`: `uint32` via `AutoVariable` -> `number` (addVariable)
   - `m_skipLoadScreen`: `bool` via `AutoVariable` -> `boolean` (addVariable)
-  - `m_observedObjects`: `NetworkId` via `AutoArray` -> `bigint` (addVariable)
+  - `m_observedObjects`: `NetworkId` via `AutoArray` -> `bigint[]` (addVariable)
 
 ### TransferReplyCharacterList
 - Status: ❌ Missing
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/transferServer/TransferReplyCharacterList.h`
 - Derived CRC/opcode hint: `0x16ca2acd`
 - Fields (order):
-  - `m_avatarList`: `AvatarList` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_avatarList`: `AvatarList` via `AutoVariable` -> `AvatarList` (addVariable)
   - `m_stationId`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
   - `m_track`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
 
@@ -5525,8 +5547,8 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Derived CRC/opcode hint: `0xf99b631a`
 - Fields (order):
   - `m_networkId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
-  - `m_transform`: `Transform` via `AutoVariable` -> `unknown` (addVariable)
-  - `m_worldspaceTransform`: `Transform` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_transform`: `Transform` via `AutoVariable` -> `Transform` (addVariable)
+  - `m_worldspaceTransform`: `Transform` via `AutoVariable` -> `Transform` (addVariable)
   - `m_containerId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_slotArrangement`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_loadWith`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
@@ -5589,7 +5611,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/UpdateVendorSearchOptionMessage.h`
 - Derived CRC/opcode hint: `0x19859626`
 - Fields (order):
-  - `m_responseId`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_responseId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_trackId`: `int` via `AutoVariable` -> `number` (addVariable)
   - `m_vendorId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_enabled`: `bool` via `AutoVariable` -> `boolean` (addVariable)
@@ -5600,7 +5622,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/UpdateVendorStatusMessage.h`
 - Derived CRC/opcode hint: `0x88ce562f`
 - Fields (order):
-  - `m_vendorId`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_vendorId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_location`: `std::string` via `AutoVariable` -> `string` (addVariable)
   - `m_status`: `int` via `AutoVariable` -> `number` (addVariable)
 
@@ -5620,7 +5642,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/loginCentralServer/ValidateAccountMessage.h`
 - Derived CRC/opcode hint: `0xfc0486bf`
 - Fields (order):
-  - `m_stationId`: `StationId` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_stationId`: `StationId` via `AutoVariable` -> `number` (addVariable)
   - `m_track`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
   - `m_subscriptionBits`: `uint32` via `AutoVariable` -> `number` (addVariable)
 
@@ -5629,34 +5651,34 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/loginCentralServer/ValidateAccountReplyMessage.h`
 - Derived CRC/opcode hint: `0x56c5340b`
 - Fields (order):
-  - `m_stationId`: `StationId` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_stationId`: `StationId` via `AutoVariable` -> `number` (addVariable)
   - `m_canLogin`: `bool` via `AutoVariable` -> `boolean` (addVariable)
   - `m_canCreateRegular`: `bool` via `AutoVariable` -> `boolean` (addVariable)
   - `m_canCreateJedi`: `bool` via `AutoVariable` -> `boolean` (addVariable)
   - `m_canSkipTutorial`: `bool` via `AutoVariable` -> `boolean` (addVariable)
   - `m_track`: `unsigned int` via `AutoVariable` -> `number` (addVariable)
-  - `m_consumedRewardEvents`: `std::pair<NetworkId, std::string>` via `AutoArray` -> `bigint` (addVariable)
-  - `m_claimedRewardItems`: `std::pair<NetworkId, std::string>` via `AutoArray` -> `bigint` (addVariable)
+  - `m_consumedRewardEvents`: `std::pair<NetworkId, std::string>` via `AutoArray` -> `[bigint, string][]` (addVariable)
+  - `m_claimedRewardItems`: `std::pair<NetworkId, std::string>` via `AutoArray` -> `[bigint, string][]` (addVariable)
 
 ### ValidateCharacterForLoginMessage
 - Status: ❌ Missing
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/centralConnectionServer/ValidateCharacterForLoginMessage.h`
 - Derived CRC/opcode hint: `0x5632d8d6`
 - Fields (order):
-  - `m_suid`: `StationId` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_suid`: `StationId` via `AutoVariable` -> `number` (addVariable)
   - `m_characterId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
 
 ### ValidateCharacterForLoginReplyMessage
 - Status: ❌ Missing
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/centralConnectionServer/ValidateCharacterForLoginReplyMessage.h`
-- Derived CRC/opcode hint: `0x0ed64af4`
+- Derived CRC/opcode hint: `0x0ed64af4` (write ctor); `0x5632d8d6` appears in read ctor string
 - Fields (order):
   - `m_approved`: `bool` via `AutoVariable` -> `boolean` (addVariable)
-  - `m_suid`: `StationId` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_suid`: `StationId` via `AutoVariable` -> `number` (addVariable)
   - `m_characterId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_containerId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_scene`: `std::string` via `AutoVariable` -> `string` (addVariable)
-  - `m_coordinates`: `Vector` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_coordinates`: `Vector` via `AutoVariable` -> `Vector` (addVariable)
   - `m_characterName`: `Unicode::String` via `AutoVariable` -> `string` (addVariable)
 
 ### VendorStatusChangeMessage
@@ -5664,7 +5686,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/VendorStatusChangeMessage.h`
 - Derived CRC/opcode hint: `0x7ddf97fb`
 - Fields (order):
-  - `m_vendorId`: `unknown` via `Unknown` -> `unknown` (addVariable)
+  - `m_vendorId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_status`: `int` via `AutoVariable` -> `number` (addVariable)
 
 ### VerifyAndLockNameRequest
@@ -5685,7 +5707,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - Fields (order):
   - `m_stationId`: `uint32` via `AutoVariable` -> `number` (addVariable)
   - `m_characterName`: `Unicode::String` via `AutoVariable` -> `string` (addVariable)
-  - `m_errorMessage`: `StringId` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_errorMessage`: `StringId` via `AutoVariable` -> `StringId` (addVariable)
 
 ### VerifyNameRequest
 - Status: ❌ Missing
@@ -5706,7 +5728,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
   - `m_characterId`: `NetworkId` via `AutoVariable` -> `bigint` (addVariable)
   - `m_creatureTemplate`: `std::string` via `AutoVariable` -> `string` (addVariable)
   - `m_name`: `Unicode::String` via `AutoVariable` -> `string` (addVariable)
-  - `m_errorMessage`: `StringId` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_errorMessage`: `StringId` via `AutoVariable` -> `StringId` (addVariable)
 
 ### VoiceChatAddClientToChannel
 - Status: ❌ Missing
@@ -5797,7 +5819,7 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 - C++ headers: `engine/shared/library/sharedNetworkMessages/src/shared/voicechat/VoiceChatOnGetAccount.h`
 - Derived CRC/opcode hint: `0x326e6b43`
 - Fields (order):
-  - `m_result`: `unsigned` via `AutoVariable` -> `unknown` (addVariable)
+  - `m_result`: `unsigned` via `AutoVariable` -> `number` (addVariable)
   - `m_loginName`: `std::string` via `AutoVariable` -> `string` (addVariable)
   - `m_password`: `std::string` via `AutoVariable` -> `string` (addVariable)
   - `m_connectionServerAddress`: `std::string` via `AutoVariable` -> `string` (addVariable)
@@ -5848,7 +5870,8 @@ Source files: `../swg-source-docker/swg-main/src/external/3rd/library/udplibrary
 
 ## Notes
 
-- `Derived CRC/opcode hint` values are computed from packet class names using the SWG CRC routine implemented in the generator/manifest pipeline.
+- `Derived CRC/opcode hint` values are SWG CRC32 values of the `GameNetworkMessage("...")` wire name where that constructor string is explicit in C++.
+- `ValidateCharacterForLoginReplyMessage` has inconsistent constructor strings in C++ (`"ValidateCharacterForLoginReplyMessage"` in write ctor and `"ValidateCharacterForLoginMessage"` in read ctor), so both CRCs are documented.
+- The original SWG server target is 32-bit (ILP32); treat `long`/`unsigned long` fields as 32-bit when reproducing wire behavior.
 - For true wire-level validation, verify with captured client traffic and the concrete serializer implementation in each packet handler.
 - `Implemented` in this file means a TypeScript packet interface exists by name; it does not guarantee production-complete behavior in handlers.
-
