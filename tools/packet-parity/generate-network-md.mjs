@@ -242,6 +242,16 @@ function formatPacketField(field) {
   return `\`${field.name}\`: \`${field.cppType}\` via \`${field.archiveContainer}\` -> \`${field.tsType}\` (${field.source})`;
 }
 
+function formatSerializedLength(length) {
+  if (!length || length.kind === 'unknown') {
+    return 'unknown (contains custom/unsupported serialized types)';
+  }
+  if (length.kind === 'exact') {
+    return `exact \`${length.exactBytes}\` byte${length.exactBytes === 1 ? '' : 's'}`;
+  }
+  return `minimum \`${length.minBytes}\` bytes + variable payload`;
+}
+
 async function main() {
   if (!(await exists(MANIFEST_FILE))) {
     throw new Error(
@@ -254,6 +264,9 @@ async function main() {
 
   const implemented = packetDefs.filter((p) => p.implementedInTypescript);
   const missing = packetDefs.filter((p) => !p.implementedInTypescript);
+  const exactLengthPackets = packetDefs.filter((p) => p.serializedLength?.kind === 'exact').length;
+  const minLengthPackets = packetDefs.filter((p) => p.serializedLength?.kind === 'min').length;
+  const unknownLengthPackets = packetDefs.filter((p) => p.serializedLength?.kind === 'unknown').length;
 
   const hppText = await fs.readFile(UDP_HPP, 'utf8');
   const cppText = await fs.readFile(UDP_CPP, 'utf8');
@@ -328,6 +341,9 @@ async function main() {
   lines.push(
     `- Coverage: **${((implemented.length / Math.max(packetDefs.length, 1)) * 100).toFixed(2)}%**`
   );
+  lines.push(`- Packets with exact serialized length model: **${exactLengthPackets}**`);
+  lines.push(`- Packets with minimum-only serialized length model: **${minLengthPackets}**`);
+  lines.push(`- Packets with unknown serialized length model: **${unknownLengthPackets}**`);
   lines.push('');
   lines.push('## Transport Layer (SOE UDP) from `UdpLibrary`');
   lines.push('');
@@ -405,6 +421,18 @@ async function main() {
     lines.push(`- Status: ✅ Implemented`);
     lines.push(`- C++ headers: ${packet.headers.map((h) => `\`${h}\``).join(', ')}`);
     lines.push(`- Derived CRC/opcode hint: \`${packet.swgCrc32}\``);
+    if (packet.crcSource === 'constructorStringMultiple') {
+      lines.push(
+        `- CRC source wire names: ${packet.wireNames.map((name) => `\`${name}\``).join(', ')}`
+      );
+    } else if (
+      packet.crcSource === 'constructorString' &&
+      packet.wireNames.length === 1 &&
+      packet.wireNames[0] !== packet.name
+    ) {
+      lines.push(`- CRC source wire name: \`${packet.wireNames[0]}\``);
+    }
+    lines.push(`- Serialized length model: ${formatSerializedLength(packet.serializedLength)}`);
     if (packet.fields.length === 0) {
       lines.push('- Fields: *(none parsed; packet may still carry behavior/state in implementation)*');
     } else {
@@ -423,6 +451,18 @@ async function main() {
     lines.push(`- Status: ❌ Missing`);
     lines.push(`- C++ headers: ${packet.headers.map((h) => `\`${h}\``).join(', ')}`);
     lines.push(`- Derived CRC/opcode hint: \`${packet.swgCrc32}\``);
+    if (packet.crcSource === 'constructorStringMultiple') {
+      lines.push(
+        `- CRC source wire names: ${packet.wireNames.map((name) => `\`${name}\``).join(', ')}`
+      );
+    } else if (
+      packet.crcSource === 'constructorString' &&
+      packet.wireNames.length === 1 &&
+      packet.wireNames[0] !== packet.name
+    ) {
+      lines.push(`- CRC source wire name: \`${packet.wireNames[0]}\``);
+    }
+    lines.push(`- Serialized length model: ${formatSerializedLength(packet.serializedLength)}`);
     if (packet.fields.length === 0) {
       lines.push('- Fields: *(none parsed)*');
     } else {
@@ -436,7 +476,18 @@ async function main() {
 
   lines.push('## Notes');
   lines.push('');
-  lines.push('- `Derived CRC/opcode hint` values are computed from packet class names using the SWG CRC routine implemented in the generator/manifest pipeline.');
+  lines.push(
+    '- `Derived CRC/opcode hint` values come from explicit `GameNetworkMessage("...")` constructor strings when present; otherwise they fall back to packet class names.'
+  );
+  lines.push(
+    '- `Serialized length model` is calculated from `Archive` serializer semantics: exact bytes for fixed-width fields, minimum bytes for variable-length fields, and unknown when custom serializers are not safely inferable.'
+  );
+  lines.push(
+    '- The original SWG server target is 32-bit (ILP32); this model treats `long`/`unsigned long` and container size counters as 32-bit.'
+  );
+  lines.push(
+    '- `AutoVariableKeyShare` and other custom archive wrappers are intentionally marked unknown length unless explicit byte layout can be proven from source.'
+  );
   lines.push('- For true wire-level validation, verify with captured client traffic and the concrete serializer implementation in each packet handler.');
   lines.push('- `Implemented` in this file means a TypeScript packet interface exists by name; it does not guarantee production-complete behavior in handlers.');
   lines.push('');

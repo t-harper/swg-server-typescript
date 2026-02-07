@@ -19,7 +19,7 @@ import {
  * StringId - Localized string reference
  * Matches C++ StringId: table(string) + textIndex(u32) + text(string)
  */
-export interface StringId {
+export interface CharacterCreationStringId {
   table: string;
   textIndex: number;
   text: string;
@@ -28,7 +28,7 @@ export interface StringId {
 /**
  * Write a StringId to the buffer
  */
-function writeStringId(writer: BufferWriter, sid: StringId): void {
+function writeStringId(writer: BufferWriter, sid: CharacterCreationStringId): void {
   writer.writeStringWithLength16LE(sid.table);
   writer.writeUInt32LE(sid.textIndex);
   writer.writeStringWithLength16LE(sid.text);
@@ -37,7 +37,7 @@ function writeStringId(writer: BufferWriter, sid: StringId): void {
 /**
  * Read a StringId from the buffer
  */
-function readStringId(reader: BufferReader): StringId {
+function readStringId(reader: BufferReader): CharacterCreationStringId {
   const table = reader.readStringWithLength16LE();
   const textIndex = reader.readUInt32LE();
   const text = reader.readStringWithLength16LE();
@@ -129,7 +129,7 @@ export interface CreateCharacterFailure {
   /** The character name that failed (Unicode) */
   characterName: string;
   /** Error message as StringId */
-  errorMessage: StringId;
+  errorMessage: CharacterCreationStringId;
 }
 
 /**
@@ -153,7 +153,7 @@ export interface ClientVerifyAndLockNameResponse {
   /** The name that was verified (Unicode) */
   characterName: string;
   /** Error message as StringId */
-  errorMessage: StringId;
+  errorMessage: CharacterCreationStringId;
 }
 
 /**
@@ -177,7 +177,7 @@ export interface ClientRandomNameResponse {
   /** The generated random name (Unicode) (SECOND in wire order) */
   randomName: string;
   /** Error message as StringId */
-  errorMessage: StringId;
+  errorMessage: CharacterCreationStringId;
 }
 
 /**
@@ -554,7 +554,7 @@ export function createCreateCharacterSuccess(characterId: bigint): CreateCharact
  */
 export function createCreateCharacterFailure(
   characterName: string,
-  errorMessage: StringId
+  errorMessage: CharacterCreationStringId
 ): CreateCharacterFailure {
   return {
     opcode: CharacterCreationOpcode.CreateCharacterFailure,
@@ -568,7 +568,7 @@ export function createCreateCharacterFailure(
  */
 export function createClientVerifyAndLockNameResponse(
   characterName: string,
-  errorMessage: StringId
+  errorMessage: CharacterCreationStringId
 ): ClientVerifyAndLockNameResponse {
   return {
     opcode: CharacterCreationOpcode.ClientVerifyAndLockNameResponse,
@@ -583,7 +583,7 @@ export function createClientVerifyAndLockNameResponse(
 export function createClientRandomNameResponse(
   templateName: string,
   randomName: string,
-  errorMessage: StringId
+  errorMessage: CharacterCreationStringId
 ): ClientRandomNameResponse {
   return {
     opcode: CharacterCreationOpcode.ClientRandomNameResponse,

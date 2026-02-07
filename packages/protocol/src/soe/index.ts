@@ -10,3 +10,4 @@ export * from './compression.js';
 export * from './buffer-utils.js';
 export * from './packet.js';
 export * from './session-manager.js';
+export * from './udp-library-wire.js';

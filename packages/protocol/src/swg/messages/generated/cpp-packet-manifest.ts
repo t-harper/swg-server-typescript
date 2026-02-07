@@ -8,6 +8,7 @@
  * - ../swg-source-docker/swg-main/src/engine/shared/library/sharedNetworkMessages/src/shared
  * - ../swg-source-docker/swg-main/src/game/shared/library/swgSharedNetworkMessages/src/shared
  * - ../swg-source-docker/swg-main/src/engine/server/library/serverNetworkMessages/src/shared
+ * - ../swg-source-docker/swg-main/src/engine/server/library/serverUtility/src/shared
  * - ../swg-source-docker/swg-main/src/game/server/library/swgServerNetworkMessages/src/shared
  */
 
@@ -22,36 +23,65 @@ export interface CppPacketFieldDefinition {
 export interface CppPacketDefinition {
   name: string;
   swgCrc32: string;
+  crcSource: 'className' | 'constructorString' | 'constructorStringMultiple';
+  wireNames: string[];
   headers: string[];
   implementedInTypescript: boolean;
   fieldCount: number;
   fields: CppPacketFieldDefinition[];
+  serializedLength: {
+    kind: 'exact' | 'min' | 'unknown';
+    exactBytes: number | null;
+    minBytes: number | null;
+  };
 }
 
 export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
   {
     "name": "AbortShutdown",
     "swgCrc32": "0x1b877422",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "AbortShutdown"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/CentralGameServerMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 0,
-    "fields": []
+    "fields": [],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 0,
+      "minBytes": 0
+    }
   },
   {
     "name": "AbortTradeMessage",
     "swgCrc32": "0x9ca80f98",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "AbortTradeMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/SecureTradeMessages.h"
     ],
     "implementedInTypescript": true,
     "fieldCount": 0,
-    "fields": []
+    "fields": [],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 0,
+      "minBytes": 0
+    }
   },
   {
     "name": "AcceptAuctionMessage",
     "swgCrc32": "0xb95c8a82",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "AcceptAuctionMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/AcceptAuctionMessage.h"
     ],
@@ -65,15 +95,22 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 8,
+      "minBytes": 8
+    }
   },
   {
     "name": "AcceptAuctionResponseMessage",
     "swgCrc32": "0xc58a446e",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/AcceptAuctionResponseMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
@@ -90,22 +127,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 12,
+      "minBytes": 12
+    }
   },
   {
     "name": "AcceptHighBidMessage",
     "swgCrc32": "0x85dfb334",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "AcceptHighBidMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/AcceptHighBidMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 4,
     "fields": [
       {
         "name": "m_responseId",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariable",
+        "cppType": "int",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -129,25 +175,43 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 24,
+      "minBytes": 24
+    }
   },
   {
     "name": "AcceptTransactionMessage",
     "swgCrc32": "0xb131ca17",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "AcceptTransactionMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/SecureTradeMessages.h"
     ],
     "implementedInTypescript": true,
     "fieldCount": 0,
-    "fields": []
+    "fields": [],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 0,
+      "minBytes": 0
+    }
   },
   {
     "name": "AccountFeatureIdRequest",
     "swgCrc32": "0xb1a7e294",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "AccountFeatureIdRequest"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/AccountFeatureIdRequest.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 6,
     "fields": [
       {
@@ -175,7 +239,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_targetStationId",
         "archiveContainer": "AutoVariable",
         "cppType": "StationId",
-        "tsType": "unknown",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -192,15 +256,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 29,
+      "minBytes": 29
+    }
   },
   {
     "name": "AccountFeatureIdResponse",
     "swgCrc32": "0x2ce96bfa",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "AccountFeatureIdResponse"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/AccountFeatureIdResponse.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 12,
     "fields": [
       {
@@ -228,7 +301,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_targetStationId",
         "archiveContainer": "AutoVariable",
         "cppType": "StationId",
-        "tsType": "unknown",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -263,14 +336,14 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_featureIds",
         "archiveContainer": "AutoVariable",
         "cppType": "std::map<uint32, int>",
-        "tsType": "Record<string, unknown>",
+        "tsType": "Map<number, number>",
         "source": "addVariable"
       },
       {
         "name": "m_sessionFeatureIdsData",
         "archiveContainer": "AutoVariable",
         "cppType": "std::map<uint32, std::string>",
-        "tsType": "Record<string, unknown>",
+        "tsType": "Map<number, string>",
         "source": "addVariable"
       },
       {
@@ -287,22 +360,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 46,
+      "exactBytes": null
+    }
   },
   {
     "name": "AddAuctionMessage",
     "swgCrc32": "0x4172a001",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "AddAuctionMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/AddAuctionMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 21,
     "fields": [
       {
         "name": "m_responseId",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariable",
+        "cppType": "int",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -421,7 +503,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_attributes",
         "archiveContainer": "AutoArray",
         "cppType": "std::pair<std::string, Unicode::String>",
-        "tsType": "[string, string]",
+        "tsType": "[string, string][]",
         "source": "addVariable"
       },
       {
@@ -445,22 +527,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 92,
+      "exactBytes": null
+    }
   },
   {
     "name": "AddBidMessage",
     "swgCrc32": "0x5b3cf104",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "AddBidMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/AddBidMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 7,
     "fields": [
       {
         "name": "m_responseId",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariable",
+        "cppType": "int",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -505,15 +596,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 34,
+      "exactBytes": null
+    }
   },
   {
     "name": "AddCharacterMessage",
     "swgCrc32": "0xf11dd1e8",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "AddCharacterMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/AddCharacterMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 5,
     "fields": [
       {
@@ -551,22 +651,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 21,
+      "exactBytes": null
+    }
   },
   {
     "name": "AddImmediateAuctionMessage",
     "swgCrc32": "0x7d9df69a",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "AddImmediateAuctionMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/AddImmediateAuctionMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 21,
     "fields": [
       {
         "name": "m_responseId",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariable",
+        "cppType": "int",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -685,7 +794,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_attributes",
         "archiveContainer": "AutoArray",
         "cppType": "std::pair<std::string, Unicode::String>",
-        "tsType": "[string, string]",
+        "tsType": "[string, string][]",
         "source": "addVariable"
       },
       {
@@ -709,11 +818,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 92,
+      "exactBytes": null
+    }
   },
   {
     "name": "AddItemFailedMessage",
-    "swgCrc32": "0x69d3e1d2",
+    "swgCrc32": "0x4417af8b",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "RemoveItemMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/SecureTradeMessages.h"
     ],
@@ -727,11 +845,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 8,
+      "minBytes": 8
+    }
   },
   {
     "name": "AddItemMessage",
     "swgCrc32": "0x1e8d1356",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "AddItemMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/SecureTradeMessages.h"
     ],
@@ -745,11 +872,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 8,
+      "minBytes": 8
+    }
   },
   {
     "name": "AddMapLocationMessage",
     "swgCrc32": "0xab2174b6",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "AddMapLocationMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/AddMapLocationMessage.h"
     ],
@@ -805,11 +941,18 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 24,
+      "exactBytes": null
+    }
   },
   {
     "name": "AddMapLocationResponseMessage",
     "swgCrc32": "0xe883aa40",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/AddMapLocationResponseMessage.h"
     ],
@@ -823,15 +966,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 8,
+      "minBytes": 8
+    }
   },
   {
     "name": "AddOIDBlockMessage",
     "swgCrc32": "0x1f05606a",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "AddOIDBlockMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/AddObjectIdBlockMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 4,
     "fields": [
       {
@@ -862,33 +1014,51 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 21,
+      "minBytes": 21
+    }
   },
   {
     "name": "AddResourceTypeMessage",
     "swgCrc32": "0x3b4532ce",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "AddResourceTypeMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameGameServer/AddResourceTypeMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
         "name": "m_data",
         "archiveContainer": "AutoArray",
         "cppType": "AddResourceTypeMessageNamespace::ResourceTypeData",
-        "tsType": "unknown",
+        "tsType": "unknown[]",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 4,
+      "exactBytes": null
+    }
   },
   {
     "name": "AdjustAccountFeatureIdRequest",
     "swgCrc32": "0x286ea14e",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "AdjustAccountFeatureIdRequest"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/AdjustAccountFeatureIdRequest.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 10,
     "fields": [
       {
@@ -923,7 +1093,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_targetStationId",
         "archiveContainer": "AutoVariable",
         "cppType": "StationId",
-        "tsType": "unknown",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -961,15 +1131,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 48,
+      "exactBytes": null
+    }
   },
   {
     "name": "AdjustAccountFeatureIdResponse",
     "swgCrc32": "0xe27e7a6b",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "AdjustAccountFeatureIdResponse"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/AdjustAccountFeatureIdResponse.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 15,
     "fields": [
       {
@@ -1004,7 +1183,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_targetStationId",
         "archiveContainer": "AutoVariable",
         "cppType": "StationId",
-        "tsType": "unknown",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -1077,15 +1256,22 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 61,
+      "exactBytes": null
+    }
   },
   {
     "name": "AINodeInfo",
     "swgCrc32": "0x24163840",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/AIDebuggingMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 9,
     "fields": [
       {
@@ -1127,14 +1313,14 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_children",
         "archiveContainer": "AutoArray",
         "cppType": "int",
-        "tsType": "number",
+        "tsType": "number[]",
         "source": "addVariable"
       },
       {
         "name": "m_siblings",
         "archiveContainer": "AutoArray",
         "cppType": "int",
-        "tsType": "number",
+        "tsType": "number[]",
         "source": "addVariable"
       },
       {
@@ -1151,15 +1337,22 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 36,
+      "exactBytes": null
+    }
   },
   {
     "name": "AIPathInfo",
     "swgCrc32": "0xca1daab6",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/AIDebuggingMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
@@ -1173,14 +1366,23 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_nodes",
         "archiveContainer": "AutoArray",
         "cppType": "AIPathInfo_NodeInfo",
-        "tsType": "unknown",
+        "tsType": "unknown[]",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 12,
+      "exactBytes": null
+    }
   },
   {
     "name": "AppendCommentMessage",
     "swgCrc32": "0x0ac49644",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "AppendCommentMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/customerService/AppendCommentMessage.h"
     ],
@@ -1215,11 +1417,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 14,
+      "exactBytes": null
+    }
   },
   {
     "name": "AppendCommentResponseMessage",
     "swgCrc32": "0xa04a3eca",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "AppendCommentResponseMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/customerService/AppendCommentResponseMessage.h"
     ],
@@ -1240,11 +1451,18 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 8,
+      "minBytes": 8
+    }
   },
   {
     "name": "AttributeListMessage",
     "swgCrc32": "0xf3f12f2a",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/AttributeListMessage.h"
     ],
@@ -1269,7 +1487,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_data",
         "archiveContainer": "AutoArray",
         "cppType": "AttributePair",
-        "tsType": "unknown",
+        "tsType": "unknown[]",
         "source": "addVariable"
       },
       {
@@ -1279,11 +1497,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 18,
+      "exactBytes": null
+    }
   },
   {
     "name": "AuctionQueryHeadersMessage",
     "swgCrc32": "0x679e0d00",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "AuctionQueryHeadersMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/AuctionQueryHeadersMessage.h"
     ],
@@ -1371,7 +1598,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_advancedSearch",
         "archiveContainer": "AutoList",
         "cppType": "SearchCondition",
-        "tsType": "unknown",
+        "tsType": "unknown[]",
         "source": "addVariable"
       },
       {
@@ -1402,11 +1629,18 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 54,
+      "exactBytes": null
+    }
   },
   {
     "name": "AuctionQueryHeadersResponseMessage",
     "swgCrc32": "0xfa500e52",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/AuctionQueryHeadersResponseMessage.h"
     ],
@@ -1431,21 +1665,21 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_stringPalette",
         "archiveContainer": "AutoArray",
         "cppType": "std::string",
-        "tsType": "string",
+        "tsType": "string[]",
         "source": "addVariable"
       },
       {
         "name": "m_wideStringPalette",
         "archiveContainer": "AutoArray",
         "cppType": "Unicode::String",
-        "tsType": "string",
+        "tsType": "string[]",
         "source": "addVariable"
       },
       {
         "name": "m_palettizedAuctionData",
         "archiveContainer": "AutoArray",
         "cppType": "Auction::PalettizedItemDataHeader",
-        "tsType": "unknown",
+        "tsType": "unknown[]",
         "source": "addVariable"
       },
       {
@@ -1462,15 +1696,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 23,
+      "exactBytes": null
+    }
   },
   {
     "name": "AuctionQueryMessage",
     "swgCrc32": "0xa0211783",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "AuctionQueryMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/AuctionQueryMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 3,
     "fields": [
       {
@@ -1494,15 +1737,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 16,
+      "minBytes": 16
+    }
   },
   {
     "name": "AuctionQueryResponseMessage",
     "swgCrc32": "0xac1c746e",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "AuctionQueryResponseMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/AuctionQueryResponseMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 3,
     "fields": [
       {
@@ -1523,18 +1775,27 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_auctionData",
         "archiveContainer": "AutoArray",
         "cppType": "AuctionData",
-        "tsType": "unknown",
+        "tsType": "unknown[]",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 12,
+      "exactBytes": null
+    }
   },
   {
     "name": "AuthTransferClientMessage",
     "swgCrc32": "0x04940ffc",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "AuthTransferClientMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameGameServer/AuthTransferClientMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 26,
     "fields": [
       {
@@ -1597,7 +1858,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_observedObjects",
         "archiveContainer": "AutoArray",
         "cppType": "NetworkId",
-        "tsType": "bigint",
+        "tsType": "bigint[]",
         "source": "addVariable"
       },
       {
@@ -1618,7 +1879,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_accountFeatureIds",
         "archiveContainer": "AutoVariable",
         "cppType": "std::map<uint32, int>",
-        "tsType": "Record<string, unknown>",
+        "tsType": "Map<number, number>",
         "source": "addVariable"
       },
       {
@@ -1667,14 +1928,14 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_consumedRewardEvents",
         "archiveContainer": "AutoArray",
         "cppType": "std::pair<NetworkId, std::string>",
-        "tsType": "bigint",
+        "tsType": "bigint[]",
         "source": "addVariable"
       },
       {
         "name": "m_claimedRewardItems",
         "archiveContainer": "AutoArray",
         "cppType": "std::pair<NetworkId, std::string>",
-        "tsType": "bigint",
+        "tsType": "bigint[]",
         "source": "addVariable"
       },
       {
@@ -1719,11 +1980,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 85,
+      "exactBytes": null
+    }
   },
   {
     "name": "BaselinesMessage",
     "swgCrc32": "0x68a75f0c",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "BaselinesMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/common/BaselinesMessage.h"
     ],
@@ -1741,7 +2011,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "typeId",
         "archiveContainer": "AutoVariable",
         "cppType": "Tag",
-        "tsType": "unknown",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -1755,14 +2025,23 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "package",
         "archiveContainer": "AutoVariable",
         "cppType": "Archive::ByteStream",
-        "tsType": "unknown",
+        "tsType": "Uint8Array",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 17,
+      "exactBytes": null
+    }
   },
   {
     "name": "BatchBaselinesMessage",
     "swgCrc32": "0x74792d5e",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "BatchBaselinesMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/common/BatchBaselinesMessage.h"
     ],
@@ -1776,11 +2055,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "unknown[]",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 4,
+      "exactBytes": null
+    }
   },
   {
     "name": "BeginTradeMessage",
     "swgCrc32": "0x325932d8",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "BeginTradeMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/SecureTradeMessages.h"
     ],
@@ -1794,21 +2082,39 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 8,
+      "minBytes": 8
+    }
   },
   {
     "name": "BeginVerificationMessage",
     "swgCrc32": "0xe7491df5",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "BeginVerificationMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/SecureTradeMessages.h"
     ],
     "implementedInTypescript": true,
     "fieldCount": 0,
-    "fields": []
+    "fields": [],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 0,
+      "minBytes": 0
+    }
   },
   {
     "name": "BidAuctionMessage",
     "swgCrc32": "0x91125453",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "BidAuctionMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/BidAuctionMessage.h"
     ],
@@ -1836,11 +2142,18 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 16,
+      "minBytes": 16
+    }
   },
   {
     "name": "BidAuctionResponseMessage",
     "swgCrc32": "0x8fcbef4a",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/BidAuctionResponseMessage.h"
     ],
@@ -1861,15 +2174,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 12,
+      "minBytes": 12
+    }
   },
   {
     "name": "BiographyMessage",
     "swgCrc32": "0x612e6fa4",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "BiographyMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameGameServer/BiographyMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
@@ -1886,40 +2208,58 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 12,
+      "exactBytes": null
+    }
   },
   {
     "name": "BountyHunterTargetListMessage",
     "swgCrc32": "0x7d0218ae",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "BountyHunterTargetListMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameGameServer/BountyHunterTargetListMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
         "name": "m_targetList",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariable",
+        "cppType": "std::vector< std::pair< NetworkId, NetworkId > >",
+        "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 4,
+      "exactBytes": null
+    }
   },
   {
     "name": "BountyHunterTargetMessage",
     "swgCrc32": "0x4c00e2b1",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "BountyHunterTargetMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameGameServer/BountyHunterTargetMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
         "name": "m_objectId",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariable",
+        "cppType": "NetworkId",
+        "tsType": "bigint",
         "source": "addVariable"
       },
       {
@@ -1929,22 +2269,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 16,
+      "minBytes": 16
+    }
   },
   {
     "name": "CancelAuctionMessage",
     "swgCrc32": "0x509e0f24",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "CancelAuctionMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/CancelAuctionMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 4,
     "fields": [
       {
         "name": "m_responseId",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariable",
+        "cppType": "int",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -1968,11 +2317,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 24,
+      "minBytes": 24
+    }
   },
   {
     "name": "CancelLiveAuctionMessage",
     "swgCrc32": "0x3687a4d2",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "CancelLiveAuctionMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/CancelLiveAuctionMessage.h"
     ],
@@ -1986,11 +2344,18 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 8,
+      "minBytes": 8
+    }
   },
   {
     "name": "CancelLiveAuctionResponseMessage",
     "swgCrc32": "0x7da2246c",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/CancelLiveAuctionResponseMessage.h"
     ],
@@ -2018,11 +2383,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 13,
+      "minBytes": 13
+    }
   },
   {
     "name": "CancelTicketMessage",
     "swgCrc32": "0x638ef431",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "CancelTicketMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/customerService/CancelTicketMessage.h"
     ],
@@ -2050,11 +2424,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 12,
+      "exactBytes": null
+    }
   },
   {
     "name": "CancelTicketResponseMessage",
     "swgCrc32": "0xd6fbf318",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "CancelTicketResponseMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/customerService/CancelTicketResponseMessage.h"
     ],
@@ -2075,15 +2458,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 8,
+      "minBytes": 8
+    }
   },
   {
     "name": "CentralCreateCharacter",
     "swgCrc32": "0x65828ed9",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "CentralCreateCharacter"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/CentralGameServerMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 17,
     "fields": [
       {
@@ -2104,7 +2496,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_coordinates",
         "archiveContainer": "AutoVariable",
         "cppType": "Vector",
-        "tsType": "unknown",
+        "tsType": "{ x: number; y: number; z: number }",
         "source": "addVariable"
       },
       {
@@ -2205,15 +2597,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 58,
+      "exactBytes": null
+    }
   },
   {
     "name": "CentralGameServerConnect",
     "swgCrc32": "0x130a0a68",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "CentralGameServerConnect"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/CentralGameServerMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 6,
     "fields": [
       {
@@ -2258,15 +2659,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 12,
+      "exactBytes": null
+    }
   },
   {
     "name": "CentralGameServerDbProcessServerProcessId",
     "swgCrc32": "0x5a129245",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "CentralGameServerDbProcessServerProcessId"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/CentralGameServerMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
@@ -2283,15 +2693,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 8,
+      "minBytes": 8
+    }
   },
   {
     "name": "CentralGameServerProxyObject",
     "swgCrc32": "0x0a3f7d31",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "CentralGameServerProxyObject"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/CentralGameServerMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 5,
     "fields": [
       {
@@ -2329,15 +2748,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 18,
+      "exactBytes": null
+    }
   },
   {
     "name": "CentralGameServerSetProcessId",
     "swgCrc32": "0x045deee0",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "CentralGameServerSetProcessId"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/CentralGameServerMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 3,
     "fields": [
       {
@@ -2361,15 +2789,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 10,
+      "exactBytes": null
+    }
   },
   {
     "name": "CentralGameServiceAddress",
     "swgCrc32": "0x9b6f0ecf",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "CentralGameServiceAddress"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralTaskManager/CentralTaskMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
@@ -2386,25 +2823,43 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 4,
+      "exactBytes": null
+    }
   },
   {
     "name": "CentralPingMessage",
     "swgCrc32": "0xf9d4e7fa",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "CentralPingMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/CentralPingMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 0,
-    "fields": []
+    "fields": [],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 0,
+      "minBytes": 0
+    }
   },
   {
     "name": "CentralPlanetServerConnect",
     "swgCrc32": "0x9740a160",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "CentralPlanetServerConnect"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralPlanetServer/CentralPlanetServerConnect.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 3,
     "fields": [
       {
@@ -2428,15 +2883,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 6,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChangeUniverseProcessMessage",
     "swgCrc32": "0x703560b3",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChangeUniverseProcessMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/ChangeUniverseProcessMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
@@ -2446,22 +2910,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 4,
+      "minBytes": 4
+    }
   },
   {
     "name": "CharacterListMessage",
     "swgCrc32": "0x2ab42c64",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "CharacterListMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/CharacterListMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
         "name": "m_data",
         "archiveContainer": "AutoArray",
         "cppType": "CharacterListMessageData",
-        "tsType": "unknown",
+        "tsType": "unknown[]",
         "source": "addVariable"
       },
       {
@@ -2471,64 +2944,80 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 8,
+      "exactBytes": null
+    }
   },
   {
     "name": "CharacterNamesMessage",
     "swgCrc32": "0x4a986bb2",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "CharacterNamesMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameGameServer/CharacterNamesMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 6,
     "fields": [
       {
         "name": "m_ids",
         "archiveContainer": "AutoArray",
         "cppType": "NetworkId",
-        "tsType": "bigint",
+        "tsType": "bigint[]",
         "source": "addVariable"
       },
       {
         "name": "m_stationIds",
         "archiveContainer": "AutoArray",
         "cppType": "int",
-        "tsType": "number",
+        "tsType": "number[]",
         "source": "addVariable"
       },
       {
         "name": "m_names",
         "archiveContainer": "AutoArray",
         "cppType": "std::string",
-        "tsType": "string",
+        "tsType": "string[]",
         "source": "addVariable"
       },
       {
         "name": "m_fullNames",
         "archiveContainer": "AutoArray",
         "cppType": "std::string",
-        "tsType": "string",
+        "tsType": "string[]",
         "source": "addVariable"
       },
       {
         "name": "m_createTimes",
         "archiveContainer": "AutoArray",
         "cppType": "int",
-        "tsType": "number",
+        "tsType": "number[]",
         "source": "addVariable"
       },
       {
         "name": "m_loginTimes",
         "archiveContainer": "AutoArray",
         "cppType": "int",
-        "tsType": "number",
+        "tsType": "number[]",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 24,
+      "exactBytes": null
+    }
   },
   {
     "name": "CharacterSheetResponseMessage",
     "swgCrc32": "0x9b3a17c4",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/CharacterSheetResponseMessage.h"
     ],
@@ -2553,7 +3042,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_bindLocation",
         "archiveContainer": "AutoVariable",
         "cppType": "Vector",
-        "tsType": "unknown",
+        "tsType": "{ x: number; y: number; z: number }",
         "source": "addVariable"
       },
       {
@@ -2567,7 +3056,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_bankLocation",
         "archiveContainer": "AutoVariable",
         "cppType": "Vector",
-        "tsType": "unknown",
+        "tsType": "{ x: number; y: number; z: number }",
         "source": "addVariable"
       },
       {
@@ -2581,7 +3070,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_residenceLocation",
         "archiveContainer": "AutoVariable",
         "cppType": "Vector",
-        "tsType": "unknown",
+        "tsType": "{ x: number; y: number; z: number }",
         "source": "addVariable"
       },
       {
@@ -2612,15 +3101,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 60,
+      "exactBytes": null
+    }
   },
   {
     "name": "CharacterTransferStatusMessage",
     "swgCrc32": "0x2b2c4fa0",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "CharacterTransferStatusMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/CharacterTransferStatusMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 3,
     "fields": [
       {
@@ -2644,11 +3142,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 14,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChatAddFriend",
     "swgCrc32": "0x6c002d13",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatAddFriend"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatAddFriend.h"
     ],
@@ -2659,7 +3166,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "characterName",
         "archiveContainer": "AutoVariable",
         "cppType": "ChatAvatarId",
-        "tsType": "unknown",
+        "tsType": "ChatAvatarId",
         "source": "addVariable"
       },
       {
@@ -2669,11 +3176,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 10,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChatAddModeratorToRoom",
     "swgCrc32": "0x90bde76f",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatAddModeratorToRoom"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatAddModeratorToRoom.h"
     ],
@@ -2684,7 +3200,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "avatarId",
         "archiveContainer": "AutoVariable",
         "cppType": "ChatAvatarId",
-        "tsType": "unknown",
+        "tsType": "ChatAvatarId",
         "source": "addVariable"
       },
       {
@@ -2701,11 +3217,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 12,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChatBanAvatarFromRoom",
     "swgCrc32": "0xd9fa0194",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatBanAvatarFromRoom"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatBanAvatarFromRoom.h"
     ],
@@ -2716,7 +3241,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "avatarId",
         "archiveContainer": "AutoVariable",
         "cppType": "ChatAvatarId",
-        "tsType": "unknown",
+        "tsType": "ChatAvatarId",
         "source": "addVariable"
       },
       {
@@ -2733,11 +3258,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 12,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChatChangeFriendStatus",
     "swgCrc32": "0xf22eb811",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatChangeFriendStatus"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatChangeFriendStatus.h"
     ],
@@ -2748,14 +3282,14 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "characterName",
         "archiveContainer": "AutoVariable",
         "cppType": "ChatAvatarId",
-        "tsType": "unknown",
+        "tsType": "ChatAvatarId",
         "source": "addVariable"
       },
       {
         "name": "friendName",
         "archiveContainer": "AutoVariable",
         "cppType": "ChatAvatarId",
-        "tsType": "unknown",
+        "tsType": "ChatAvatarId",
         "source": "addVariable"
       },
       {
@@ -2772,11 +3306,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 17,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChatChangeIgnoreStatus",
     "swgCrc32": "0xd6f40538",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatChangeIgnoreStatus"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatChangeIgnoreStatus.h"
     ],
@@ -2787,14 +3330,14 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "characterName",
         "archiveContainer": "AutoVariable",
         "cppType": "ChatAvatarId",
-        "tsType": "unknown",
+        "tsType": "ChatAvatarId",
         "source": "addVariable"
       },
       {
         "name": "friendName",
         "archiveContainer": "AutoVariable",
         "cppType": "ChatAvatarId",
-        "tsType": "unknown",
+        "tsType": "ChatAvatarId",
         "source": "addVariable"
       },
       {
@@ -2811,15 +3354,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 17,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChatConnectAvatar",
     "swgCrc32": "0x7b37ac9b",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatConnectAvatar"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/ChatConnectAvatar.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 5,
     "fields": [
       {
@@ -2857,11 +3409,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 16,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChatCreateRoom",
     "swgCrc32": "0x35366bed",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatCreateRoom"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatCreateRoom.h"
     ],
@@ -2910,11 +3471,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 12,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChatDeleteAllPersistentMessages",
     "swgCrc32": "0x8b1e8e72",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatDeleteAllPersistentMessages"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatDeleteAllPersistentMessages.h"
     ],
@@ -2935,11 +3505,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 16,
+      "minBytes": 16
+    }
   },
   {
     "name": "ChatDeletePersistentMessage",
     "swgCrc32": "0x8f251641",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatDeletePersistentMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatDeletePersistentMessage.h"
     ],
@@ -2953,11 +3532,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 4,
+      "minBytes": 4
+    }
   },
   {
     "name": "ChatDestroyRoom",
     "swgCrc32": "0x094b2a77",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatDestroyRoom"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatDestroyRoom.h"
     ],
@@ -2978,11 +3566,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 8,
+      "minBytes": 8
+    }
   },
   {
     "name": "ChatDestroyRoomByName",
     "swgCrc32": "0x6a3301bc",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatDestroyRoomByName"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatDestroyRoomByName.h"
     ],
@@ -2996,15 +3593,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 2,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChatDisconnectAvatar",
     "swgCrc32": "0x214836ea",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatDisconnectAvatar"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/ChatDisconnectAvatar.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
@@ -3014,11 +3620,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 8,
+      "minBytes": 8
+    }
   },
   {
     "name": "ChatEnterRoom",
     "swgCrc32": "0x1002e2b6",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatEnterRoom"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatEnterRoom.h"
     ],
@@ -3039,11 +3654,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 6,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChatEnterRoomById",
     "swgCrc32": "0xbc6bddf2",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatEnterRoomById"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatEnterRoomById.h"
     ],
@@ -3071,11 +3695,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 10,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChatFriendsListUpdate",
     "swgCrc32": "0x6cd2fcd8",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatFriendsListUpdate"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatFriendsListUpdate.h"
     ],
@@ -3086,7 +3719,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "characterName",
         "archiveContainer": "AutoVariable",
         "cppType": "ChatAvatarId",
-        "tsType": "unknown",
+        "tsType": "ChatAvatarId",
         "source": "addVariable"
       },
       {
@@ -3096,11 +3729,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 7,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChatGetFriendsList",
     "swgCrc32": "0x351c5dfe",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatGetFriendsList"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatGetFriendsList.h"
     ],
@@ -3111,14 +3753,23 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "characterName",
         "archiveContainer": "AutoVariable",
         "cppType": "ChatAvatarId",
-        "tsType": "unknown",
+        "tsType": "ChatAvatarId",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 6,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChatGetIgnoreList",
     "swgCrc32": "0x54da3095",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatGetIgnoreList"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatGetIgnoreList.h"
     ],
@@ -3129,14 +3780,23 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "characterName",
         "archiveContainer": "AutoVariable",
         "cppType": "ChatAvatarId",
-        "tsType": "unknown",
+        "tsType": "ChatAvatarId",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 6,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChatInstantMessageToCharacter",
     "swgCrc32": "0x84bb21f7",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatInstantMessageToCharacter"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatInstantMessageToCharacter.h"
     ],
@@ -3147,7 +3807,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "characterName",
         "archiveContainer": "AutoVariable",
         "cppType": "ChatAvatarId",
-        "tsType": "unknown",
+        "tsType": "ChatAvatarId",
         "source": "addVariable"
       },
       {
@@ -3171,11 +3831,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 18,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChatInstantMessageToClient",
     "swgCrc32": "0x3c565ced",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatInstantMessageToClient"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatInstantMessageToClient.h"
     ],
@@ -3186,7 +3855,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "fromName",
         "archiveContainer": "AutoVariable",
         "cppType": "ChatAvatarId",
-        "tsType": "unknown",
+        "tsType": "ChatAvatarId",
         "source": "addVariable"
       },
       {
@@ -3203,11 +3872,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 14,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChatInviteAvatarToRoom",
     "swgCrc32": "0x7273ecd3",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatInviteAvatarToRoom"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatInviteAvatarToRoom.h"
     ],
@@ -3218,7 +3896,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "avatarId",
         "archiveContainer": "AutoVariable",
         "cppType": "ChatAvatarId",
-        "tsType": "unknown",
+        "tsType": "ChatAvatarId",
         "source": "addVariable"
       },
       {
@@ -3228,11 +3906,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 8,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChatInviteGroupMembersToRoom",
     "swgCrc32": "0x2c0430f0",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatInviteGroupMembersToRoom"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatInviteGroupMembersToRoom.h"
     ],
@@ -3250,7 +3937,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "groupLeaderId",
         "archiveContainer": "AutoVariable",
         "cppType": "ChatAvatarId",
-        "tsType": "unknown",
+        "tsType": "ChatAvatarId",
         "source": "addVariable"
       },
       {
@@ -3264,14 +3951,23 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "invitedMembers",
         "archiveContainer": "AutoArray",
         "cppType": "NetworkId",
-        "tsType": "bigint",
+        "tsType": "bigint[]",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 20,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChatInviteGroupToRoom",
     "swgCrc32": "0x01b5c536",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatInviteGroupToRoom"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatInviteGroupToRoom.h"
     ],
@@ -3282,7 +3978,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "avatarId",
         "archiveContainer": "AutoVariable",
         "cppType": "ChatAvatarId",
-        "tsType": "unknown",
+        "tsType": "ChatAvatarId",
         "source": "addVariable"
       },
       {
@@ -3292,11 +3988,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 8,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChatKickAvatarFromRoom",
     "swgCrc32": "0xe0bce25b",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatKickAvatarFromRoom"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatKickAvatarFromRoom.h"
     ],
@@ -3307,7 +4012,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_avatarId",
         "archiveContainer": "AutoVariable",
         "cppType": "ChatAvatarId",
-        "tsType": "unknown",
+        "tsType": "ChatAvatarId",
         "source": "addVariable"
       },
       {
@@ -3317,11 +4022,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 8,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChatMessageFromGame",
     "swgCrc32": "0x21ca3bb2",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatMessageFromGame"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatMessageFromGame.h"
     ],
@@ -3377,11 +4091,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 19,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChatOnAddFriend",
     "swgCrc32": "0x2b2a0d94",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatOnAddFriend"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatOnAddFriend.h"
     ],
@@ -3402,11 +4125,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 8,
+      "minBytes": 8
+    }
   },
   {
     "name": "ChatOnAddModeratorToRoom",
     "swgCrc32": "0x36a03858",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatOnAddModeratorToRoom"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatOnAddModeratorToRoom.h"
     ],
@@ -3417,14 +4149,14 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "avatarId",
         "archiveContainer": "AutoVariable",
         "cppType": "ChatAvatarId",
-        "tsType": "unknown",
+        "tsType": "ChatAvatarId",
         "source": "addVariable"
       },
       {
         "name": "granterId",
         "archiveContainer": "AutoVariable",
         "cppType": "ChatAvatarId",
-        "tsType": "unknown",
+        "tsType": "ChatAvatarId",
         "source": "addVariable"
       },
       {
@@ -3448,11 +4180,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 22,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChatOnBanAvatarFromRoom",
     "swgCrc32": "0x5a38538d",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatOnBanAvatarFromRoom"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatOnBanAvatarFromRoom.h"
     ],
@@ -3470,14 +4211,14 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "banner",
         "archiveContainer": "AutoVariable",
         "cppType": "ChatAvatarId",
-        "tsType": "unknown",
+        "tsType": "ChatAvatarId",
         "source": "addVariable"
       },
       {
         "name": "bannee",
         "archiveContainer": "AutoVariable",
         "cppType": "ChatAvatarId",
-        "tsType": "unknown",
+        "tsType": "ChatAvatarId",
         "source": "addVariable"
       },
       {
@@ -3494,11 +4235,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 22,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChatOnChangeFriendStatus",
     "swgCrc32": "0x54336726",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatOnChangeFriendStatus"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatOnChangeFriendStatus.h"
     ],
@@ -3516,7 +4266,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "friendName",
         "archiveContainer": "AutoVariable",
         "cppType": "ChatAvatarId",
-        "tsType": "unknown",
+        "tsType": "ChatAvatarId",
         "source": "addVariable"
       },
       {
@@ -3540,11 +4290,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 23,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChatOnChangeIgnoreStatus",
     "swgCrc32": "0x70e9da0f",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatOnChangeIgnoreStatus"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatOnChangeIgnoreStatus.h"
     ],
@@ -3562,7 +4321,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "ignoreName",
         "archiveContainer": "AutoVariable",
         "cppType": "ChatAvatarId",
-        "tsType": "unknown",
+        "tsType": "ChatAvatarId",
         "source": "addVariable"
       },
       {
@@ -3586,21 +4345,39 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 23,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChatOnConnectAvatar",
     "swgCrc32": "0xd72fe9be",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatOnConnectAvatar"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatOnConnectAvatar.h"
     ],
     "implementedInTypescript": true,
     "fieldCount": 0,
-    "fields": []
+    "fields": [],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 0,
+      "minBytes": 0
+    }
   },
   {
     "name": "ChatOnCreateRoom",
     "swgCrc32": "0x35d7cc9f",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatOnCreateRoom"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatOnCreateRoom.h"
     ],
@@ -3618,7 +4395,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "roomData",
         "archiveContainer": "AutoVariable",
         "cppType": "ChatRoomData",
-        "tsType": "unknown",
+        "tsType": "ChatRoomData",
         "source": "addVariable"
       },
       {
@@ -3628,11 +4405,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 43,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChatOnDeleteAllPersistentMessages",
     "swgCrc32": "0x4f23965a",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatOnDeleteAllPersistentMessages"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatOnDeleteAllPersistentMessages.h"
     ],
@@ -3653,11 +4439,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 3,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChatOnDestroyRoom",
     "swgCrc32": "0xe8ec5877",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatOnDestroyRoom"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatOnDestroyRoom.h"
     ],
@@ -3668,7 +4463,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "destroyer",
         "archiveContainer": "AutoVariable",
         "cppType": "ChatAvatarId",
-        "tsType": "unknown",
+        "tsType": "ChatAvatarId",
         "source": "addVariable"
       },
       {
@@ -3692,11 +4487,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 18,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChatOnEnteredRoom",
     "swgCrc32": "0xe69bdc0a",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatOnEnteredRoom"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatOnEnteredRoom.h"
     ],
@@ -3707,7 +4511,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "characterName",
         "archiveContainer": "AutoVariable",
         "cppType": "ChatAvatarId",
-        "tsType": "unknown",
+        "tsType": "ChatAvatarId",
         "source": "addVariable"
       },
       {
@@ -3731,11 +4535,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 18,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChatOnGetFriendsList",
     "swgCrc32": "0xe97ab594",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatOnGetFriendsList"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatOnGetFriendsList.h"
     ],
@@ -3753,14 +4566,23 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "friends",
         "archiveContainer": "AutoArray",
         "cppType": "ChatAvatarId",
-        "tsType": "unknown",
+        "tsType": "ChatAvatarId[]",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 12,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChatOnGetIgnoreList",
     "swgCrc32": "0xf8c275b0",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatOnGetIgnoreList"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatOnGetIgnoreList.h"
     ],
@@ -3778,14 +4600,23 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "ignores",
         "archiveContainer": "AutoArray",
         "cppType": "ChatAvatarId",
-        "tsType": "unknown",
+        "tsType": "ChatAvatarId[]",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 12,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChatOnInviteGroupToRoom",
     "swgCrc32": "0x8277972f",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatOnInviteGroupToRoom"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatOnInviteGroupToRoom.h"
     ],
@@ -3803,14 +4634,14 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "invitor",
         "archiveContainer": "AutoVariable",
         "cppType": "ChatAvatarId",
-        "tsType": "unknown",
+        "tsType": "ChatAvatarId",
         "source": "addVariable"
       },
       {
         "name": "invitee",
         "archiveContainer": "AutoVariable",
         "cppType": "ChatAvatarId",
-        "tsType": "unknown",
+        "tsType": "ChatAvatarId",
         "source": "addVariable"
       },
       {
@@ -3820,11 +4651,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 18,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChatOnInviteToRoom",
     "swgCrc32": "0x493fe74a",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatOnInviteToRoom"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatOnInviteToRoom.h"
     ],
@@ -3842,14 +4682,14 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "invitor",
         "archiveContainer": "AutoVariable",
         "cppType": "ChatAvatarId",
-        "tsType": "unknown",
+        "tsType": "ChatAvatarId",
         "source": "addVariable"
       },
       {
         "name": "invitee",
         "archiveContainer": "AutoVariable",
         "cppType": "ChatAvatarId",
-        "tsType": "unknown",
+        "tsType": "ChatAvatarId",
         "source": "addVariable"
       },
       {
@@ -3859,11 +4699,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 18,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChatOnKickAvatarFromRoom",
     "swgCrc32": "0x46a13d6c",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatOnKickAvatarFromRoom"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatOnKickAvatarFromRoom.h"
     ],
@@ -3874,14 +4723,14 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "avatarId",
         "archiveContainer": "AutoVariable",
         "cppType": "ChatAvatarId",
-        "tsType": "unknown",
+        "tsType": "ChatAvatarId",
         "source": "addVariable"
       },
       {
         "name": "removerId",
         "archiveContainer": "AutoVariable",
         "cppType": "ChatAvatarId",
-        "tsType": "unknown",
+        "tsType": "ChatAvatarId",
         "source": "addVariable"
       },
       {
@@ -3898,11 +4747,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 18,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChatOnLeaveRoom",
     "swgCrc32": "0x60b5098b",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatOnLeaveRoom"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatOnLeaveRoom.h"
     ],
@@ -3913,7 +4771,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "characterName",
         "archiveContainer": "AutoVariable",
         "cppType": "ChatAvatarId",
-        "tsType": "unknown",
+        "tsType": "ChatAvatarId",
         "source": "addVariable"
       },
       {
@@ -3937,11 +4795,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 18,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChatOnReceiveRoomInvitation",
     "swgCrc32": "0xc17eb06d",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatOnReceiveRoomInvitation"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatOnReceiveRoomInvitation.h"
     ],
@@ -3952,7 +4819,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "invitorAvatar",
         "archiveContainer": "AutoVariable",
         "cppType": "ChatAvatarId",
-        "tsType": "unknown",
+        "tsType": "ChatAvatarId",
         "source": "addVariable"
       },
       {
@@ -3962,11 +4829,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 8,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChatOnRemoveModeratorFromRoom",
     "swgCrc32": "0x1342fc47",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatOnRemoveModeratorFromRoom"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatOnRemoveModeratorFromRoom.h"
     ],
@@ -3977,14 +4853,14 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "avatarId",
         "archiveContainer": "AutoVariable",
         "cppType": "ChatAvatarId",
-        "tsType": "unknown",
+        "tsType": "ChatAvatarId",
         "source": "addVariable"
       },
       {
         "name": "removerId",
         "archiveContainer": "AutoVariable",
         "cppType": "ChatAvatarId",
-        "tsType": "unknown",
+        "tsType": "ChatAvatarId",
         "source": "addVariable"
       },
       {
@@ -4008,11 +4884,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 22,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChatOnRequestLog",
     "swgCrc32": "0xed546792",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatOnRequestLog"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatOnRequestLog.h"
     ],
@@ -4023,7 +4908,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "logEntries",
         "archiveContainer": "AutoArray",
         "cppType": "ChatLogEntry",
-        "tsType": "unknown",
+        "tsType": "unknown[]",
         "source": "addVariable"
       },
       {
@@ -4033,11 +4918,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 8,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChatOnSendInstantMessage",
     "swgCrc32": "0x88dbb381",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatOnSendInstantMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatOnSendInstantMessage.h"
     ],
@@ -4058,11 +4952,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 8,
+      "minBytes": 8
+    }
   },
   {
     "name": "ChatOnSendPersistentMessage",
     "swgCrc32": "0x94e7a7ae",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatOnSendPersistentMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatOnSendPersistentMessage.h"
     ],
@@ -4083,11 +4986,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 8,
+      "minBytes": 8
+    }
   },
   {
     "name": "ChatOnSendRoomInvitation",
     "swgCrc32": "0x25b3aee6",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatOnSendRoomInvitation"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatOnSendRoomInvitation.h"
     ],
@@ -4108,11 +5020,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 8,
+      "minBytes": 8
+    }
   },
   {
     "name": "ChatOnSendRoomMessage",
     "swgCrc32": "0xe7b61633",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatOnSendRoomMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatOnSendRoomMessage.h"
     ],
@@ -4133,11 +5054,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 8,
+      "minBytes": 8
+    }
   },
   {
     "name": "ChatOnUnbanAvatarFromRoom",
     "swgCrc32": "0xbaf9b815",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatOnUnbanAvatarFromRoom"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatOnUnbanAvatarFromRoom.h"
     ],
@@ -4155,14 +5085,14 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "banner",
         "archiveContainer": "AutoVariable",
         "cppType": "ChatAvatarId",
-        "tsType": "unknown",
+        "tsType": "ChatAvatarId",
         "source": "addVariable"
       },
       {
         "name": "bannee",
         "archiveContainer": "AutoVariable",
         "cppType": "ChatAvatarId",
-        "tsType": "unknown",
+        "tsType": "ChatAvatarId",
         "source": "addVariable"
       },
       {
@@ -4179,11 +5109,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 22,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChatOnUninviteFromRoom",
     "swgCrc32": "0xbe33c7e8",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatOnUninviteFromRoom"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatOnUninviteFromRoom.h"
     ],
@@ -4201,14 +5140,14 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "invitor",
         "archiveContainer": "AutoVariable",
         "cppType": "ChatAvatarId",
-        "tsType": "unknown",
+        "tsType": "ChatAvatarId",
         "source": "addVariable"
       },
       {
         "name": "invitee",
         "archiveContainer": "AutoVariable",
         "cppType": "ChatAvatarId",
-        "tsType": "unknown",
+        "tsType": "ChatAvatarId",
         "source": "addVariable"
       },
       {
@@ -4225,11 +5164,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 22,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChatPersistentMessageToClient",
     "swgCrc32": "0x08485e17",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatPersistentMessageToClient"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatPersistentMessageToClient.h"
     ],
@@ -4240,14 +5188,23 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "data",
         "archiveContainer": "AutoVariable",
         "cppType": "Data",
-        "tsType": "unknown",
+        "tsType": "Uint8Array",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 4,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChatPersistentMessageToServer",
     "swgCrc32": "0x25a29fa6",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatPersistentMessageToServer"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatPersistentMessageToServer.h"
     ],
@@ -4286,14 +5243,23 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "toCharacterName",
         "archiveContainer": "AutoVariable",
         "cppType": "ChatAvatarId",
-        "tsType": "unknown",
+        "tsType": "ChatAvatarId",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 22,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChatPutAvatarInRoom",
     "swgCrc32": "0xae9d52ae",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatPutAvatarInRoom"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatPutAvatarInRoom.h"
     ],
@@ -4328,11 +5294,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 6,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChatQueryRoom",
     "swgCrc32": "0x9cf2b192",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatQueryRoom"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatQueryRoom.h"
     ],
@@ -4353,11 +5328,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 6,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChatQueryRoomResults",
     "swgCrc32": "0xc4de864e",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatQueryRoomResults"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatQueryRoomResults.h"
     ],
@@ -4368,28 +5352,28 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "avatars",
         "archiveContainer": "AutoArray",
         "cppType": "ChatAvatarId",
-        "tsType": "unknown",
+        "tsType": "ChatAvatarId[]",
         "source": "addVariable"
       },
       {
         "name": "invitees",
         "archiveContainer": "AutoArray",
         "cppType": "ChatAvatarId",
-        "tsType": "unknown",
+        "tsType": "ChatAvatarId[]",
         "source": "addVariable"
       },
       {
         "name": "moderators",
         "archiveContainer": "AutoArray",
         "cppType": "ChatAvatarId",
-        "tsType": "unknown",
+        "tsType": "ChatAvatarId[]",
         "source": "addVariable"
       },
       {
         "name": "banned",
         "archiveContainer": "AutoArray",
         "cppType": "ChatAvatarId",
-        "tsType": "unknown",
+        "tsType": "ChatAvatarId[]",
         "source": "addVariable"
       },
       {
@@ -4403,14 +5387,23 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "roomData",
         "archiveContainer": "AutoVariable",
         "cppType": "ChatRoomData",
-        "tsType": "unknown",
+        "tsType": "ChatRoomData",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 55,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChatRemoveAvatarFromRoom",
     "swgCrc32": "0x493e3ffa",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatRemoveAvatarFromRoom"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatRemoveAvatarFromRoom.h"
     ],
@@ -4421,7 +5414,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "avatarId",
         "archiveContainer": "AutoVariable",
         "cppType": "ChatAvatarId",
-        "tsType": "unknown",
+        "tsType": "ChatAvatarId",
         "source": "addVariable"
       },
       {
@@ -4431,11 +5424,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 8,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChatRemoveFriend",
     "swgCrc32": "0xc7d647a2",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatRemoveFriend"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatRemoveFriend.h"
     ],
@@ -4446,14 +5448,23 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "characterName",
         "archiveContainer": "AutoVariable",
         "cppType": "ChatAvatarId",
-        "tsType": "unknown",
+        "tsType": "ChatAvatarId",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 6,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChatRemoveModeratorFromRoom",
     "swgCrc32": "0x8a3f8e04",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatRemoveModeratorFromRoom"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatRemoveModeratorFromRoom.h"
     ],
@@ -4464,7 +5475,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "avatarId",
         "archiveContainer": "AutoVariable",
         "cppType": "ChatAvatarId",
-        "tsType": "unknown",
+        "tsType": "ChatAvatarId",
         "source": "addVariable"
       },
       {
@@ -4481,11 +5492,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 12,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChatRequestLog",
     "swgCrc32": "0xedb5c0e0",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatRequestLog"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatRequestLog.h"
     ],
@@ -4506,11 +5526,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 8,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChatRequestPersistentMessage",
     "swgCrc32": "0x07e3559f",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatRequestPersistentMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatRequestPersistentMessage.h"
     ],
@@ -4531,21 +5560,39 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 8,
+      "minBytes": 8
+    }
   },
   {
     "name": "ChatRequestRoomList",
     "swgCrc32": "0x4c3d2cfa",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatRequestRoomList"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatRequestRoomList.h"
     ],
     "implementedInTypescript": true,
     "fieldCount": 0,
-    "fields": []
+    "fields": [],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 0,
+      "minBytes": 0
+    }
   },
   {
     "name": "ChatRoomList",
     "swgCrc32": "0x70deb197",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatRoomList"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatRoomList.h"
     ],
@@ -4556,14 +5603,23 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "roomData",
         "archiveContainer": "AutoArray",
         "cppType": "ChatRoomData",
-        "tsType": "unknown",
+        "tsType": "ChatRoomData[]",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 4,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChatRoomMessage",
     "swgCrc32": "0xcd4ce444",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatRoomMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatRoomMessage.h"
     ],
@@ -4574,7 +5630,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "fromName",
         "archiveContainer": "AutoVariable",
         "cppType": "ChatAvatarId",
-        "tsType": "unknown",
+        "tsType": "ChatAvatarId",
         "source": "addVariable"
       },
       {
@@ -4598,11 +5654,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 18,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChatSendToRoom",
     "swgCrc32": "0x20e4dbe3",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatSendToRoom"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatSendToRoom.h"
     ],
@@ -4637,15 +5702,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 16,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChatServerOnline",
     "swgCrc32": "0xd0600e63",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatServerOnline"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/ChatServerOnline.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
@@ -4662,11 +5736,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 4,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChatServerStatus",
     "swgCrc32": "0x7102b15f",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatServerStatus"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatServerStatus.h"
     ],
@@ -4680,11 +5763,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 1,
+      "minBytes": 1
+    }
   },
   {
     "name": "ChatSystemMessage",
     "swgCrc32": "0x6d2a6413",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatSystemMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatSystemMessage.h"
     ],
@@ -4712,11 +5804,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 9,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChatUnbanAvatarFromRoom",
     "swgCrc32": "0x4c8f94a9",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatUnbanAvatarFromRoom"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatUnbanAvatarFromRoom.h"
     ],
@@ -4727,7 +5828,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "avatarId",
         "archiveContainer": "AutoVariable",
         "cppType": "ChatAvatarId",
-        "tsType": "unknown",
+        "tsType": "ChatAvatarId",
         "source": "addVariable"
       },
       {
@@ -4744,11 +5845,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 12,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChatUninviteFromRoom",
     "swgCrc32": "0xfc8d01f1",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChatUninviteFromRoom"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/chat/ChatUninviteFromRoom.h"
     ],
@@ -4759,7 +5869,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "avatar",
         "archiveContainer": "AutoVariable",
         "cppType": "ChatAvatarId",
-        "tsType": "unknown",
+        "tsType": "ChatAvatarId",
         "source": "addVariable"
       },
       {
@@ -4776,33 +5886,51 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 12,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChunkCompleteMessage",
     "swgCrc32": "0xd4edc601",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChunkCompleteMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/ChunkCompleteMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
         "name": "m_chunks",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoArray",
+        "cppType": "std::pair<int, int>",
+        "tsType": "[number, number][]",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 4,
+      "exactBytes": null
+    }
   },
   {
     "name": "ChunkObjectListMessage",
     "swgCrc32": "0xf6df9f36",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ChunkObjectListMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/ChunkObjectListMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
@@ -4816,18 +5944,27 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_ids",
         "archiveContainer": "AutoArray",
         "cppType": "NetworkId",
-        "tsType": "bigint",
+        "tsType": "bigint[]",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 8,
+      "exactBytes": null
+    }
   },
   {
     "name": "ClaimRewardsMessage",
     "swgCrc32": "0xb139f85c",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ClaimRewardsMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/ClaimRewardsMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 11,
     "fields": [
       {
@@ -4841,7 +5978,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_stationId",
         "archiveContainer": "AutoVariable",
         "cppType": "StationId",
-        "tsType": "unknown",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -4869,14 +6006,14 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_accountUniqueItems",
         "archiveContainer": "AutoArray",
         "cppType": "std::string",
-        "tsType": "string",
+        "tsType": "string[]",
         "source": "addVariable"
       },
       {
         "name": "m_additionalItems",
         "archiveContainer": "AutoArray",
         "cppType": "std::string",
-        "tsType": "string",
+        "tsType": "string[]",
         "source": "addVariable"
       },
       {
@@ -4907,15 +6044,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 36,
+      "exactBytes": null
+    }
   },
   {
     "name": "ClaimRewardsReplyMessage",
     "swgCrc32": "0xf7b0daec",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ClaimRewardsReplyMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/ClaimRewardsReplyMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 11,
     "fields": [
       {
@@ -4929,7 +6075,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_stationId",
         "archiveContainer": "AutoVariable",
         "cppType": "StationId",
-        "tsType": "unknown",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -4950,14 +6096,14 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_accountUniqueItems",
         "archiveContainer": "AutoArray",
         "cppType": "std::string",
-        "tsType": "string",
+        "tsType": "string[]",
         "source": "addVariable"
       },
       {
         "name": "m_additionalItems",
         "archiveContainer": "AutoArray",
         "cppType": "std::string",
-        "tsType": "string",
+        "tsType": "string[]",
         "source": "addVariable"
       },
       {
@@ -4995,22 +6141,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 40,
+      "exactBytes": null
+    }
   },
   {
     "name": "CleanupInvalidItemRetrievalMessage",
     "swgCrc32": "0x2beeb2e9",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "CleanupInvalidItemRetrievalMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/CleanupInvalidItemRetrievalMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 3,
     "fields": [
       {
         "name": "m_responseId",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariable",
+        "cppType": "int",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -5027,11 +6182,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 16,
+      "minBytes": 16
+    }
   },
   {
     "name": "ClientCreateCharacter",
     "swgCrc32": "0xb97f3074",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ClientCreateCharacter"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/ClientCentralMessages.h"
     ],
@@ -5129,15 +6293,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 30,
+      "exactBytes": null
+    }
   },
   {
     "name": "ClientCreateCharacterFailed",
     "swgCrc32": "0xdf333c6e",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ClientCreateCharacterFailed"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/ClientCentralMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
@@ -5151,18 +6324,27 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_errorMessage",
         "archiveContainer": "AutoVariable",
         "cppType": "StringId",
-        "tsType": "unknown",
+        "tsType": "{ table: string; textIndex: number; text: string }",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 12,
+      "exactBytes": null
+    }
   },
   {
     "name": "ClientCreateCharacterSuccess",
-    "swgCrc32": "0x1db575cc",
+    "swgCrc32": "0xdf333c6e",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ClientCreateCharacterFailed"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/ClientCentralMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
@@ -5172,11 +6354,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 8,
+      "minBytes": 8
+    }
   },
   {
     "name": "ClientIdMsg",
     "swgCrc32": "0xd5899226",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ClientIdMsg"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/ClientCentralMessages.h"
     ],
@@ -5194,7 +6385,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "token",
         "archiveContainer": "AutoArray",
         "cppType": "unsigned char",
-        "tsType": "number",
+        "tsType": "number[]",
         "source": "addVariable"
       },
       {
@@ -5204,11 +6395,18 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 10,
+      "exactBytes": null
+    }
   },
   {
     "name": "ClientMfdStatusUpdateMessage",
     "swgCrc32": "0x2d2d6ee1",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/ClientMfdStatusUpdateMessage.h"
     ],
@@ -5233,14 +6431,23 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_worldCoordinates",
         "archiveContainer": "AutoVariable",
         "cppType": "Vector",
-        "tsType": "unknown",
+        "tsType": "{ x: number; y: number; z: number }",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 22,
+      "exactBytes": null
+    }
   },
   {
     "name": "ClientNotificationBoxMessage",
     "swgCrc32": "0x90cf7e03",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ClientNotificationBoxMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/common/ClientNotificationBoxMessage.h"
     ],
@@ -5303,11 +6510,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 31,
+      "exactBytes": null
+    }
   },
   {
     "name": "ClientOpenContainerMessage",
     "swgCrc32": "0xdca57409",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ClientOpenContainerMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/ClientOpenContainerMessage.h"
     ],
@@ -5328,11 +6544,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 10,
+      "exactBytes": null
+    }
   },
   {
     "name": "ClientPermissionsMessage",
     "swgCrc32": "0xe00730e5",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ClientPermissionsMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/ClientPermissionsMessage.h"
     ],
@@ -5367,11 +6592,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 4,
+      "minBytes": 4
+    }
   },
   {
     "name": "ClientRandomNameRequest",
     "swgCrc32": "0xd6d1b6d1",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ClientRandomNameRequest"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/ClientCentralMessages.h"
     ],
@@ -5385,11 +6619,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 2,
+      "exactBytes": null
+    }
   },
   {
     "name": "ClientRandomNameResponse",
     "swgCrc32": "0xe85fb868",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ClientRandomNameResponse"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/ClientCentralMessages.h"
     ],
@@ -5414,14 +6657,23 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_errorMessage",
         "archiveContainer": "AutoVariable",
         "cppType": "StringId",
-        "tsType": "unknown",
+        "tsType": "{ table: string; textIndex: number; text: string }",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 14,
+      "exactBytes": null
+    }
   },
   {
     "name": "ClientVerifyAndLockNameRequest",
     "swgCrc32": "0x9eb04b9f",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ClientVerifyAndLockNameRequest"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/ClientCentralMessages.h"
     ],
@@ -5442,11 +6694,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 6,
+      "exactBytes": null
+    }
   },
   {
     "name": "ClientVerifyAndLockNameResponse",
     "swgCrc32": "0x9b2c6ba7",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ClientVerifyAndLockNameResponse"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/ClientCentralMessages.h"
     ],
@@ -5464,28 +6725,42 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_errorMessage",
         "archiveContainer": "AutoVariable",
         "cppType": "StringId",
-        "tsType": "unknown",
+        "tsType": "{ table: string; textIndex: number; text: string }",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 12,
+      "exactBytes": null
+    }
   },
   {
     "name": "CloseHolocronMessage",
     "swgCrc32": "0xc0938a9d",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/CloseHolocronMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 0,
-    "fields": []
+    "fields": [],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 0,
+      "minBytes": 0
+    }
   },
   {
     "name": "ClusterWideDataGetElementMessage",
     "swgCrc32": "0x074406f8",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/common/ClusterWideDataGetElementMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 4,
     "fields": [
       {
@@ -5516,15 +6791,22 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 9,
+      "exactBytes": null
+    }
   },
   {
     "name": "ClusterWideDataGetElementResponseMessage",
     "swgCrc32": "0x9745c2ba",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/common/ClusterWideDataGetElementResponseMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 6,
     "fields": [
       {
@@ -5559,25 +6841,32 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_elementNameList",
         "archiveContainer": "AutoArray",
         "cppType": "std::string",
-        "tsType": "string",
+        "tsType": "string[]",
         "source": "addVariable"
       },
       {
         "name": "m_elementDictionaryList",
         "archiveContainer": "AutoArray",
         "cppType": "ValueDictionary",
-        "tsType": "unknown",
+        "tsType": "Map<string, { type: \"bool\" | \"float\" | \"object id\" | \"signed int\" | \"string\"; value: boolean | number | bigint | string }>[]",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 20,
+      "exactBytes": null
+    }
   },
   {
     "name": "ClusterWideDataReleaseLockMessage",
     "swgCrc32": "0x27ebe6b0",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/common/ClusterWideDataReleaseLockMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
@@ -5594,15 +6883,22 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 6,
+      "exactBytes": null
+    }
   },
   {
     "name": "ClusterWideDataRemoveElementMessage",
     "swgCrc32": "0x0f887a9a",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/common/ClusterWideDataRemoveElementMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 3,
     "fields": [
       {
@@ -5626,15 +6922,22 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 8,
+      "exactBytes": null
+    }
   },
   {
     "name": "ClusterWideDataUpdateDictionaryMessage",
     "swgCrc32": "0xa3edb019",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/common/ClusterWideDataUpdateDictionaryMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 6,
     "fields": [
       {
@@ -5655,7 +6958,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_dictionary",
         "archiveContainer": "AutoVariable",
         "cppType": "ValueDictionary",
-        "tsType": "unknown",
+        "tsType": "Map<string, { type: \"bool\" | \"float\" | \"object id\" | \"signed int\" | \"string\"; value: boolean | number | bigint | string }>",
         "source": "addVariable"
       },
       {
@@ -5679,22 +6982,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 14,
+      "exactBytes": null
+    }
   },
   {
     "name": "CMCreateAuctionBidMessage",
     "swgCrc32": "0xd016ea8d",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "CMCreateAuctionBidMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/commoditiesSwgDatabase/CMCreateAuctionBidMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 4,
     "fields": [
       {
         "name": "m_itemId",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariable",
+        "cppType": "NetworkId",
+        "tsType": "bigint",
         "source": "addVariable"
       },
       {
@@ -5718,22 +7030,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 24,
+      "minBytes": 24
+    }
   },
   {
     "name": "CMCreateAuctionMessage",
     "swgCrc32": "0x5d13287d",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "CMCreateAuctionMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/commoditiesSwgDatabase/CMCreateAuctionMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 17,
     "fields": [
       {
         "name": "m_creatorId",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariable",
+        "cppType": "NetworkId",
+        "tsType": "bigint",
         "source": "addVariable"
       },
       {
@@ -5775,7 +7096,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_attributes",
         "archiveContainer": "AutoArray",
         "cppType": "std::pair<std::string, Unicode::String>",
-        "tsType": "[string, string]",
+        "tsType": "[string, string][]",
         "source": "addVariable"
       },
       {
@@ -5848,22 +7169,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 84,
+      "exactBytes": null
+    }
   },
   {
     "name": "CMCreateLocationMessage",
     "swgCrc32": "0x204fd8c8",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "CMCreateLocationMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/commoditiesSwgDatabase/CMCreateLocationMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 11,
     "fields": [
       {
         "name": "m_locationId",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariable",
+        "cppType": "NetworkId",
+        "tsType": "bigint",
         "source": "addVariable"
       },
       {
@@ -5936,57 +7266,89 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 51,
+      "exactBytes": null
+    }
   },
   {
     "name": "CMDeleteAuctionMessage",
     "swgCrc32": "0x80f56d35",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "CMDeleteAuctionMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/commoditiesSwgDatabase/CMDeleteAuctionMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
         "name": "m_itemId",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariable",
+        "cppType": "NetworkId",
+        "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 8,
+      "minBytes": 8
+    }
   },
   {
     "name": "CMDeleteLocationMessage",
     "swgCrc32": "0xe65c5df2",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "CMDeleteLocationMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/commoditiesSwgDatabase/CMDeleteLocationMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
         "name": "m_locationId",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariable",
+        "cppType": "NetworkId",
+        "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 8,
+      "minBytes": 8
+    }
   },
   {
     "name": "CmdSceneReady",
     "swgCrc32": "0x43fd1c22",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/CommandChannelMessages.h"
     ],
     "implementedInTypescript": true,
     "fieldCount": 0,
-    "fields": []
+    "fields": [],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 0,
+      "minBytes": 0
+    }
   },
   {
     "name": "CmdStartScene",
     "swgCrc32": "0x3ae6dfae",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/CommandChannelMessages.h"
     ],
@@ -6018,7 +7380,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "startPosition",
         "archiveContainer": "AutoVariable",
         "cppType": "Vector",
-        "tsType": "unknown",
+        "tsType": "{ x: number; y: number; z: number }",
         "source": "addVariable"
       },
       {
@@ -6049,22 +7411,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 41,
+      "exactBytes": null
+    }
   },
   {
     "name": "CMUpdateAuctionMessage",
     "swgCrc32": "0x3d2715f7",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "CMUpdateAuctionMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/commoditiesSwgDatabase/CMUpdateAuctionMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 3,
     "fields": [
       {
         "name": "m_itemId",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariable",
+        "cppType": "NetworkId",
+        "tsType": "bigint",
         "source": "addVariable"
       },
       {
@@ -6081,22 +7452,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 20,
+      "minBytes": 20
+    }
   },
   {
     "name": "CMUpdateLocationMessage",
     "swgCrc32": "0xb8d7945f",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "CMUpdateLocationMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/commoditiesSwgDatabase/CMUpdateLocationMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 11,
     "fields": [
       {
         "name": "m_locationId",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariable",
+        "cppType": "NetworkId",
+        "tsType": "bigint",
         "source": "addVariable"
       },
       {
@@ -6169,15 +7549,22 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 51,
+      "exactBytes": null
+    }
   },
   {
     "name": "CombatActionCompleteMessage",
     "swgCrc32": "0xef145a2b",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "game/shared/library/swgSharedNetworkMessages/src/shared/combat/CombatActionCompleteMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
@@ -6187,22 +7574,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 4,
+      "minBytes": 4
+    }
   },
   {
     "name": "CommoditiesLoadDoneMessage",
-    "swgCrc32": "0x48842a81",
+    "swgCrc32": "0x07a76171",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "CommoditiesLoadDone"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/commoditiesSwgDatabase/CommoditiesLoadDoneMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 4,
     "fields": [
       {
         "name": "m_auctionLocationsCount",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariable",
+        "cppType": "int",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -6226,11 +7622,18 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 16,
+      "minBytes": 16
+    }
   },
   {
     "name": "ConGenericMessage",
     "swgCrc32": "0x08c5fc76",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/ConsoleChannelMessages.h"
     ],
@@ -6251,15 +7654,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 6,
+      "exactBytes": null
+    }
   },
   {
     "name": "ConnectionCreateCharacter",
     "swgCrc32": "0xdd45ad94",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ConnectionCreateCharacter"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralConnectionServer/CentralConnectionServerMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 17,
     "fields": [
       {
@@ -6381,15 +7793,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 40,
+      "exactBytes": null
+    }
   },
   {
     "name": "ConnectionCreateCharacterFailed",
     "swgCrc32": "0xf1f8f8fc",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ConnectionCreateCharacterFailed"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralConnectionServer/CentralConnectionServerMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 4,
     "fields": [
       {
@@ -6410,7 +7831,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_errorMessage",
         "archiveContainer": "AutoVariable",
         "cppType": "StringId",
-        "tsType": "unknown",
+        "tsType": "{ table: string; textIndex: number; text: string }",
         "source": "addVariable"
       },
       {
@@ -6420,15 +7841,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 18,
+      "exactBytes": null
+    }
   },
   {
     "name": "ConnectionCreateCharacterSuccess",
     "swgCrc32": "0x72dcf126",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ConnectionCreateCharacterSuccess"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralConnectionServer/CentralConnectionServerMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
@@ -6445,33 +7875,49 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 12,
+      "minBytes": 12
+    }
   },
   {
     "name": "ConnectionKeyPush",
     "swgCrc32": "0x2058a4e0",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ConnectionKeyPush"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralConnectionServer/CentralConnectionServerMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
         "name": "key",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariableKeyShare",
+        "cppType": "KeyShare::Key",
+        "tsType": "Uint8Array",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 16,
+      "minBytes": 16
+    }
   },
   {
     "name": "ConnectionRandomNameRequest",
     "swgCrc32": "0x94487654",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralConnectionServer/CentralConnectionServerMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
@@ -6488,15 +7934,22 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "declarationOnly"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 6,
+      "exactBytes": null
+    }
   },
   {
     "name": "ConnectionRandomNameResponse",
     "swgCrc32": "0x4c9b7671",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralConnectionServer/CentralConnectionServerMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 3,
     "fields": [
       {
@@ -6520,15 +7973,22 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "declarationOnly"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 10,
+      "exactBytes": null
+    }
   },
   {
     "name": "ConnectionServerAddress",
     "swgCrc32": "0x0b723e12",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/CentralGameServerMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
@@ -6545,15 +8005,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "declarationOnly"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 4,
+      "exactBytes": null
+    }
   },
   {
     "name": "ConnectionServerDown",
     "swgCrc32": "0xc51b4b25",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ConnectionServerDown"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/loginCentralServer/ConnectionServerDown.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
@@ -6563,15 +8032,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 4,
+      "minBytes": 4
+    }
   },
   {
     "name": "ConnectionServerId",
     "swgCrc32": "0xf6409bb5",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ConnectionServerId"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralConnectionServer/CentralConnectionServerMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
@@ -6581,11 +8059,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 4,
+      "minBytes": 4
+    }
   },
   {
     "name": "ConnectPlayerMessage",
     "swgCrc32": "0x2e365218",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ConnectPlayerMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/customerService/ConnectPlayerMessage.h"
     ],
@@ -6599,11 +8086,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 4,
+      "minBytes": 4
+    }
   },
   {
     "name": "ConnectPlayerResponseMessage",
     "swgCrc32": "0x6137556f",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ConnectPlayerResponseMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/customerService/ConnectPlayerResponseMessage.h"
     ],
@@ -6617,15 +8113,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 4,
+      "minBytes": 4
+    }
   },
   {
     "name": "ConnEnumerateCharacterId",
     "swgCrc32": "0xc71333e9",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ConnEnumerateCharacterId"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralConnectionServer/CentralConnectionServerMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 4,
     "fields": [
       {
@@ -6656,22 +8161,29 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 12,
+      "exactBytes": null
+    }
   },
   {
     "name": "ConsentRequestMessage",
     "swgCrc32": "0x99dcb094",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "game/shared/library/swgSharedNetworkMessages/src/shared/consent/ConsentRequestMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
         "name": "m_question",
         "archiveContainer": "AutoVariable",
         "cppType": "ProsePackage",
-        "tsType": "unknown",
+        "tsType": "{ stringId: { table: string; textIndex: number; text: string }; actor: { id: bigint; stringId: { table: string; textIndex: number; text: string }; str: string }; target: { id: bigint; stringId: { table: string; textIndex: number; text: string }; str: string }; other: { id: bigint; stringId: { table: string; textIndex: number; text: string }; str: string }; digitInteger: number; digitFloat: number; complexGrammar: boolean }",
         "source": "addVariable"
       },
       {
@@ -6681,11 +8193,18 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 81,
+      "exactBytes": null
+    }
   },
   {
     "name": "ConsentResponseMessage",
     "swgCrc32": "0x6fc16ae8",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/ConsentResponseMessage.h"
     ],
@@ -6713,15 +8232,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 13,
+      "minBytes": 13
+    }
   },
   {
     "name": "ControlAssumed",
     "swgCrc32": "0x152bbdaa",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ControlAssumed"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameConnectionServer/GameConnectionServerMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 7,
     "fields": [
       {
@@ -6749,7 +8277,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_startPosition",
         "archiveContainer": "AutoVariable",
         "cppType": "Vector",
-        "tsType": "unknown",
+        "tsType": "{ x: number; y: number; z: number }",
         "source": "addVariable"
       },
       {
@@ -6773,11 +8301,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 37,
+      "exactBytes": null
+    }
   },
   {
     "name": "CreateAuctionMessage",
     "swgCrc32": "0xad47021d",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "CreateAuctionMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/CreateAuctionMessage.h"
     ],
@@ -6833,11 +8370,18 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 33,
+      "exactBytes": null
+    }
   },
   {
     "name": "CreateAuctionResponseMessage",
     "swgCrc32": "0x0e61cc92",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/CreateAuctionResponseMessage.h"
     ],
@@ -6865,11 +8409,18 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 14,
+      "exactBytes": null
+    }
   },
   {
     "name": "CreateClientPathMessage",
     "swgCrc32": "0x71957628",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/CreateClientPathMessage.h"
     ],
@@ -6880,14 +8431,21 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_pointList",
         "archiveContainer": "AutoArray",
         "cppType": "Vector",
-        "tsType": "unknown",
+        "tsType": "{ x: number; y: number; z: number }[]",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 4,
+      "exactBytes": null
+    }
   },
   {
     "name": "CreateClientProjectileLocationToObjectMessage",
     "swgCrc32": "0x3643d394",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/ClientEffectMessages.h"
     ],
@@ -6905,7 +8463,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_startLocation",
         "archiveContainer": "AutoVariable",
         "cppType": "Vector",
-        "tsType": "unknown",
+        "tsType": "{ x: number; y: number; z: number }",
         "source": "addVariable"
       },
       {
@@ -6957,11 +8515,18 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 45,
+      "exactBytes": null
+    }
   },
   {
     "name": "CreateClientProjectileMessage",
     "swgCrc32": "0xa37e7199",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/ClientEffectMessages.h"
     ],
@@ -7052,11 +8617,18 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 47,
+      "exactBytes": null
+    }
   },
   {
     "name": "CreateClientProjectileObjectToLocationMessage",
     "swgCrc32": "0xcfdf929d",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/ClientEffectMessages.h"
     ],
@@ -7095,7 +8667,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_targetLocation",
         "archiveContainer": "AutoVariable",
         "cppType": "Vector",
-        "tsType": "unknown",
+        "tsType": "{ x: number; y: number; z: number }",
         "source": "addVariable"
       },
       {
@@ -7126,11 +8698,18 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 45,
+      "exactBytes": null
+    }
   },
   {
     "name": "CreateClientProjectileObjectToObjectMessage",
     "swgCrc32": "0xaf90d564",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/ClientEffectMessages.h"
     ],
@@ -7207,15 +8786,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 43,
+      "exactBytes": null
+    }
   },
   {
     "name": "CreateDynamicRegionCircleMessage",
     "swgCrc32": "0x8aca52c9",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "CreateDynamicRegionCircleMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameGameServer/CreateDynamicRegionCircleMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 15,
     "fields": [
       {
@@ -7323,15 +8911,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 52,
+      "exactBytes": null
+    }
   },
   {
     "name": "CreateDynamicRegionRectangleMessage",
     "swgCrc32": "0xb8564783",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "CreateDynamicRegionRectangleMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameGameServer/CreateDynamicRegionRectangleMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 16,
     "fields": [
       {
@@ -7446,15 +9043,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 56,
+      "exactBytes": null
+    }
   },
   {
     "name": "CreateDynamicSpawnRegionCircleMessage",
     "swgCrc32": "0x5236e904",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "CreateDynamicSpawnRegionCircleMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameGameServer/CreateDynamicSpawnRegionCircleMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 18,
     "fields": [
       {
@@ -7583,36 +9189,54 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 62,
+      "exactBytes": null
+    }
   },
   {
     "name": "CreateGroupMessage",
     "swgCrc32": "0x4e652ea3",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "CreateGroupMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameGameServer/CreateGroupMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
         "name": "m_leader",
         "archiveContainer": "AutoVariable",
         "cppType": "GroupMemberParam",
-        "tsType": "unknown",
+        "tsType": "{ m_memberId: bigint; m_memberName: string; m_memberDifficulty: number; m_memberProfession: number; m_memberIsPC: boolean; m_memberShipId: bigint; m_memberShipIsPOB: boolean; m_memberOwnsPOB: boolean }",
         "source": "addVariable"
       },
       {
         "name": "m_members",
         "archiveContainer": "AutoVariable",
         "cppType": "std::vector<GroupMemberParam>",
-        "tsType": "unknown[]",
+        "tsType": "{ m_memberId: bigint; m_memberName: string; m_memberDifficulty: number; m_memberProfession: number; m_memberIsPC: boolean; m_memberShipId: bigint; m_memberShipIsPOB: boolean; m_memberOwnsPOB: boolean }[]",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 30,
+      "exactBytes": null
+    }
   },
   {
     "name": "CreateImmediateAuctionMessage",
     "swgCrc32": "0x1e9ce308",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "CreateImmediateAuctionMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/CreateImmediateAuctionMessage.h"
     ],
@@ -7675,11 +9299,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 34,
+      "exactBytes": null
+    }
   },
   {
     "name": "CreateMissileMessage",
     "swgCrc32": "0x721cf08b",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "CreateMissileMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/CreateMissileMessage.h"
     ],
@@ -7711,14 +9344,14 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_sourceLocation",
         "archiveContainer": "AutoVariable",
         "cppType": "Vector",
-        "tsType": "unknown",
+        "tsType": "{ x: number; y: number; z: number }",
         "source": "addVariable"
       },
       {
         "name": "m_targetLocation",
         "archiveContainer": "AutoVariable",
         "cppType": "Vector",
-        "tsType": "unknown",
+        "tsType": "{ x: number; y: number; z: number }",
         "source": "addVariable"
       },
       {
@@ -7749,11 +9382,18 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 60,
+      "minBytes": 60
+    }
   },
   {
     "name": "CreateNebulaLightningMessage",
     "swgCrc32": "0x65f27987",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/CreateNebulaLightningMessage.h"
     ],
@@ -7764,18 +9404,27 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_nebulaLightningData",
         "archiveContainer": "AutoVariable",
         "cppType": "NebulaLightningData",
-        "tsType": "unknown",
+        "tsType": "{ lightningId: number; nebulaId: number; syncStampStart: number; syncStampEnd: number; endpoint0: { x: number; y: number; z: number }; endpoint1: { x: number; y: number; z: number } }",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 38,
+      "minBytes": 38
+    }
   },
   {
     "name": "CreateNewObjectMessage",
     "swgCrc32": "0x4ce9b7a0",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "CreateNewObjectMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/CreateNewObjectMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 4,
     "fields": [
       {
@@ -7803,18 +9452,27 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_pos",
         "archiveContainer": "AutoVariable",
         "cppType": "Vector",
-        "tsType": "unknown",
+        "tsType": "{ x: number; y: number; z: number }",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 26,
+      "exactBytes": null
+    }
   },
   {
     "name": "CreateObjectByCrcMessage",
     "swgCrc32": "0xdde01fab",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "CreateObjectByCrcMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameGameServer/CreateObjectMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 5,
     "fields": [
       {
@@ -7835,7 +9493,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_objType",
         "archiveContainer": "AutoVariable",
         "cppType": "Tag",
-        "tsType": "unknown",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -7852,11 +9510,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 25,
+      "minBytes": 25
+    }
   },
   {
     "name": "CreateProjectileMessage",
     "swgCrc32": "0xb88af9a5",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "CreateProjectileMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/CreateProjectileMessage.h"
     ],
@@ -7895,14 +9562,14 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_startPosition_p",
         "archiveContainer": "AutoVariable",
         "cppType": "PackedPosition",
-        "tsType": "unknown",
+        "tsType": "{ x: number; y: number; z: number }",
         "source": "addVariable"
       },
       {
         "name": "m_direction_p",
         "archiveContainer": "AutoVariable",
         "cppType": "PackedPosition",
-        "tsType": "unknown",
+        "tsType": "{ x: number; y: number; z: number }",
         "source": "addVariable"
       },
       {
@@ -7912,15 +9579,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 21,
+      "minBytes": 21
+    }
   },
   {
     "name": "CreateSyncUiMessage",
     "swgCrc32": "0x1bf4a460",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "CreateSyncUiMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameGameServer/CreateSyncUiMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
@@ -7934,14 +9610,23 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_clients",
         "archiveContainer": "AutoDeltaVector",
         "cppType": "NetworkId",
-        "tsType": "bigint",
+        "tsType": "bigint[]",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 12,
+      "exactBytes": null
+    }
   },
   {
     "name": "CreateTicketMessage",
     "swgCrc32": "0x40e64dac",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "CreateTicketMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/customerService/CreateTicketMessage.h"
     ],
@@ -8011,11 +9696,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 29,
+      "exactBytes": null
+    }
   },
   {
     "name": "CreateTicketResponseMessage",
     "swgCrc32": "0x550a407a",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "CreateTicketResponseMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/customerService/CreateTicketResponseMessage.h"
     ],
@@ -8036,22 +9730,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 8,
+      "minBytes": 8
+    }
   },
   {
     "name": "CreateVendorMarketMessage",
     "swgCrc32": "0x1e687b02",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "CreateVendorMarketMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/CreateVendorMarketMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 6,
     "fields": [
       {
         "name": "m_responseId",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariable",
+        "cppType": "int",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -8089,15 +9792,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 26,
+      "exactBytes": null
+    }
   },
   {
     "name": "CSGetCharactersRequestMessage",
     "swgCrc32": "0xf8b5ab70",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "CSGetCharactersRequestMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/CSDBNetMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 5,
     "fields": [
       {
@@ -8135,15 +9847,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 20,
+      "minBytes": 20
+    }
   },
   {
     "name": "CSGetDeletedItemsRequestMessage",
     "swgCrc32": "0x5c56e37a",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "CSGetDeletedItemsRequestMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/CSDBNetMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 5,
     "fields": [
       {
@@ -8181,15 +9902,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 20,
+      "minBytes": 20
+    }
   },
   {
     "name": "CSToolRequest",
     "swgCrc32": "0xfd4baef3",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "CSToolRequest"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/loginCentralServer/CSToolRequest.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 6,
     "fields": [
       {
@@ -8234,15 +9964,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 18,
+      "exactBytes": null
+    }
   },
   {
     "name": "CSToolResponse",
     "swgCrc32": "0xc12fe7e9",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "CSToolResponse"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/loginCentralServer/CSToolResponse.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 3,
     "fields": [
       {
@@ -8266,15 +10005,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 10,
+      "exactBytes": null
+    }
   },
   {
     "name": "DatabaseCreateCharacterSuccess",
     "swgCrc32": "0x5ff5569c",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "DatabaseCreateCharacterSuccess"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/CentralGameServerMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 5,
     "fields": [
       {
@@ -8288,7 +10036,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_stationId",
         "archiveContainer": "AutoVariable",
         "cppType": "StationId",
-        "tsType": "unknown",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -8312,25 +10060,43 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 21,
+      "exactBytes": null
+    }
   },
   {
     "name": "DatabaseSaveStart",
     "swgCrc32": "0x1e32bdff",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "DatabaseSaveStart"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/CentralGameServerMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 0,
-    "fields": []
+    "fields": [],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 0,
+      "minBytes": 0
+    }
   },
   {
     "name": "DBCSRequestMessage",
     "swgCrc32": "0xb328f51f",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "DBCSRequestMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/CSDBNetMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 6,
     "fields": [
       {
@@ -8375,22 +10141,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 20,
+      "exactBytes": null
+    }
   },
   {
     "name": "DebugTransformMessage",
     "swgCrc32": "0xd0cdaa62",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "DebugTransformMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/AIDebuggingMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
         "name": "m_transform",
         "archiveContainer": "AutoVariable",
         "cppType": "Transform",
-        "tsType": "unknown",
+        "tsType": "{ rotation: { x: number; y: number; z: number; w: number }; position: { x: number; y: number; z: number } }",
         "source": "addVariable"
       },
       {
@@ -8400,22 +10175,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 36,
+      "minBytes": 36
+    }
   },
   {
     "name": "DeleteAuctionLocationMessage",
     "swgCrc32": "0x8eb26b80",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "DeleteAuctionLocationMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/DeleteAuctionLocationMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 4,
     "fields": [
       {
         "name": "m_responseId",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariable",
+        "cppType": "int",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -8439,11 +10223,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 18,
+      "exactBytes": null
+    }
   },
   {
     "name": "DeleteCharacterMessage",
     "swgCrc32": "0xe87ad031",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "DeleteCharacterMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/DeleteCharacterMessage.h"
     ],
@@ -8464,11 +10257,18 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 12,
+      "minBytes": 12
+    }
   },
   {
     "name": "DeleteCharacterReplyMessage",
     "swgCrc32": "0x8268989b",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/DeleteCharacterReplyMessage.h"
     ],
@@ -8482,11 +10282,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 4,
+      "minBytes": 4
+    }
   },
   {
     "name": "DeltasMessage",
     "swgCrc32": "0x12862153",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "DeltasMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/common/DeltasMessage.h"
     ],
@@ -8504,7 +10313,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "typeId",
         "archiveContainer": "AutoVariable",
         "cppType": "Tag",
-        "tsType": "unknown",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -8518,34 +10327,57 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "package",
         "archiveContainer": "AutoVariable",
         "cppType": "Archive::ByteStream",
-        "tsType": "unknown",
+        "tsType": "Uint8Array",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 17,
+      "exactBytes": null
+    }
   },
   {
     "name": "DenyTradeMessage",
     "swgCrc32": "0x6ec28670",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "DenyTradeMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/SecureTradeMessages.h"
     ],
     "implementedInTypescript": true,
     "fieldCount": 0,
-    "fields": []
+    "fields": [],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 0,
+      "minBytes": 0
+    }
   },
   {
     "name": "DestroyClientPathMessage",
     "swgCrc32": "0xa75e85eb",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/DestroyClientPathMessage.h"
     ],
     "implementedInTypescript": true,
     "fieldCount": 0,
-    "fields": []
+    "fields": [],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 0,
+      "minBytes": 0
+    }
   },
   {
     "name": "DestroyShipComponentMessage",
     "swgCrc32": "0x3871d784",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/DestroyShipComponentMessage.h"
     ],
@@ -8573,11 +10405,18 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 16,
+      "minBytes": 16
+    }
   },
   {
     "name": "DestroyShipMessage",
     "swgCrc32": "0x5c680884",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/DestroyShipMessage.h"
     ],
@@ -8598,22 +10437,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 12,
+      "minBytes": 12
+    }
   },
   {
     "name": "DestroyVendorMarketMessage",
     "swgCrc32": "0xad27b09b",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "DestroyVendorMarketMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/DestroyVendorMarketMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 5,
     "fields": [
       {
         "name": "m_responseId",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariable",
+        "cppType": "int",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -8644,21 +10492,39 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 20,
+      "exactBytes": null
+    }
   },
   {
     "name": "DisconnectPlayerMessage",
     "swgCrc32": "0x9e56eba2",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "DisconnectPlayerMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/customerService/DisconnectPlayerMessage.h"
     ],
     "implementedInTypescript": true,
     "fieldCount": 0,
-    "fields": []
+    "fields": [],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 0,
+      "minBytes": 0
+    }
   },
   {
     "name": "DisconnectPlayerResponseMessage",
     "swgCrc32": "0x514320f6",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "DisconnectPlayerResponseMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/customerService/DisconnectPlayerResponseMessage.h"
     ],
@@ -8672,15 +10538,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 4,
+      "minBytes": 4
+    }
   },
   {
     "name": "DownloadCharacterMessage",
     "swgCrc32": "0xb9bc02b5",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "DownloadCharacterMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/DownloadCharacterMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 4,
     "fields": [
       {
@@ -8711,15 +10586,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 17,
+      "minBytes": 17
+    }
   },
   {
     "name": "DropClient",
     "swgCrc32": "0x48dda6a2",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "DropClient"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameConnectionServer/GameConnectionServerMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
@@ -8736,15 +10620,22 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 9,
+      "minBytes": 9
+    }
   },
   {
     "name": "EditAppearanceMessage",
     "swgCrc32": "0x023320d5",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/EditAppearanceMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
@@ -8754,15 +10645,22 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 8,
+      "minBytes": 8
+    }
   },
   {
     "name": "EditStatsMessage",
     "swgCrc32": "0x305e8c28",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/EditStatsMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
@@ -8772,15 +10670,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 8,
+      "minBytes": 8
+    }
   },
   {
     "name": "EnableNewJediTrackingMessage",
     "swgCrc32": "0xd24bcc5b",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "EnableNewJediTrackingMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameGameServer/EnableNewJediTrackingMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
@@ -8790,15 +10697,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 1,
+      "minBytes": 1
+    }
   },
   {
     "name": "EndBaselinesMessage",
     "swgCrc32": "0x6546d701",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "EndBaselinesMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameGameServer/EndBaselinesMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
@@ -8808,11 +10724,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 8,
+      "minBytes": 8
+    }
   },
   {
     "name": "EnterStructurePlacementModeMessage",
     "swgCrc32": "0xe8a54dc1",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "EnterStructurePlacementModeMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/EnterStructurePlacementModeMessage.h"
     ],
@@ -8833,11 +10758,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 10,
+      "exactBytes": null
+    }
   },
   {
     "name": "EnterTicketPurchaseModeMessage",
     "swgCrc32": "0x904dae1a",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "EnterTicketPurchaseModeMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/EnterTicketPurchaseModeMessage.h"
     ],
@@ -8865,11 +10799,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 5,
+      "exactBytes": null
+    }
   },
   {
     "name": "EnumerateCharacterId",
     "swgCrc32": "0x65ea4574",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "EnumerateCharacterId"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/ClientCentralMessages.h"
     ],
@@ -8880,18 +10823,27 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_data",
         "archiveContainer": "AutoArray",
         "cppType": "Chardata",
-        "tsType": "unknown",
+        "tsType": "unknown[]",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 4,
+      "exactBytes": null
+    }
   },
   {
     "name": "EnumerateServers",
     "swgCrc32": "0xc86cdc30",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "EnumerateServers"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/EnumerateServers.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 4,
     "fields": [
       {
@@ -8922,11 +10874,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 9,
+      "exactBytes": null
+    }
   },
   {
     "name": "ErrorMessage",
     "swgCrc32": "0xb5abf91a",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ErrorMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/common/ErrorMessage.h"
     ],
@@ -8954,15 +10915,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 5,
+      "exactBytes": null
+    }
   },
   {
     "name": "ExchangeListCreditsMessage",
     "swgCrc32": "0x9160dc18",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ExchangeListCreditsMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameGameServer/ExchangeListCreditsMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 3,
     "fields": [
       {
@@ -8986,15 +10956,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 16,
+      "minBytes": 16
+    }
   },
   {
     "name": "ExcommunicateGameServerMessage",
     "swgCrc32": "0x302914e5",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ExcommunicateGameServerMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/ExcommunicateGameServerMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 3,
     "fields": [
       {
@@ -9018,11 +10997,18 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 10,
+      "exactBytes": null
+    }
   },
   {
     "name": "ExecuteConsoleCommand",
     "swgCrc32": "0xb1cfce1c",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/ConsoleChannelMessages.h"
     ],
@@ -9036,11 +11022,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 2,
+      "exactBytes": null
+    }
   },
   {
     "name": "ExpertiseRequestMessage",
     "swgCrc32": "0xc19085d5",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ExpertiseRequestMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/ExpertiseRequestMessage.h"
     ],
@@ -9051,7 +11046,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_addExpertisesList",
         "archiveContainer": "AutoArray",
         "cppType": "std::string",
-        "tsType": "string",
+        "tsType": "string[]",
         "source": "addVariable"
       },
       {
@@ -9061,15 +11056,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 5,
+      "exactBytes": null
+    }
   },
   {
     "name": "FactionalSystemMessage",
     "swgCrc32": "0x77331b83",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "FactionalSystemMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gamePlanetServer/FactionalSystemMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 5,
     "fields": [
       {
@@ -9083,7 +11087,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_location",
         "archiveContainer": "AutoVariable",
         "cppType": "Vector",
-        "tsType": "unknown",
+        "tsType": "{ x: number; y: number; z: number }",
         "source": "addVariable"
       },
       {
@@ -9107,21 +11111,37 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 22,
+      "exactBytes": null
+    }
   },
   {
     "name": "FactionRequestMessage",
     "swgCrc32": "0xc1b03b81",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "FactionRequestMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/FactionRequestMessage.h"
     ],
     "implementedInTypescript": true,
     "fieldCount": 0,
-    "fields": []
+    "fields": [],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 0,
+      "minBytes": 0
+    }
   },
   {
     "name": "FactionResponseMessage",
     "swgCrc32": "0x5dd53957",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/FactionResponseMessage.h"
     ],
@@ -9153,25 +11173,34 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_npcFactionNameList",
         "archiveContainer": "AutoArray",
         "cppType": "std::string",
-        "tsType": "string",
+        "tsType": "string[]",
         "source": "addVariable"
       },
       {
         "name": "m_npcFactionValueList",
         "archiveContainer": "AutoArray",
         "cppType": "float",
-        "tsType": "number",
+        "tsType": "number[]",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 20,
+      "exactBytes": null
+    }
   },
   {
     "name": "FailedToLoadObjectMessage",
     "swgCrc32": "0xea984c3e",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "FailedToLoadObjectMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/FailedToLoadObjectMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
@@ -9188,15 +11217,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 12,
+      "minBytes": 12
+    }
   },
   {
     "name": "FeatureIdTransactionRequest",
     "swgCrc32": "0x52327235",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "FeatureIdTransactionRequest"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/FeatureIdTransactionRequest.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 3,
     "fields": [
       {
@@ -9210,7 +11248,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_stationId",
         "archiveContainer": "AutoVariable",
         "cppType": "StationId",
-        "tsType": "unknown",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -9220,15 +11258,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 16,
+      "minBytes": 16
+    }
   },
   {
     "name": "FeatureIdTransactionResponse",
     "swgCrc32": "0x7193ca5a",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "FeatureIdTransactionResponse"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/FeatureIdTransactionResponse.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 3,
     "fields": [
       {
@@ -9249,25 +11296,34 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_transactions",
         "archiveContainer": "AutoVariable",
         "cppType": "std::map<std::string, int>",
-        "tsType": "Record<string, unknown>",
+        "tsType": "Map<string, number>",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 16,
+      "exactBytes": null
+    }
   },
   {
     "name": "FeatureIdTransactionSyncUpdate",
     "swgCrc32": "0x30cd6d44",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "FeatureIdTransactionSyncUpdate"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/FeatureIdTransactionSyncUpdate.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 4,
     "fields": [
       {
         "name": "m_stationId",
         "archiveContainer": "AutoVariable",
         "cppType": "StationId",
-        "tsType": "unknown",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -9291,15 +11347,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 18,
+      "exactBytes": null
+    }
   },
   {
     "name": "FirstPlanetGameServerIdMessage",
     "swgCrc32": "0xc113129f",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "FirstPlanetGameServerIdMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gamePlanetServer/FirstPlanetGameServerIdMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
@@ -9309,15 +11374,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 4,
+      "minBytes": 4
+    }
   },
   {
     "name": "FlagObjectForDeleteMessage",
     "swgCrc32": "0x463c408b",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "FlagObjectForDeleteMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/FlagObjectForDeleteMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 5,
     "fields": [
       {
@@ -9355,15 +11429,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 15,
+      "minBytes": 15
+    }
   },
   {
     "name": "ForceUnloadObjectMessage",
     "swgCrc32": "0x311d30d2",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ForceUnloadObjectMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/ForceUnloadObjectMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
@@ -9380,11 +11463,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 9,
+      "minBytes": 9
+    }
   },
   {
     "name": "FrameEndMessage",
     "swgCrc32": "0xcc7e8772",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "FrameEndMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/common/FrameEndMessage.h"
     ],
@@ -9412,11 +11504,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 10,
+      "exactBytes": null
+    }
   },
   {
     "name": "GalaxyLoopTimesResponse",
     "swgCrc32": "0x4e428088",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "GalaxyLoopTimesResponse"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/GalaxyLoopTimesResponse.h"
     ],
@@ -9437,22 +11538,29 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 8,
+      "minBytes": 8
+    }
   },
   {
     "name": "GameClientMessage",
     "swgCrc32": "0x82f667db",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameConnectionServer/GameConnectionServerMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 3,
     "fields": [
       {
         "name": "distributionList",
         "archiveContainer": "AutoArray",
         "cppType": "NetworkId",
-        "tsType": "bigint",
+        "tsType": "bigint[]",
         "source": "addVariable"
       },
       {
@@ -9466,18 +11574,27 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "byteStream",
         "archiveContainer": "AutoVariable",
         "cppType": "Archive::ByteStream",
-        "tsType": "unknown",
+        "tsType": "Uint8Array",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 9,
+      "exactBytes": null
+    }
   },
   {
     "name": "GameCreateCharacterFailed",
     "swgCrc32": "0x68864b0b",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "GameCreateCharacterFailed"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/CentralGameServerMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 4,
     "fields": [
       {
@@ -9498,7 +11615,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_errorMessage",
         "archiveContainer": "AutoVariable",
         "cppType": "StringId",
-        "tsType": "unknown",
+        "tsType": "{ table: string; textIndex: number; text: string }",
         "source": "addVariable"
       },
       {
@@ -9508,15 +11625,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 18,
+      "exactBytes": null
+    }
   },
   {
     "name": "GameGameServerConnect",
     "swgCrc32": "0x26b6443d",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "GameGameServerConnect"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameGameServer/GameGameServerMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 4,
     "fields": [
       {
@@ -9547,25 +11673,43 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 13,
+      "minBytes": 13
+    }
   },
   {
     "name": "GameServerConnectAck",
     "swgCrc32": "0x6f2ebf37",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "GameServerConnectAck"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameGameServer/GameServerConnectAck.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 0,
-    "fields": []
+    "fields": [],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 0,
+      "minBytes": 0
+    }
   },
   {
     "name": "GameServerCSRequestMessage",
-    "swgCrc32": "0x5910ee03",
+    "swgCrc32": "0x1a75d634",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "GameServerCSRequest"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/GameServerCSRequestMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 7,
     "fields": [
       {
@@ -9617,15 +11761,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 22,
+      "exactBytes": null
+    }
   },
   {
     "name": "GameServerCSResponseMessage",
-    "swgCrc32": "0xfe156d71",
+    "swgCrc32": "0x24b95695",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "GameServerCSResponse"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/GameServerCSResponseMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 4,
     "fields": [
       {
@@ -9656,15 +11809,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 14,
+      "exactBytes": null
+    }
   },
   {
     "name": "GameServerForceChangeAuthorityMessage",
     "swgCrc32": "0x566154f8",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "GameServerForceChangeAuthorityMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gamePlanetServer/GameServerForceChangeAuthorityMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 3,
     "fields": [
       {
@@ -9688,15 +11850,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 16,
+      "minBytes": 16
+    }
   },
   {
     "name": "GameServerForLoginMessage",
     "swgCrc32": "0x4907263d",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "GameServerForLoginMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralPlanetServer/GameServerForLoginMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 3,
     "fields": [
       {
@@ -9720,15 +11891,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 16,
+      "minBytes": 16
+    }
   },
   {
     "name": "GameServerReadyMessage",
     "swgCrc32": "0x34f352e9",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "GameServerReadyMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/GameServerReadyMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
@@ -9738,15 +11918,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 4,
+      "minBytes": 4
+    }
   },
   {
     "name": "GameServerStatus",
     "swgCrc32": "0x9367176d",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "GameServerStatus"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/planetWatch/GameServerStatus.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
@@ -9760,18 +11949,27 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_serverInfo",
         "archiveContainer": "AutoVariable",
         "cppType": "ServerInfo",
-        "tsType": "unknown",
+        "tsType": "{ ipAddress: string; serverId: number; systemPid: number; sceneId: string }",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 13,
+      "exactBytes": null
+    }
   },
   {
     "name": "GameServerUniverseLoadedMessage",
     "swgCrc32": "0x19741b91",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "GameServerUniverseLoadedMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/GameServerUniverseLoadedMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
@@ -9788,15 +11986,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 8,
+      "minBytes": 8
+    }
   },
   {
     "name": "GameSetClusterName",
     "swgCrc32": "0xc7d6abfd",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "GameSetClusterName"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameTaskManager/GameTaskManagerMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
@@ -9813,39 +12020,64 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 4,
+      "exactBytes": null
+    }
   },
   {
     "name": "GameSetDbProcess",
     "swgCrc32": "0xaabe6a82",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "GameSetDbProcess"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameTaskManager/GameTaskManagerMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 0,
-    "fields": []
+    "fields": [],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 0,
+      "minBytes": 0
+    }
   },
   {
     "name": "GenericValueTypeMessage",
     "swgCrc32": "0x20b4b3c7",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/common/GenericValueTypeMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
         "name": "value",
         "archiveContainer": "AutoVariable",
         "cppType": "ValueType",
-        "tsType": "unknown",
-        "source": "declarationOnly"
+        "tsType": "Uint8Array",
+        "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 0,
+      "exactBytes": null
+    }
   },
   {
     "name": "GetArticleMessage",
     "swgCrc32": "0x5e7b4846",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "GetArticleMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/customerService/GetArticleMessage.h"
     ],
@@ -9866,11 +12098,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 4,
+      "exactBytes": null
+    }
   },
   {
     "name": "GetArticleResponseMessage",
     "swgCrc32": "0x934baee0",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "GetArticleResponseMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/customerService/GetArticleResponseMessage.h"
     ],
@@ -9891,11 +12132,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 8,
+      "exactBytes": null
+    }
   },
   {
     "name": "GetAuctionDetails",
     "swgCrc32": "0xd36efae4",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "GetAuctionDetails"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/GetAuctionDetails.h"
     ],
@@ -9909,11 +12159,18 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 8,
+      "minBytes": 8
+    }
   },
   {
     "name": "GetAuctionDetailsResponse",
     "swgCrc32": "0xfe0e644b",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/GetAuctionDetailsResponse.h"
     ],
@@ -9924,36 +12181,54 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_details",
         "archiveContainer": "AutoVariable",
         "cppType": "Auction::ItemDataDetails",
-        "tsType": "unknown",
+        "tsType": "{ itemId: bigint; userDescription: string; propertyList: [string, string][]; templateName: string; appearanceString: string }",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 20,
+      "exactBytes": null
+    }
   },
   {
     "name": "GetAuctionLocationsMessage",
     "swgCrc32": "0x98ef63ca",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "GetAuctionLocationsMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/commoditiesSwgDatabase/GetAuctionLocationsMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
         "name": "m_auctionLocations",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoList",
+        "cppType": "AuctionLocation",
+        "tsType": "unknown[]",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 4,
+      "exactBytes": null
+    }
   },
   {
     "name": "GetCharacterIdReplyMessage",
     "swgCrc32": "0x7811f6c8",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "GetCharacterIdReplyMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/CSDBNetMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 5,
     "fields": [
       {
@@ -9991,15 +12266,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 22,
+      "exactBytes": null
+    }
   },
   {
     "name": "GetCharactersForAccountCSReplyMsg",
     "swgCrc32": "0x04ae2493",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "GetCharactersForAccountCSReplyMsg"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/CSDBNetMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 6,
     "fields": [
       {
@@ -10044,11 +12328,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 22,
+      "exactBytes": null
+    }
   },
   {
     "name": "GetCommentsMessage",
     "swgCrc32": "0x270a9ec5",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "GetCommentsMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/customerService/GetCommentsMessage.h"
     ],
@@ -10062,11 +12355,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 4,
+      "minBytes": 4
+    }
   },
   {
     "name": "GetCommentsResponseMessage",
     "swgCrc32": "0xeadb08ca",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "GetCommentsResponseMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/customerService/GetCommentsResponseMessage.h"
     ],
@@ -10084,18 +12386,27 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_comments",
         "archiveContainer": "AutoArray",
         "cppType": "CustomerServiceComment",
-        "tsType": "unknown",
+        "tsType": "unknown[]",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 8,
+      "exactBytes": null
+    }
   },
   {
     "name": "GetDeletedItemsReplyMessage",
     "swgCrc32": "0x29bee8b5",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "GetDeletedItemsReplyMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/CSDBNetMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 6,
     "fields": [
       {
@@ -10140,22 +12451,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 26,
+      "exactBytes": null
+    }
   },
   {
     "name": "GetItemDetailsMessage",
     "swgCrc32": "0x3ea0cd21",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "GetItemDetailsMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/GetItemDetailsMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 4,
     "fields": [
       {
         "name": "m_responseId",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariable",
+        "cppType": "int",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -10179,22 +12499,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 24,
+      "minBytes": 24
+    }
   },
   {
     "name": "GetItemMessage",
     "swgCrc32": "0x1db6ce02",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "GetItemMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/GetItemMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 5,
     "fields": [
       {
         "name": "m_responseId",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariable",
+        "cppType": "int",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -10225,11 +12554,18 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 26,
+      "exactBytes": null
+    }
   },
   {
     "name": "GetMapLocationsMessage",
     "swgCrc32": "0x1a7ab839",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/GetMapLocationsMessage.h"
     ],
@@ -10264,11 +12600,18 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 14,
+      "exactBytes": null
+    }
   },
   {
     "name": "GetMapLocationsResponseMessage",
     "swgCrc32": "0x9f80464c",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/GetMapLocationsResponseMessage.h"
     ],
@@ -10286,21 +12629,21 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_mapLocationsStatic",
         "archiveContainer": "AutoArray",
         "cppType": "MapLocation",
-        "tsType": "unknown",
+        "tsType": "unknown[]",
         "source": "addVariable"
       },
       {
         "name": "m_mapLocationsDynamic",
         "archiveContainer": "AutoArray",
         "cppType": "MapLocation",
-        "tsType": "unknown",
+        "tsType": "unknown[]",
         "source": "addVariable"
       },
       {
         "name": "m_mapLocationsPersist",
         "archiveContainer": "AutoArray",
         "cppType": "MapLocation",
-        "tsType": "unknown",
+        "tsType": "unknown[]",
         "source": "addVariable"
       },
       {
@@ -10324,69 +12667,105 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 26,
+      "exactBytes": null
+    }
   },
   {
     "name": "GetMarketAuctionAttributesMessage",
     "swgCrc32": "0x089d3d5b",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "GetMarketAuctionAttributesMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/commoditiesSwgDatabase/GetMarketAuctionAttributesMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
         "name": "m_attributes",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoList",
+        "cppType": "MarketAuctionAttribute",
+        "tsType": "unknown[]",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 4,
+      "exactBytes": null
+    }
   },
   {
     "name": "GetMarketAuctionBidsMessage",
     "swgCrc32": "0x8648e93e",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "GetMarketAuctionBidsMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/commoditiesSwgDatabase/GetMarketAuctionBidsMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
         "name": "m_marketAuctionBids",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoList",
+        "cppType": "MarketAuctionBid",
+        "tsType": "unknown[]",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 4,
+      "exactBytes": null
+    }
   },
   {
     "name": "GetMarketAuctionsMessage",
     "swgCrc32": "0x454fe683",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "GetMarketAuctionsMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/commoditiesSwgDatabase/GetMarketAuctionsMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
         "name": "m_auctions",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoList",
+        "cppType": "MarketAuction",
+        "tsType": "unknown[]",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 4,
+      "exactBytes": null
+    }
   },
   {
     "name": "GetMoneyFromOfflineObjectMessage",
     "swgCrc32": "0x95525c33",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "GetMoneyFromOfflineObjectMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameGameServer/GetMoneyFromOfflineObjectMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 7,
     "fields": [
       {
@@ -10438,22 +12817,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 29,
+      "exactBytes": null
+    }
   },
   {
     "name": "GetPlayerVendorCountMessage",
     "swgCrc32": "0xd8717daa",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "GetPlayerVendorCountMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/GetPlayerVendorCountMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 3,
     "fields": [
       {
         "name": "m_responseId",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariable",
+        "cppType": "int",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -10470,11 +12858,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 16,
+      "minBytes": 16
+    }
   },
   {
     "name": "GetTicketsMessage",
     "swgCrc32": "0xc9a5f98d",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "GetTicketsMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/customerService/GetTicketsMessage.h"
     ],
@@ -10502,11 +12899,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 12,
+      "minBytes": 12
+    }
   },
   {
     "name": "GetTicketsResponseMessage",
     "swgCrc32": "0xbb567f98",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "GetTicketsResponseMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/customerService/GetTicketsResponseMessage.h"
     ],
@@ -10531,25 +12937,34 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_tickets",
         "archiveContainer": "AutoArray",
         "cppType": "CustomerServiceTicket",
-        "tsType": "unknown",
+        "tsType": "unknown[]",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 12,
+      "exactBytes": null
+    }
   },
   {
     "name": "GetVendorOwnerMessage",
     "swgCrc32": "0x76aaf946",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "GetVendorOwnerMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/GetVendorOwnerMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 4,
     "fields": [
       {
         "name": "m_responseId",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariable",
+        "cppType": "int",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -10573,22 +12988,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 18,
+      "exactBytes": null
+    }
   },
   {
     "name": "GetVendorValueMessage",
     "swgCrc32": "0xb9b230e9",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "GetVendorValueMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/GetVendorValueMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 3,
     "fields": [
       {
         "name": "m_responseId",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariable",
+        "cppType": "int",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -10605,11 +13029,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 10,
+      "exactBytes": null
+    }
   },
   {
     "name": "GiveMoneyMessage",
     "swgCrc32": "0xd1527ee8",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "GiveMoneyMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/SecureTradeMessages.h"
     ],
@@ -10623,15 +13056,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 4,
+      "minBytes": 4
+    }
   },
   {
     "name": "GrantCommand",
     "swgCrc32": "0xe67e3875",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "GrantCommand"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/GrantCommand.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
@@ -10641,15 +13083,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 2,
+      "exactBytes": null
+    }
   },
   {
     "name": "GrantSkill",
     "swgCrc32": "0x2c6da47f",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "GrantSkill"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/GrantSkill.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 5,
     "fields": [
       {
@@ -10663,7 +13114,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "commandsProvided",
         "archiveContainer": "AutoArray",
         "cppType": "std::string",
-        "tsType": "string",
+        "tsType": "string[]",
         "source": "addVariable"
       },
       {
@@ -10687,11 +13138,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 12,
+      "exactBytes": null
+    }
   },
   {
     "name": "GuildRequestMessage",
     "swgCrc32": "0x81eb4ef7",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "GuildRequestMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/GuildRequestMessage.h"
     ],
@@ -10705,11 +13165,18 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 8,
+      "minBytes": 8
+    }
   },
   {
     "name": "GuildResponseMessage",
     "swgCrc32": "0x32263f20",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/GuildResponseMessage.h"
     ],
@@ -10737,21 +13204,39 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 12,
+      "exactBytes": null
+    }
   },
   {
     "name": "HeartBeat",
     "swgCrc32": "0xa16cf9af",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "HeartBeat"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/HeartBeat.h"
     ],
     "implementedInTypescript": true,
     "fieldCount": 0,
-    "fields": []
+    "fields": [],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 0,
+      "minBytes": 0
+    }
   },
   {
     "name": "HyperspaceMessage",
     "swgCrc32": "0xcbf88482",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "HyperspaceMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/HyperspaceMessage.h"
     ],
@@ -10765,11 +13250,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 8,
+      "minBytes": 8
+    }
   },
   {
     "name": "IsVendorOwnerMessage",
     "swgCrc32": "0x21b55a3b",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "IsVendorOwnerMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/IsVendorOwnerMessage.h"
     ],
@@ -10783,11 +13277,18 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 8,
+      "minBytes": 8
+    }
   },
   {
     "name": "IsVendorOwnerResponseMessage",
     "swgCrc32": "0xce04173e",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/IsVendorOwnerResponseMessage.h"
     ],
@@ -10829,22 +13330,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 20,
+      "exactBytes": null
+    }
   },
   {
     "name": "ItemMovedMessage",
     "swgCrc32": "0x7113f28f",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ItemMovedMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/ItemMovedMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 3,
     "fields": [
       {
         "name": "m_playerId",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariable",
+        "cppType": "NetworkId",
+        "tsType": "bigint",
         "source": "addVariable"
       },
       {
@@ -10861,15 +13371,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 14,
+      "exactBytes": null
+    }
   },
   {
     "name": "KickPlayer",
     "swgCrc32": "0x3b88e235",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "KickPlayer"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameConnectionServer/GameConnectionServerMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
@@ -10886,33 +13405,51 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 10,
+      "exactBytes": null
+    }
   },
   {
     "name": "LoadCommoditiesMessage",
-    "swgCrc32": "0xf197c845",
+    "swgCrc32": "0xcb3a0cf5",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "LoadCommodities"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/commoditiesSwgDatabase/LoadCommoditiesMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
         "name": "m_payload",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariable",
+        "cppType": "int",
+        "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 4,
+      "minBytes": 4
+    }
   },
   {
     "name": "LoadContainedObjectMessage",
     "swgCrc32": "0xe62088b1",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "LoadContainedObjectMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameGameServer/LoadContainedObjectMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
@@ -10929,15 +13466,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 16,
+      "minBytes": 16
+    }
   },
   {
     "name": "LoadContentsMessage",
     "swgCrc32": "0x3bdee90a",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "LoadContentsMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameGameServer/LoadContentsMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
@@ -10947,15 +13493,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 8,
+      "minBytes": 8
+    }
   },
   {
     "name": "LoadObjectMessage",
     "swgCrc32": "0x3ca48c8e",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "LoadObjectMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/LoadObjectMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
@@ -10972,22 +13527,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 12,
+      "minBytes": 12
+    }
   },
   {
     "name": "LoadStructureMessage",
     "swgCrc32": "0xd7feaaa4",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "LoadStructureMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameGameServer/LoadStructureMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
         "name": "m_structureId",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariable",
+        "cppType": "NetworkId",
+        "tsType": "bigint",
         "source": "addVariable"
       },
       {
@@ -10997,15 +13561,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 10,
+      "exactBytes": null
+    }
   },
   {
     "name": "LoadUniverseMessage",
     "swgCrc32": "0x53b5ad41",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "LoadUniverseMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/LoadUniverseMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
@@ -11015,15 +13588,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 4,
+      "minBytes": 4
+    }
   },
   {
     "name": "LocateObjectResponseMessage",
     "swgCrc32": "0xedb4ec31",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "LocateObjectResponseMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameGameServer/LocateObjectResponseMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 10,
     "fields": [
       {
@@ -11051,7 +13633,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_position_w",
         "archiveContainer": "AutoVariable",
         "cppType": "Vector",
-        "tsType": "unknown",
+        "tsType": "{ x: number; y: number; z: number }",
         "source": "addVariable"
       },
       {
@@ -11096,15 +13678,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 53,
+      "exactBytes": null
+    }
   },
   {
     "name": "LocatePlayerResponseMessage",
     "swgCrc32": "0x02e04c69",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "LocatePlayerResponseMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameGameServer/LocatePlayerResponseMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 6,
     "fields": [
       {
@@ -11139,7 +13730,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_position_w",
         "archiveContainer": "AutoVariable",
         "cppType": "Vector",
-        "tsType": "unknown",
+        "tsType": "{ x: number; y: number; z: number }",
         "source": "addVariable"
       },
       {
@@ -11149,22 +13740,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 38,
+      "exactBytes": null
+    }
   },
   {
     "name": "LocateStructureMessage",
     "swgCrc32": "0x50334cb5",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "LocateStructureMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameGameServer/LocateStructureMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 5,
     "fields": [
       {
         "name": "m_structureId",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariable",
+        "cppType": "NetworkId",
+        "tsType": "bigint",
         "source": "addVariable"
       },
       {
@@ -11195,15 +13795,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 20,
+      "exactBytes": null
+    }
   },
   {
     "name": "LocationRequest",
     "swgCrc32": "0xcead7afa",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "LocationRequest"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gamePlanetServer/LocationRequest.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 9,
     "fields": [
       {
@@ -11269,15 +13878,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 32,
+      "exactBytes": null
+    }
   },
   {
     "name": "LocationResponse",
     "swgCrc32": "0xfe8aa5a0",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "LocationResponse"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gamePlanetServer/LocationResponse.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 6,
     "fields": [
       {
@@ -11322,15 +13940,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 23,
+      "exactBytes": null
+    }
   },
   {
     "name": "LoggedInMessage",
     "swgCrc32": "0x96a4782c",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "LoggedInMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralConnectionServer/CentralConnectionServerMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
@@ -11340,11 +13967,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 4,
+      "minBytes": 4
+    }
   },
   {
     "name": "LoginClientId",
     "swgCrc32": "0x41131f96",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "LoginClientId"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientLoginServer/ClientLoginMessages.h"
     ],
@@ -11372,11 +14008,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 6,
+      "exactBytes": null
+    }
   },
   {
     "name": "LoginClientToken",
     "swgCrc32": "0xaab296c6",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "LoginClientToken"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientLoginServer/ClientLoginMessages.h"
     ],
@@ -11387,7 +14032,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "token",
         "archiveContainer": "AutoArray",
         "cppType": "unsigned char",
-        "tsType": "number",
+        "tsType": "number[]",
         "source": "addVariable"
       },
       {
@@ -11404,15 +14049,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 10,
+      "exactBytes": null
+    }
   },
   {
     "name": "LoginClusterName",
     "swgCrc32": "0x04ddce9d",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "LoginClusterName"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/loginCentralServer/LoginClusterName.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
@@ -11429,15 +14083,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 6,
+      "exactBytes": null
+    }
   },
   {
     "name": "LoginClusterName2",
     "swgCrc32": "0xa28dfd69",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "LoginClusterName2"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/loginCentralServer/LoginClusterName2.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 5,
     "fields": [
       {
@@ -11475,11 +14138,18 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 14,
+      "exactBytes": null
+    }
   },
   {
     "name": "LoginClusterStatus",
     "swgCrc32": "0x3436aeb6",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientLoginServer/LoginClusterStatus.h"
     ],
@@ -11490,14 +14160,21 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_data",
         "archiveContainer": "AutoArray",
         "cppType": "ClusterData",
-        "tsType": "unknown",
+        "tsType": "unknown[]",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 4,
+      "exactBytes": null
+    }
   },
   {
     "name": "LoginClusterStatusEx",
     "swgCrc32": "0xfa5b4b5a",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientLoginServer/LoginClusterStatusEx.h"
     ],
@@ -11508,18 +14185,27 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_data",
         "archiveContainer": "AutoArray",
         "cppType": "ClusterData",
-        "tsType": "unknown",
+        "tsType": "unknown[]",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 4,
+      "exactBytes": null
+    }
   },
   {
     "name": "LoginConnectionServerAddress",
     "swgCrc32": "0x31fa1b9a",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "LoginConnectionServerAddress"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/loginCentralServer/LoginConnectionServerAddress.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 6,
     "fields": [
       {
@@ -11564,22 +14250,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 16,
+      "exactBytes": null
+    }
   },
   {
     "name": "LoginCreateCharacterAckMessage",
     "swgCrc32": "0x498f4c04",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "LoginCreateCharacterAckMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/loginCentralServer/LoginCreateCharacterAckMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
         "name": "m_stationId",
         "archiveContainer": "AutoVariable",
         "cppType": "StationId",
-        "tsType": "unknown",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -11589,22 +14284,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 12,
+      "minBytes": 12
+    }
   },
   {
     "name": "LoginCreateCharacterMessage",
     "swgCrc32": "0x67f36fbf",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "LoginCreateCharacterMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/loginCentralServer/LoginCreateCharacterMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 5,
     "fields": [
       {
         "name": "m_stationId",
         "archiveContainer": "AutoVariable",
         "cppType": "StationId",
-        "tsType": "unknown",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -11635,11 +14339,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 21,
+      "exactBytes": null
+    }
   },
   {
     "name": "LoginEnumCluster",
     "swgCrc32": "0xc11c63b9",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "LoginEnumCluster"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientLoginServer/LoginEnumCluster.h"
     ],
@@ -11650,7 +14363,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_data",
         "archiveContainer": "AutoArray",
         "cppType": "ClusterData",
-        "tsType": "unknown",
+        "tsType": "unknown[]",
         "source": "addVariable"
       },
       {
@@ -11660,11 +14373,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 8,
+      "exactBytes": null
+    }
   },
   {
     "name": "LoginIncorrectClientId",
     "swgCrc32": "0x20e7e510",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "LoginIncorrectClientId"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientLoginServer/ClientLoginMessages.h"
     ],
@@ -11685,33 +14407,51 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 4,
+      "exactBytes": null
+    }
   },
   {
     "name": "LoginKeyPush",
     "swgCrc32": "0xfcdd24d1",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "LoginKeyPush"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/loginCentralServer/LoginKeyPush.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
         "name": "key",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariableKeyShare",
+        "cppType": "KeyShare::Key",
+        "tsType": "Uint8Array",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 16,
+      "minBytes": 16
+    }
   },
   {
     "name": "LoginRestoreCharacterMessage",
     "swgCrc32": "0xa641137c",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "LoginRestoreCharacterMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/loginCentralServer/LoginRestoreCharacterMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 6,
     "fields": [
       {
@@ -11732,7 +14472,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_account",
         "archiveContainer": "AutoVariable",
         "cppType": "StationId",
-        "tsType": "unknown",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -11756,15 +14496,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 23,
+      "exactBytes": null
+    }
   },
   {
     "name": "LoginUpgradeAccountMessage",
     "swgCrc32": "0xdae77ab7",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "LoginUpgradeAccountMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/loginCentralServer/LoginUpgradeAccountMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 7,
     "fields": [
       {
@@ -11778,7 +14527,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_stationId",
         "archiveContainer": "AutoVariable",
         "cppType": "StationId",
-        "tsType": "unknown",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -11816,15 +14565,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 29,
+      "exactBytes": null
+    }
   },
   {
     "name": "LogMessage",
     "swgCrc32": "0xaf5f77a2",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "LogMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/LogMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 5,
     "fields": [
       {
@@ -11862,21 +14620,39 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 18,
+      "exactBytes": null
+    }
   },
   {
     "name": "LogoutMessage",
     "swgCrc32": "0x42fd19dd",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "LogoutMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/LogoutMessage.h"
     ],
     "implementedInTypescript": true,
     "fieldCount": 0,
-    "fields": []
+    "fields": [],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 0,
+      "minBytes": 0
+    }
   },
   {
     "name": "MessageRegionListCircleResponse",
     "swgCrc32": "0x637a6506",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "MessageRegionListCircleResponse"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/MessageRegionListCircleResponse.h"
     ],
@@ -11974,11 +14750,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 50,
+      "exactBytes": null
+    }
   },
   {
     "name": "MessageRegionListRectResponse",
     "swgCrc32": "0xade558c4",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "MessageRegionListRectResponse"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/MessageRegionListRectResponse.h"
     ],
@@ -12090,21 +14875,39 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 58,
+      "exactBytes": null
+    }
   },
   {
     "name": "MessageRegionListRequest",
     "swgCrc32": "0x821a4c5d",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "MessageRegionListRequest"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/MessageRegionListRequest.h"
     ],
     "implementedInTypescript": true,
     "fieldCount": 0,
-    "fields": []
+    "fields": [],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 0,
+      "minBytes": 0
+    }
   },
   {
     "name": "MessageRegionListResponse",
     "swgCrc32": "0x4836e9b3",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "MessageRegionListResponse"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/MessageRegionListResponse.h"
     ],
@@ -12202,15 +15005,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 56,
+      "exactBytes": null
+    }
   },
   {
     "name": "MessageToAckMessage",
     "swgCrc32": "0xc695d40c",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "MessageToAckMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/MessageToAckMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
@@ -12220,22 +15032,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 8,
+      "minBytes": 8
+    }
   },
   {
     "name": "MessageToMessage",
     "swgCrc32": "0xd9cd0336",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "MessageToMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/MessageToMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
         "name": "m_data",
         "archiveContainer": "AutoVariable",
         "cppType": "MessageToPayload",
-        "tsType": "unknown",
+        "tsType": "Uint8Array",
         "source": "addVariable"
       },
       {
@@ -12245,33 +15066,51 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 8,
+      "exactBytes": null
+    }
   },
   {
     "name": "MetricsDataMessage",
     "swgCrc32": "0x1d4c62a0",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "MetricsDataMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/metricsMessages/MetricsDataMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
         "name": "m_data",
         "archiveContainer": "AutoArray",
         "cppType": "MetricsPair",
-        "tsType": "unknown",
+        "tsType": "unknown[]",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 4,
+      "exactBytes": null
+    }
   },
   {
     "name": "MetricsInitiationMessage",
     "swgCrc32": "0x2d36a6c6",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "MetricsInitiationMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/metricsMessages/MetricsInitiationMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 4,
     "fields": [
       {
@@ -12302,11 +15141,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 9,
+      "exactBytes": null
+    }
   },
   {
     "name": "NewbieTutorialEnableHudElement",
     "swgCrc32": "0xca375124",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "NewbieTutorialEnableHudElement"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/NewbieTutorialEnableHudElement.h"
     ],
@@ -12334,11 +15182,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 7,
+      "exactBytes": null
+    }
   },
   {
     "name": "NewbieTutorialEnableInterfaceElement",
     "swgCrc32": "0x33d2981a",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "NewbieTutorialEnableInterfaceElement"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/NewbieTutorialEnableInterfaceElement.h"
     ],
@@ -12359,11 +15216,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 3,
+      "exactBytes": null
+    }
   },
   {
     "name": "NewbieTutorialHighlightUIElement",
     "swgCrc32": "0x98519af4",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "NewbieTutorialHighlightUIElement"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/NewbieTutorialHighlightUIElement.h"
     ],
@@ -12384,11 +15250,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 6,
+      "exactBytes": null
+    }
   },
   {
     "name": "NewbieTutorialRequest",
     "swgCrc32": "0x90dd61af",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "NewbieTutorialRequest"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/NewbieTutorialRequest.h"
     ],
@@ -12402,11 +15277,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 2,
+      "exactBytes": null
+    }
   },
   {
     "name": "NewbieTutorialResponse",
     "swgCrc32": "0xca88fbad",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "NewbieTutorialResponse"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/NewbieTutorialResponse.h"
     ],
@@ -12420,11 +15304,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 2,
+      "exactBytes": null
+    }
   },
   {
     "name": "NewbieTutorialSetToolbarElement",
     "swgCrc32": "0x9f432719",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "NewbieTutorialSetToolbarElement"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/NewbieTutorialSetToolbarElement.h"
     ],
@@ -12452,15 +15345,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 14,
+      "exactBytes": null
+    }
   },
   {
     "name": "NewCentralConnectionServer",
     "swgCrc32": "0x0194bb7d",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "NewCentralConnectionServer"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralConnectionServer/CentralConnectionServerMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 11,
     "fields": [
       {
@@ -12540,15 +15442,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 24,
+      "exactBytes": null
+    }
   },
   {
     "name": "NewClient",
     "swgCrc32": "0x0c4eb3a9",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "NewClient"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameConnectionServer/NewClient.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 19,
     "fields": [
       {
@@ -12597,7 +15508,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_observedObjects",
         "archiveContainer": "AutoArray",
         "cppType": "NetworkId",
-        "tsType": "bigint",
+        "tsType": "bigint[]",
         "source": "addVariable"
       },
       {
@@ -12653,14 +15564,14 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_consumedRewardEvents",
         "archiveContainer": "AutoArray",
         "cppType": "std::pair<NetworkId, std::string>",
-        "tsType": "bigint",
+        "tsType": "bigint[]",
         "source": "addVariable"
       },
       {
         "name": "m_claimedRewardItems",
         "archiveContainer": "AutoArray",
         "cppType": "std::pair<NetworkId, std::string>",
-        "tsType": "bigint",
+        "tsType": "bigint[]",
         "source": "addVariable"
       },
       {
@@ -12684,15 +15595,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 61,
+      "exactBytes": null
+    }
   },
   {
     "name": "NewGameServer",
     "swgCrc32": "0x8b46825c",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "NewGameServer"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameConnectionServer/GameConnectionServerMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
@@ -12709,11 +15629,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 6,
+      "exactBytes": null
+    }
   },
   {
     "name": "NewTicketActivityMessage",
     "swgCrc32": "0x274f4e78",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "NewTicketActivityMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/customerService/NewTicketActivityMessage.h"
     ],
@@ -12727,11 +15656,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 4,
+      "minBytes": 4
+    }
   },
   {
     "name": "NewTicketActivityResponseMessage",
     "swgCrc32": "0x6ea42d80",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "NewTicketActivityResponseMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/customerService/NewTicketActivityResponseMessage.h"
     ],
@@ -12752,11 +15690,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 5,
+      "minBytes": 5
+    }
   },
   {
     "name": "ObjControllerMessage",
     "swgCrc32": "0x80ce5e46",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ObjControllerMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/ObjectChannelMessages.h"
     ],
@@ -12788,18 +15735,25 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "value",
         "archiveContainer": "AutoVariable",
         "cppType": "real",
-        "tsType": "unknown",
+        "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 20,
+      "minBytes": 20
+    }
   },
   {
     "name": "ObjectMenuSelectMessage",
     "swgCrc32": "0x93539cf7",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/ObjectMenuSelectMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
@@ -12816,22 +15770,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 10,
+      "minBytes": 10
+    }
   },
   {
     "name": "OnAcceptHighBidMessage",
     "swgCrc32": "0xa3bb5afb",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "OnAcceptHighBidMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/OnAcceptHighBidMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 5,
     "fields": [
       {
         "name": "m_responseId",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariable",
+        "cppType": "int",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -12862,22 +15825,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 28,
+      "minBytes": 28
+    }
   },
   {
     "name": "OnAddAuctionMessage",
     "swgCrc32": "0x5084b943",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "OnAddAuctionMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/OnAddAuctionMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 8,
     "fields": [
       {
         "name": "m_responseId",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariable",
+        "cppType": "int",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -12929,22 +15901,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 40,
+      "exactBytes": null
+    }
   },
   {
     "name": "OnAddBidMessage",
     "swgCrc32": "0x53581b50",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "OnAddBidMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/OnAddBidMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 15,
     "fields": [
       {
         "name": "m_responseId",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariable",
+        "cppType": "int",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -13045,22 +16026,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 78,
+      "exactBytes": null
+    }
   },
   {
     "name": "OnAuctionExpiredMessage",
     "swgCrc32": "0x5299f57c",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "OnAuctionExpiredMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/OnAuctionExpiredMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 13,
     "fields": [
       {
         "name": "m_responseId",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariable",
+        "cppType": "int",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -13147,22 +16137,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 53,
+      "exactBytes": null
+    }
   },
   {
     "name": "OnCancelAuctionMessage",
     "swgCrc32": "0x76fae6eb",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "OnCancelAuctionMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/OnCancelAuctionMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 8,
     "fields": [
       {
         "name": "m_responseId",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariable",
+        "cppType": "int",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -13214,22 +16213,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 42,
+      "exactBytes": null
+    }
   },
   {
     "name": "OnCleanupInvalidItemRetrievalMessage",
     "swgCrc32": "0x0c918398",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "OnCleanupInvalidItemRetrievalMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/OnCleanupInvalidItemRetrievalMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 6,
     "fields": [
       {
         "name": "m_responseId",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariable",
+        "cppType": "int",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -13267,22 +16275,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 36,
+      "minBytes": 36
+    }
   },
   {
     "name": "OnCreateVendorMarketMessage",
     "swgCrc32": "0x38d41f76",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "OnCreateVendorMarketMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/OnCreateVendorMarketMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 5,
     "fields": [
       {
         "name": "m_responseId",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariable",
+        "cppType": "int",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -13313,22 +16330,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 22,
+      "exactBytes": null
+    }
   },
   {
     "name": "OnGetItemDetailsMessage",
     "swgCrc32": "0xd8ecf973",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "OnGetItemDetailsMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/OnGetItemDetailsMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 10,
     "fields": [
       {
         "name": "m_responseId",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariable",
+        "cppType": "int",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -13384,7 +16410,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_attributes",
         "archiveContainer": "AutoArray",
         "cppType": "std::pair<std::string, Unicode::String>",
-        "tsType": "[string, string]",
+        "tsType": "[string, string][]",
         "source": "addVariable"
       },
       {
@@ -13394,22 +16420,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 48,
+      "exactBytes": null
+    }
   },
   {
     "name": "OnGetItemMessage",
     "swgCrc32": "0x5f5477ba",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "OnGetItemMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/OnGetItemMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 6,
     "fields": [
       {
         "name": "m_responseId",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariable",
+        "cppType": "int",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -13447,22 +16482,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 30,
+      "exactBytes": null
+    }
   },
   {
     "name": "OnGetPlayerVendorCountMessage",
     "swgCrc32": "0xf142e230",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "OnGetPlayerVendorCountMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/OnGetPlayerVendorCountMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 5,
     "fields": [
       {
         "name": "m_responseId",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariable",
+        "cppType": "int",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -13493,22 +16537,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 24,
+      "exactBytes": null
+    }
   },
   {
     "name": "OnGetVendorOwnerMessage",
     "swgCrc32": "0x90e6cd14",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "OnGetVendorOwnerMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/OnGetVendorOwnerMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 6,
     "fields": [
       {
         "name": "m_responseId",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariable",
+        "cppType": "int",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -13546,22 +16599,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 30,
+      "exactBytes": null
+    }
   },
   {
     "name": "OnGetVendorValueMessage",
     "swgCrc32": "0x5ffe04bb",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "OnGetVendorValueMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/OnGetVendorValueMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 4,
     "fields": [
       {
         "name": "m_responseId",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariable",
+        "cppType": "int",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -13585,22 +16647,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 14,
+      "exactBytes": null
+    }
   },
   {
     "name": "OnItemExpiredMessage",
     "swgCrc32": "0xc9bb63b5",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "OnItemExpiredMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/OnItemExpiredMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 8,
     "fields": [
       {
         "name": "m_responseId",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariable",
+        "cppType": "int",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -13652,22 +16723,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 42,
+      "exactBytes": null
+    }
   },
   {
     "name": "OnPermanentAuctionPurchasedMessage",
     "swgCrc32": "0xa5610dc1",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "OnPermanentAuctionPurchasedMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/OnPermanentAuctionPurchasedMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 10,
     "fields": [
       {
         "name": "m_responseId",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariable",
+        "cppType": "int",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -13730,25 +16810,34 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_attributes",
         "archiveContainer": "AutoArray",
         "cppType": "std::pair<std::string, Unicode::String>",
-        "tsType": "[string, string]",
+        "tsType": "[string, string][]",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 50,
+      "exactBytes": null
+    }
   },
   {
     "name": "OnQueryAuctionHeadersMessage",
     "swgCrc32": "0x3a3f0de2",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "OnQueryAuctionHeadersMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/OnQueryAuctionHeadersMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 9,
     "fields": [
       {
         "name": "m_responseId",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariable",
+        "cppType": "int",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -13783,7 +16872,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_auctionData",
         "archiveContainer": "AutoVariable",
         "cppType": "ADV",
-        "tsType": "unknown",
+        "tsType": "{ type: number; auctionId: bigint; itemId: bigint; itemNameLength: number; itemName: string; minBid: number; highBid: number; timer: number; buyNowPrice: number; location: string; ownerId: bigint; highBidderId: bigint; maxProxyBid: number; myBid: number; itemType: number; resourceContainerClassCrc: number; flags: number; entranceCharge: number }[]",
         "source": "addVariable"
       },
       {
@@ -13807,22 +16896,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 37,
+      "exactBytes": null
+    }
   },
   {
     "name": "OnQueryVendorItemCountReplyMessage",
     "swgCrc32": "0x457382d4",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "OnQueryVendorItemCountReplyMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/OnQueryVendorItemCountReplyMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 4,
     "fields": [
       {
         "name": "m_responseId",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariable",
+        "cppType": "int",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -13846,22 +16944,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 17,
+      "minBytes": 17
+    }
   },
   {
     "name": "OnUpdateVendorSearchOptionMessage",
     "swgCrc32": "0xd7d0ec98",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "OnUpdateVendorSearchOptionMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/OnUpdateVendorSearchOptionMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
         "name": "m_playerId",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariable",
+        "cppType": "NetworkId",
+        "tsType": "bigint",
         "source": "addVariable"
       },
       {
@@ -13871,22 +16978,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 9,
+      "minBytes": 9
+    }
   },
   {
     "name": "OnVendorRefuseItemMessage",
     "swgCrc32": "0xbe5b6131",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "OnVendorRefuseItemMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/OnVendorRefuseItemMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 6,
     "fields": [
       {
         "name": "m_responseId",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariable",
+        "cppType": "int",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -13924,15 +17040,22 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 36,
+      "minBytes": 36
+    }
   },
   {
     "name": "OpenHolocronToPageMessage",
     "swgCrc32": "0x7cb65021",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/OpenHolocronToPageMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
@@ -13942,11 +17065,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 2,
+      "exactBytes": null
+    }
   },
   {
     "name": "ParametersMessage",
     "swgCrc32": "0x487652da",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ParametersMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/ParametersMessage.h"
     ],
@@ -13960,29 +17092,36 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 4,
+      "minBytes": 4
+    }
   },
   {
     "name": "PermissionListCreateMessage",
     "swgCrc32": "0x52f364b8",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "game/shared/library/swgSharedNetworkMessages/src/shared/permissionList/PermissionListCreateMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 3,
     "fields": [
       {
         "name": "m_currentMembers",
         "archiveContainer": "AutoArray",
         "cppType": "Unicode::String",
-        "tsType": "string",
+        "tsType": "string[]",
         "source": "addVariable"
       },
       {
         "name": "m_nearbyPeople",
         "archiveContainer": "AutoArray",
         "cppType": "Unicode::String",
-        "tsType": "string",
+        "tsType": "string[]",
         "source": "addVariable"
       },
       {
@@ -13992,15 +17131,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 12,
+      "exactBytes": null
+    }
   },
   {
     "name": "PermissionListModifyMessage",
     "swgCrc32": "0x2e83b86d",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "PermissionListModifyMessage"
+    ],
     "headers": [
       "game/shared/library/swgSharedNetworkMessages/src/shared/permissionList/PermissionListModifyMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 3,
     "fields": [
       {
@@ -14024,15 +17172,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 12,
+      "exactBytes": null
+    }
   },
   {
     "name": "PersistedPlayerMessage",
     "swgCrc32": "0x6c8820b1",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "PersistedPlayerMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameGameServer/PersistedPlayerMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
@@ -14042,15 +17199,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 8,
+      "minBytes": 8
+    }
   },
   {
     "name": "PlanetLoadCharacterMessage",
     "swgCrc32": "0x49ac6028",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "PlanetLoadCharacterMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gamePlanetServer/PlanetLoadCharacterMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
@@ -14067,33 +17233,51 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 12,
+      "minBytes": 12
+    }
   },
   {
     "name": "PlanetNodeStatusMessage",
     "swgCrc32": "0x5e2e0cd6",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "PlanetNodeStatusMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/planetWatch/PlanetNodeStatusMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
         "name": "m_data",
         "archiveContainer": "AutoArray",
         "cppType": "PlanetNodeStatusMessageData",
-        "tsType": "unknown",
+        "tsType": "unknown[]",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 4,
+      "exactBytes": null
+    }
   },
   {
     "name": "PlanetObjectIdMessage",
     "swgCrc32": "0xa7f3a82f",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "PlanetObjectIdMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/PlanetObjectIdMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
@@ -14110,33 +17294,51 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 10,
+      "exactBytes": null
+    }
   },
   {
     "name": "PlanetObjectStatusMessage",
     "swgCrc32": "0x62689eb0",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "PlanetObjectStatusMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/planetWatch/PlanetObjectStatusMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
         "name": "m_data",
         "archiveContainer": "AutoArray",
         "cppType": "PlanetObjectStatusMessageData",
-        "tsType": "unknown",
+        "tsType": "unknown[]",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 4,
+      "exactBytes": null
+    }
   },
   {
     "name": "PlanetRemoveObject",
     "swgCrc32": "0xcd248a61",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "PlanetRemoveObject"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gamePlanetServer/PlanetRemoveObject.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
@@ -14146,11 +17348,18 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 8,
+      "minBytes": 8
+    }
   },
   {
     "name": "PlanetTravelPointListRequest",
     "swgCrc32": "0x96405d4d",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/PlanetTravelPointListRequest.h"
     ],
@@ -14178,11 +17387,18 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 14,
+      "exactBytes": null
+    }
   },
   {
     "name": "PlanetTravelPointListResponse",
     "swgCrc32": "0x4d32541f",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/PlanetTravelPointListResponse.h"
     ],
@@ -14200,28 +17416,28 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_travelPointNameList",
         "archiveContainer": "AutoArray",
         "cppType": "std::string",
-        "tsType": "string",
+        "tsType": "string[]",
         "source": "addVariable"
       },
       {
         "name": "m_travelPointPointList",
         "archiveContainer": "AutoArray",
         "cppType": "Vector",
-        "tsType": "unknown",
+        "tsType": "{ x: number; y: number; z: number }[]",
         "source": "addVariable"
       },
       {
         "name": "m_travelPointCostList",
         "archiveContainer": "AutoArray",
         "cppType": "int",
-        "tsType": "number",
+        "tsType": "number[]",
         "source": "addVariable"
       },
       {
         "name": "m_travelPointInterplanetaryList",
         "archiveContainer": "AutoArray",
         "cppType": "bool",
-        "tsType": "boolean",
+        "tsType": "boolean[]",
         "source": "addVariable"
       },
       {
@@ -14231,11 +17447,18 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 22,
+      "exactBytes": null
+    }
   },
   {
     "name": "PlayClientEffectLocMessage",
     "swgCrc32": "0x02949e74",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/ClientEffectMessages.h"
     ],
@@ -14298,11 +17521,18 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 30,
+      "exactBytes": null
+    }
   },
   {
     "name": "PlayClientEffectObjectMessage",
     "swgCrc32": "0x8855434a",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/ClientEffectMessages.h"
     ],
@@ -14337,11 +17567,18 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 14,
+      "exactBytes": null
+    }
   },
   {
     "name": "PlayClientEffectObjectTransformMessage",
     "swgCrc32": "0x4f5e09b6",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/ClientEffectMessages.h"
     ],
@@ -14359,7 +17596,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_transform",
         "archiveContainer": "AutoVariable",
         "cppType": "Transform",
-        "tsType": "unknown",
+        "tsType": "{ rotation: { x: number; y: number; z: number; w: number }; position: { x: number; y: number; z: number } }",
         "source": "addVariable"
       },
       {
@@ -14376,11 +17613,18 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 40,
+      "exactBytes": null
+    }
   },
   {
     "name": "PlayClientEventLocMessage",
     "swgCrc32": "0x0a4e222c",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/ClientEffectMessages.h"
     ],
@@ -14443,11 +17687,18 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 30,
+      "exactBytes": null
+    }
   },
   {
     "name": "PlayClientEventObjectMessage",
     "swgCrc32": "0xaf83c3f2",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/ClientEffectMessages.h"
     ],
@@ -14475,11 +17726,18 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 12,
+      "exactBytes": null
+    }
   },
   {
     "name": "PlayClientEventObjectTransformMessage",
     "swgCrc32": "0x90302f79",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/ClientEffectMessages.h"
     ],
@@ -14497,7 +17755,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_transform",
         "archiveContainer": "AutoVariable",
         "cppType": "Transform",
-        "tsType": "unknown",
+        "tsType": "{ rotation: { x: number; y: number; z: number; w: number }; position: { x: number; y: number; z: number } }",
         "source": "addVariable"
       },
       {
@@ -14507,15 +17765,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 38,
+      "exactBytes": null
+    }
   },
   {
     "name": "PlayCutSceneMessage",
     "swgCrc32": "0xf34397f6",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "PlayCutSceneMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/PlayCutSceneMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
@@ -14525,15 +17792,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 2,
+      "exactBytes": null
+    }
   },
   {
     "name": "PlayedTimeAccumMessage",
     "swgCrc32": "0xb68dd9bb",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "PlayedTimeAccumMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameGameServer/PlayedTimeAccumMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
@@ -14550,21 +17826,35 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 12,
+      "minBytes": 12
+    }
   },
   {
     "name": "PlayerMoneyRequest",
     "swgCrc32": "0x9d105aa1",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/PlayerMoneyRequest.h"
     ],
     "implementedInTypescript": true,
     "fieldCount": 0,
-    "fields": []
+    "fields": [],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 0,
+      "minBytes": 0
+    }
   },
   {
     "name": "PlayerMoneyResponse",
     "swgCrc32": "0x367e737e",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/PlayerMoneyResponse.h"
     ],
@@ -14585,15 +17875,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 8,
+      "minBytes": 8
+    }
   },
   {
     "name": "PlayMusicMessage",
     "swgCrc32": "0x04270d8a",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "PlayMusicMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/PlayMusicMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 4,
     "fields": [
       {
@@ -14624,51 +17923,78 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 15,
+      "exactBytes": null
+    }
   },
   {
     "name": "PopulateMissionBrowserMessage",
     "swgCrc32": "0x88d9885c",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "PopulateMissionBrowserMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/PopulateMissionBrowserMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
         "name": "m_missions",
         "archiveContainer": "AutoArray",
         "cppType": "NetworkId",
-        "tsType": "bigint",
+        "tsType": "bigint[]",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 4,
+      "exactBytes": null
+    }
   },
   {
     "name": "PopulationListMessage",
     "swgCrc32": "0x2286ec30",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "PopulationListMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/PopulationListMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
         "name": "m_list",
         "archiveContainer": "AutoVariable",
         "cppType": "PopulationList",
-        "tsType": "unknown",
+        "tsType": "{ scene: string; x: number; z: number; population: number }[]",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 4,
+      "exactBytes": null
+    }
   },
   {
     "name": "PreloadFinishedMessage",
     "swgCrc32": "0x58351f00",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "PreloadFinishedMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/PreloadFinishedMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
@@ -14678,15 +18004,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 1,
+      "minBytes": 1
+    }
   },
   {
     "name": "PreloadRequestCompleteMessage",
     "swgCrc32": "0xe7001b62",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "PreloadRequestCompleteMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/PreloadRequestCompleteMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
@@ -14703,15 +18038,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 8,
+      "minBytes": 8
+    }
   },
   {
     "name": "ProfilerOperationMessage",
     "swgCrc32": "0xdf0837f4",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ProfilerOperationMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameGameServer/ProfilerOperationMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
@@ -14728,22 +18072,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 6,
+      "exactBytes": null
+    }
   },
   {
     "name": "QueryAuctionHeadersMessage",
     "swgCrc32": "0x04fe82b0",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "QueryAuctionHeadersMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/QueryAuctionHeadersMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 21,
     "fields": [
       {
         "name": "m_responseId",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariable",
+        "cppType": "int",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -14834,7 +18187,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_advancedSearch",
         "archiveContainer": "AutoList",
         "cppType": "AuctionQueryHeadersMessage::SearchCondition",
-        "tsType": "unknown",
+        "tsType": "unknown[]",
         "source": "addVariable"
       },
       {
@@ -14886,22 +18239,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 77,
+      "exactBytes": null
+    }
   },
   {
     "name": "QueryVendorItemCountMessage",
     "swgCrc32": "0x6eac2a3e",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "QueryVendorItemCountMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/QueryVendorItemCountMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 3,
     "fields": [
       {
         "name": "m_responseId",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariable",
+        "cppType": "int",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -14918,15 +18280,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 16,
+      "minBytes": 16
+    }
   },
   {
     "name": "RandomNameRequest",
     "swgCrc32": "0x73c472da",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "RandomNameRequest"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/RandomName.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
@@ -14943,15 +18314,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 6,
+      "exactBytes": null
+    }
   },
   {
     "name": "RandomNameResponse",
     "swgCrc32": "0x1b718e0d",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "RandomNameResponse"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/RandomName.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 4,
     "fields": [
       {
@@ -14979,28 +18359,46 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_errorMessage",
         "archiveContainer": "AutoVariable",
         "cppType": "StringId",
-        "tsType": "unknown",
+        "tsType": "{ table: string; textIndex: number; text: string }",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 18,
+      "exactBytes": null
+    }
   },
   {
     "name": "RefreshCharacterList",
     "swgCrc32": "0xb6f405c7",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "RefreshCharacterList"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/ClientCentralMessages.h"
     ],
     "implementedInTypescript": true,
     "fieldCount": 0,
-    "fields": []
+    "fields": [],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 0,
+      "minBytes": 0
+    }
   },
   {
     "name": "ReleaseAuthoritativeMessage",
     "swgCrc32": "0x446fc7a7",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ReleaseAuthoritativeMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/ReleaseAuthoritativeMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
@@ -15017,15 +18415,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 12,
+      "minBytes": 12
+    }
   },
   {
     "name": "ReleaseNameMessage",
     "swgCrc32": "0x0b395e83",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ReleaseNameMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/CentralGameServerMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
@@ -15042,35 +18449,60 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 12,
+      "minBytes": 12
+    }
   },
   {
     "name": "ReloadAdminTableMessage",
     "swgCrc32": "0x3c50149a",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ReloadAdminTableMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameGameServer/ReloadAdminTableMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 0,
-    "fields": []
+    "fields": [],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 0,
+      "minBytes": 0
+    }
   },
   {
     "name": "ReloadCommandTableMessage",
     "swgCrc32": "0x813441ea",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ReloadCommandTableMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameGameServer/ReloadCommandTableMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 0,
-    "fields": []
+    "fields": [],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 0,
+      "minBytes": 0
+    }
   },
   {
     "name": "ReloadDatatableMessage",
     "swgCrc32": "0x9ae44f4b",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameGameServer/ReloadDatatableMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
@@ -15080,15 +18512,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 2,
+      "exactBytes": null
+    }
   },
   {
     "name": "ReloadScriptMessage",
     "swgCrc32": "0xb01e6f79",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ReloadScriptMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameGameServer/ReloadScriptMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
@@ -15098,15 +18539,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 2,
+      "exactBytes": null
+    }
   },
   {
     "name": "ReloadTemplateMessage",
     "swgCrc32": "0xe8954d93",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ReloadTemplateMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameGameServer/ReloadTemplateMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
@@ -15116,11 +18566,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 2,
+      "exactBytes": null
+    }
   },
   {
     "name": "RemoveItemMessage",
     "swgCrc32": "0x4417af8b",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "RemoveItemMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/SecureTradeMessages.h"
     ],
@@ -15134,15 +18593,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 8,
+      "minBytes": 8
+    }
   },
   {
     "name": "RenameCharacterMessage",
     "swgCrc32": "0x21d03ecf",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "RenameCharacterMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameGameServer/RenameCharacterMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 4,
     "fields": [
       {
@@ -15173,15 +18641,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 24,
+      "exactBytes": null
+    }
   },
   {
     "name": "RenameCharacterMessageEx",
     "swgCrc32": "0x32615bf7",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "RenameCharacterMessageEx"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameGameServer/RenameCharacterMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 7,
     "fields": [
       {
@@ -15233,15 +18710,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 30,
+      "exactBytes": null
+    }
   },
   {
     "name": "RequestBiographyMessage",
     "swgCrc32": "0x275ce034",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "RequestBiographyMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameGameServer/RequestBiographyMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
@@ -15251,11 +18737,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 8,
+      "minBytes": 8
+    }
   },
   {
     "name": "RequestCategoriesMessage",
     "swgCrc32": "0xf898e25f",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "RequestCategoriesMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/customerService/RequestCategoriesMessage.h"
     ],
@@ -15269,11 +18764,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 2,
+      "exactBytes": null
+    }
   },
   {
     "name": "RequestCategoriesResponseMessage",
     "swgCrc32": "0x61148fd4",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "RequestCategoriesResponseMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/customerService/RequestCategoriesResponseMessage.h"
     ],
@@ -15291,25 +18795,34 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_categories",
         "archiveContainer": "AutoArray",
         "cppType": "CustomerServiceCategory",
-        "tsType": "unknown",
+        "tsType": "unknown[]",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 8,
+      "exactBytes": null
+    }
   },
   {
     "name": "RequestChunkMessage",
     "swgCrc32": "0xd17e56e2",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "RequestChunkMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/RequestChunkMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
         "name": "m_chunks",
         "archiveContainer": "AutoArray",
         "cppType": "Chunk",
-        "tsType": "unknown",
+        "tsType": "unknown[]",
         "source": "addVariable"
       },
       {
@@ -15319,25 +18832,43 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 6,
+      "exactBytes": null
+    }
   },
   {
     "name": "RequestGalaxyLoopTimes",
     "swgCrc32": "0x7d842d68",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "RequestGalaxyLoopTimes"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/RequestGalaxyLoopTimes.h"
     ],
     "implementedInTypescript": true,
     "fieldCount": 0,
-    "fields": []
+    "fields": [],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 0,
+      "minBytes": 0
+    }
   },
   {
     "name": "RequestGameServerForLoginMessage",
     "swgCrc32": "0x539f07e8",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "RequestGameServerForLoginMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralPlanetServer/RequestGameServerForLoginMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 6,
     "fields": [
       {
@@ -15372,7 +18903,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_coordinates",
         "archiveContainer": "AutoVariable",
         "cppType": "Vector",
-        "tsType": "unknown",
+        "tsType": "{ x: number; y: number; z: number }",
         "source": "addVariable"
       },
       {
@@ -15382,15 +18913,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 35,
+      "exactBytes": null
+    }
   },
   {
     "name": "RequestObjectMessage",
     "swgCrc32": "0xe8a27aa1",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "RequestObjectMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/RequestObjectMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
@@ -15407,15 +18947,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 12,
+      "minBytes": 12
+    }
   },
   {
     "name": "RequestOIDsMessage",
     "swgCrc32": "0x1f5d9e6d",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "RequestOIDsMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/RequestObjectIdsMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 3,
     "fields": [
       {
@@ -15439,15 +18988,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 9,
+      "minBytes": 9
+    }
   },
   {
     "name": "RequestPlanetObjectIdMessage",
     "swgCrc32": "0x16661790",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "RequestPlanetObjectIdMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/RequestPlanetObjectIdMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
@@ -15457,15 +19015,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 2,
+      "exactBytes": null
+    }
   },
   {
     "name": "RequestSceneTransfer",
     "swgCrc32": "0xf609e9a3",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "RequestSceneTransfer"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/SceneTransferMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 8,
     "fields": [
       {
@@ -15493,14 +19060,14 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_position_p",
         "archiveContainer": "AutoVariable",
         "cppType": "Vector",
-        "tsType": "unknown",
+        "tsType": "{ x: number; y: number; z: number }",
         "source": "addVariable"
       },
       {
         "name": "m_position_w",
         "archiveContainer": "AutoVariable",
         "cppType": "Vector",
-        "tsType": "unknown",
+        "tsType": "{ x: number; y: number; z: number }",
         "source": "addVariable"
       },
       {
@@ -15524,15 +19091,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 50,
+      "exactBytes": null
+    }
   },
   {
     "name": "RequestUnloadObjectMessage",
     "swgCrc32": "0x59189a1f",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "RequestUnloadObjectMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/RequestUnloadObjectMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
@@ -15549,15 +19125,22 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 12,
+      "minBytes": 12
+    }
   },
   {
     "name": "RequestUnstick",
     "swgCrc32": "0x54ac0603",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/AIDebuggingMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
@@ -15567,15 +19150,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 8,
+      "minBytes": 8
+    }
   },
   {
     "name": "RequestWatchObjectPath",
-    "swgCrc32": "0xe8fe804f",
+    "swgCrc32": "0xd0cdaa62",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "DebugTransformMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/AIDebuggingMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 3,
     "fields": [
       {
@@ -15599,15 +19191,22 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 17,
+      "minBytes": 17
+    }
   },
   {
     "name": "RequestWatchPathMap",
     "swgCrc32": "0xd8cfe8a8",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/AIDebuggingMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
@@ -15624,15 +19223,22 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 9,
+      "minBytes": 9
+    }
   },
   {
     "name": "ResourceHarvesterActivatePageMessage",
     "swgCrc32": "0xde9821e6",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/ResourceHarvesterActivatePageMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
@@ -15642,22 +19248,29 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 8,
+      "minBytes": 8
+    }
   },
   {
     "name": "ResourceListForSurveyMessage",
     "swgCrc32": "0x8a64b1d5",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "game/shared/library/swgSharedNetworkMessages/src/shared/survey/ResourceListForSurveyMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 3,
     "fields": [
       {
         "name": "m_data",
         "archiveContainer": "AutoArray",
         "cppType": "DataItem",
-        "tsType": "unknown",
+        "tsType": "unknown[]",
         "source": "addVariable"
       },
       {
@@ -15674,15 +19287,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 14,
+      "exactBytes": null
+    }
   },
   {
     "name": "RestartServerMessage",
     "swgCrc32": "0xec40bb5c",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "RestartServerMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameGameServer/RestartServerMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 3,
     "fields": [
       {
@@ -15706,11 +19328,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 10,
+      "exactBytes": null
+    }
   },
   {
     "name": "RetrieveAuctionItemMessage",
     "swgCrc32": "0x12b0d449",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "RetrieveAuctionItemMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/RetrieveAuctionItemMessage.h"
     ],
@@ -15731,11 +19362,18 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 16,
+      "minBytes": 16
+    }
   },
   {
     "name": "RetrieveAuctionItemResponseMessage",
     "swgCrc32": "0x9499ef8c",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/RetrieveAuctionItemResponseMessage.h"
     ],
@@ -15756,15 +19394,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 12,
+      "minBytes": 12
+    }
   },
   {
     "name": "RetrievedItemLoadMessage",
     "swgCrc32": "0x28410810",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "RetrievedItemLoadMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameGameServer/RetrievedItemLoadMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
@@ -15781,15 +19428,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 16,
+      "minBytes": 16
+    }
   },
   {
     "name": "RevokeCommand",
     "swgCrc32": "0x22c9a55e",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "RevokeCommand"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/RevokeCommand.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
@@ -15799,15 +19455,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 2,
+      "exactBytes": null
+    }
   },
   {
     "name": "RevokeSkill",
     "swgCrc32": "0xeffbee72",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "RevokeSkill"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/RevokeSkill.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
@@ -15817,11 +19482,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 2,
+      "exactBytes": null
+    }
   },
   {
     "name": "SceneCreateObjectByCrc",
     "swgCrc32": "0xfe89ddea",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "SceneCreateObjectByCrc"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/SceneChannelMessages.h"
     ],
@@ -15839,7 +19513,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_transform",
         "archiveContainer": "AutoVariable",
         "cppType": "Transform",
-        "tsType": "unknown",
+        "tsType": "{ rotation: { x: number; y: number; z: number; w: number }; position: { x: number; y: number; z: number } }",
         "source": "addVariable"
       },
       {
@@ -15856,11 +19530,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 41,
+      "minBytes": 41
+    }
   },
   {
     "name": "SceneCreateObjectByName",
     "swgCrc32": "0x1f73d501",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "SceneCreateObjectByName"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/SceneChannelMessages.h"
     ],
@@ -15878,7 +19561,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_transform",
         "archiveContainer": "AutoVariable",
         "cppType": "Transform",
-        "tsType": "unknown",
+        "tsType": "{ rotation: { x: number; y: number; z: number; w: number }; position: { x: number; y: number; z: number } }",
         "source": "addVariable"
       },
       {
@@ -15895,11 +19578,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 39,
+      "exactBytes": null
+    }
   },
   {
     "name": "SceneDestroyObject",
     "swgCrc32": "0x4d45d504",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "SceneDestroyObject"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/SceneChannelMessages.h"
     ],
@@ -15920,11 +19612,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 9,
+      "minBytes": 9
+    }
   },
   {
     "name": "SceneEndBaselines",
     "swgCrc32": "0x2c436037",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "SceneEndBaselines"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/SceneChannelMessages.h"
     ],
@@ -15938,15 +19639,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 8,
+      "minBytes": 8
+    }
   },
   {
     "name": "SceneTransferMessage",
     "swgCrc32": "0xf68d0454",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "SceneTransferMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/SceneTransferMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 9,
     "fields": [
       {
@@ -15974,14 +19684,14 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_position_p",
         "archiveContainer": "AutoVariable",
         "cppType": "Vector",
-        "tsType": "unknown",
+        "tsType": "{ x: number; y: number; z: number }",
         "source": "addVariable"
       },
       {
         "name": "m_position_w",
         "archiveContainer": "AutoVariable",
         "cppType": "Vector",
-        "tsType": "unknown",
+        "tsType": "{ x: number; y: number; z: number }",
         "source": "addVariable"
       },
       {
@@ -16012,11 +19722,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 54,
+      "exactBytes": null
+    }
   },
   {
     "name": "SearchKnowledgeBaseMessage",
     "swgCrc32": "0x962e8b9b",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "SearchKnowledgeBaseMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/customerService/SearchKnowledgeBaseMessage.h"
     ],
@@ -16037,11 +19756,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 6,
+      "exactBytes": null
+    }
   },
   {
     "name": "SearchKnowledgeBaseResponseMessage",
     "swgCrc32": "0x7cbc8f67",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "SearchKnowledgeBaseResponseMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/customerService/SearchKnowledgeBaseResponseMessage.h"
     ],
@@ -16059,14 +19787,23 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_searchResults",
         "archiveContainer": "AutoArray",
         "cppType": "CustomerServiceSearchResult",
-        "tsType": "unknown",
+        "tsType": "unknown[]",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 8,
+      "exactBytes": null
+    }
   },
   {
     "name": "SelectCharacter",
     "swgCrc32": "0xb5098d76",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "SelectCharacter"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/ClientCentralMessages.h"
     ],
@@ -16080,22 +19817,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 8,
+      "minBytes": 8
+    }
   },
   {
     "name": "ServerDeleteCharacterMessage",
     "swgCrc32": "0x3c2b2151",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ServerDeleteCharacterMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/loginCentralServer/ServerDeleteCharacterMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 3,
     "fields": [
       {
         "name": "m_stationId",
         "archiveContainer": "AutoVariable",
         "cppType": "StationId",
-        "tsType": "unknown",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -16112,15 +19858,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 16,
+      "minBytes": 16
+    }
   },
   {
     "name": "ServerIdleMessage",
     "swgCrc32": "0x2394ec69",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ServerIdleMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameTaskManager/GameTaskManagerMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
@@ -16130,11 +19885,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 1,
+      "minBytes": 1
+    }
   },
   {
     "name": "ServerTimeMessage",
     "swgCrc32": "0x2ebc3bd9",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ServerTimeMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/ServerTimeMessage.h"
     ],
@@ -16148,11 +19912,18 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 8,
+      "minBytes": 8
+    }
   },
   {
     "name": "ServerWeatherMessage",
     "swgCrc32": "0x486356ea",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/ServerWeatherMessage.h"
     ],
@@ -16170,18 +19941,27 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_windVelocity_w",
         "archiveContainer": "AutoVariable",
         "cppType": "Vector",
-        "tsType": "unknown",
+        "tsType": "{ x: number; y: number; z: number }",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 16,
+      "minBytes": 16
+    }
   },
   {
     "name": "SetAuthoritativeMessage",
     "swgCrc32": "0xf35341dd",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "SetAuthoritativeMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/SetAuthoritativeMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 7,
     "fields": [
       {
@@ -16223,7 +20003,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_goalTransform",
         "archiveContainer": "AutoVariable",
         "cppType": "Transform",
-        "tsType": "unknown",
+        "tsType": "{ rotation: { x: number; y: number; z: number; w: number }; position: { x: number; y: number; z: number } }",
         "source": "addVariable"
       },
       {
@@ -16233,15 +20013,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 51,
+      "minBytes": 51
+    }
   },
   {
     "name": "SetConnectionServerPublic",
     "swgCrc32": "0x134c6ea0",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "SetConnectionServerPublic"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralConnectionServer/SetConnectionServerPublic.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
@@ -16251,22 +20040,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 1,
+      "minBytes": 1
+    }
   },
   {
     "name": "SetEntranceChargeMessage",
     "swgCrc32": "0x2970990c",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "SetEntranceChargeMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/SetEntranceChargeMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 4,
     "fields": [
       {
         "name": "m_responseId",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariable",
+        "cppType": "int",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -16290,22 +20088,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 20,
+      "minBytes": 20
+    }
   },
   {
     "name": "SetGameTimeMessage",
     "swgCrc32": "0x7feb61fd",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "SetGameTimeMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/SetGameTimeMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 3,
     "fields": [
       {
         "name": "m_responseId",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariable",
+        "cppType": "int",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -16322,15 +20129,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 12,
+      "minBytes": 12
+    }
   },
   {
     "name": "SetObjectPositionMessage",
     "swgCrc32": "0xf6dc76b0",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "SetObjectPositionMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/SetObjectPositionMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 4,
     "fields": [
       {
@@ -16361,15 +20177,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 12,
+      "exactBytes": null
+    }
   },
   {
     "name": "SetPlanetServerMessage",
     "swgCrc32": "0xce0f25c5",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "SetPlanetServerMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/SetPlanetServerMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
@@ -16386,22 +20211,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 4,
+      "exactBytes": null
+    }
   },
   {
     "name": "SetSalesTaxMessage",
     "swgCrc32": "0x456d250e",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "SetSalesTaxMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/SetSalesTaxMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 5,
     "fields": [
       {
         "name": "m_responseId",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariable",
+        "cppType": "int",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -16432,11 +20266,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 22,
+      "exactBytes": null
+    }
   },
   {
     "name": "SetTransformMessage",
     "swgCrc32": "0x808914ec",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "SetTransformMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/common/SetTransformMessage.h"
     ],
@@ -16454,7 +20297,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_transform",
         "archiveContainer": "AutoVariable",
         "cppType": "Transform",
-        "tsType": "unknown",
+        "tsType": "{ rotation: { x: number; y: number; z: number; w: number }; position: { x: number; y: number; z: number } }",
         "source": "addVariable"
       },
       {
@@ -16464,15 +20307,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 44,
+      "minBytes": 44
+    }
   },
   {
     "name": "SetUniverseAuthoritativeMessage",
     "swgCrc32": "0x634b6158",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "SetUniverseAuthoritativeMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/SetUniverseAuthoritativeMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
@@ -16482,11 +20334,18 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 4,
+      "minBytes": 4
+    }
   },
   {
     "name": "ShipUpdateTransformCollisionMessage",
     "swgCrc32": "0x763648d0",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/ShipUpdateTransformCollisionMessage.h"
     ],
@@ -16504,14 +20363,14 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_transform",
         "archiveContainer": "AutoVariable",
         "cppType": "Transform",
-        "tsType": "unknown",
+        "tsType": "{ rotation: { x: number; y: number; z: number; w: number }; position: { x: number; y: number; z: number } }",
         "source": "addVariable"
       },
       {
         "name": "m_velocity",
         "archiveContainer": "AutoVariable",
         "cppType": "Vector",
-        "tsType": "unknown",
+        "tsType": "{ x: number; y: number; z: number }",
         "source": "addVariable"
       },
       {
@@ -16521,11 +20380,18 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 52,
+      "minBytes": 52
+    }
   },
   {
     "name": "ShipUpdateTransformMessage",
     "swgCrc32": "0x76026fb9",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/ShipUpdateTransformMessage.h"
     ],
@@ -16543,35 +20409,35 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_transform",
         "archiveContainer": "AutoVariable",
         "cppType": "PackedTransform",
-        "tsType": "unknown",
+        "tsType": "{ rotation: { w: number; x: number; y: number; z: number }; position: { x: number; y: number; z: number } }",
         "source": "addVariable"
       },
       {
         "name": "m_velocity",
         "archiveContainer": "AutoVariable",
         "cppType": "PackedVelocity",
-        "tsType": "unknown",
+        "tsType": "{ vx: number; vy: number; vz: number }",
         "source": "addVariable"
       },
       {
         "name": "m_yawRate",
         "archiveContainer": "AutoVariable",
         "cppType": "PackedRotationRate",
-        "tsType": "unknown",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
         "name": "m_pitchRate",
         "archiveContainer": "AutoVariable",
         "cppType": "PackedRotationRate",
-        "tsType": "unknown",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
         "name": "m_rollRate",
         "archiveContainer": "AutoVariable",
         "cppType": "PackedRotationRate",
-        "tsType": "unknown",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -16581,15 +20447,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 23,
+      "minBytes": 23
+    }
   },
   {
     "name": "ShutdownCluster",
     "swgCrc32": "0xfdba3a4b",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ShutdownCluster"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/CentralGameServerMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 3,
     "fields": [
       {
@@ -16613,11 +20488,18 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 12,
+      "exactBytes": null
+    }
   },
   {
     "name": "SlowDownEffectMessage",
     "swgCrc32": "0x29b9a8d4",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/SlowDownEffectMessage.h"
     ],
@@ -16666,15 +20548,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 32,
+      "minBytes": 32
+    }
   },
   {
     "name": "SpawnGameServer",
     "swgCrc32": "0x7f6649a2",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "SpawnGameServer"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralTaskManager/CentralTaskMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
@@ -16691,22 +20582,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 4,
+      "exactBytes": null
+    }
   },
   {
     "name": "SPCharacterProfileMessage",
     "swgCrc32": "0x7a3e1b23",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "SPCharacterProfileMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameStationPlayersCollector/SPCharacterProfileMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 16,
     "fields": [
       {
         "name": "m_clusterName",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariable",
+        "cppType": "std::string",
+        "tsType": "string",
         "source": "addVariable"
       },
       {
@@ -16814,11 +20714,18 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 62,
+      "exactBytes": null
+    }
   },
   {
     "name": "StatMigrationTargetsMessage",
     "swgCrc32": "0xefac38c4",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/StatMigrationTargetsMessage.h"
     ],
@@ -16874,21 +20781,37 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 28,
+      "minBytes": 28
+    }
   },
   {
     "name": "StomachRequestMessage",
     "swgCrc32": "0xb75dd5d7",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "StomachRequestMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/StomachRequestMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 0,
-    "fields": []
+    "fields": [],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 0,
+      "minBytes": 0
+    }
   },
   {
     "name": "StopClientEffectObjectByLabelMessage",
     "swgCrc32": "0xad6f6b26",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/ClientEffectMessages.h"
     ],
@@ -16916,22 +20839,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 11,
+      "exactBytes": null
+    }
   },
   {
     "name": "StructureListMessage",
     "swgCrc32": "0xc16c1699",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "StructureListMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/StructureListMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 4,
     "fields": [
       {
         "name": "m_data",
         "archiveContainer": "AutoArray",
         "cppType": "StructureListMessageData",
-        "tsType": "unknown",
+        "tsType": "unknown[]",
         "source": "addVariable"
       },
       {
@@ -16955,36 +20887,45 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 20,
+      "exactBytes": null
+    }
   },
   {
     "name": "StructuresForPurgeMessage",
     "swgCrc32": "0x9e837e1a",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "StructuresForPurgeMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameGameServer/StructuresForPurgeMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 4,
     "fields": [
       {
         "name": "m_stationId",
         "archiveContainer": "AutoVariable",
         "cppType": "StationId",
-        "tsType": "unknown",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
         "name": "m_structures",
         "archiveContainer": "AutoArray",
         "cppType": "std::pair<NetworkId, NetworkId>",
-        "tsType": "bigint",
+        "tsType": "bigint[]",
         "source": "addVariable"
       },
       {
         "name": "m_vendors",
         "archiveContainer": "AutoArray",
         "cppType": "std::pair<NetworkId, std::pair<NetworkId, Unicode::String> >",
-        "tsType": "bigint",
+        "tsType": "bigint[]",
         "source": "addVariable"
       },
       {
@@ -16994,11 +20935,18 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 13,
+      "exactBytes": null
+    }
   },
   {
     "name": "SuiCreatePageMessage",
     "swgCrc32": "0xd44b7259",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/SuiCreatePageMessage.h"
     ],
@@ -17009,14 +20957,21 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_pageData",
         "archiveContainer": "AutoDeltaVariable",
         "cppType": "SuiPageData",
-        "tsType": "unknown",
+        "tsType": "SuiPageData",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 34,
+      "exactBytes": null
+    }
   },
   {
     "name": "SuiEventNotification",
     "swgCrc32": "0x092d3564",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/SuiEventNotification.h"
     ],
@@ -17041,18 +20996,25 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_subscribedProperties",
         "archiveContainer": "AutoDeltaVector",
         "cppType": "Unicode::String",
-        "tsType": "string",
+        "tsType": "string[]",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 12,
+      "exactBytes": null
+    }
   },
   {
     "name": "SUIMessage",
     "swgCrc32": "0x09d8905f",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/ServerUserInterfaceMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
@@ -17062,11 +21024,18 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 4,
+      "minBytes": 4
+    }
   },
   {
     "name": "SuiUpdatePageMessage",
     "swgCrc32": "0x5f3342f6",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/SuiUpdatePageMessage.h"
     ],
@@ -17077,36 +21046,52 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_pageData",
         "archiveContainer": "AutoDeltaVariable",
         "cppType": "SuiPageData",
-        "tsType": "unknown",
+        "tsType": "SuiPageData",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 34,
+      "exactBytes": null
+    }
   },
   {
     "name": "SurveyMessage",
     "swgCrc32": "0x877f79ac",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "game/shared/library/swgSharedNetworkMessages/src/shared/survey/SurveyMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
         "name": "m_data",
         "archiveContainer": "AutoArray",
         "cppType": "DataItem",
-        "tsType": "unknown",
+        "tsType": "unknown[]",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 4,
+      "exactBytes": null
+    }
   },
   {
     "name": "SynchronizeScriptVarDeltasMessage",
     "swgCrc32": "0x9ca86247",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "SynchronizeScriptVarDeltasMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameGameServer/SynchronizeScriptVarDeltasMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
@@ -17123,15 +21108,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number[]",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 12,
+      "exactBytes": null
+    }
   },
   {
     "name": "SynchronizeScriptVarsMessage",
     "swgCrc32": "0x1d28083d",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "SynchronizeScriptVarsMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameGameServer/SynchronizeScriptVarsMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
@@ -17148,15 +21142,51 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number[]",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 12,
+      "exactBytes": null
+    }
+  },
+  {
+    "name": "SystemAssignedProcessId",
+    "swgCrc32": "0x58c07f21",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "SystemAssignedProcessId"
+    ],
+    "headers": [
+      "engine/server/library/serverUtility/src/shared/SystemAssignedProcessId.h"
+    ],
+    "implementedInTypescript": true,
+    "fieldCount": 1,
+    "fields": [
+      {
+        "name": "m_id",
+        "archiveContainer": "AutoVariable",
+        "cppType": "unsigned long",
+        "tsType": "number",
+        "source": "addVariable"
+      }
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 4,
+      "minBytes": 4
+    }
   },
   {
     "name": "TaskConnectionIdMessage",
     "swgCrc32": "0xa80b40ac",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "TaskConnectionIdMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/TaskConnectionIdMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 4,
     "fields": [
       {
@@ -17187,15 +21217,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 9,
+      "exactBytes": null
+    }
   },
   {
     "name": "TaskConsoleCommand",
     "swgCrc32": "0x1ca9759e",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "TaskConsoleCommand"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/core/TaskConsoleCommand.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
@@ -17205,33 +21244,51 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 2,
+      "exactBytes": null
+    }
   },
   {
     "name": "TaskEnumCluster",
     "swgCrc32": "0x8f4efa4f",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "TaskEnumCluster"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/TaskEnumCluster.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
         "name": "clusterNames",
         "archiveContainer": "AutoArray",
         "cppType": "std::string",
-        "tsType": "string",
+        "tsType": "string[]",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 4,
+      "exactBytes": null
+    }
   },
   {
     "name": "TaskEnumProcesses",
     "swgCrc32": "0xc6a76016",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "TaskEnumProcesses"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/TaskEnumProcesses.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 4,
     "fields": [
       {
@@ -17245,32 +21302,41 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "commandLines",
         "archiveContainer": "AutoArray",
         "cppType": "std::string",
-        "tsType": "string",
+        "tsType": "string[]",
         "source": "addVariable"
       },
       {
         "name": "loadedOnStartup",
         "archiveContainer": "AutoArray",
         "cppType": "bool",
-        "tsType": "boolean",
+        "tsType": "boolean[]",
         "source": "addVariable"
       },
       {
         "name": "pids",
         "archiveContainer": "AutoArray",
         "cppType": "uint32",
-        "tsType": "number",
+        "tsType": "number[]",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 14,
+      "exactBytes": null
+    }
   },
   {
     "name": "TaskKillProcess",
     "swgCrc32": "0xb949e0c6",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "TaskKillProcess"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/TaskKillProcess.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 3,
     "fields": [
       {
@@ -17294,15 +21360,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 7,
+      "exactBytes": null
+    }
   },
   {
     "name": "TaskProcessDiedMessage",
     "swgCrc32": "0xdb3525b4",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "TaskProcessDiedMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralTaskManager/TaskProcessDiedMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
@@ -17319,25 +21394,43 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 6,
+      "exactBytes": null
+    }
   },
   {
     "name": "TaskShutdownGameServer",
     "swgCrc32": "0xd1926a07",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "TaskShutdownGameServer"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameTaskManager/GameTaskManagerMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 0,
-    "fields": []
+    "fields": [],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 0,
+      "minBytes": 0
+    }
   },
   {
     "name": "TaskSpawnProcess",
     "swgCrc32": "0x5759d090",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "TaskSpawnProcess"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/TaskSpawnProcess.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 5,
     "fields": [
       {
@@ -17375,15 +21468,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 14,
+      "exactBytes": null
+    }
   },
   {
     "name": "TaskSpawnProcessAck",
     "swgCrc32": "0x4dff97ea",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "TaskSpawnProcessAck"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/TaskSpawnProcessAck.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
@@ -17393,15 +21495,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 4,
+      "minBytes": 4
+    }
   },
   {
     "name": "TaskUtilization",
     "swgCrc32": "0x28b95196",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "TaskUtilization"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/TaskUtilization.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
@@ -17418,15 +21529,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 5,
+      "minBytes": 5
+    }
   },
   {
     "name": "TeleportMessage",
     "swgCrc32": "0x0d694486",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "TeleportMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameGameServer/TeleportMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 5,
     "fields": [
       {
@@ -17447,7 +21567,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_position_w",
         "archiveContainer": "AutoVariable",
         "cppType": "Vector",
-        "tsType": "unknown",
+        "tsType": "{ x: number; y: number; z: number }",
         "source": "addVariable"
       },
       {
@@ -17461,18 +21581,27 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_position_p",
         "archiveContainer": "AutoVariable",
         "cppType": "Vector",
-        "tsType": "unknown",
+        "tsType": "{ x: number; y: number; z: number }",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 42,
+      "exactBytes": null
+    }
   },
   {
     "name": "TeleportToMessage",
     "swgCrc32": "0x49f2b5aa",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "TeleportToMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameGameServer/TeleportToMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 3,
     "fields": [
       {
@@ -17496,15 +21625,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 20,
+      "minBytes": 20
+    }
   },
   {
     "name": "ToggleAvatarLoginStatus",
     "swgCrc32": "0x8b164ae1",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ToggleAvatarLoginStatus"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/ToggleAvatarLoginStatus.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 4,
     "fields": [
       {
@@ -17535,25 +21673,43 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 15,
+      "exactBytes": null
+    }
   },
   {
     "name": "TradeCompleteMessage",
     "swgCrc32": "0xc542038b",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "TradeCompleteMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/SecureTradeMessages.h"
     ],
     "implementedInTypescript": true,
     "fieldCount": 0,
-    "fields": []
+    "fields": [],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 0,
+      "minBytes": 0
+    }
   },
   {
     "name": "TransferControlMessage",
     "swgCrc32": "0x919a236d",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "TransferControlMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameConnectionServer/GameConnectionServerMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 4,
     "fields": [
       {
@@ -17581,25 +21737,34 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_observedObjects",
         "archiveContainer": "AutoArray",
         "cppType": "NetworkId",
-        "tsType": "bigint",
+        "tsType": "bigint[]",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 17,
+      "exactBytes": null
+    }
   },
   {
     "name": "TransferReplyCharacterList",
     "swgCrc32": "0x16ca2acd",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "TransferReplyCharacterList"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/transferServer/TransferReplyCharacterList.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 3,
     "fields": [
       {
         "name": "m_avatarList",
         "archiveContainer": "AutoVariable",
         "cppType": "AvatarList",
-        "tsType": "unknown",
+        "tsType": "{ m_name: string; m_objectTemplateId: number; m_networkId: bigint; m_clusterId: number; m_characterType: number }[]",
         "source": "addVariable"
       },
       {
@@ -17616,15 +21781,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 12,
+      "exactBytes": null
+    }
   },
   {
     "name": "TransferReplyMoveValidation",
     "swgCrc32": "0x1f977c9d",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "TransferReplyMoveValidation"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/transferServer/TransferReplyMoveValidation.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 12,
     "fields": [
       {
@@ -17711,15 +21885,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 36,
+      "exactBytes": null
+    }
   },
   {
     "name": "TransferRequestMoveValidation",
     "swgCrc32": "0x9ece4f53",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "TransferRequestMoveValidation"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/transferServer/TransferRequestMoveValidation.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 11,
     "fields": [
       {
@@ -17799,25 +21982,43 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 35,
+      "exactBytes": null
+    }
   },
   {
     "name": "UnAcceptTransactionMessage",
     "swgCrc32": "0xe81e4382",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "UnAcceptTransactionMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/SecureTradeMessages.h"
     ],
     "implementedInTypescript": true,
     "fieldCount": 0,
-    "fields": []
+    "fields": [],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 0,
+      "minBytes": 0
+    }
   },
   {
     "name": "UnloadedPlayerMessage",
     "swgCrc32": "0x58cd04e6",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "UnloadedPlayerMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameGameServer/UnloadedPlayerMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
@@ -17827,15 +22028,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 8,
+      "minBytes": 8
+    }
   },
   {
     "name": "UnloadObjectMessage",
     "swgCrc32": "0x3be552e8",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "UnloadObjectMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/UnloadObjectMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
@@ -17845,15 +22055,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 8,
+      "minBytes": 8
+    }
   },
   {
     "name": "UnloadProxyMessage",
     "swgCrc32": "0x0901cb45",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "UnloadProxyMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gamePlanetServer/UnloadProxyMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
@@ -17870,11 +22089,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 12,
+      "minBytes": 12
+    }
   },
   {
     "name": "UpdateCellPermissionMessage",
     "swgCrc32": "0xf612499c",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "UpdateCellPermissionMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/UpdateCellPermissionMessage.h"
     ],
@@ -17895,15 +22123,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 9,
+      "minBytes": 9
+    }
   },
   {
     "name": "UpdateConnectionServerStatus",
     "swgCrc32": "0xe87735a6",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "UpdateConnectionServerStatus"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralConnectionServer/UpdateConnectionServerStatus.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
@@ -17920,15 +22157,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 4,
+      "minBytes": 4
+    }
   },
   {
     "name": "UpdateContainmentMessage",
     "swgCrc32": "0x56cbde9e",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "UpdateContainmentMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/UpdateContainmentMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 3,
     "fields": [
       {
@@ -17952,15 +22198,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 20,
+      "minBytes": 20
+    }
   },
   {
     "name": "UpdateLoginConnectionServerStatus",
     "swgCrc32": "0x1b5e3f1c",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "UpdateLoginConnectionServerStatus"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/loginCentralServer/UpdateLoginConnectionServerStatus.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 4,
     "fields": [
       {
@@ -17991,11 +22246,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 12,
+      "minBytes": 12
+    }
   },
   {
     "name": "UpdateMissileMessage",
     "swgCrc32": "0x1228cd01",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "UpdateMissileMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/UpdateMissileMessage.h"
     ],
@@ -18030,15 +22294,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 20,
+      "minBytes": 20
+    }
   },
   {
     "name": "UpdateObjectOnPlanetMessage",
     "swgCrc32": "0x65a2418e",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "UpdateObjectOnPlanetMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gamePlanetServer/UpdateObjectOnPlanetMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 15,
     "fields": [
       {
@@ -18146,15 +22419,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 59,
+      "minBytes": 59
+    }
   },
   {
     "name": "UpdateObjectPositionMessage",
     "swgCrc32": "0xf99b631a",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "UpdateObjectPositionMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameGameServer/UpdateObjectPositionMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 8,
     "fields": [
       {
@@ -18168,14 +22450,14 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_transform",
         "archiveContainer": "AutoVariable",
         "cppType": "Transform",
-        "tsType": "unknown",
+        "tsType": "{ rotation: { x: number; y: number; z: number; w: number }; position: { x: number; y: number; z: number } }",
         "source": "addVariable"
       },
       {
         "name": "m_worldspaceTransform",
         "archiveContainer": "AutoVariable",
         "cppType": "Transform",
-        "tsType": "unknown",
+        "tsType": "{ rotation: { x: number; y: number; z: number; w: number }; position: { x: number; y: number; z: number } }",
         "source": "addVariable"
       },
       {
@@ -18213,15 +22495,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 86,
+      "minBytes": 86
+    }
   },
   {
     "name": "UpdatePlayerCountMessage",
     "swgCrc32": "0xf213b208",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "UpdatePlayerCountMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralConnectionServer/UpdatePlayerCountMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 6,
     "fields": [
       {
@@ -18266,15 +22557,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 21,
+      "minBytes": 21
+    }
   },
   {
     "name": "UpdatePostureMessage",
     "swgCrc32": "0x0bde6b41",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "UpdatePostureMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/UpdatePostureMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
@@ -18291,11 +22591,18 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 9,
+      "minBytes": 9
+    }
   },
   {
     "name": "UpdatePvpStatusMessage",
     "swgCrc32": "0x08a1c126",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/UpdatePvpStatusMessage.h"
     ],
@@ -18323,15 +22630,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 16,
+      "minBytes": 16
+    }
   },
   {
     "name": "UpdateTransformMessage",
     "swgCrc32": "0x1b24f808",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "UpdateTransformMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/UpdateTransformMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 9,
     "fields": [
       {
@@ -18397,15 +22713,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 22,
+      "minBytes": 22
+    }
   },
   {
     "name": "UpdateTransformWithParentMessage",
     "swgCrc32": "0xc867ab5a",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "UpdateTransformWithParentMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/UpdateTransformWithParentMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 10,
     "fields": [
       {
@@ -18478,22 +22803,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 30,
+      "minBytes": 30
+    }
   },
   {
     "name": "UpdateVendorSearchOptionMessage",
     "swgCrc32": "0x19859626",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "UpdateVendorSearchOptionMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/UpdateVendorSearchOptionMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 5,
     "fields": [
       {
         "name": "m_responseId",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariable",
+        "cppType": "int",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -18524,22 +22858,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 25,
+      "minBytes": 25
+    }
   },
   {
     "name": "UpdateVendorStatusMessage",
     "swgCrc32": "0x88ce562f",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "UpdateVendorStatusMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/UpdateVendorStatusMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 3,
     "fields": [
       {
         "name": "m_vendorId",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariable",
+        "cppType": "NetworkId",
+        "tsType": "bigint",
         "source": "addVariable"
       },
       {
@@ -18556,15 +22899,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 14,
+      "exactBytes": null
+    }
   },
   {
     "name": "UploadCharacterMessage",
     "swgCrc32": "0x4526695f",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "UploadCharacterMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/UploadCharacterMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 5,
     "fields": [
       {
@@ -18602,22 +22954,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 19,
+      "exactBytes": null
+    }
   },
   {
     "name": "ValidateAccountMessage",
     "swgCrc32": "0xfc0486bf",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ValidateAccountMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/loginCentralServer/ValidateAccountMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 3,
     "fields": [
       {
         "name": "m_stationId",
         "archiveContainer": "AutoVariable",
         "cppType": "StationId",
-        "tsType": "unknown",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -18634,22 +22995,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 12,
+      "minBytes": 12
+    }
   },
   {
     "name": "ValidateAccountReplyMessage",
     "swgCrc32": "0x56c5340b",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ValidateAccountReplyMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/loginCentralServer/ValidateAccountReplyMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 8,
     "fields": [
       {
         "name": "m_stationId",
         "archiveContainer": "AutoVariable",
         "cppType": "StationId",
-        "tsType": "unknown",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -18691,32 +23061,41 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_consumedRewardEvents",
         "archiveContainer": "AutoArray",
         "cppType": "std::pair<NetworkId, std::string>",
-        "tsType": "bigint",
+        "tsType": "bigint[]",
         "source": "addVariable"
       },
       {
         "name": "m_claimedRewardItems",
         "archiveContainer": "AutoArray",
         "cppType": "std::pair<NetworkId, std::string>",
-        "tsType": "bigint",
+        "tsType": "bigint[]",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 20,
+      "exactBytes": null
+    }
   },
   {
     "name": "ValidateCharacterForLoginMessage",
     "swgCrc32": "0x5632d8d6",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "ValidateCharacterForLoginMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralConnectionServer/ValidateCharacterForLoginMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
         "name": "m_suid",
         "archiveContainer": "AutoVariable",
         "cppType": "StationId",
-        "tsType": "unknown",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -18726,15 +23105,25 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 12,
+      "minBytes": 12
+    }
   },
   {
     "name": "ValidateCharacterForLoginReplyMessage",
     "swgCrc32": "0x0ed64af4",
+    "crcSource": "constructorStringMultiple",
+    "wireNames": [
+      "ValidateCharacterForLoginReplyMessage",
+      "ValidateCharacterForLoginMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralConnectionServer/ValidateCharacterForLoginReplyMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 7,
     "fields": [
       {
@@ -18748,7 +23137,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_suid",
         "archiveContainer": "AutoVariable",
         "cppType": "StationId",
-        "tsType": "unknown",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -18776,7 +23165,7 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_coordinates",
         "archiveContainer": "AutoVariable",
         "cppType": "Vector",
-        "tsType": "unknown",
+        "tsType": "{ x: number; y: number; z: number }",
         "source": "addVariable"
       },
       {
@@ -18786,22 +23175,31 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 39,
+      "exactBytes": null
+    }
   },
   {
     "name": "VendorStatusChangeMessage",
     "swgCrc32": "0x7ddf97fb",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "VendorStatusChangeMessage"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/gameCommoditiesServer/VendorStatusChangeMessage.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
         "name": "m_vendorId",
-        "archiveContainer": "Unknown",
-        "cppType": "unknown",
-        "tsType": "unknown",
+        "archiveContainer": "AutoVariable",
+        "cppType": "NetworkId",
+        "tsType": "bigint",
         "source": "addVariable"
       },
       {
@@ -18811,15 +23209,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 12,
+      "minBytes": 12
+    }
   },
   {
     "name": "VerifyAndLockNameRequest",
     "swgCrc32": "0x7e71dc9d",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "VerifyAndLockNameRequest"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/VerifyAndLockName.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 5,
     "fields": [
       {
@@ -18857,15 +23264,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 22,
+      "exactBytes": null
+    }
   },
   {
     "name": "VerifyAndLockNameResponse",
     "swgCrc32": "0x9f124fde",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "VerifyAndLockNameResponse"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/VerifyAndLockName.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 3,
     "fields": [
       {
@@ -18886,18 +23302,27 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_errorMessage",
         "archiveContainer": "AutoVariable",
         "cppType": "StringId",
-        "tsType": "unknown",
+        "tsType": "{ table: string; textIndex: number; text: string }",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 16,
+      "exactBytes": null
+    }
   },
   {
     "name": "VerifyNameRequest",
     "swgCrc32": "0x414190c2",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "VerifyNameRequest"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/CentralGameServerMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 4,
     "fields": [
       {
@@ -18928,15 +23353,24 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 18,
+      "exactBytes": null
+    }
   },
   {
     "name": "VerifyNameResponse",
     "swgCrc32": "0x4323c0f3",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "VerifyNameResponse"
+    ],
     "headers": [
       "engine/server/library/serverNetworkMessages/src/shared/centralGameServer/CentralGameServerMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 5,
     "fields": [
       {
@@ -18971,14 +23405,23 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_errorMessage",
         "archiveContainer": "AutoVariable",
         "cppType": "StringId",
-        "tsType": "unknown",
+        "tsType": "{ table: string; textIndex: number; text: string }",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 26,
+      "exactBytes": null
+    }
   },
   {
     "name": "VerifyPlayerNameMessage",
     "swgCrc32": "0xbb8cad45",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "VerifyPlayerNameMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/customerService/VerifyPlayerNameMessage.h"
     ],
@@ -18999,11 +23442,20 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "bigint",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 12,
+      "exactBytes": null
+    }
   },
   {
     "name": "VerifyPlayerNameResponseMessage",
     "swgCrc32": "0xf4c498fd",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "VerifyPlayerNameResponseMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/customerService/VerifyPlayerNameResponseMessage.h"
     ],
@@ -19024,25 +23476,41 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 5,
+      "exactBytes": null
+    }
   },
   {
     "name": "VerifyTradeMessage",
     "swgCrc32": "0x9ae247ee",
+    "crcSource": "constructorString",
+    "wireNames": [
+      "VerifyTradeMessage"
+    ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/SecureTradeMessages.h"
     ],
     "implementedInTypescript": true,
     "fieldCount": 0,
-    "fields": []
+    "fields": [],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 0,
+      "minBytes": 0
+    }
   },
   {
     "name": "VoiceChatAddClientToChannel",
     "swgCrc32": "0x42f4feed",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/voicechat/VoiceChatMiscMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 4,
     "fields": [
       {
@@ -19073,15 +23541,22 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 13,
+      "exactBytes": null
+    }
   },
   {
     "name": "VoiceChatChannelCommand",
     "swgCrc32": "0xaaa69e80",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/voicechat/VoiceChatMiscMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 5,
     "fields": [
       {
@@ -19119,15 +23594,22 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 14,
+      "exactBytes": null
+    }
   },
   {
     "name": "VoiceChatChannelInfo",
     "swgCrc32": "0x4bf970fe",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/voicechat/VoiceChatChannelInfo.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 6,
     "fields": [
       {
@@ -19172,15 +23654,22 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 14,
+      "exactBytes": null
+    }
   },
   {
     "name": "VoiceChatDeleteChannel",
     "swgCrc32": "0x0054f75a",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/voicechat/VoiceChatMiscMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
@@ -19190,15 +23679,22 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 2,
+      "exactBytes": null
+    }
   },
   {
     "name": "VoiceChatGetChannel",
     "swgCrc32": "0xf59b53eb",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/voicechat/VoiceChatMiscMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 5,
     "fields": [
       {
@@ -19236,15 +23732,22 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 10,
+      "exactBytes": null
+    }
   },
   {
     "name": "VoiceChatInvite",
     "swgCrc32": "0xedfd5217",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/voicechat/VoiceChatMiscMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 5,
     "fields": [
       {
@@ -19282,15 +23785,22 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 22,
+      "exactBytes": null
+    }
   },
   {
     "name": "VoiceChatKick",
     "swgCrc32": "0x7f4cc972",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/voicechat/VoiceChatMiscMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 4,
     "fields": [
       {
@@ -19321,15 +23831,22 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 20,
+      "exactBytes": null
+    }
   },
   {
     "name": "VoiceChatOnChannelCommand",
     "swgCrc32": "0xbaadf242",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/voicechat/VoiceChatMiscMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 6,
     "fields": [
       {
@@ -19374,22 +23891,29 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 18,
+      "exactBytes": null
+    }
   },
   {
     "name": "VoiceChatOnGetAccount",
     "swgCrc32": "0x326e6b43",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/voicechat/VoiceChatOnGetAccount.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 4,
     "fields": [
       {
         "name": "m_result",
         "archiveContainer": "AutoVariable",
         "cppType": "unsigned",
-        "tsType": "unknown",
+        "tsType": "number",
         "source": "addVariable"
       },
       {
@@ -19413,15 +23937,22 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 10,
+      "exactBytes": null
+    }
   },
   {
     "name": "VoiceChatOnGetChannel",
     "swgCrc32": "0x9513e10c",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/voicechat/VoiceChatMiscMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 6,
     "fields": [
       {
@@ -19466,15 +23997,22 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 9,
+      "exactBytes": null
+    }
   },
   {
     "name": "VoiceChatRemoveClientFromChannel",
     "swgCrc32": "0xbbe51f8c",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/voicechat/VoiceChatMiscMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 3,
     "fields": [
       {
@@ -19498,15 +24036,22 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 12,
+      "exactBytes": null
+    }
   },
   {
     "name": "VoiceChatRequestChannelInfo",
     "swgCrc32": "0x65f92dcf",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/voicechat/VoiceChatMiscMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
@@ -19523,15 +24068,22 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "string",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 10,
+      "exactBytes": null
+    }
   },
   {
     "name": "VoiceChatRequestPersonalChannel",
     "swgCrc32": "0x585e6b30",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/voicechat/VoiceChatMiscMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 2,
     "fields": [
       {
@@ -19548,15 +24100,22 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "boolean",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 9,
+      "minBytes": 9
+    }
   },
   {
     "name": "VoiceChatStatus",
     "swgCrc32": "0x9e601905",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/voicechat/VoiceChatMiscMessages.h"
     ],
-    "implementedInTypescript": false,
+    "implementedInTypescript": true,
     "fieldCount": 1,
     "fields": [
       {
@@ -19566,11 +24125,18 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "tsType": "number",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "exact",
+      "exactBytes": 4,
+      "minBytes": 4
+    }
   },
   {
     "name": "WhoListMessage",
     "swgCrc32": "0x9ba0d09f",
+    "crcSource": "className",
+    "wireNames": [],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/WhoListMessage.h"
     ],
@@ -19581,10 +24147,15 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
         "name": "m_data",
         "archiveContainer": "AutoArray",
         "cppType": "Unicode::String",
-        "tsType": "string",
+        "tsType": "string[]",
         "source": "addVariable"
       }
-    ]
+    ],
+    "serializedLength": {
+      "kind": "min",
+      "minBytes": 4,
+      "exactBytes": null
+    }
   }
 ];
 
@@ -19593,8 +24164,8 @@ export const CPP_PACKET_DEFINITIONS_BY_NAME = new Map<string, CppPacketDefinitio
 );
 
 export const CPP_PACKET_PARITY_SUMMARY = {
-  totalPackets: 525,
-  implementedPackets: 218,
-  missingPackets: 307,
-  coveragePercent: 41.52,
+  totalPackets: 526,
+  implementedPackets: 526,
+  missingPackets: 0,
+  coveragePercent: 100,
 } as const;

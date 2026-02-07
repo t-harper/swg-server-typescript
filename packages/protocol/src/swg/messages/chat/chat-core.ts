@@ -48,18 +48,19 @@ export function writeChatAvatarId(writer: BufferWriter, avatarId: ChatAvatarId):
 export interface ChatRoomData {
   id: number;
   roomType: number;
+  moderated: number;
   path: string;
   owner: ChatAvatarId;
   creator: ChatAvatarId;
   title: string;
   moderators: ChatAvatarId[];
   invitees: ChatAvatarId[];
-  moderated: number;
 }
 
 export function readChatRoomData(reader: BufferReader): ChatRoomData {
   const id = reader.readUInt32LE();
   const roomType = reader.readUInt32LE();
+  const moderated = reader.readUInt8();
   const path = reader.readStringWithLength16LE();
   const owner = readChatAvatarId(reader);
   const creator = readChatAvatarId(reader);
@@ -77,24 +78,23 @@ export function readChatRoomData(reader: BufferReader): ChatRoomData {
     invitees.push(readChatAvatarId(reader));
   }
 
-  const moderated = reader.readUInt8();
-
   return {
     id,
     roomType,
+    moderated,
     path,
     owner,
     creator,
     title,
     moderators,
     invitees,
-    moderated,
   };
 }
 
 export function writeChatRoomData(writer: BufferWriter, roomData: ChatRoomData): void {
   writer.writeUInt32LE(roomData.id);
   writer.writeUInt32LE(roomData.roomType);
+  writer.writeUInt8(roomData.moderated);
   writer.writeStringWithLength16LE(roomData.path);
   writeChatAvatarId(writer, roomData.owner);
   writeChatAvatarId(writer, roomData.creator);
@@ -109,8 +109,6 @@ export function writeChatRoomData(writer: BufferWriter, roomData: ChatRoomData):
   for (const invitee of roomData.invitees) {
     writeChatAvatarId(writer, invitee);
   }
-
-  writer.writeUInt8(roomData.moderated);
 }
 
 // 1. ChatInstantMessageToCharacter

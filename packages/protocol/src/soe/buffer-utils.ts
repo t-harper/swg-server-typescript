@@ -219,6 +219,18 @@ export class BufferReader {
   }
 
   /**
+   * Read signed 64-bit integer (big-endian) as BigInt
+   */
+  readInt64BE(): bigint {
+    if (!this.hasRemaining(8)) {
+      throw new RangeError('Buffer underflow: cannot read Int64BE');
+    }
+    const value = this.view.getBigInt64(this.position, false);
+    this.position += 8;
+    return value;
+  }
+
+  /**
    * Read unsigned 64-bit integer (little-endian) as BigInt
    */
   readUInt64LE(): bigint {
@@ -226,6 +238,18 @@ export class BufferReader {
       throw new RangeError('Buffer underflow: cannot read UInt64LE');
     }
     const value = this.view.getBigUint64(this.position, true);
+    this.position += 8;
+    return value;
+  }
+
+  /**
+   * Read signed 64-bit integer (little-endian) as BigInt
+   */
+  readInt64LE(): bigint {
+    if (!this.hasRemaining(8)) {
+      throw new RangeError('Buffer underflow: cannot read Int64LE');
+    }
+    const value = this.view.getBigInt64(this.position, true);
     this.position += 8;
     return value;
   }
@@ -627,11 +651,29 @@ export class BufferWriter {
   }
 
   /**
+   * Write signed 64-bit integer (big-endian) from BigInt
+   */
+  writeInt64BE(value: bigint): void {
+    this.ensureCapacity(8);
+    this.view.setBigInt64(this.position, value, false);
+    this.position += 8;
+  }
+
+  /**
    * Write unsigned 64-bit integer (little-endian) from BigInt
    */
   writeUInt64LE(value: bigint): void {
     this.ensureCapacity(8);
     this.view.setBigUint64(this.position, value, true);
+    this.position += 8;
+  }
+
+  /**
+   * Write signed 64-bit integer (little-endian) from BigInt
+   */
+  writeInt64LE(value: bigint): void {
+    this.ensureCapacity(8);
+    this.view.setBigInt64(this.position, value, true);
     this.position += 8;
   }
 

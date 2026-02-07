@@ -25,3 +25,4 @@ export * from './client-effects.js';
 export * from './map-travel-messages.js';
 export * from './sui-messages.js';
 export * from './tutorial-messages.js';
+export * from './cpp-packet-stubs.js';

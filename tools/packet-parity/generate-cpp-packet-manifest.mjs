@@ -25,6 +25,7 @@ const CPP_MESSAGE_ROOTS = [
   'engine/shared/library/sharedNetworkMessages/src/shared',
   'game/shared/library/swgSharedNetworkMessages/src/shared',
   'engine/server/library/serverNetworkMessages/src/shared',
+  'engine/server/library/serverUtility/src/shared',
   'game/server/library/swgServerNetworkMessages/src/shared',
 ];
 
@@ -34,6 +35,7 @@ const OUTPUT_MANIFEST_FILE = path.join(OUTPUT_DIR, 'cpp-packet-manifest.ts');
 
 const SUPPORTED_ARCHIVE_CONTAINERS = new Set([
   'AutoVariable',
+  'AutoVariableKeyShare',
   'AutoArray',
   'AutoList',
   'AutoSet',
@@ -162,18 +164,112 @@ function splitTopLevelTemplateArgs(typeString) {
   return args;
 }
 
-function mapCppTypeToTs(cppTypeRaw) {
+function mapCppTypeToTsBase(cppTypeRaw) {
   const cppType = normalizeCppType(cppTypeRaw);
   const lower = cppType.toLowerCase();
 
+  if (cppType === 'Vector') {
+    return '{ x: number; y: number; z: number }';
+  }
+
+  if (cppType === 'Quaternion') {
+    return '{ x: number; y: number; z: number; w: number }';
+  }
+
+  if (cppType === 'Transform') {
+    return '{ rotation: { x: number; y: number; z: number; w: number }; position: { x: number; y: number; z: number } }';
+  }
+
+  if (cppType === 'StringId') {
+    return '{ table: string; textIndex: number; text: string }';
+  }
+
+  if (cppType === 'ChatAvatarId') {
+    return 'ChatAvatarId';
+  }
+
+  if (cppType === 'ChatRoomData') {
+    return 'ChatRoomData';
+  }
+
+  if (cppType === 'SuiPageData') {
+    return 'SuiPageData';
+  }
+
+  if (cppType === 'ValueDictionary') {
+    return 'Map<string, { type: "bool" | "float" | "object id" | "signed int" | "string"; value: boolean | number | bigint | string }>';
+  }
+
+  if (cppType === 'ProsePackage') {
+    return '{ stringId: { table: string; textIndex: number; text: string }; actor: { id: bigint; stringId: { table: string; textIndex: number; text: string }; str: string }; target: { id: bigint; stringId: { table: string; textIndex: number; text: string }; str: string }; other: { id: bigint; stringId: { table: string; textIndex: number; text: string }; str: string }; digitInteger: number; digitFloat: number; complexGrammar: boolean }';
+  }
+
+  if (cppType === 'GroupMemberParam') {
+    return '{ m_memberId: bigint; m_memberName: string; m_memberDifficulty: number; m_memberProfession: number; m_memberIsPC: boolean; m_memberShipId: bigint; m_memberShipIsPOB: boolean; m_memberOwnsPOB: boolean }';
+  }
+
+  if (cppType === 'NebulaLightningData') {
+    return '{ lightningId: number; nebulaId: number; syncStampStart: number; syncStampEnd: number; endpoint0: { x: number; y: number; z: number }; endpoint1: { x: number; y: number; z: number } }';
+  }
+
+  if (cppType === 'ServerInfo') {
+    return '{ ipAddress: string; serverId: number; systemPid: number; sceneId: string }';
+  }
+
+  if (cppType === 'Auction::ItemDataDetails') {
+    return '{ itemId: bigint; userDescription: string; propertyList: [string, string][]; templateName: string; appearanceString: string }';
+  }
+
+  if (cppType === 'ADV') {
+    return '{ type: number; auctionId: bigint; itemId: bigint; itemNameLength: number; itemName: string; minBid: number; highBid: number; timer: number; buyNowPrice: number; location: string; ownerId: bigint; highBidderId: bigint; maxProxyBid: number; myBid: number; itemType: number; resourceContainerClassCrc: number; flags: number; entranceCharge: number }[]';
+  }
+
+  if (cppType === 'PopulationList') {
+    return '{ scene: string; x: number; z: number; population: number }[]';
+  }
+
+  if (cppType === 'AvatarList') {
+    return '{ m_name: string; m_objectTemplateId: number; m_networkId: bigint; m_clusterId: number; m_characterType: number }[]';
+  }
+
+  if (cppType === 'ValueType') {
+    return 'Uint8Array';
+  }
+
+  if (cppType === 'PackedPosition') {
+    return '{ x: number; y: number; z: number }';
+  }
+
+  if (cppType === 'PackedVelocity') {
+    return '{ vx: number; vy: number; vz: number }';
+  }
+
+  if (cppType === 'PackedTransform') {
+    return '{ rotation: { w: number; x: number; y: number; z: number }; position: { x: number; y: number; z: number } }';
+  }
+
+  if (cppType === 'PackedRotationRate') {
+    return 'number';
+  }
+
+  if (cppType === 'KeyShare::Key') {
+    return 'Uint8Array';
+  }
+
   if (
-    /^(bool)$/.test(lower)
+    cppType === 'Archive::ByteStream' ||
+    cppType === 'Data' ||
+    cppType === 'MessageToPayload'
   ) {
+    return 'Uint8Array';
+  }
+
+  if (/^(bool)$/.test(lower)) {
     return 'boolean';
   }
 
   if (
-    /^(int|short|long|float|double|char|byte|uint8|uint16|uint32|int8|int16|int32|unsigned char|unsigned short|unsigned int|unsigned long)$/.test(
+    /^(int|short|long|float|real|double|char|byte|uint8|uint16|uint32|int8|int16|int32|unsigned|stationid|tag|unsigned char|unsigned short|unsigned int|unsigned long)$/.test(
       lower
     )
   ) {
@@ -197,30 +293,40 @@ function mapCppTypeToTs(cppTypeRaw) {
 
   if (cppType.startsWith('std::vector<')) {
     const inner = cppType.slice('std::vector<'.length, -1);
-    return `${mapCppTypeToTs(inner)}[]`;
+    return `${mapCppTypeToTsBase(inner)}[]`;
   }
 
   if (cppType.startsWith('std::list<')) {
     const inner = cppType.slice('std::list<'.length, -1);
-    return `${mapCppTypeToTs(inner)}[]`;
+    return `${mapCppTypeToTsBase(inner)}[]`;
+  }
+
+  if (cppType.startsWith('std::deque<')) {
+    const inner = cppType.slice('std::deque<'.length, -1);
+    return `${mapCppTypeToTsBase(inner)}[]`;
   }
 
   if (cppType.startsWith('std::set<')) {
     const inner = cppType.slice('std::set<'.length, -1);
-    return `${mapCppTypeToTs(inner)}[]`;
+    return `${mapCppTypeToTsBase(inner)}[]`;
   }
 
   if (cppType.startsWith('std::pair<')) {
     const inner = cppType.slice('std::pair<'.length, -1);
     const args = splitTopLevelTemplateArgs(inner);
     if (args.length === 2) {
-      return `[${mapCppTypeToTs(args[0])}, ${mapCppTypeToTs(args[1])}]`;
+      return `[${mapCppTypeToTsBase(args[0])}, ${mapCppTypeToTsBase(args[1])}]`;
     }
     return '[unknown, unknown]';
   }
 
   if (cppType.startsWith('std::map<') || cppType.startsWith('std::unordered_map<')) {
-    return 'Record<string, unknown>';
+    const inner = cppType.slice(cppType.indexOf('<') + 1, -1);
+    const args = splitTopLevelTemplateArgs(inner);
+    if (args.length === 2) {
+      return `Map<${mapCppTypeToTsBase(args[0])}, ${mapCppTypeToTsBase(args[1])}>`;
+    }
+    return 'Map<unknown, unknown>';
   }
 
   if (cppType === 'PackedRgb') {
@@ -228,6 +334,256 @@ function mapCppTypeToTs(cppTypeRaw) {
   }
 
   return 'unknown';
+}
+
+function mapCppTypeToTs(cppTypeRaw, archiveContainer) {
+  const base = mapCppTypeToTsBase(cppTypeRaw);
+
+  if (
+    archiveContainer === 'AutoArray' ||
+    archiveContainer === 'AutoList' ||
+    archiveContainer === 'AutoSet' ||
+    archiveContainer === 'AutoDeltaVector' ||
+    archiveContainer === 'AutoDeltaSet' ||
+    archiveContainer === 'AutoDeltaQueue'
+  ) {
+    return base.endsWith('[]') ? base : `${base}[]`;
+  }
+
+  if (
+    archiveContainer === 'AutoMap' ||
+    archiveContainer === 'AutoDeltaMap' ||
+    archiveContainer === 'AutoDeltaPackedMap'
+  ) {
+    if (base.startsWith('Map<')) {
+      return base;
+    }
+    const args = splitTopLevelTemplateArgs(normalizeCppType(cppTypeRaw));
+    if (args.length === 2) {
+      return `Map<${mapCppTypeToTsBase(args[0])}, ${mapCppTypeToTsBase(args[1])}>`;
+    }
+    return 'Map<unknown, unknown>';
+  }
+
+  return base;
+}
+
+const FIXED_LENGTH_BY_TYPE = new Map([
+  ['bool', 1],
+  ['char', 1],
+  ['signed char', 1],
+  ['unsigned char', 1],
+  ['int8', 1],
+  ['uint8', 1],
+  ['byte', 1],
+  ['short', 2],
+  ['signed short', 2],
+  ['signed short int', 2],
+  ['unsigned short', 2],
+  ['unsigned short int', 2],
+  ['int16', 2],
+  ['uint16', 2],
+  ['int', 4],
+  ['signed int', 4],
+  ['unsigned int', 4],
+  ['long', 4],
+  ['signed long', 4],
+  ['signed long int', 4],
+  ['unsigned long', 4],
+  ['unsigned long int', 4],
+  ['int32', 4],
+  ['uint32', 4],
+  ['float', 4],
+  ['real', 4],
+  ['double', 8],
+  ['int64', 8],
+  ['uint64', 8],
+  ['long long', 8],
+  ['unsigned long long', 8],
+  ['networkid', 8],
+  ['stationid', 4],
+  ['tag', 4],
+  ['unsigned', 4],
+  ['vector', 12],
+  ['quaternion', 16],
+  ['transform', 28],
+  ['packedposition', 6],
+  ['packedvelocity', 4],
+  ['packedrotationrate', 1],
+  ['packedtransform', 10],
+  ['keyshare::key', 16],
+]);
+
+function mergeLengthKinds(lhs, rhs) {
+  if (lhs.kind === 'unknown' || rhs.kind === 'unknown') {
+    return { kind: 'unknown', minBytes: null, exactBytes: null };
+  }
+  if (lhs.kind === 'exact' && rhs.kind === 'exact') {
+    return {
+      kind: 'exact',
+      exactBytes: lhs.exactBytes + rhs.exactBytes,
+      minBytes: lhs.exactBytes + rhs.exactBytes,
+    };
+  }
+
+  const lhsMin = lhs.kind === 'exact' ? lhs.exactBytes : lhs.minBytes;
+  const rhsMin = rhs.kind === 'exact' ? rhs.exactBytes : rhs.minBytes;
+  return {
+    kind: 'min',
+    minBytes: lhsMin + rhsMin,
+    exactBytes: null,
+  };
+}
+
+function estimateCppTypeLength(cppTypeRaw) {
+  const cppType = normalizeCppType(cppTypeRaw);
+  const lower = cppType.toLowerCase();
+
+  if (FIXED_LENGTH_BY_TYPE.has(lower)) {
+    const bytes = FIXED_LENGTH_BY_TYPE.get(lower);
+    return { kind: 'exact', exactBytes: bytes, minBytes: bytes };
+  }
+
+  if (cppType === 'std::string') {
+    return { kind: 'min', minBytes: 2, exactBytes: null };
+  }
+
+  if (cppType === 'Unicode::String' || cppType.endsWith('::String')) {
+    return { kind: 'min', minBytes: 4, exactBytes: null };
+  }
+
+  if (cppType === 'Archive::ByteStream') {
+    return { kind: 'min', minBytes: 4, exactBytes: null };
+  }
+
+  if (cppType === 'Data' || cppType === 'MessageToPayload') {
+    return { kind: 'min', minBytes: 4, exactBytes: null };
+  }
+
+  if (cppType === 'StringId') {
+    return { kind: 'min', minBytes: 8, exactBytes: null };
+  }
+
+  if (cppType === 'ChatAvatarId') {
+    return { kind: 'min', minBytes: 6, exactBytes: null };
+  }
+
+  if (cppType === 'ChatRoomData') {
+    return { kind: 'min', minBytes: 35, exactBytes: null };
+  }
+
+  if (cppType === 'SuiPageData') {
+    return { kind: 'min', minBytes: 34, exactBytes: null };
+  }
+
+  if (cppType === 'ValueDictionary') {
+    return { kind: 'min', minBytes: 4, exactBytes: null };
+  }
+
+  if (cppType === 'ProsePackage') {
+    return { kind: 'min', minBytes: 77, exactBytes: null };
+  }
+
+  if (cppType === 'GroupMemberParam') {
+    return { kind: 'min', minBytes: 26, exactBytes: null };
+  }
+
+  if (cppType === 'NebulaLightningData') {
+    return { kind: 'exact', exactBytes: 38, minBytes: 38 };
+  }
+
+  if (cppType === 'ServerInfo') {
+    return { kind: 'min', minBytes: 12, exactBytes: null };
+  }
+
+  if (cppType === 'ValueType') {
+    return { kind: 'min', minBytes: 0, exactBytes: null };
+  }
+
+  if (cppType === 'Auction::ItemDataDetails') {
+    return { kind: 'min', minBytes: 20, exactBytes: null };
+  }
+
+  if (cppType === 'ADV') {
+    return { kind: 'min', minBytes: 4, exactBytes: null };
+  }
+
+  if (cppType === 'PopulationList') {
+    return { kind: 'min', minBytes: 4, exactBytes: null };
+  }
+
+  if (cppType === 'AvatarList') {
+    return { kind: 'min', minBytes: 4, exactBytes: null };
+  }
+
+  if (
+    cppType.startsWith('std::vector<') ||
+    cppType.startsWith('std::list<') ||
+    cppType.startsWith('std::set<') ||
+    cppType.startsWith('std::deque<') ||
+    cppType.startsWith('std::map<') ||
+    cppType.startsWith('std::unordered_map<')
+  ) {
+    return { kind: 'min', minBytes: 4, exactBytes: null };
+  }
+
+  if (cppType.startsWith('std::pair<')) {
+    const inner = cppType.slice('std::pair<'.length, -1);
+    const args = splitTopLevelTemplateArgs(inner);
+    if (args.length !== 2) {
+      return { kind: 'unknown', minBytes: null, exactBytes: null };
+    }
+    return mergeLengthKinds(estimateCppTypeLength(args[0]), estimateCppTypeLength(args[1]));
+  }
+
+  return { kind: 'unknown', minBytes: null, exactBytes: null };
+}
+
+function estimateFieldLength(field) {
+  const container = field.archiveContainer;
+  if (container === 'Unknown') {
+    return { kind: 'unknown', minBytes: null, exactBytes: null };
+  }
+
+  if (container === 'AutoVariableKeyShare') {
+    return { kind: 'exact', exactBytes: 16, minBytes: 16 };
+  }
+
+  if (
+    container === 'AutoArray' ||
+    container === 'AutoList' ||
+    container === 'AutoSet' ||
+    container === 'AutoMap' ||
+    container === 'AutoDeltaVector' ||
+    container === 'AutoDeltaSet' ||
+    container === 'AutoDeltaMap' ||
+    container === 'AutoDeltaPackedMap' ||
+    container === 'AutoDeltaQueue'
+  ) {
+    return { kind: 'min', minBytes: 4, exactBytes: null };
+  }
+
+  if (container === 'AutoByteStream' || container === 'AutoDeltaByteStream') {
+    return { kind: 'min', minBytes: 4, exactBytes: null };
+  }
+
+  return estimateCppTypeLength(field.cppType);
+}
+
+function estimatePacketLength(fields) {
+  if (!fields || fields.length === 0) {
+    return { kind: 'exact', exactBytes: 0, minBytes: 0 };
+  }
+
+  let state = { kind: 'exact', exactBytes: 0, minBytes: 0 };
+  for (const field of fields) {
+    const fieldLen = estimateFieldLength(field);
+    state = mergeLengthKinds(state, fieldLen);
+    if (state.kind === 'unknown') {
+      return state;
+    }
+  }
+  return state;
 }
 
 function parseArchiveFieldsFromClassBlock(block) {
@@ -239,26 +595,23 @@ function parseArchiveFieldsFromClassBlock(block) {
     .filter(Boolean);
 
   for (const statement of statements) {
-    if (!statement.includes('Archive::')) {
-      continue;
-    }
-    if (statement.includes('(')) {
-      continue;
-    }
+    let normalized = statement
+      .replace(/^[}\s]*(?:(?:public|private|protected)\s*:\s*)+/g, '')
+      .replace(/^[}\s]+/g, '')
+      .trim();
 
-    const fullMatch =
-      statement.match(/^Archive::([A-Za-z0-9_]+)\s*<(.+)>\s*([A-Za-z_][A-Za-z0-9_]*)$/) ??
-      statement.match(/^([A-Za-z0-9_:<>\s]+)\s+([A-Za-z_][A-Za-z0-9_]*)$/);
-
-    if (!fullMatch) {
+    if (!normalized || normalized.includes('(')) {
       continue;
     }
 
-    if (fullMatch.length === 4 && fullMatch[1].startsWith('Auto')) {
-      const archiveContainer = fullMatch[1];
-      const cppType = normalizeCppType(fullMatch[2]);
-      const name = fullMatch[3];
-      const tsType = mapCppTypeToTs(cppType);
+    const directMatch = normalized.match(
+      /^Archive::([A-Za-z0-9_]+)\s*<([\s\S]+)>\s*([A-Za-z_][A-Za-z0-9_]*)$/
+    );
+    if (directMatch) {
+      const archiveContainer = directMatch[1];
+      const cppType = normalizeCppType(directMatch[2]);
+      const name = directMatch[3];
+      const tsType = mapCppTypeToTs(cppType, archiveContainer);
       fields.push({
         name,
         archiveContainer,
@@ -268,25 +621,61 @@ function parseArchiveFieldsFromClassBlock(block) {
       continue;
     }
 
-    const fallbackDecl = fullMatch[1];
-    const fallbackName = fullMatch[2];
-    const archiveMatch = fallbackDecl.match(/Archive::([A-Za-z0-9_]+)\s*<(.+)>/);
-    if (!archiveMatch) {
+    const keyShareMatch = normalized.match(/^AutoVariableKeyShare\s+([A-Za-z_][A-Za-z0-9_]*)$/);
+    if (keyShareMatch) {
+      const archiveContainer = 'AutoVariableKeyShare';
+      const cppType = 'KeyShare::Key';
+      const tsType = mapCppTypeToTs(cppType, archiveContainer);
+      fields.push({
+        name: keyShareMatch[1],
+        archiveContainer,
+        cppType,
+        tsType,
+      });
       continue;
     }
-
-    const archiveContainer = archiveMatch[1];
-    const cppType = normalizeCppType(archiveMatch[2]);
-    const tsType = mapCppTypeToTs(cppType);
-    fields.push({
-      name: fallbackName,
-      archiveContainer,
-      cppType,
-      tsType,
-    });
   }
 
   return fields.filter((field) => SUPPORTED_ARCHIVE_CONTAINERS.has(field.archiveContainer));
+}
+
+function extractConstructorWireNames(cppContent) {
+  const namesByClass = new Map();
+  const regex =
+    /\b([A-Za-z_][A-Za-z0-9_]*)(?:<[^>]+>)?::\1(?:<[^>]+>)?\s*\([\s\S]*?\)\s*:\s*GameNetworkMessage\s*\(\s*"([^"]+)"\s*\)/g;
+
+  for (const match of cppContent.matchAll(regex)) {
+    const className = match[1];
+    const wireName = match[2];
+    if (!namesByClass.has(className)) {
+      namesByClass.set(className, []);
+    }
+    namesByClass.get(className).push(wireName);
+  }
+
+  return namesByClass;
+}
+
+function dedupePreserveOrder(values) {
+  const seen = new Set();
+  const out = [];
+  for (const value of values) {
+    if (seen.has(value)) {
+      continue;
+    }
+    seen.add(value);
+    out.push(value);
+  }
+  return out;
+}
+
+function mergeMapOfArrays(target, source) {
+  for (const [key, values] of source.entries()) {
+    if (!target.has(key)) {
+      target.set(key, []);
+    }
+    target.get(key).push(...values);
+  }
 }
 
 function extractConstructorAddVariableOrders(cppContent) {
@@ -316,8 +705,10 @@ function extractConstructorAddVariableOrders(cppContent) {
 
   for (const line of lines) {
     if (!activeClass) {
-      const ctorMatch = line.match(/\b([A-Za-z_][A-Za-z0-9_]*)::\1\s*\(/);
-      if (ctorMatch) {
+      const ctorMatch = line.match(
+        /\b([A-Za-z_][A-Za-z0-9_]*)(?:<[^>]+>)?::([A-Za-z_][A-Za-z0-9_]*)(?:<[^>]+>)?\s*\(/
+      );
+      if (ctorMatch && ctorMatch[1] === ctorMatch[2]) {
         activeClass = ctorMatch[1];
       }
     }
@@ -457,19 +848,18 @@ async function main() {
   }
 
   const constructorOrdersByClass = new Map();
+  const orderSourceFiles = dedupePreserveOrder([...cppFiles, ...headerFiles]);
+  for (const sourceFile of orderSourceFiles) {
+    const text = await fs.readFile(sourceFile, 'utf8');
+    const ordersInFile = extractConstructorAddVariableOrders(text);
+    mergeMapOfArrays(constructorOrdersByClass, ordersInFile);
+  }
+
+  const constructorWireNamesByClass = new Map();
   for (const cppFile of cppFiles) {
     const text = await fs.readFile(cppFile, 'utf8');
-    const ordersInFile = extractConstructorAddVariableOrders(text);
-
-    for (const [className, orders] of ordersInFile.entries()) {
-      if (!constructorOrdersByClass.has(className)) {
-        constructorOrdersByClass.set(className, []);
-      }
-      const acc = constructorOrdersByClass.get(className);
-      for (const order of orders) {
-        acc.push(order);
-      }
-    }
+    const wireNamesInFile = extractConstructorWireNames(text);
+    mergeMapOfArrays(constructorWireNamesByClass, wireNamesInFile);
   }
 
   const tsInterfaces = await readTsInterfaceNames();
@@ -507,15 +897,29 @@ async function main() {
       orderedFields.push({ ...field, source: 'declarationOnly' });
     }
 
-    const crc = computeSwgCrc32(className);
+    const wireNames = dedupePreserveOrder(constructorWireNamesByClass.get(className) ?? []);
+    let crcInputName = className;
+    let crcSource = 'className';
+    if (wireNames.length === 1) {
+      crcInputName = wireNames[0];
+      crcSource = 'constructorString';
+    } else if (wireNames.length > 1) {
+      crcInputName = wireNames[0];
+      crcSource = 'constructorStringMultiple';
+    }
+    const crc = computeSwgCrc32(crcInputName);
+    const serializedLength = estimatePacketLength(orderedFields);
 
     definitions.push({
       name: className,
       swgCrc32: `0x${crc.toString(16).padStart(8, '0')}`,
+      crcSource,
+      wireNames,
       headers: metadata.headers,
       implementedInTypescript: tsInterfaces.has(className),
       fieldCount: orderedFields.length,
       fields: orderedFields,
+      serializedLength,
     });
   }
 
@@ -547,10 +951,17 @@ export interface CppPacketFieldDefinition {
 export interface CppPacketDefinition {
   name: string;
   swgCrc32: string;
+  crcSource: 'className' | 'constructorString' | 'constructorStringMultiple';
+  wireNames: string[];
   headers: string[];
   implementedInTypescript: boolean;
   fieldCount: number;
   fields: CppPacketFieldDefinition[];
+  serializedLength: {
+    kind: 'exact' | 'min' | 'unknown';
+    exactBytes: number | null;
+    minBytes: number | null;
+  };
 }
 
 export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = ${JSON.stringify(definitions, null, 2)};

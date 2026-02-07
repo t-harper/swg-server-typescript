@@ -5,3 +5,4 @@
 
 export * from './message-registry.js';
 export * from './messages/index.js';
+export * from './wire/index.js';
