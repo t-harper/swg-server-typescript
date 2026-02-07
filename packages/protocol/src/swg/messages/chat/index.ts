@@ -5,4 +5,5 @@
 
 export * from './chat-core.js';
 export * from './chat-moderation.js';
+export * from './chat-remaining.js';
 export * from './chat-social.js';
