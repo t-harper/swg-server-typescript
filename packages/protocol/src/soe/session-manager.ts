@@ -399,14 +399,14 @@ export class SessionManager extends EventEmitter {
     );
 
     // Send session response
-    // C++ encryptMethod: 0=None, 1=UserSupplied (compression)
+    // C++ has cEncryptPasses=2, both using UserSupplied (compression)
     const response = Packet.createSessionResponse(
       packet.connectionId,
       crcSeed,
       this.options.udpBufferSize,
       {
         encryptMethod0: this.options.enableCompression ? 1 : 0, // UserSupplied = compression
-        encryptMethod1: 0, // None - only 1 pass needed
+        encryptMethod1: this.options.enableCompression ? 1 : 0, // UserSupplied = compression
       }
     );
 
@@ -941,79 +941,98 @@ export class SessionManager extends EventEmitter {
   }
 
   /**
-   * SOE user-supplied encrypt (compression with trailing flag byte)
+   * Single pass of SOE user-supplied encrypt (compression with trailing flag byte)
    * Matches C++ OnUserSuppliedEncrypt in ManagerHandler.cpp
-   * Operates on payload after opcode (first 2 bytes), appends flag byte at end
+   * Operates on raw payload bytes, appends flag byte at end
    */
-  private soeEncrypt(data: Uint8Array): Uint8Array {
-    if (data.length <= 2) {
-      // No payload to compress, just add flag byte (not compressed)
-      const result = new Uint8Array(data.length + 1);
-      result.set(data);
-      result[data.length] = 0x00;
-      return result;
-    }
-
-    const opcode = data.subarray(0, 2);
-    const payload = data.subarray(2);
-
-    try {
-      const compressed = compressData(payload);
-      if (compressed.length < payload.length) {
-        // Compression helped — use compressed data + flag 0x01
-        const result = new Uint8Array(2 + compressed.length + 1);
-        result.set(opcode);
-        result.set(compressed, 2);
-        result[2 + compressed.length] = 0x01;
-        return result;
+  private soeEncryptOnePass(payload: Uint8Array): Uint8Array {
+    if (payload.length > 0) {
+      try {
+        const compressed = compressData(payload);
+        if (compressed.length < payload.length) {
+          // Compression helped — compressed data + flag 0x01
+          const result = new Uint8Array(compressed.length + 1);
+          result.set(compressed);
+          result[compressed.length] = 0x01;
+          return result;
+        }
+      } catch {
+        // Compression failed, fall through to uncompressed
       }
-    } catch {
-      // Compression failed, fall through to uncompressed
     }
 
     // Not compressed — original payload + flag 0x00
-    const result = new Uint8Array(data.length + 1);
-    result.set(data);
-    result[data.length] = 0x00;
+    const result = new Uint8Array(payload.length + 1);
+    result.set(payload);
+    result[payload.length] = 0x00;
     return result;
   }
 
   /**
-   * SOE user-supplied decrypt (decompression based on trailing flag byte)
+   * Single pass of SOE user-supplied decrypt (decompression based on trailing flag byte)
    * Matches C++ OnUserSuppliedDecrypt in ManagerHandler.cpp
    * Checks last byte: 0x01 = compressed (decompress), 0x00 = not compressed (strip flag)
    */
+  private soeDecryptOnePass(payload: Uint8Array): Uint8Array {
+    if (payload.length === 0) {
+      return payload;
+    }
+
+    const flag = payload[payload.length - 1];
+    const data = payload.subarray(0, payload.length - 1);
+
+    if (flag === 0x01 && data.length > 0) {
+      // Compressed — decompress
+      try {
+        return decompressData(data);
+      } catch (err) {
+        console.error('[SOE] Decompression failed:', err);
+        return data;
+      }
+    }
+
+    // Not compressed — return data without flag byte
+    return data;
+  }
+
+  /**
+   * SOE encrypt with 2 passes (matches C++ cEncryptPasses=2)
+   * Both passes use UserSupplied encryption (compression)
+   * Operates on payload after opcode (first 2 bytes are preserved)
+   */
+  private soeEncrypt(data: Uint8Array): Uint8Array {
+    const opcode = data.subarray(0, 2);
+    let payload = data.subarray(2);
+
+    // C++ encrypts in forward order: pass 0, then pass 1
+    for (let j = 0; j < 2; j++) {
+      payload = this.soeEncryptOnePass(payload);
+    }
+
+    const result = new Uint8Array(2 + payload.length);
+    result.set(opcode);
+    result.set(payload, 2);
+    return result;
+  }
+
+  /**
+   * SOE decrypt with 2 passes (matches C++ cEncryptPasses=2)
+   * Both passes use UserSupplied decryption (decompression)
+   * Operates on payload after opcode (first 2 bytes are preserved)
+   */
   private soeDecrypt(data: Uint8Array): Uint8Array {
     if (data.length <= 2) {
-      // No payload + flag to process
       return data;
     }
 
     const opcode = data.subarray(0, 2);
-    const payloadWithFlag = data.subarray(2);
+    let payload = data.subarray(2);
 
-    if (payloadWithFlag.length === 0) {
-      return data;
+    // C++ decrypts in reverse order: pass 1 first, then pass 0
+    for (let j = 1; j >= 0; j--) {
+      payload = this.soeDecryptOnePass(payload);
     }
 
-    const flag = payloadWithFlag[payloadWithFlag.length - 1];
-    const payload = payloadWithFlag.subarray(0, payloadWithFlag.length - 1);
-
-    if (flag === 0x01 && payload.length > 0) {
-      // Compressed — decompress
-      try {
-        const decompressed = decompressData(payload);
-        const result = new Uint8Array(2 + decompressed.length);
-        result.set(opcode);
-        result.set(decompressed, 2);
-        return result;
-      } catch (err) {
-        console.error('[SOE] Decompression failed:', err);
-        // Fall through to return without flag
-      }
-    }
-
-    // Not compressed — return opcode + payload (without flag byte)
     const result = new Uint8Array(2 + payload.length);
     result.set(opcode);
     result.set(payload, 2);

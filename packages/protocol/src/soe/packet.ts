@@ -641,7 +641,7 @@ export function createSessionResponse(
     crcSeed,
     crcBytes: options.crcBytes ?? 2,
     encryptMethod0: options.encryptMethod0 ?? 1, // UserSupplied (compression)
-    encryptMethod1: options.encryptMethod1 ?? 0, // None
+    encryptMethod1: options.encryptMethod1 ?? 1, // UserSupplied (compression)
     serverUdpBufferSize,
     protocolVersion: options.protocolVersion ?? 2,
   };
