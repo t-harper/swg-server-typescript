@@ -236,6 +236,105 @@ function mapCppTypeToTsBase(cppTypeRaw) {
     return 'Uint8Array';
   }
 
+  // --- Login cluster types (disambiguated) ---
+  if (cppType === 'LoginEnumCluster::ClusterData') {
+    return '{ m_clusterId: number; m_clusterName: string; m_timeZone: number }';
+  }
+  if (cppType === 'LoginClusterStatus::ClusterData') {
+    return '{ m_clusterId: number; m_connectionServerAddress: string; m_connectionServerPort: number; m_connectionServerPingPort: number; m_populationOnline: number; m_populationOnlineStatus: number; m_maxCharactersPerAccount: number; m_timeZone: number; m_status: number; m_dontRecommend: boolean; m_onlinePlayerLimit: number; m_onlineFreeTrialLimit: number }';
+  }
+  if (cppType === 'LoginClusterStatusEx::ClusterData') {
+    return '{ m_clusterId: number; m_branch: string; m_networkVersion: string; m_version: number; m_reserved1: number; m_reserved2: number; m_reserved3: number; m_reserved4: number }';
+  }
+
+  // --- Map/survey types ---
+  if (cppType === 'MapLocation') {
+    return '{ locationId: bigint; locationName: string; x: number; y: number; category: number; subCategory: number; flags: number }';
+  }
+  if (cppType === 'SurveyMessage::DataItem') {
+    return '{ x: number; y: number; z: number; efficiency: number }';
+  }
+  if (cppType === 'ResourceListForSurveyMessage::DataItem') {
+    return '{ resourceName: string; resourceId: bigint; parentClassName: string }';
+  }
+
+  // --- Auction/market types ---
+  if (cppType === 'SearchCondition' || cppType === 'AuctionQueryHeadersMessage::SearchCondition') {
+    return '{ attributeNameCrc: number; requiredAttribute: boolean; comparison: number; intMin?: number; intMax?: number; floatMin?: number; floatMax?: number; stringValue?: string }';
+  }
+  if (cppType === 'AuctionLocation') {
+    return '{ locationId: bigint; locationNameLength: number; locationName: string; ownerId: bigint; salesTax: number; salesTaxBankId: bigint; emptyDate: number; lastAccessDate: number; inactiveDate: number; status: number; searchEnabled: boolean; entranceCharge: number }';
+  }
+  if (cppType === 'MarketAuction') {
+    return '{ itemId: bigint; ownerId: bigint; creatorId: bigint; locationId: bigint; minBid: number; buyNowPrice: number; auctionTimer: number; oobLength: number; oob: string; userDescriptionLength: number; userDescription: string; category: number; itemTemplateId: number; itemNameLength: number; itemName: string; itemTimer: number; active: number; itemSize: number }';
+  }
+  if (cppType === 'MarketAuctionAttribute') {
+    return '{ itemId: bigint; attributeName: string; attributeValue: string }';
+  }
+  if (cppType === 'MarketAuctionBid') {
+    return '{ itemId: bigint; bidderId: bigint; bid: number; maxProxyBid: number }';
+  }
+  if (cppType === 'Auction::PalettizedItemDataHeader') {
+    return '{ itemId: bigint; itemNameKey: number; highBid: number; timer: number; buyNowPrice: number; locationKey: number; ownerId: bigint; ownerNameKey: number; highBidderId: bigint; highBidderNameKey: number; maxProxyBid: number; myBid: number; itemType: number; resourceContainerClassCrc: number; flags: number; entranceCharge: number }';
+  }
+  if (cppType === 'AuctionData') {
+    return '{ auctionId: bigint; location: string; ownerId: bigint; minBid: number; timer: number; itemId: bigint; soldFlag: number; highBidderId: bigint; itemType: number; resourceContainerClassCrc: number; itemQuantity: number; itemTimer: number; highBid: number; highBidMaxProxy: number }';
+  }
+
+  // --- Game utility types ---
+  if (cppType === 'AttributePair') {
+    return '[string, string]';
+  }
+  if (cppType === 'BatchBaselinesMessageData') {
+    return '{ networkId: bigint; objectType: number; packageId: number; package: Uint8Array }';
+  }
+  if (cppType === 'CharacterListMessageData') {
+    return '{ name: string; objectTemplate: string; characterId: bigint; containerId: bigint; location: string; coordinates: { x: number; y: number; z: number } }';
+  }
+  if (cppType === 'Chardata') {
+    return '{ name: string; objectTemplateId: number; networkId: bigint; clusterId: number; characterType: number }';
+  }
+  if (cppType === 'Chunk') {
+    return '{ process: number; nodeX: number; nodeZ: number }';
+  }
+  if (cppType === 'StructureListMessageData') {
+    return '{ objectTemplate: string; structureId: bigint; location: string; coordinates: { x: number; y: number; z: number }; deleted: number }';
+  }
+
+  // --- Customer service types ---
+  if (cppType === 'ChatLogEntry') {
+    return '{ from: string; to: string; channel: string; message: string; time: number }';
+  }
+  if (cppType === 'CustomerServiceCategory') {
+    return '{ categoryName: string; categoryId: number; subCategories: unknown[]; isBugType: boolean; isServiceType: boolean }';
+  }
+  if (cppType === 'CustomerServiceComment') {
+    return '{ ticketId: number; commentId: number; fromCsr: boolean; comment: string; commentorName: string }';
+  }
+  if (cppType === 'CustomerServiceTicket') {
+    return '{ categoryId: number; subCategoryId: number; characterName: string; details: string; language: string; ticketId: number; modifiedDate: bigint; read: boolean; closed: boolean }';
+  }
+  if (cppType === 'CustomerServiceSearchResult') {
+    return '{ title: string; id: string; matchPercent: number }';
+  }
+
+  // --- Metrics/planet/AI types ---
+  if (cppType === 'MetricsPair') {
+    return '{ label: string; value: number; description: string; persistData: boolean; summary: boolean }';
+  }
+  if (cppType === 'AIPathInfo_NodeInfo') {
+    return '{ node: number; state: number }';
+  }
+  if (cppType === 'AddResourceTypeMessageNamespace::ResourceTypeData') {
+    return '{ networkId: bigint; name: string; depletedTimestamp: number; parentClass: string; attributes: [string, number][]; fractalSeeds: [bigint, number][] }';
+  }
+  if (cppType === 'PlanetNodeStatusMessageData') {
+    return '{ x: number; z: number; loaded: boolean; servers: number[]; subscriptionCounts: number[] }';
+  }
+  if (cppType === 'PlanetObjectStatusMessageData') {
+    return '{ objectId: bigint; x: number; z: number; authoritativeServer: number; interestRadius: number; deleteObject: number; objectTypeTag: number; level: number; hibernating: boolean; templateCrc: number; aiActivity: number; creationType: number }';
+  }
+
   if (cppType === 'PackedPosition') {
     return '{ x: number; y: number; z: number }';
   }
@@ -514,6 +613,105 @@ function estimateCppTypeLength(cppTypeRaw) {
 
   if (cppType === 'AvatarList') {
     return { kind: 'min', minBytes: 4, exactBytes: null };
+  }
+
+  // --- Login cluster types (disambiguated) ---
+  if (cppType === 'LoginEnumCluster::ClusterData') {
+    return { kind: 'min', minBytes: 10, exactBytes: null };
+  }
+  if (cppType === 'LoginClusterStatus::ClusterData') {
+    return { kind: 'min', minBytes: 37, exactBytes: null };
+  }
+  if (cppType === 'LoginClusterStatusEx::ClusterData') {
+    return { kind: 'min', minBytes: 24, exactBytes: null };
+  }
+
+  // --- Map/survey types ---
+  if (cppType === 'MapLocation') {
+    return { kind: 'min', minBytes: 23, exactBytes: null };
+  }
+  if (cppType === 'SurveyMessage::DataItem') {
+    return { kind: 'exact', exactBytes: 16, minBytes: 16 };
+  }
+  if (cppType === 'ResourceListForSurveyMessage::DataItem') {
+    return { kind: 'min', minBytes: 12, exactBytes: null };
+  }
+
+  // --- Auction/market types ---
+  if (cppType === 'SearchCondition' || cppType === 'AuctionQueryHeadersMessage::SearchCondition') {
+    return { kind: 'min', minBytes: 6, exactBytes: null };
+  }
+  if (cppType === 'AuctionLocation') {
+    return { kind: 'min', minBytes: 43, exactBytes: null };
+  }
+  if (cppType === 'MarketAuction') {
+    return { kind: 'min', minBytes: 74, exactBytes: null };
+  }
+  if (cppType === 'MarketAuctionAttribute') {
+    return { kind: 'min', minBytes: 14, exactBytes: null };
+  }
+  if (cppType === 'MarketAuctionBid') {
+    return { kind: 'exact', exactBytes: 24, minBytes: 24 };
+  }
+  if (cppType === 'Auction::PalettizedItemDataHeader') {
+    return { kind: 'exact', exactBytes: 67, minBytes: 67 };
+  }
+  if (cppType === 'AuctionData') {
+    return { kind: 'min', minBytes: 64, exactBytes: null };
+  }
+
+  // --- Game utility types ---
+  if (cppType === 'AttributePair') {
+    return { kind: 'min', minBytes: 6, exactBytes: null };
+  }
+  if (cppType === 'BatchBaselinesMessageData') {
+    return { kind: 'min', minBytes: 17, exactBytes: null };
+  }
+  if (cppType === 'CharacterListMessageData') {
+    return { kind: 'min', minBytes: 32, exactBytes: null };
+  }
+  if (cppType === 'Chardata') {
+    return { kind: 'min', minBytes: 20, exactBytes: null };
+  }
+  if (cppType === 'Chunk') {
+    return { kind: 'exact', exactBytes: 12, minBytes: 12 };
+  }
+  if (cppType === 'StructureListMessageData') {
+    return { kind: 'min', minBytes: 26, exactBytes: null };
+  }
+
+  // --- Customer service types ---
+  if (cppType === 'ChatLogEntry') {
+    return { kind: 'min', minBytes: 20, exactBytes: null };
+  }
+  if (cppType === 'CustomerServiceCategory') {
+    return { kind: 'min', minBytes: 12, exactBytes: null };
+  }
+  if (cppType === 'CustomerServiceComment') {
+    return { kind: 'min', minBytes: 15, exactBytes: null };
+  }
+  if (cppType === 'CustomerServiceTicket') {
+    return { kind: 'min', minBytes: 24, exactBytes: null };
+  }
+  if (cppType === 'CustomerServiceSearchResult') {
+    return { kind: 'min', minBytes: 8, exactBytes: null };
+  }
+
+  // --- Metrics/planet/AI types ---
+  if (cppType === 'MetricsPair') {
+    return { kind: 'min', minBytes: 10, exactBytes: null };
+  }
+  if (cppType === 'AIPathInfo_NodeInfo') {
+    return { kind: 'exact', exactBytes: 5, minBytes: 5 };
+  }
+  if (cppType === 'AddResourceTypeMessageNamespace::ResourceTypeData') {
+    return { kind: 'min', minBytes: 20, exactBytes: null };
+  }
+  if (cppType === 'PlanetNodeStatusMessageData') {
+    return { kind: 'min', minBytes: 17, exactBytes: null };
+  }
+  if (cppType === 'PlanetObjectStatusMessageData') {
+    return { kind: 'exact', exactBytes: 49, minBytes: 49 };
   }
 
   if (
@@ -921,6 +1119,34 @@ async function main() {
       fields: orderedFields,
       serializedLength,
     });
+  }
+
+  // Disambiguate typedefs that share a name but have different wire formats
+  // based on the parent packet class.
+  const AMBIGUOUS_TYPEDEF_MAP = {
+    ClusterData: {
+      LoginEnumCluster: 'LoginEnumCluster::ClusterData',
+      LoginClusterStatus: 'LoginClusterStatus::ClusterData',
+      LoginClusterStatusEx: 'LoginClusterStatusEx::ClusterData',
+    },
+    DataItem: {
+      SurveyMessage: 'SurveyMessage::DataItem',
+      ResourceListForSurveyMessage: 'ResourceListForSurveyMessage::DataItem',
+    },
+  };
+
+  for (const def of definitions) {
+    for (const field of def.fields) {
+      const disambiguation = AMBIGUOUS_TYPEDEF_MAP[field.cppType];
+      if (!disambiguation) {
+        continue;
+      }
+      const qualified = disambiguation[def.name];
+      if (qualified) {
+        field.cppType = qualified;
+        field.tsType = mapCppTypeToTs(qualified, field.archiveContainer);
+      }
+    }
   }
 
   const totalPackets = definitions.length;
