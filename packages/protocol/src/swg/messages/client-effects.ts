@@ -580,7 +580,7 @@ export function createStopClientEffectObjectByLabelMessage(
  * SlowDownEffectMessage - Visual slow-down cone effect between source and target
  * C++ addVariable order: source, target, coneLength, coneAngle, slopeAngle, expireTime
  */
-export interface SlowDownEffectMessage {
+export interface SlowDownEffectNetworkMessage {
   opcode: typeof ClientEffectOpcode.SlowDownEffectMessage;
   source: bigint;
   target: bigint;
@@ -590,7 +590,7 @@ export interface SlowDownEffectMessage {
   expireTime: number;
 }
 
-export function serializeSlowDownEffectMessage(message: SlowDownEffectMessage): Uint8Array {
+export function serializeSlowDownEffectNetworkMessage(message: SlowDownEffectNetworkMessage): Uint8Array {
   const writer = new BufferWriter(64);
   writer.writeUInt16LE(6); // operandCount
   writer.writeUInt32LE(message.opcode);
@@ -603,7 +603,7 @@ export function serializeSlowDownEffectMessage(message: SlowDownEffectMessage): 
   return writer.toBuffer();
 }
 
-export function deserializeSlowDownEffectMessage(data: Uint8Array): SlowDownEffectMessage {
+export function deserializeSlowDownEffectNetworkMessage(data: Uint8Array): SlowDownEffectNetworkMessage {
   const reader = new BufferReader(data);
   reader.readUInt16LE(); // operandCount
   const opcode = reader.readUInt32LE();
@@ -627,14 +627,14 @@ export function deserializeSlowDownEffectMessage(data: Uint8Array): SlowDownEffe
   };
 }
 
-export function createSlowDownEffectMessage(
+export function createSlowDownEffectNetworkMessage(
   source: bigint,
   target: bigint,
   coneLength: number,
   coneAngle: number,
   slopeAngle: number,
   expireTime: number,
-): SlowDownEffectMessage {
+): SlowDownEffectNetworkMessage {
   return {
     opcode: ClientEffectOpcode.SlowDownEffectMessage,
     source,
@@ -1479,7 +1479,7 @@ export type ClientEffectMessage =
   | PlayClientEventObjectMessage
   | PlayClientEventObjectTransformMessage
   | StopClientEffectObjectByLabelMessage
-  | SlowDownEffectMessage
+  | SlowDownEffectNetworkMessage
   | CreateClientPathMessage
   | DestroyClientPathMessage
   | CreateProjectileMessage
