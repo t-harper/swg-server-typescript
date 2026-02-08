@@ -100,6 +100,12 @@ export class Session {
   /** Whether SOE-level encryption (compression) is enabled for this session */
   public useCompression: boolean;
 
+  /** SOE encrypt method for pass 0: 0=None, 1=UserSupplied(compression) */
+  public encryptMethod0: number;
+
+  /** SOE encrypt method for pass 1: 0=None, 4=XOR */
+  public encryptMethod1: number;
+
   /** Buffer for reordering out-of-order packets */
   public outOfOrderQueue: Map<number, Uint8Array>;
 
@@ -127,6 +133,8 @@ export class Session {
       useCompression?: boolean;
       maxPacketSize?: number;
       protocolVersion?: number;
+      encryptMethod0?: number;
+      encryptMethod1?: number;
     } = {}
   ) {
     this.sessionId = sessionId;
@@ -137,6 +145,8 @@ export class Session {
     this.receiveSequence = 0;
     this.lastActivity = Date.now();
     this.useCompression = options.useCompression ?? true;
+    this.encryptMethod0 = options.encryptMethod0 ?? 0;
+    this.encryptMethod1 = options.encryptMethod1 ?? 0;
     this.outOfOrderQueue = new Map();
     this.pendingAcks = new Map();
     this.fragmentBuffer = null;
@@ -334,10 +344,15 @@ export class SessionManager extends EventEmitter {
         data = stripCrc(data);
       }
 
-      // SOE decrypt (compression-based) for all non-session packets
+      // SOE decrypt for all non-session packets
       // C++ ProcessRawPacket applies decrypt passes after CRC strip
       if (session.state === SessionState.Connected && this.packetHasCrc(opcode)) {
-        data = this.soeDecrypt(data);
+        data = this.soeDecrypt(data, session);
+        // Debug: log decrypted packet
+        const decHex = Array.from(data.slice(0, Math.min(64, data.length)))
+          .map(b => b.toString(16).padStart(2, '0'))
+          .join(' ');
+        console.log(`[SOE] Decrypted opcode=0x${opcode.toString(16).padStart(4, '0')} len=${data.length} hex=[${decHex}]`);
       }
 
       // Route to appropriate handler
@@ -386,6 +401,10 @@ export class SessionManager extends EventEmitter {
     // Generate a CRC seed for this session
     const crcSeed = this.options.enableEncryption ? generateRandomSeed() : 0;
 
+    // Encryption config: match C++ server [1,4] = compression + XOR
+    const encryptMethod0 = 1; // UserSupplied (compression)
+    const encryptMethod1 = 4; // XOR CBC cipher
+
     // Create new session
     const session = this.createSession(
       rinfo.address,
@@ -395,23 +414,27 @@ export class SessionManager extends EventEmitter {
       {
         useCompression: this.options.enableCompression,
         maxPacketSize: Math.min(packet.clientUdpBufferSize, this.options.udpBufferSize),
+        encryptMethod0,
+        encryptMethod1,
       }
     );
 
-    // Send session response
-    // C++ has cEncryptPasses=2, both using UserSupplied (compression)
+    // Send session response with same encrypt methods we stored on the session
     const response = Packet.createSessionResponse(
       packet.connectionId,
       crcSeed,
       this.options.udpBufferSize,
       {
-        encryptMethod0: this.options.enableCompression ? 1 : 0, // UserSupplied = compression
-        encryptMethod1: this.options.enableCompression ? 1 : 0, // UserSupplied = compression
+        encryptMethod0,
+        encryptMethod1,
       }
     );
 
     // Session response is sent without CRC (pre-negotiation)
-    this.sendRaw(session, Packet.serialize(response));
+    const responseBytes = Packet.serialize(response);
+    const respHex = Array.from(responseBytes).map(b => b.toString(16).padStart(2, '0')).join(' ');
+    console.log(`[SOE] SessionResponse to ${rinfo.address}:${rinfo.port}: crcSeed=0x${crcSeed.toString(16)}, encrypt=[${encryptMethod0},${encryptMethod1}], hex=[${respHex}]`);
+    this.sendRaw(session, responseBytes);
 
     // Mark session as connected
     session.state = SessionState.Connected;
@@ -485,8 +508,8 @@ export class SessionManager extends EventEmitter {
       // Expected packet - process it
       session.receiveSequence = (session.receiveSequence + 1) & 0xffff;
 
-      // Emit the data event (SOE-level decompression already applied in handlePacket)
-      this.emit('data', session, packet.data);
+      // Deliver data (handles UdpPacketGroup unwrapping)
+      this.deliverData(session, packet.data);
 
       // Send acknowledgement
       this.sendAck(session, packet.sequence);
@@ -568,8 +591,8 @@ export class SessionManager extends EventEmitter {
       const completeData = this.reassembleFragments(session.fragmentBuffer);
       session.fragmentBuffer = null;
 
-      // Emit the data event (SOE-level decompression already applied in handlePacket)
-      this.emit('data', session, completeData);
+      // Deliver data (handles UdpPacketGroup unwrapping)
+      this.deliverData(session, completeData);
     }
 
     // Process any queued out-of-order packets
@@ -654,7 +677,7 @@ export class SessionManager extends EventEmitter {
 
     // SOE encrypt (compression) + CRC for all non-session packets
     if (session.state === SessionState.Connected && this.packetHasCrc(opcode)) {
-      data = this.soeEncrypt(data);
+      data = this.soeEncrypt(data, session);
       data = appendCrc(data, session.crcSeed);
     }
 
@@ -670,6 +693,12 @@ export class SessionManager extends EventEmitter {
       return;
     }
 
+    // Debug: log SWG data being sent
+    const swgHex = Array.from(data.slice(0, Math.min(48, data.length)))
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join(' ');
+    console.log(`[SOE] sendReliable: appDataLen=${data.length} hex=[${swgHex}]`);
+
     // Calculate max data size per packet
     // Account for: opcode (2) + sequence (2) + compress flag (1) + CRC (2) = 7 bytes overhead
     const maxDataSize = session.maxPacketSize - 7;
@@ -680,9 +709,17 @@ export class SessionManager extends EventEmitter {
       const packet = Packet.createData(sequence, data);
       const serialized = Packet.serialize(packet);
 
+      // Debug: log pre-encryption Data packet
+      const preHex = Array.from(serialized).map(b => b.toString(16).padStart(2, '0')).join(' ');
+      console.log(`[SOE] Data seq=${sequence} pre-encrypt len=${serialized.length} hex=[${preHex}]`);
+
       // Apply SOE encryption (compression) and CRC
-      const encrypted = this.soeEncrypt(serialized);
+      const encrypted = this.soeEncrypt(serialized, session);
       const withCrc = appendCrc(encrypted, session.crcSeed);
+
+      // Debug: log post-encryption+CRC packet
+      const postHex = Array.from(withCrc).map(b => b.toString(16).padStart(2, '0')).join(' ');
+      console.log(`[SOE] Data seq=${sequence} on-wire len=${withCrc.length} hex=[${postHex}]`);
 
       session.pendingAcks.set(sequence, {
         sequence,
@@ -696,6 +733,50 @@ export class SessionManager extends EventEmitter {
       // Fragment the data
       this.sendFragmented(session, data);
     }
+  }
+
+  /**
+   * Send multiple application messages as a single reliable Data packet.
+   * Uses UdpPacketGroup framing (0x00 0x19) to bundle messages,
+   * matching the C++ UdpLibrary behavior where multiple Send() calls
+   * in the same frame are grouped into one Data packet.
+   */
+  sendReliableGroup(session: Session, messages: Uint8Array[]): void {
+    if (session.state !== SessionState.Connected) {
+      this.emitError(new Error('Cannot send data on disconnected session'), session);
+      return;
+    }
+
+    if (messages.length === 0) return;
+
+    // If only one message, send directly (no group framing needed)
+    if (messages.length === 1) {
+      this.sendReliable(session, messages[0]!);
+      return;
+    }
+
+    // Build UdpPacketGroup: [0x00][0x19][varlen(len1)][msg1][varlen(len2)][msg2]...
+    // Calculate total size
+    let totalSize = 2; // 0x00 + 0x19 header
+    for (const msg of messages) {
+      // Variable-length size prefix: 1 byte if < 0xFF, 3 bytes if >= 0xFF
+      totalSize += msg.length < 0xFF ? 1 : 3;
+      totalSize += msg.length;
+    }
+
+    const writer = new BufferWriter(totalSize);
+    writer.writeUInt8(0x00);  // zero-escape byte
+    writer.writeUInt8(0x19);  // cUdpPacketGroup type
+    for (const msg of messages) {
+      writer.writeVariableLength(msg.length);
+      writer.writeBytes(msg);
+    }
+
+    const groupPayload = writer.toBuffer();
+
+    console.log(`[SOE] sendReliableGroup: ${messages.length} messages, groupLen=${groupPayload.length}`);
+
+    this.sendReliable(session, groupPayload);
   }
 
   /**
@@ -729,8 +810,8 @@ export class SessionManager extends EventEmitter {
       const packet = Packet.createDataFragment(sequence, fragment);
       const serialized = Packet.serialize(packet);
 
-      // Apply SOE encryption (compression) and CRC
-      const encrypted = this.soeEncrypt(serialized);
+      // Apply SOE encryption (compression + XOR) and CRC
+      const encrypted = this.soeEncrypt(serialized, session);
       const withCrc = appendCrc(encrypted, session.crcSeed);
 
       session.pendingAcks.set(sequence, {
@@ -762,6 +843,8 @@ export class SessionManager extends EventEmitter {
     options: {
       useCompression?: boolean;
       maxPacketSize?: number;
+      encryptMethod0?: number;
+      encryptMethod1?: number;
     } = {}
   ): Session {
     const key = Session.getKey(address, port);
@@ -865,6 +948,50 @@ export class SessionManager extends EventEmitter {
   }
 
   /**
+   * Deliver application data from the reliable channel.
+   * Handles UdpLibrary internal framing (zero-escape + cUdpPacketGroup).
+   * In the C++ UdpLibrary, if the first byte is 0x00 it's an internal packet;
+   * type 0x19 (cUdpPacketGroup) wraps multiple app messages with size prefixes.
+   */
+  private deliverData(session: Session, data: Uint8Array): void {
+    if (data.length < 1) return;
+
+    // Check for zero-escape (UdpLibrary internal packet)
+    if (data[0] === 0x00 && data.length >= 2) {
+      const internalType = data[1];
+
+      // cUdpPacketGroup = 0x19 (25) — multiple size-prefixed app messages
+      if (internalType === 0x19) {
+        let offset = 2; // skip zero-byte + type byte
+        while (offset < data.length) {
+          // Read variable-length size: 1 byte if < 0xFF, else 0xFF + u16BE
+          let msgSize = data[offset]!;
+          offset += 1;
+          if (msgSize === 0xff && offset + 2 <= data.length) {
+            msgSize = ((data[offset]! << 8) | data[offset + 1]!) & 0xffff;
+            offset += 2;
+          }
+
+          if (msgSize === 0 || offset + msgSize > data.length) break;
+
+          const message = data.subarray(offset, offset + msgSize);
+          offset += msgSize;
+
+          // Recursively deliver (sub-messages may also be zero-escaped)
+          this.deliverData(session, message);
+        }
+        return;
+      }
+
+      // Other internal types (keep-alive, etc.) — ignore for now
+      return;
+    }
+
+    // Application data — emit directly
+    this.emit('data', session, data);
+  }
+
+  /**
    * Send an acknowledgement packet
    */
   private sendAck(session: Session, sequence: number): void {
@@ -899,7 +1026,7 @@ export class SessionManager extends EventEmitter {
           const packet = Packet.deserialize(data) as Packet.DataPacket;
           session.receiveSequence = (session.receiveSequence + 1) & 0xffff;
 
-          this.emit('data', session, packet.data);
+          this.deliverData(session, packet.data);
           processed = true;
         } else if (opcode === SoeOpcode.DataFragment) {
           // Re-process as fragment (it's the raw packet data)
@@ -996,17 +1123,91 @@ export class SessionManager extends EventEmitter {
   }
 
   /**
-   * SOE encrypt with 2 passes (matches C++ cEncryptPasses=2)
-   * Both passes use UserSupplied encryption (compression)
-   * Operates on payload after opcode (first 2 bytes are preserved)
+   * XOR encrypt (matches C++ UdpConnection::EncryptXor, cEncryptMethodXor=4)
+   * CBC-like XOR cipher: each 4-byte chunk is XOR'd with previous encrypted output
+   * Uses encryptCode (CRC seed) as initial key, little-endian int operations
    */
-  private soeEncrypt(data: Uint8Array): Uint8Array {
+  private xorEncrypt(payload: Uint8Array, encryptCode: number): Uint8Array {
+    const result = new Uint8Array(payload.length);
+    let prev = encryptCode;
+    let offset = 0;
+
+    // Process 4-byte chunks (little-endian int XOR with CBC feedback)
+    while (offset + 4 <= payload.length) {
+      const chunk = (payload[offset]!) | (payload[offset + 1]! << 8) |
+                    (payload[offset + 2]! << 16) | (payload[offset + 3]! << 24);
+      const encrypted = (chunk ^ prev) | 0; // force signed 32-bit
+      result[offset] = encrypted & 0xFF;
+      result[offset + 1] = (encrypted >>> 8) & 0xFF;
+      result[offset + 2] = (encrypted >>> 16) & 0xFF;
+      result[offset + 3] = (encrypted >>> 24) & 0xFF;
+      prev = encrypted;
+      offset += 4;
+    }
+
+    // Remaining bytes: XOR with lowest byte of prev
+    while (offset < payload.length) {
+      result[offset] = (payload[offset]! ^ prev) & 0xFF;
+      offset++;
+    }
+
+    return result;
+  }
+
+  /**
+   * XOR decrypt (matches C++ UdpConnection::DecryptXor)
+   * Reverse of encrypt: prev tracks encrypted (input) values, not decrypted output
+   */
+  private xorDecrypt(payload: Uint8Array, encryptCode: number): Uint8Array {
+    const result = new Uint8Array(payload.length);
+    let prev = encryptCode;
+    let offset = 0;
+
+    // Process 4-byte chunks
+    while (offset + 4 <= payload.length) {
+      const encrypted = (payload[offset]!) | (payload[offset + 1]! << 8) |
+                        (payload[offset + 2]! << 16) | (payload[offset + 3]! << 24);
+      const decrypted = (encrypted ^ prev) | 0;
+      result[offset] = decrypted & 0xFF;
+      result[offset + 1] = (decrypted >>> 8) & 0xFF;
+      result[offset + 2] = (decrypted >>> 16) & 0xFF;
+      result[offset + 3] = (decrypted >>> 24) & 0xFF;
+      prev = encrypted; // feedback: prev = encrypted INPUT (not decrypted output)
+      offset += 4;
+    }
+
+    // Remaining bytes
+    while (offset < payload.length) {
+      result[offset] = (payload[offset]! ^ prev) & 0xFF;
+      offset++;
+    }
+
+    return result;
+  }
+
+  /**
+   * SOE encrypt with 2 passes (matches C++ cEncryptPasses=2)
+   * Each pass is conditional based on session encrypt methods:
+   *   0 = None (skip), 1 = UserSupplied (compression), 4 = XOR
+   * Operates on payload after opcode (first 2 bytes are preserved for internal packets)
+   */
+  private soeEncrypt(data: Uint8Array, session: Session): Uint8Array {
+    // If both methods are None, skip encryption entirely
+    if (session.encryptMethod0 === 0 && session.encryptMethod1 === 0) {
+      return data;
+    }
+
     const opcode = data.subarray(0, 2);
     let payload = data.subarray(2);
 
-    // C++ encrypts in forward order: pass 0, then pass 1
-    for (let j = 0; j < 2; j++) {
-      payload = this.soeEncryptOnePass(payload);
+    // C++ encrypts in forward order: pass 0 first, then pass 1
+    if (session.encryptMethod0 === 1) {
+      payload = this.soeEncryptOnePass(payload);  // Pass 0: UserSupplied (compress)
+    }
+    if (session.encryptMethod1 === 4) {
+      payload = this.xorEncrypt(payload, session.crcSeed);  // Pass 1: XOR
+    } else if (session.encryptMethod1 === 1) {
+      payload = this.soeEncryptOnePass(payload);  // Pass 1: UserSupplied (compress again)
     }
 
     const result = new Uint8Array(2 + payload.length);
@@ -1017,11 +1218,16 @@ export class SessionManager extends EventEmitter {
 
   /**
    * SOE decrypt with 2 passes (matches C++ cEncryptPasses=2)
-   * Both passes use UserSupplied decryption (decompression)
-   * Operates on payload after opcode (first 2 bytes are preserved)
+   * Decrypts in reverse order: Pass 1 first, then Pass 0
+   * Each pass is conditional based on session encrypt methods
    */
-  private soeDecrypt(data: Uint8Array): Uint8Array {
+  private soeDecrypt(data: Uint8Array, session: Session): Uint8Array {
     if (data.length <= 2) {
+      return data;
+    }
+
+    // If both methods are None, skip decryption entirely
+    if (session.encryptMethod0 === 0 && session.encryptMethod1 === 0) {
       return data;
     }
 
@@ -1029,8 +1235,13 @@ export class SessionManager extends EventEmitter {
     let payload = data.subarray(2);
 
     // C++ decrypts in reverse order: pass 1 first, then pass 0
-    for (let j = 1; j >= 0; j--) {
-      payload = this.soeDecryptOnePass(payload);
+    if (session.encryptMethod1 === 4) {
+      payload = this.xorDecrypt(payload, session.crcSeed);  // Pass 1: XOR decrypt
+    } else if (session.encryptMethod1 === 1) {
+      payload = this.soeDecryptOnePass(payload);  // Pass 1: UserSupplied (decompress)
+    }
+    if (session.encryptMethod0 === 1) {
+      payload = this.soeDecryptOnePass(payload);  // Pass 0: UserSupplied (decompress)
     }
 
     const result = new Uint8Array(2 + payload.length);
@@ -1054,6 +1265,13 @@ export class SessionManager extends EventEmitter {
       this.emitError(new Error('No send callback configured'));
       return;
     }
+
+    // Debug: log outgoing packets
+    const opcode = data.length >= 2 ? ((data[0]! << 8) | data[1]!) : 0;
+    const hexDump = Array.from(data.slice(0, Math.min(48, data.length)))
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join(' ');
+    console.log(`[SOE] Send ${session.clientAddress.address}:${session.clientAddress.port} opcode=0x${opcode.toString(16).padStart(4, '0')} len=${data.length} hex=[${hexDump}]`);
 
     session.packetsSent++;
     this.sendCallback(data, session.clientAddress.address, session.clientAddress.port);

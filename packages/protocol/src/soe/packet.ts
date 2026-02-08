@@ -211,7 +211,8 @@ function deserializeSessionRequest(reader: BufferReader): SessionRequestPacket {
  * Serialize a Session Response packet
  */
 function serializeSessionResponse(packet: SessionResponsePacket): Uint8Array {
-  const writer = new BufferWriter(32);
+  // Match C++ UdpPacket_ConnectConfirm: 17 bytes total (no protocolVersion)
+  const writer = new BufferWriter(17);
   writer.writeUInt16BE(SoeOpcode.SessionResponse);
   writer.writeUInt32BE(packet.connectionId);
   writer.writeUInt32BE(packet.crcSeed);
@@ -219,7 +220,6 @@ function serializeSessionResponse(packet: SessionResponsePacket): Uint8Array {
   writer.writeUInt8(packet.encryptMethod0);
   writer.writeUInt8(packet.encryptMethod1);
   writer.writeUInt32BE(packet.serverUdpBufferSize);
-  writer.writeUInt32BE(packet.protocolVersion);
   return writer.toBuffer();
 }
 

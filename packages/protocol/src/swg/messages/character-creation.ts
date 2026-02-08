@@ -53,19 +53,19 @@ function readStringId(reader: BufferReader): CharacterCreationStringId {
  */
 export const CharacterCreationOpcode = {
   /** Client request to create a character */
-  ClientCreateCharacter: 0x00b97c38,
-  /** Server response - character created successfully */
-  CreateCharacterSuccess: 0x1db575cc,
+  ClientCreateCharacter: 0xb97f3074,
+  /** Server response - character created successfully (same wire name as Failed in C++) */
+  CreateCharacterSuccess: 0xdf333c6e,
   /** Server response - character creation failed */
   CreateCharacterFailure: 0xdf333c6e,
   /** Client request to validate a character name */
-  ClientVerifyAndLockNameRequest: 0xd6d1b6d1,
+  ClientVerifyAndLockNameRequest: 0x9eb04b9f,
   /** Server response to name validation request */
-  ClientVerifyAndLockNameResponse: 0xe85fb868,
+  ClientVerifyAndLockNameResponse: 0x9b2c6ba7,
   /** Client request to get random name suggestions */
-  ClientRandomNameRequest: 0xd6a80a5c,
+  ClientRandomNameRequest: 0xd6d1b6d1,
   /** Server response with random name */
-  ClientRandomNameResponse: 0xe5d6e54d,
+  ClientRandomNameResponse: 0xe85fb868,
 } as const;
 
 export type CharacterCreationOpcodeType =

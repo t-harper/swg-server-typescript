@@ -4,7 +4,7 @@ export const CommonMessageOpcodes = {
   FrameEndMessage: 0x2d8aa5e5,
   SetTransformMessage: 0x0e1b97c8,
   BatchBaselinesMessage: 0x2f4483f2,
-  LoginClusterStatusEx: 0x7a42b23d,
+  LoginClusterStatusEx: 0xfa5b4b5a,
   PlayerMoneyRequest: 0x9d105aa1,
   PlayerMoneyResponse: 0x367c4205,
 } as const;
@@ -212,7 +212,7 @@ export interface LoginClusterStatusEx {
 
 export function serializeLoginClusterStatusEx(message: LoginClusterStatusEx): Uint8Array {
   const writer = new BufferWriter();
-  writer.writeUInt16LE(1); // operandCount
+  writer.writeUInt16LE(2); // operandCount: cmd + data
   writer.writeUInt32LE(message.opcode);
 
   // AutoArray<ClusterData>

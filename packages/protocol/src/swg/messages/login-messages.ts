@@ -11,19 +11,25 @@ import { BufferReader, BufferWriter } from '../../soe/buffer-utils.js';
  */
 export const LoginMessageOpcode = {
   /** Client sending credentials */
-  LoginClientId: 0x41131f25,
+  LoginClientId: 0x41131f96,
   /** Server response with session token */
-  LoginClientToken: 0x01e0b0a4,
+  LoginClientToken: 0xaab296c6,
   /** Server response for invalid credentials */
-  LoginIncorrectClientId: 0x5dd86f53,
+  LoginIncorrectClientId: 0x20e7e510,
   /** Client requesting character list */
   EnumerateCharacterId: 0x65ea4574,
-  /** Server response with character list */
-  EnumerateCharacterIdResponse: 0x92e18a13,
+  /** Server response with character list (same opcode as request in C++) */
+  EnumerateCharacterIdResponse: 0x65ea4574,
   /** Server list message */
-  LoginClusterStatus: 0x25d27d45,
+  LoginClusterStatus: 0x3436aeb6,
   /** Cluster data (servers) */
   LoginEnumCluster: 0xc11c63b9,
+  /** GenericValueTypeMessage<int32> - server epoch time */
+  ServerNowEpochTime: 0x24b73893,
+  /** GenericValueTypeMessage<set<string>> - disabled cluster names */
+  CharacterCreationDisabled: 0xf41a5265,
+  /** Client request for extended cluster info */
+  RequestExtendedClusterInfo: 0x8e33ed05,
 } as const;
 
 export type LoginMessageOpcodeType =
@@ -366,4 +372,34 @@ export function createEnumerateCharacterIdResponse(
     opcode: LoginMessageOpcode.EnumerateCharacterIdResponse,
     characters,
   };
+}
+
+/**
+ * Serialize ServerNowEpochTime message
+ * GenericValueTypeMessage<int32> with current epoch time
+ * C++ sends this as the FIRST response when LoginClientId is received
+ */
+export function serializeServerNowEpochTime(epochTime: number): Uint8Array {
+  const writer = new BufferWriter(10);
+  writer.writeUInt16LE(2); // operandCount: cmd + value
+  writer.writeUInt32LE(LoginMessageOpcode.ServerNowEpochTime);
+  writer.writeInt32LE(epochTime);
+  return writer.toBuffer();
+}
+
+/**
+ * Serialize CharacterCreationDisabled message
+ * GenericValueTypeMessage<set<string>> with disabled cluster names
+ * C++ sends this after LoginEnumCluster
+ */
+export function serializeCharacterCreationDisabled(disabledClusters: string[]): Uint8Array {
+  const writer = new BufferWriter(64);
+  writer.writeUInt16LE(2); // operandCount: cmd + value
+  writer.writeUInt32LE(LoginMessageOpcode.CharacterCreationDisabled);
+  // std::set<std::string> serialized as: u32LE count + [string_u16LE, ...]
+  writer.writeUInt32LE(disabledClusters.length);
+  for (const name of disabledClusters) {
+    writer.writeStringWithLength16LE(name);
+  }
+  return writer.toBuffer();
 }

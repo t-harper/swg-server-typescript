@@ -115,6 +115,9 @@ importers:
       '@swg/shared-types':
         specifier: workspace:*
         version: link:../../packages/shared-types
+      '@swg/world':
+        specifier: workspace:*
+        version: link:../../packages/world
     devDependencies:
       '@types/node':
         specifier: ^22.10.0

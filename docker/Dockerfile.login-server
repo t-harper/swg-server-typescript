@@ -31,8 +31,8 @@ COPY packages/shared-types ./packages/shared-types
 COPY packages/objects ./packages/objects
 COPY tsconfig.json ./
 
-# Build the application
-RUN pnpm --filter @swg/login-server build
+# Build the application (turbo handles dependency graph - builds @swg/protocol etc. first)
+RUN pnpm turbo run build --filter=@swg/login-server
 
 # Production stage
 FROM node:22-alpine AS production

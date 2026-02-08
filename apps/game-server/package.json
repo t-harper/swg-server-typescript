@@ -20,7 +20,8 @@
     "@swg/objects": "workspace:*",
     "@swg/protocol": "workspace:*",
     "@swg/redis": "workspace:*",
-    "@swg/shared-types": "workspace:*"
+    "@swg/shared-types": "workspace:*",
+    "@swg/world": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",

@@ -18,6 +18,10 @@
       "types": "./dist/swg/index.d.ts",
       "import": "./dist/swg/index.js"
     },
+    "./soe/*": {
+      "types": "./dist/soe/*",
+      "import": "./dist/soe/*"
+    },
     "./swg/messages/*": {
       "types": "./dist/swg/messages/*",
       "import": "./dist/swg/messages/*"

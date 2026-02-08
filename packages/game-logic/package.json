@@ -25,6 +25,14 @@
     "./skills": {
       "types": "./dist/skills/index.d.ts",
       "import": "./dist/skills/index.js"
+    },
+    "./resources": {
+      "types": "./dist/resources/index.d.ts",
+      "import": "./dist/resources/index.js"
+    },
+    "./*": {
+      "types": "./dist/*",
+      "import": "./dist/*"
     }
   },
   "scripts": {

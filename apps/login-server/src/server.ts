@@ -19,6 +19,8 @@ import {
   LoginMessageOpcode,
   deserializeLoginClientId,
   getLoginMessageOpcode,
+  serializeServerNowEpochTime,
+  serializeCharacterCreationDisabled,
 } from '@swg/protocol/swg/messages/login-messages.js';
 import {
   CharacterCreationOpcode,
@@ -32,6 +34,10 @@ import {
   createLoginEnumCluster,
   createLoginClusterStatus,
 } from '@swg/protocol/swg/messages/login-cluster-messages.js';
+import {
+  serializeLoginClusterStatusEx,
+  createLoginClusterStatusEx,
+} from '@swg/protocol/swg/messages/common-messages.js';
 
 import { UdpServer, createUdpServer, type RemoteEndpoint } from './network/udp-server.js';
 import {
@@ -58,6 +64,12 @@ interface LoginSession {
   accountId?: number;
   stationId?: bigint;
   sessionToken?: string;
+  clusterConfig?: {
+    clusterId: number;
+    clusterName: string;
+    connectionServerAddress: string;
+    connectionServerPort: number;
+  };
 }
 
 /**
@@ -187,6 +199,12 @@ export async function createServer(config: ServerConfig): Promise<LoginServer> {
       return;
     }
 
+    // Debug: dump first 32 bytes of decrypted SWG payload
+    const hexDump = Array.from(data.slice(0, Math.min(32, data.length)))
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join(' ');
+    console.log(`[LoginServer] SWG data from ${clientKey}: len=${data.length} hex=[${hexDump}]`);
+
     const loginSession = getLoginSession(soeSession);
     const opcode = getLoginMessageOpcode(data);
 
@@ -194,6 +212,7 @@ export async function createServer(config: ServerConfig): Promise<LoginServer> {
       switch (opcode) {
         case LoginMessageOpcode.LoginClientId: {
           console.log(`[LoginServer] LoginClientId from ${clientKey}`);
+
           const loginMessage = deserializeLoginClientId(data);
           const result = await loginHandler.handleLoginClientId(
             loginSession.clientSession,
@@ -213,10 +232,10 @@ export async function createServer(config: ServerConfig): Promise<LoginServer> {
             loginSession.clientSession.stationId = result.session.stationId;
             loginSession.clientSession.sessionToken = result.session.sessionToken;
 
-            // Send LoginClientToken response
-            sessionManager.sendReliable(soeSession, result.response);
-
-            // Send cluster enumeration
+            // Build ALL login response messages to send as a single atomic group.
+            // The C++ server bundles these in one Data packet using UdpPacketGroup (0x00 0x19).
+            // The client expects them to arrive atomically — sending LoginClientToken
+            // before LoginEnumCluster causes a crash (client accesses uninitialized cluster data).
             const maxChars = config.maxCharsPerAccount ?? 2;
             const clusterConfig = {
               clusterId: config.clusterIdNumeric ?? serverId,
@@ -225,11 +244,15 @@ export async function createServer(config: ServerConfig): Promise<LoginServer> {
               connectionServerPort: config.connectionServer?.port ?? 44455,
             };
 
+            // Store cluster config on login session for later use
+            loginSession.clusterConfig = clusterConfig;
+
+            const epochTime = Math.floor(Date.now() / 1000);
+
             const enumCluster = createLoginEnumCluster(
               [{ clusterId: clusterConfig.clusterId, clusterName: clusterConfig.clusterName, timeZone: 0 }],
               maxChars
             );
-            sessionManager.sendReliable(soeSession, serializeLoginEnumCluster(enumCluster));
 
             const clusterStatus = createLoginClusterStatus([{
               clusterId: clusterConfig.clusterId,
@@ -245,7 +268,30 @@ export async function createServer(config: ServerConfig): Promise<LoginServer> {
               onlinePlayerLimit: 3000,
               onlineFreeTrialLimit: 3000,
             }]);
-            sessionManager.sendReliable(soeSession, serializeLoginClusterStatus(clusterStatus));
+
+            const clusterStatusEx = createLoginClusterStatusEx([{
+              clusterId: clusterConfig.clusterId,
+              branch: 'swg-main',
+              networkVersion: '20100225-17:43',
+              version: 0,
+              reserved1: 0,
+              reserved2: 0,
+              reserved3: 0,
+              reserved4: 0,
+            }]);
+
+            // Send all 6 messages as a single atomic group (matches C++ server order)
+            const loginResponseMessages = [
+              serializeServerNowEpochTime(epochTime),
+              result.response,                                    // LoginClientToken
+              serializeLoginEnumCluster(enumCluster),
+              serializeCharacterCreationDisabled([]),
+              serializeLoginClusterStatus(clusterStatus),
+              serializeLoginClusterStatusEx(clusterStatusEx),
+            ];
+
+            console.log(`[LoginServer] Sending login response group: ${loginResponseMessages.length} messages`);
+            sessionManager.sendReliableGroup(soeSession, loginResponseMessages);
           } else {
             // Auth failed - disconnect the client
             sessionManager.disconnectSession(soeSession, DisconnectReason.Application);
@@ -306,6 +352,12 @@ export async function createServer(config: ServerConfig): Promise<LoginServer> {
           const response = characterCreationHandler.handleRandomName(randomMessage);
 
           sessionManager.sendReliable(soeSession, response);
+          break;
+        }
+
+        case LoginMessageOpcode.RequestExtendedClusterInfo: {
+          console.log(`[LoginServer] RequestExtendedClusterInfo from ${clientKey} (ignoring for now)`);
+          // TODO: respond with LoginClusterStatusEx after auth flow completes
           break;
         }
 

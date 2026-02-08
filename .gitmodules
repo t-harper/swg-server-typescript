@@ -1,0 +1,3 @@
+[submodule "data/serverdata"]
+	path = data/serverdata
+	url = https://github.com/SWG-Source/serverdata.git

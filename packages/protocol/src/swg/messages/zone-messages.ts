@@ -12,7 +12,7 @@ export const ZoneMessageOpcode = {
   /** Client ready for scene data (sent after loading screen) */
   CmdSceneReady: 0x43fd1c22,
   /** Start scene loading - sent from server to client */
-  CmdStartScene: 0x3aeba79e,
+  CmdStartScene: 0x3ae6dfae,
   /** Create object by CRC template */
   SceneCreateObjectByCrc: 0xfe89ddea,
   /** Destroy/remove object from scene */
@@ -24,7 +24,7 @@ export const ZoneMessageOpcode = {
   /** Object endpoint message */
   SceneEndBaselines: 0x2c436037,
   /** Server time sync */
-  ServerTimeMessage: 0x2e365218,
+  ServerTimeMessage: 0x2ebc3bd9,
   /** Game server ready acknowledgement */
   GameServerReady: 0xd5899226,
   /** Request warp to location */
