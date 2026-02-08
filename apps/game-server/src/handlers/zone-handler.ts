@@ -71,10 +71,11 @@ export function sendZoneIn(
     const serverEpoch = Math.floor(Date.now() / 1000);
 
     // 1. CmdStartScene -- triggers the client loading screen
-    // sceneName is the scene ID (e.g., "tatooine"), NOT the terrain file path
+    // sceneName is the terrain file path (e.g., "terrain/tatooine.trn") - confirmed via C++ pcap
+    const terrainFile = `terrain/${data.sceneId}.trn`;
     const startScene = createCmdStartScene(
       data.characterId,
-      data.sceneId,       // scene name like "tatooine"
+      terrainFile,        // terrain file path like "terrain/tatooine.trn"
       data.x, data.y, data.z,
       0,                  // startYaw
       templateName,       // template path string

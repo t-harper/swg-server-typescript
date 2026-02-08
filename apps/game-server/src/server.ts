@@ -525,10 +525,11 @@ export async function createServer(config: ServerConfig): Promise<GameServer> {
     const galacticTime = BigInt(Math.floor(Date.now() / 1000));
     const serverEpoch = Math.floor(Date.now() / 1000);
 
-    // 1. CmdStartScene
+    // 1. CmdStartScene — sceneName is the terrain file path, not just the scene ID
+    const terrainFile = `terrain/${character.sceneId}.trn`;
     send(serializeCmdStartScene(createCmdStartScene(
       objectId,
-      character.sceneId,
+      terrainFile,
       character.x, character.y, character.z,
       0,
       templatePath,

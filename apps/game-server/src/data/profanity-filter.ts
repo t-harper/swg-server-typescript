@@ -46,16 +46,12 @@ const PROFANITY_LIST: readonly string[] = [
   'penis',
   'pussy',
   'vagina',
-  // Variants and common substitutions
-  'a$$',
-  '@ss',
-  'b1tch',
-  'd1ck',
-  'f*ck',
+  // Common misspellings (leet-speak variants are auto-generated, don't add
+  // symbol-heavy entries here — normalizeString strips non-alphanumeric chars
+  // turning e.g. "a$$" into "a" which matches every name containing 'a')
   'fck',
   'fuk',
   'phuck',
-  'sh1t',
   // Other inappropriate terms
   'nazi',
   'hitler',
@@ -172,6 +168,9 @@ export function checkProfanity(input: string): ProfanityCheckResult {
   for (const profaneWord of PROFANITY_LIST) {
     const normalizedProfane = normalizeString(profaneWord);
 
+    // Skip words that normalize to fewer than 3 chars — too short for reliable substring matching
+    if (normalizedProfane.length < 3) continue;
+
     if (normalized.includes(normalizedProfane)) {
       const position = normalized.indexOf(normalizedProfane);
       return {
@@ -188,6 +187,8 @@ export function checkProfanity(input: string): ProfanityCheckResult {
 
   for (const profaneWord of PROFANITY_LIST) {
     const normalizedProfane = normalizeString(profaneWord);
+
+    if (normalizedProfane.length < 3) continue;
 
     if (normalizedNoSpaces.includes(normalizedProfane)) {
       return {

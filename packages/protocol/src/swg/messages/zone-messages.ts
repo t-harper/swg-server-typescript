@@ -154,7 +154,7 @@ export function deserializeCmdStartScene(data: Uint8Array): CmdStartScene {
 
 /**
  * Create a CmdStartScene message
- * @param sceneName - Scene ID like "tatooine", NOT the terrain file path
+ * @param sceneName - Terrain file path like "terrain/tatooine.trn" (confirmed via C++ pcap)
  * @param templateName - Full template path like "object/creature/player/shared_human_male.iff"
  */
 export function createCmdStartScene(
