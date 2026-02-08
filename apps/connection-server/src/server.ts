@@ -8,6 +8,10 @@
 
 import type { ServerConfig } from '@swg/config';
 import {
+  initDb,
+  CharacterRepository,
+} from '@swg/database';
+import {
   getRedisClient,
   SessionStore,
   PubSubManager,
@@ -25,6 +29,12 @@ import {
   deserializeSelectCharacter,
   getConnectionMessageOpcode,
 } from '@swg/protocol/swg/messages/connection-messages.js';
+import {
+  CharacterCreationOpcode,
+  deserializeClientCreateCharacter,
+  deserializeClientVerifyAndLockNameRequest,
+  deserializeClientRandomNameRequest,
+} from '@swg/protocol/swg/messages/character-creation.js';
 import { BufferWriter } from '@swg/protocol/soe/buffer-utils.js';
 import { serializeHeartBeat } from '@swg/protocol/swg/messages/character-messages.js';
 import { createClientPermissionsMessage } from '@swg/protocol/swg/messages/object-messages.js';
@@ -46,6 +56,10 @@ import {
   GameServerStatus,
   type GameServerInfo,
 } from './handlers/routing-handler.js';
+import {
+  CharacterCreationHandler,
+  createCharacterCreationHandler,
+} from './handlers/character-creation-handler.js';
 
 /**
  * Server shutdown message for pub/sub
@@ -121,7 +135,7 @@ function serializeAccountFeatureBits(
   epochSeconds: number,
 ): Uint8Array {
   const writer = new BufferWriter(32);
-  writer.writeUInt16LE(1); // GenericValueTypeMessage has 1 variable payload
+  writer.writeUInt16LE(2); // operandCount (1 payload + operandCount itself)
   writer.writeUInt32LE(ConnectionServerMessageOpcode.AccountFeatureBits);
   writer.writeUInt32LE(gameFeatures >>> 0);
   writer.writeUInt32LE(subscriptionFeatures >>> 0);
@@ -132,7 +146,7 @@ function serializeAccountFeatureBits(
 
 function serializeVoiceChatStatus(statusCode: number): Uint8Array {
   const writer = new BufferWriter(16);
-  writer.writeUInt16LE(1);
+  writer.writeUInt16LE(2); // operandCount (1 field + operandCount itself)
   writer.writeUInt32LE(ConnectionServerMessageOpcode.VoiceChatStatus);
   writer.writeUInt32LE(statusCode >>> 0);
   return writer.toBuffer();
@@ -168,6 +182,15 @@ export async function createServer(config: ServerConfig): Promise<ConnectionServ
   // Create session store and pub/sub manager
   const sessionStore = createSessionStore(redisClient);
   const pubsub = createPubSubManager(redisClient);
+
+  // Initialize database for character creation
+  const db = initDb(config.database);
+  const characterRepository = new CharacterRepository(db);
+  const characterCreationHandler = createCharacterCreationHandler(
+    characterRepository,
+    sessionStore,
+    1, // serverId
+  );
 
   // Create UDP server
   const udpServer = createUdpServer({
@@ -271,6 +294,41 @@ export async function createServer(config: ServerConfig): Promise<ConnectionServ
           break;
         }
 
+        case CharacterCreationOpcode.ClientCreateCharacter: {
+          console.log(`[ConnectionServer] ClientCreateCharacter from ${clientKey}`);
+          const createMessage = deserializeClientCreateCharacter(data);
+          const createResult = await characterCreationHandler.createCharacter(
+            { authenticated: connSession.authenticated, accountId: connSession.accountId },
+            createMessage,
+          );
+          sessionManager.sendReliable(connSession.soeSession, createResult.response);
+          if (createResult.success) {
+            console.log(`[ConnectionServer] Character created: ${createMessage.characterName} (ID: ${createResult.characterId})`);
+          } else {
+            console.log(`[ConnectionServer] Character creation failed: ${createResult.errorMessage}`);
+          }
+          break;
+        }
+
+        case CharacterCreationOpcode.ClientVerifyAndLockNameRequest: {
+          console.log(`[ConnectionServer] ClientVerifyAndLockNameRequest from ${clientKey}`);
+          const verifyMessage = deserializeClientVerifyAndLockNameRequest(data);
+          const verifyResponse = await characterCreationHandler.handleVerifyName(
+            { authenticated: connSession.authenticated, accountId: connSession.accountId },
+            verifyMessage,
+          );
+          sessionManager.sendReliable(connSession.soeSession, verifyResponse);
+          break;
+        }
+
+        case CharacterCreationOpcode.ClientRandomNameRequest: {
+          console.log(`[ConnectionServer] ClientRandomNameRequest from ${clientKey}`);
+          const randomMessage = deserializeClientRandomNameRequest(data);
+          const randomResponse = characterCreationHandler.handleRandomName(randomMessage);
+          sessionManager.sendReliable(connSession.soeSession, randomResponse);
+          break;
+        }
+
         default:
           console.log(
             `[ConnectionServer] Unknown SWG message opcode: 0x${opcode.toString(16)} from ${clientKey}`,
@@ -331,10 +389,11 @@ export async function createServer(config: ServerConfig): Promise<ConnectionServ
     );
 
     const clientPermissions = createClientPermissionsMessage(
-      true,
-      true,
-      true,
-      true,
+      true,  // canLogin
+      true,  // canPlay
+      false, // canSave (matches C++ default)
+      true,  // canSendMail
+      false, // isAdmin
     );
 
     // Match C++ post-auth ordering seen in packet captures.

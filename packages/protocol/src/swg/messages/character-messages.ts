@@ -117,7 +117,7 @@ export interface HeartBeat {
 
 export function serializeHeartBeat(_msg?: HeartBeat): Uint8Array {
   const writer = new BufferWriter();
-  writer.writeUInt16LE(0); // operandCount
+  writer.writeUInt16LE(1); // operandCount (C++ includes operandCount itself)
   writer.writeUInt32LE(CharacterMessageOpcodes.HeartBeat);
   return writer.toBuffer();
 }

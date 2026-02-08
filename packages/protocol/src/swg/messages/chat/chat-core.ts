@@ -887,7 +887,7 @@ export interface ChatServerStatus {
 
 export function serializeChatServerStatus(msg: ChatServerStatus): Uint8Array {
   const writer = new BufferWriter();
-  writer.writeUInt16LE(1); // operandCount
+  writer.writeUInt16LE(2); // operandCount (1 field + operandCount itself)
   writer.writeUInt32LE(ChatCoreOpcodes.ChatServerStatus);
   writer.writeUInt8(msg.status ? 1 : 0);
   return writer.toBuffer();

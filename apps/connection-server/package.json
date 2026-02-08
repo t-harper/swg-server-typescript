@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@swg/config": "workspace:*",
+    "@swg/database": "workspace:*",
     "@swg/protocol": "workspace:*",
     "@swg/redis": "workspace:*",
     "@swg/shared-types": "workspace:*"

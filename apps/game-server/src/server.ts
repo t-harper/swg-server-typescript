@@ -1,6 +1,10 @@
 /**
  * Game Server
- * Main server orchestration for the game world
+ * Main server orchestration for the game world.
+ *
+ * In C++ SWG, the "ConnectionServer" is the client-facing game server.
+ * Clients connect here after login for: auth, character creation, character
+ * selection, and zone-in.  This server merges that role with the GameServer.
  */
 
 import type { ServerConfig } from '@swg/config';
@@ -11,15 +15,14 @@ import {
   type Session,
   DisconnectReason,
 } from '@swg/protocol/soe';
+import { BufferWriter } from '@swg/protocol/soe/buffer-utils.js';
 import {
   MovementMessageOpcode,
   deserializeDataTransform,
   deserializeDataTransformWithParent,
-  getMovementMessageOpcode,
 } from '@swg/protocol/swg/messages/movement.js';
 import {
   ZoneMessageOpcode,
-  deserializeCmdSceneReady,
   isZoneMessageOpcode,
   createCmdStartScene,
   serializeCmdStartScene,
@@ -33,10 +36,23 @@ import {
 import {
   ConnectionMessageOpcode,
   deserializeClientIdMsg,
+  deserializeSelectCharacter,
 } from '@swg/protocol/swg/messages/connection-messages.js';
 import {
+  CharacterCreationOpcode,
+  deserializeClientCreateCharacter,
+  deserializeClientVerifyAndLockNameRequest,
+  deserializeClientRandomNameRequest,
+} from '@swg/protocol/swg/messages/character-creation.js';
+import { serializeHeartBeat } from '@swg/protocol/swg/messages/character-messages.js';
+import { createClientPermissionsMessage } from '@swg/protocol/swg/messages/object-messages.js';
+import {
+  createChatServerStatus,
+  serializeChatServerStatus,
+} from '@swg/protocol/swg/messages/chat/chat-core.js';
+import {
   PlayerObject as PlayerObjectClass,
-  TemplateCrc,
+  calculateTemplateCrc,
 } from '@swg/objects';
 import { Posture } from '@swg/protocol';
 
@@ -46,6 +62,10 @@ import {
   type GameSession,
   type PlayerObject,
 } from './handlers/movement-handler.js';
+import {
+  CharacterCreationHandler,
+  createCharacterCreationHandler,
+} from './handlers/character-creation-handler.js';
 import {
   sendCreatureBaselines,
   sendPlayerBaselines,
@@ -57,6 +77,58 @@ import {
   SpawnManager,
   createSpawnManager,
 } from './services/index.js';
+
+// ---------------------------------------------------------------------------
+// Opcodes for connection-level messages that don't belong to other categories
+// ---------------------------------------------------------------------------
+const ConnectionServerMessageOpcode = {
+  AccountFeatureBits: 0x979f0279,
+  VoiceChatStatus: 0x9e601905,
+} as const;
+
+const DefaultFeatureBits = {
+  game: 0x00000000,
+  subscription: 0x00000001,
+} as const;
+
+function serializeAccountFeatureBits(
+  gameFeatures: number,
+  subscriptionFeatures: number,
+  connectionServerNumber: number,
+  epochSeconds: number,
+): Uint8Array {
+  const writer = new BufferWriter(32);
+  writer.writeUInt16LE(2); // operandCount
+  writer.writeUInt32LE(ConnectionServerMessageOpcode.AccountFeatureBits);
+  writer.writeUInt32LE(gameFeatures >>> 0);
+  writer.writeUInt32LE(subscriptionFeatures >>> 0);
+  writer.writeInt32LE(connectionServerNumber | 0);
+  writer.writeInt32LE(epochSeconds | 0);
+  return writer.toBuffer();
+}
+
+function serializeVoiceChatStatus(statusCode: number): Uint8Array {
+  const writer = new BufferWriter(16);
+  writer.writeUInt16LE(2); // operandCount
+  writer.writeUInt32LE(ConnectionServerMessageOpcode.VoiceChatStatus);
+  writer.writeUInt32LE(statusCode >>> 0);
+  return writer.toBuffer();
+}
+
+// ---------------------------------------------------------------------------
+// Extended game session: tracks auth state before character selection
+// ---------------------------------------------------------------------------
+interface ExtendedGameSession {
+  soeSession: Session;
+  sessionToken: string;
+  authenticated: boolean;
+  accountId: number;
+  sentPostAuthPackets: boolean;
+
+  // Set when character is selected/created
+  characterId?: bigint;
+  movementSession?: GameSession;
+}
 
 /**
  * Game Server instance interface
@@ -72,16 +144,7 @@ export interface GameServer {
 }
 
 /**
- * Create a unique key for a client endpoint
- */
-function getClientKey(address: string, port: number): string {
-  return `${address}:${port}`;
-}
-
-/**
  * Create the Game Server
- * @param config - Server configuration
- * @returns GameServer instance
  */
 export async function createServer(config: ServerConfig): Promise<GameServer> {
   // Initialize database
@@ -97,32 +160,38 @@ export async function createServer(config: ServerConfig): Promise<GameServer> {
   const characterRepository = new CharacterRepository(db);
   const objectRepository = new ObjectRepository(db);
 
-  // Create session store (uses default prefix 'session:' matching all servers)
+  // Create session store
   const sessionStore = new SessionStore(redisClient, {
     defaultTtlSeconds: config.gameServer?.sessionTimeout ?? 3600,
   });
+
+  // Create character creation handler
+  const characterCreationHandler = createCharacterCreationHandler(
+    characterRepository,
+    sessionStore,
+    config.clusterIdNumeric ?? 1,
+  );
 
   // Create zone service
   const zoneService = createZoneService(objectRepository, {
     viewDistance: config.gameServer?.viewDistance ?? 192,
     autoLoadZones: ['tatooine', 'naboo', 'corellia'],
     enableAutoSave: true,
-    autoSaveInterval: 300000, // 5 minutes
+    autoSaveInterval: 300000,
   });
 
   // Create spawn manager
   const spawnManager = createSpawnManager(zoneService, {
-    defaultRespawnDelay: 300000, // 5 minutes
+    defaultRespawnDelay: 300000,
   });
 
-  // Create handlers
+  // Create movement handler
   const movementHandler = createMovementHandler({
     cellSize: config.gameServer?.spatialCellSize ?? 64,
     viewDistance: config.gameServer?.viewDistance ?? 192,
   });
 
-  // Create UDP socket (placeholder - will use actual UDP server)
-  // For now, using a similar pattern to login-server
+  // Create UDP socket
   const { createSocket } = await import('node:dgram');
   const udpSocket = createSocket('udp4');
 
@@ -137,71 +206,233 @@ export async function createServer(config: ServerConfig): Promise<GameServer> {
     tickInterval: 100,
   });
 
-  // Game sessions map (keyed by client address:port)
-  const gameSessions = new Map<string, GameSession>();
+  // Extended game sessions (keyed by SOE session key)
+  const extSessions = new Map<string, ExtendedGameSession>();
 
-  // Player objects map (keyed by object ID)
+  // Legacy game sessions for movement handler (keyed by SOE session key)
+  const gameSessions = new Map<string, GameSession>();
   const playerObjects = new Map<bigint, PlayerObject>();
 
-  // Server configuration
   const serverPort = config.gameServer?.port ?? 44463;
   const bindAddress = config.gameServer?.bindAddress ?? '0.0.0.0';
 
-  /**
-   * Get or create a game session for a SOE session
-   */
-  function getGameSession(soeSession: Session): GameSession | undefined {
-    const key = soeSession.getKey();
-    return gameSessions.get(key);
+  // -----------------------------------------------------------------------
+  // Post-auth packets (HeartBeat + AccountFeatureBits + ClientPermissions)
+  // -----------------------------------------------------------------------
+  function sendPostAuthPackets(ext: ExtendedGameSession): void {
+    if (ext.sentPostAuthPackets) return;
+
+    const accountFeatureBits = serializeAccountFeatureBits(
+      DefaultFeatureBits.game,
+      DefaultFeatureBits.subscription,
+      1,
+      Math.floor(Date.now() / 1000),
+    );
+
+    const clientPermissions = createClientPermissionsMessage(
+      true,  // canLogin
+      true,  // canPlay
+      false, // canSave
+      true,  // canSendMail
+      false, // isAdmin
+    );
+
+    sessionManager.sendReliableGroup(ext.soeSession, [
+      serializeHeartBeat(),
+      accountFeatureBits,
+      clientPermissions,
+    ]);
+
+    ext.sentPostAuthPackets = true;
+    console.log(`[GameServer] Sent post-auth packets to ${ext.soeSession.getKey()}`);
   }
 
+  // -----------------------------------------------------------------------
+  // Post-select packets (ChatServerStatus + VoiceChatStatus)
+  // -----------------------------------------------------------------------
+  function sendPostSelectPackets(ext: ExtendedGameSession): void {
+    const chatStatus = serializeChatServerStatus(createChatServerStatus(true));
+    const voiceStatus = serializeVoiceChatStatus(0);
+
+    sessionManager.sendReliableGroup(ext.soeSession, [chatStatus, voiceStatus]);
+    console.log(`[GameServer] Sent chat/voice status to ${ext.soeSession.getKey()}`);
+  }
+
+  // -----------------------------------------------------------------------
+  // ClientIdMsg — authenticate the client, do NOT require characterId yet
+  // -----------------------------------------------------------------------
   /**
-   * Handle ClientIdMsg - validates session token and initiates zone-in
+   * Unpack a legacy KeyShare::Token envelope sent by the login server.
+   * Format: u32LE cipherDataLen + u32LE dataLen + cipherData[cipherDataLen] + digest[16]
+   * Returns the inner token bytes, or null if the envelope is invalid.
    */
+  function tryUnpackLegacyLoginToken(tokenBytes: Uint8Array): Uint8Array | null {
+    if (tokenBytes.length < 24) return null;
+    const view = new DataView(tokenBytes.buffer, tokenBytes.byteOffset, tokenBytes.byteLength);
+    const cipherDataLen = view.getUint32(0, true);
+    const dataLen = view.getUint32(4, true);
+    if (8 + cipherDataLen + 16 !== tokenBytes.length) return null;
+    if (cipherDataLen !== dataLen || dataLen === 0) return null;
+    return tokenBytes.subarray(8, 8 + dataLen);
+  }
+
+  function bytesToHex(bytes: Uint8Array): string {
+    return Array.from(bytes).map((b) => b.toString(16).padStart(2, '0')).join('');
+  }
+
   async function handleClientIdMsg(
     soeSession: Session,
-    data: Uint8Array
+    data: Uint8Array,
   ): Promise<void> {
     const clientKey = soeSession.getKey();
     console.log(`[GameServer] ClientIdMsg from ${clientKey}`);
 
-    // Deserialize the message using the protocol deserializer
     const message = deserializeClientIdMsg(data);
+    const tokenBytes = new Uint8Array(message.token);
+    const unpacked = tryUnpackLegacyLoginToken(tokenBytes);
+    const token = bytesToHex(unpacked ?? tokenBytes);
+    if (unpacked) {
+      console.log(`[GameServer] Unpacked legacy token: ${tokenBytes.length} -> ${unpacked.length} bytes`);
+    }
 
-    // Convert token bytes to hex string for Redis lookup
-    const token = Array.from(message.token)
-      .map((b) => b.toString(16).padStart(2, '0'))
-      .join('');
+    console.log(`[GameServer] Token raw=${tokenBytes.length}bytes, unpacked=${unpacked ? unpacked.length + 'bytes' : 'null'}, hex=${token}`);
 
-    // Validate session via Redis
     const sessionData = await sessionStore.getSession(token);
     if (!sessionData) {
-      console.log(`[GameServer] Invalid token from ${clientKey}`);
+      console.log(`[GameServer] Invalid token from ${clientKey} (looked up: session:${token})`);
       sessionManager.disconnectSession(soeSession, DisconnectReason.Application);
       return;
     }
 
-    const characterId = sessionData.characterId;
-    if (!characterId) {
-      console.log(`[GameServer] No character selected for ${clientKey}`);
-      sessionManager.disconnectSession(soeSession, DisconnectReason.Application);
+    console.log(`[GameServer] Authenticated account ${sessionData.accountId} from ${clientKey}`);
+
+    const ext: ExtendedGameSession = {
+      soeSession,
+      sessionToken: token,
+      authenticated: true,
+      accountId: sessionData.accountId,
+      sentPostAuthPackets: false,
+    };
+    extSessions.set(clientKey, ext);
+
+    // Send post-auth packets immediately (like C++ ConnectionServer)
+    sendPostAuthPackets(ext);
+
+    // If the client already has a characterId in Redis (returning player
+    // who previously selected a character), we could auto-zone, but the
+    // SWG client always sends SelectCharacter explicitly after auth.
+  }
+
+  // -----------------------------------------------------------------------
+  // SelectCharacter — load character from DB and zone in
+  // -----------------------------------------------------------------------
+  async function handleSelectCharacter(
+    soeSession: Session,
+    data: Uint8Array,
+  ): Promise<void> {
+    const clientKey = soeSession.getKey();
+    const ext = extSessions.get(clientKey);
+    if (!ext?.authenticated) {
+      console.warn(`[GameServer] SelectCharacter from unauthenticated ${clientKey}`);
       return;
     }
 
-    // Load character from database with all related data
+    const msg = deserializeSelectCharacter(data);
+    const characterId = msg.characterId;
+    console.log(`[GameServer] SelectCharacter ${characterId} from ${clientKey}`);
+
+    // Update Redis so other servers know the selected character
+    await sessionStore.updateSession(ext.sessionToken, {
+      characterId,
+      lastActivity: Date.now(),
+    });
+
+    // Send chat/voice status (C++ sends these right after selection)
+    sendPostSelectPackets(ext);
+
+    // Load and zone in
+    await loadAndZoneIn(ext, characterId);
+  }
+
+  // -----------------------------------------------------------------------
+  // Character creation messages
+  // -----------------------------------------------------------------------
+  async function handleCharacterCreation(
+    soeSession: Session,
+    opcode: number,
+    data: Uint8Array,
+  ): Promise<void> {
+    const clientKey = soeSession.getKey();
+    const ext = extSessions.get(clientKey);
+    if (!ext?.authenticated) {
+      console.warn(`[GameServer] Character creation from unauthenticated ${clientKey}`);
+      return;
+    }
+
+    const creationSession = {
+      authenticated: true,
+      accountId: ext.accountId,
+    };
+
+    if (opcode === CharacterCreationOpcode.ClientRandomNameRequest) {
+      const msg = deserializeClientRandomNameRequest(data);
+      const response = characterCreationHandler.handleRandomName(msg);
+      sessionManager.sendReliable(soeSession, response);
+      return;
+    }
+
+    if (opcode === CharacterCreationOpcode.ClientVerifyAndLockNameRequest) {
+      const msg = deserializeClientVerifyAndLockNameRequest(data);
+      const response = await characterCreationHandler.handleVerifyName(creationSession, msg);
+      sessionManager.sendReliable(soeSession, response);
+      return;
+    }
+
+    if (opcode === CharacterCreationOpcode.ClientCreateCharacter) {
+      console.log(`[GameServer] ClientCreateCharacter from ${clientKey}`);
+      const msg = deserializeClientCreateCharacter(data);
+      const result = await characterCreationHandler.createCharacter(creationSession, msg);
+
+      // Send success/failure response
+      sessionManager.sendReliable(soeSession, result.response);
+
+      if (result.success && result.characterId) {
+        console.log(`[GameServer] Character created: ${msg.characterName} (ID: ${result.characterId})`);
+
+        // Update Redis with the new characterId
+        await sessionStore.updateSession(ext.sessionToken, {
+          characterId: result.characterId,
+          lastActivity: Date.now(),
+        });
+
+        // The client will send SelectCharacter next to trigger zone-in
+      }
+    }
+  }
+
+  // -----------------------------------------------------------------------
+  // Load character from DB, build objects, and send the zone-in sequence
+  // -----------------------------------------------------------------------
+  async function loadAndZoneIn(
+    ext: ExtendedGameSession,
+    characterId: bigint,
+  ): Promise<void> {
+    const soeSession = ext.soeSession;
+    const clientKey = soeSession.getKey();
+
     const character = await characterRepository.findByIdWithRelations(characterId);
     if (!character) {
-      console.log(`[GameServer] Character ${characterId} not found`);
+      console.log(`[GameServer] Character ${characterId} not found for ${clientKey}`);
       sessionManager.disconnectSession(soeSession, DisconnectReason.Application);
       return;
     }
 
-    console.log(
-      `[GameServer] Loading character ${character.name} (${characterId}) for account ${sessionData.accountId}`
-    );
+    console.log(`[GameServer] Loading character ${character.name} (${characterId}) for account ${ext.accountId}`);
 
-    // Build in-memory CreatureObject / PlayerObject for baselines
-    const playerObj = new PlayerObjectClass(characterId, TemplateCrc.HUMAN_MALE);
+    // Build in-memory PlayerObject for baselines
+    const templatePath = character.templateName || 'object/creature/player/shared_human_male.iff';
+    const templateCrc = calculateTemplateCrc(templatePath);
+    const playerObj = new PlayerObjectClass(characterId, templateCrc);
     playerObj.objectNameStfFile = 'string_name';
     playerObj.objectNameStfName = character.name;
     playerObj.sceneId = character.sceneId;
@@ -216,41 +447,32 @@ export async function createServer(config: ServerConfig): Promise<GameServer> {
       z: character.orientationZ ?? 0,
       w: character.orientationW ?? 1,
     };
-    playerObj.accountId = BigInt(sessionData.accountId);
+    playerObj.accountId = BigInt(ext.accountId);
 
-    // Populate skills from DB
     if (character.skills) {
       for (const skill of character.skills) {
         playerObj.addSkill(skill.skillName);
       }
     }
-
-    // Populate experience from DB
     if (character.experience) {
       for (const xp of character.experience) {
         playerObj.setExperience(xp.experienceType, xp.amount);
       }
     }
-
-    // Start a new play session
     playerObj.startSession();
 
-    // Build the movement-handler PlayerObject (lightweight position tracker)
+    // Movement-handler lightweight position tracker
     const movementPlayerObj: PlayerObject = {
       objectId: characterId,
       characterId,
       name: character.name,
-      position: {
-        x: character.x ?? 0,
-        y: character.y ?? 0,
-        z: character.z ?? 0,
-      },
+      position: { x: character.x ?? 0, y: character.y ?? 0, z: character.z ?? 0 },
       yaw: 0,
       posture: Posture.UPRIGHT,
       speed: 0,
       movementState: movementHandler.getValidator().createInitialState(
         { x: character.x ?? 0, y: character.y ?? 0, z: character.z ?? 0 },
-        1.0
+        1.0,
       ),
       speciesModifier: 1.0,
       zoneId: character.sceneId,
@@ -258,105 +480,90 @@ export async function createServer(config: ServerConfig): Promise<GameServer> {
       gridZ: Math.floor((character.z ?? 0) / 64),
     };
 
-    // Create the send callback
     const sendCallback = (packet: Uint8Array) => {
       sessionManager.sendReliable(soeSession, packet);
     };
 
-    // Create game session
     const gameSession: GameSession = {
       sessionId: soeSession.sessionId,
       address: soeSession.clientAddress.address,
       port: soeSession.clientAddress.port,
       authenticated: true,
-      accountId: sessionData.accountId,
+      accountId: ext.accountId,
       characterId,
       player: movementPlayerObj,
       sendCallback,
     };
 
+    ext.characterId = characterId;
+    ext.movementSession = gameSession;
     gameSessions.set(clientKey, gameSession);
     playerObjects.set(characterId, movementPlayerObj);
-
-    // Register player with movement handler
     movementHandler.registerPlayer(gameSession, movementPlayerObj);
 
     // Send the zone-in packet sequence
-    await sendZoneInSequence(gameSession, playerObj, character, sendCallback);
+    await sendZoneInSequence(playerObj, character, sendCallback);
   }
 
-  /**
-   * Send the full zone-in packet sequence to the client
-   */
+  // -----------------------------------------------------------------------
+  // Zone-in packet sequence
+  // -----------------------------------------------------------------------
   async function sendZoneInSequence(
-    gameSession: GameSession,
     playerObj: PlayerObjectClass,
-    character: { sceneId: string; x: number; y: number; z: number; orientationX: number; orientationY: number; orientationZ: number; orientationW: number; templateName?: string },
-    send: SendReliable
+    character: {
+      sceneId: string;
+      x: number; y: number; z: number;
+      orientationX: number; orientationY: number; orientationZ: number; orientationW: number;
+      templateName?: string;
+    },
+    send: SendReliable,
   ): Promise<void> {
     const objectId = playerObj.objectId;
+    console.log(`[GameServer] Sending zone-in for ${objectId} to ${character.sceneId} (${character.x}, ${character.y}, ${character.z})`);
 
-    console.log(
-      `[GameServer] Sending zone-in sequence for ${objectId} to ${character.sceneId} (${character.x}, ${character.y}, ${character.z})`
-    );
-
-    // 1. CmdStartScene - tells the client which scene to load and where
-    // sceneName is the scene ID (e.g., "tatooine"), not the terrain file path
     const templatePath = character.templateName || 'object/creature/player/shared_human_male.iff';
     const galacticTime = BigInt(Math.floor(Date.now() / 1000));
     const serverEpoch = Math.floor(Date.now() / 1000);
-    const startScene = createCmdStartScene(
-      objectId,
-      character.sceneId,    // scene name like "tatooine"
-      character.x,
-      character.y,
-      character.z,
-      0,                    // startYaw
-      templatePath,         // template name string, not CRC
-      galacticTime,
-      serverEpoch
-    );
-    send(serializeCmdStartScene(startScene));
 
-    // 2. SceneCreateObjectByCrc - create the player object in the scene
-    const createObject = createSceneCreateObjectByCrc(
+    // 1. CmdStartScene
+    send(serializeCmdStartScene(createCmdStartScene(
+      objectId,
+      character.sceneId,
+      character.x, character.y, character.z,
+      0,
+      templatePath,
+      galacticTime,
+      serverEpoch,
+    )));
+
+    // 2. SceneCreateObjectByCrc
+    send(serializeSceneCreateObjectByCrc(createSceneCreateObjectByCrc(
       objectId,
       playerObj.templateCrc,
-      character.x,
-      character.y,
-      character.z,
-      character.orientationX,
-      character.orientationY,
-      character.orientationZ,
-      character.orientationW,
-      false // not hyperspace
-    );
-    send(serializeSceneCreateObjectByCrc(createObject));
+      character.x, character.y, character.z,
+      character.orientationX, character.orientationY, character.orientationZ, character.orientationW,
+      false,
+    )));
 
-    // 3. CREO baselines (1, 3, 4, 6) - creature state
+    // 3. CREO baselines (1, 3, 4, 6)
     sendCreatureBaselines(playerObj, objectId, send);
 
-    // 4. PLAY baselines (3, 6, 8, 9) - player-specific state
+    // 4. PLAY baselines (3, 6, 8, 9)
     sendPlayerBaselines(playerObj, objectId, send);
 
-    // 5. SceneEndBaselines - signals the client that all baselines are sent
-    const endBaselines = createSceneEndBaselines(objectId);
-    send(serializeSceneEndBaselines(endBaselines));
+    // 5. SceneEndBaselines
+    send(serializeSceneEndBaselines(createSceneEndBaselines(objectId)));
 
-    // 6. ServerTimeMessage - synchronize the server clock
-    const serverTime = createServerTimeMessage(BigInt(Math.floor(Date.now() / 1000)));
-    send(serializeServerTimeMessage(serverTime));
+    // 6. ServerTimeMessage
+    send(serializeServerTimeMessage(createServerTimeMessage(BigInt(Math.floor(Date.now() / 1000)))));
 
     console.log(`[GameServer] Zone-in sequence sent for ${objectId}`);
   }
 
-  /**
-   * Handle SWG message received from client
-   */
-  async function handleSwgMessage(
-    soeSession: Session,
-    data: Uint8Array
-  ): Promise<void> {
+  // -----------------------------------------------------------------------
+  // SWG message dispatcher
+  // -----------------------------------------------------------------------
+  async function handleSwgMessage(soeSession: Session, data: Uint8Array): Promise<void> {
     const clientKey = soeSession.getKey();
 
     if (data.length < 1) {
@@ -364,33 +571,53 @@ export async function createServer(config: ServerConfig): Promise<GameServer> {
       return;
     }
 
-    // Check for ClientIdMsg before requiring an authenticated session.
-    // This is the first message a client sends after connecting.
+    // 4-byte opcode messages (preceded by u16 operandCount)
     if (data.length >= 6) {
       const view = new DataView(data.buffer, data.byteOffset, data.byteLength);
-      const opcode = view.getUint32(2, true); // skip u16 operandCount
+      const opcode = view.getUint32(2, true);
 
+      // ClientIdMsg — first message from client, before auth
       if (opcode === ConnectionMessageOpcode.ClientIdMsg) {
         await handleClientIdMsg(soeSession, data);
         return;
       }
+
+      // SelectCharacter
+      if (opcode === ConnectionMessageOpcode.SelectCharacter) {
+        await handleSelectCharacter(soeSession, data);
+        return;
+      }
+
+      // Character creation opcodes
+      if (
+        opcode === CharacterCreationOpcode.ClientCreateCharacter ||
+        opcode === CharacterCreationOpcode.ClientVerifyAndLockNameRequest ||
+        opcode === CharacterCreationOpcode.ClientRandomNameRequest
+      ) {
+        await handleCharacterCreation(soeSession, opcode, data);
+        return;
+      }
     }
 
-    const session = getGameSession(soeSession);
+    // Everything below requires an authenticated + zoned-in session
+    const session = gameSessions.get(clientKey);
     if (!session) {
-      console.warn(`[GameServer] No game session for ${clientKey}`);
+      // Not zoned in yet — might be a pre-zone message, just log it
+      if (data.length >= 6) {
+        const view = new DataView(data.buffer, data.byteOffset, data.byteLength);
+        const opcode = view.getUint32(2, true);
+        console.log(`[GameServer] Pre-zone message 0x${opcode.toString(16)} from ${clientKey}`);
+      }
       return;
     }
 
     try {
-      // Check for movement messages (single byte opcodes)
       const firstByte = data[0];
 
+      // Movement messages (single byte opcodes)
       if (firstByte === MovementMessageOpcode.DataTransform) {
         const message = deserializeDataTransform(data);
         movementHandler.handleDataTransform(session, message);
-
-        // Update zone position
         if (session.player) {
           zoneService.updateObjectPosition(session.player.objectId, {
             x: message.transform.x,
@@ -404,8 +631,6 @@ export async function createServer(config: ServerConfig): Promise<GameServer> {
       if (firstByte === MovementMessageOpcode.DataTransformWithParent) {
         const message = deserializeDataTransformWithParent(data);
         movementHandler.handleDataTransformWithParent(session, message);
-
-        // Update zone position for cell-relative movement
         if (session.player) {
           zoneService.updateObjectPosition(session.player.objectId, {
             x: message.transform.x,
@@ -416,12 +641,11 @@ export async function createServer(config: ServerConfig): Promise<GameServer> {
         return;
       }
 
-      // Check for 4-byte opcode messages
+      // 4-byte opcode messages
       if (data.length >= 6) {
         const view = new DataView(data.buffer, data.byteOffset, data.byteLength);
-        const opcode = view.getUint32(2, true); // skip u16 operandCount
+        const opcode = view.getUint32(2, true);
 
-        // Handle zone messages
         if (opcode === ZoneMessageOpcode.CmdSceneReady) {
           console.log(`[GameServer] CmdSceneReady from ${clientKey}`);
           if (session.player) {
@@ -430,28 +654,21 @@ export async function createServer(config: ServerConfig): Promise<GameServer> {
           return;
         }
 
-        // Log unknown opcodes
         if (!isZoneMessageOpcode(opcode)) {
-          console.log(
-            `[GameServer] Unknown SWG message opcode: 0x${opcode.toString(16)} from ${clientKey}`
-          );
+          console.log(`[GameServer] Unknown opcode 0x${opcode.toString(16)} from ${clientKey}`);
         }
       }
     } catch (error) {
-      console.error(
-        `[GameServer] Error handling SWG message from ${clientKey}:`,
-        error
-      );
+      console.error(`[GameServer] Error handling message from ${clientKey}:`, error);
     }
   }
 
-  /**
-   * Clean up a game session
-   */
+  // -----------------------------------------------------------------------
+  // Session cleanup
+  // -----------------------------------------------------------------------
   async function cleanupGameSession(key: string): Promise<void> {
     const session = gameSessions.get(key);
     if (session) {
-      // Remove player from zone
       if (session.player) {
         await zoneService.exitZone(session.player);
         movementHandler.unregisterPlayer(session.player.objectId);
@@ -459,14 +676,11 @@ export async function createServer(config: ServerConfig): Promise<GameServer> {
       }
       gameSessions.delete(key);
     }
+    extSessions.delete(key);
   }
 
-  /**
-   * Send callback for zone service
-   */
   function sendToPlayer(objectId: bigint, data: Uint8Array): void {
-    // Find the session for this player
-    for (const [key, session] of gameSessions) {
+    for (const [, session] of gameSessions) {
       if (session.player?.objectId === objectId && session.sendCallback) {
         session.sendCallback(data);
         return;
@@ -474,61 +688,62 @@ export async function createServer(config: ServerConfig): Promise<GameServer> {
     }
   }
 
-  // Set up zone service send callback
+  // -----------------------------------------------------------------------
+  // Wire up SOE session manager
+  // -----------------------------------------------------------------------
   zoneService.setSendCallback(sendToPlayer);
 
-  // Set up session manager callbacks
   sessionManager.setSendCallback((data, address, port) => {
     udpSocket.send(data, port, address);
   });
 
-  // Handle new connections
   sessionManager.on('session:connected', (session: Session) => {
-    const key = session.getKey();
-    console.log(`[GameServer] Session connected: ${key}`);
-    // Session will be fully initialized when player authenticates
+    console.log(`[GameServer] Session connected: ${session.getKey()}`);
   });
 
-  // Handle disconnections
   sessionManager.on('session:disconnected', (session: Session, reason: number) => {
     const key = session.getKey();
     console.log(`[GameServer] Session disconnected: ${key}, reason: ${reason}`);
     void cleanupGameSession(key);
   });
 
-  // Handle received data (SWG messages)
   sessionManager.on('data', (session: Session, data: Uint8Array) => {
     void handleSwgMessage(session, data);
   });
 
-  // Handle errors
   sessionManager.on('error', (error: Error, session?: Session) => {
     if (session) {
-      console.error(`[GameServer] Error for session ${session.getKey()}:`, error);
+      console.error(`[GameServer] Error for ${session.getKey()}:`, error);
     } else {
       console.error('[GameServer] Error:', error);
     }
   });
 
-  // Server control state
   let running = false;
 
   return {
     async start(): Promise<void> {
-      if (running) {
-        throw new Error('Server is already running');
-      }
+      if (running) throw new Error('Server is already running');
 
-      // Initialize zone service
       await zoneService.initialize();
       console.log('[GameServer] Zone service initialized');
 
-      // Initialize spawn manager
       await spawnManager.initialize();
       console.log('[GameServer] Spawn manager initialized');
 
       return new Promise((resolve, reject) => {
         udpSocket.on('message', (msg, rinfo) => {
+          console.log(`[GameServer] UDP recv ${rinfo.address}:${rinfo.port} len=${msg.length} hex=[${Array.from(msg.subarray(0, Math.min(16, msg.length))).map(b => b.toString(16).padStart(2, '0')).join(' ')}]`);
+
+          // C++ ConnectionServer echoes short probe packets (1-4 bytes) so
+          // the client can measure cluster latency before establishing an SOE
+          // session.  Without this the client considers the server unreachable.
+          if (msg.length > 0 && msg.length <= 4) {
+            console.log(`[GameServer] Echoing ping probe from ${rinfo.address}:${rinfo.port}`);
+            udpSocket.send(msg, rinfo.port, rinfo.address);
+            return;
+          }
+
           sessionManager.handlePacket(new Uint8Array(msg), {
             address: rinfo.address,
             port: rinfo.port,
@@ -537,9 +752,7 @@ export async function createServer(config: ServerConfig): Promise<GameServer> {
 
         udpSocket.on('error', (error) => {
           console.error('[GameServer] UDP error:', error);
-          if (!running) {
-            reject(error);
-          }
+          if (!running) reject(error);
         });
 
         udpSocket.bind(serverPort, bindAddress, () => {
@@ -552,72 +765,34 @@ export async function createServer(config: ServerConfig): Promise<GameServer> {
     },
 
     async stop(): Promise<void> {
-      if (!running) {
-        return;
-      }
+      if (!running) return;
 
-      // Stop session manager (disconnects all sessions)
       sessionManager.stop();
-
-      // Disconnect all sessions gracefully
       for (const session of sessionManager.getSessions()) {
         sessionManager.disconnectSession(session, DisconnectReason.Application);
       }
-
-      // Clean up all game sessions
       for (const key of gameSessions.keys()) {
         await cleanupGameSession(key);
       }
-
-      // Shutdown spawn manager
       await spawnManager.shutdown();
       console.log('[GameServer] Spawn manager shutdown');
-
-      // Shutdown zone service
       await zoneService.shutdown();
       console.log('[GameServer] Zone service shutdown');
-
-      // Destroy session manager
       sessionManager.destroy();
 
-      // Close UDP socket
       return new Promise((resolve) => {
         udpSocket.close(() => {
-          // Disconnect Redis
-          redisClient
-            .disconnect()
-            .then(() => {
-              running = false;
-              console.log('[GameServer] Stopped');
-              resolve();
-            })
-            .catch((error) => {
-              console.error('[GameServer] Error disconnecting Redis:', error);
-              running = false;
-              resolve();
-            });
+          redisClient.disconnect()
+            .then(() => { running = false; console.log('[GameServer] Stopped'); resolve(); })
+            .catch((error) => { console.error('[GameServer] Redis disconnect error:', error); running = false; resolve(); });
         });
       });
     },
 
-    isRunning(): boolean {
-      return running;
-    },
-
-    getConnectionCount(): number {
-      return sessionManager.getSessionCount();
-    },
-
-    getPlayerCount(): number {
-      return playerObjects.size;
-    },
-
-    getZoneService(): ZoneService {
-      return zoneService;
-    },
-
-    getSpawnManager(): SpawnManager {
-      return spawnManager;
-    },
+    isRunning: () => running,
+    getConnectionCount: () => sessionManager.getSessionCount(),
+    getPlayerCount: () => playerObjects.size,
+    getZoneService: () => zoneService,
+    getSpawnManager: () => spawnManager,
   };
 }

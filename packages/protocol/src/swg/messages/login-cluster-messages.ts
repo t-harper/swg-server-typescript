@@ -93,7 +93,7 @@ export function createLoginEnumCluster(
 }
 
 // ============================================
-// LoginClusterStatus (0x25D27D45)
+// LoginClusterStatus (0x3436AEB6)
 // ============================================
 
 /**
@@ -112,10 +112,7 @@ export interface ClusterStatusDataEntry {
   notRecommended: boolean;
   onlinePlayerLimit: number;
   onlineFreeTrialLimit: number;
-  /**
-   * Observed on live C++ wire captures as a trailing u16 (typically 0).
-   * Keeping this preserves packet-for-packet parity for LoginClusterStatus.
-   */
+  /** Trailing u16 required by the client binary (not in C++ server source, but client crashes without it). */
   reserved?: number;
 }
 

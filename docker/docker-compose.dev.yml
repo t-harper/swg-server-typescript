@@ -111,7 +111,7 @@ services:
       - ./data/game:/app/data
     command: ["node", "--import", "tsx", "--watch", "apps/game-server/src/index.ts"]
     ports:
-      - "44460:44460/udp"
+      - "44463:44463/udp"
       - "9232:9229"
     # Single instance for development
     deploy:

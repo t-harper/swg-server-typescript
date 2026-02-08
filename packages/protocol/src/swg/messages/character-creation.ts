@@ -54,8 +54,8 @@ function readStringId(reader: BufferReader): CharacterCreationStringId {
 export const CharacterCreationOpcode = {
   /** Client request to create a character */
   ClientCreateCharacter: 0xb97f3074,
-  /** Server response - character created successfully (same wire name as Failed in C++) */
-  CreateCharacterSuccess: 0xdf333c6e,
+  /** Server response - character created successfully */
+  CreateCharacterSuccess: 0x1db575cc,
   /** Server response - character creation failed */
   CreateCharacterFailure: 0xdf333c6e,
   /** Client request to validate a character name */
@@ -251,8 +251,8 @@ export function deserializeClientCreateCharacter(data: Uint8Array): ClientCreate
 export function serializeClientCreateCharacter(message: ClientCreateCharacter): Uint8Array {
   const writer = new BufferWriter(2048);
 
-  // operandCount prefix (13 fields)
-  writer.writeUInt16LE(13);
+  // operandCount prefix (13 fields + operandCount itself = 14)
+  writer.writeUInt16LE(14);
   writer.writeUInt32LE(message.opcode);
 
   // Write fields in C++ addVariable order
@@ -279,8 +279,8 @@ export function serializeClientCreateCharacter(message: ClientCreateCharacter): 
 export function serializeCreateCharacterSuccess(message: CreateCharacterSuccess): Uint8Array {
   const writer = new BufferWriter(16);
 
-  // operandCount prefix (1 field)
-  writer.writeUInt16LE(1);
+  // operandCount prefix (1 field + operandCount itself = 2)
+  writer.writeUInt16LE(2);
   writer.writeUInt32LE(message.opcode);
   writer.writeUInt64LE(message.characterId);
 
@@ -317,8 +317,8 @@ export function deserializeCreateCharacterSuccess(data: Uint8Array): CreateChara
 export function serializeCreateCharacterFailure(message: CreateCharacterFailure): Uint8Array {
   const writer = new BufferWriter(256);
 
-  // operandCount prefix (2 fields)
-  writer.writeUInt16LE(2);
+  // operandCount prefix (2 fields + operandCount itself = 3)
+  writer.writeUInt16LE(3);
   writer.writeUInt32LE(message.opcode);
   writer.writeUnicodeStringWithLength(message.characterName);
   writeStringId(writer, message.errorMessage);
@@ -388,8 +388,8 @@ export function serializeClientVerifyAndLockNameRequest(
 ): Uint8Array {
   const writer = new BufferWriter(256);
 
-  // operandCount prefix (2 fields)
-  writer.writeUInt16LE(2);
+  // operandCount prefix (2 fields + operandCount itself = 3)
+  writer.writeUInt16LE(3);
   writer.writeUInt32LE(message.opcode);
   writer.writeStringWithLength16LE(message.templateName);
   writer.writeUnicodeStringWithLength(message.characterName);
@@ -405,8 +405,8 @@ export function serializeClientVerifyAndLockNameResponse(
 ): Uint8Array {
   const writer = new BufferWriter(256);
 
-  // operandCount prefix (2 fields)
-  writer.writeUInt16LE(2);
+  // operandCount prefix (2 fields + operandCount itself = 3)
+  writer.writeUInt16LE(3);
   writer.writeUInt32LE(message.opcode);
   writer.writeUnicodeStringWithLength(message.characterName);
   writeStringId(writer, message.errorMessage);
@@ -476,8 +476,8 @@ export function serializeClientRandomNameRequest(
 ): Uint8Array {
   const writer = new BufferWriter(256);
 
-  // operandCount prefix (1 field)
-  writer.writeUInt16LE(1);
+  // operandCount prefix (1 field + operandCount itself = 2)
+  writer.writeUInt16LE(2);
   writer.writeUInt32LE(message.opcode);
   writer.writeStringWithLength16LE(message.templateName);
 
@@ -492,8 +492,8 @@ export function serializeClientRandomNameResponse(
 ): Uint8Array {
   const writer = new BufferWriter(256);
 
-  // operandCount prefix (3 fields)
-  writer.writeUInt16LE(3);
+  // operandCount prefix (3 fields + operandCount itself = 4)
+  writer.writeUInt16LE(4);
   writer.writeUInt32LE(message.opcode);
 
   // Wire order: templateName (ASCII) FIRST, randomName (Unicode) SECOND

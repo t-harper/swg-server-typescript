@@ -73,7 +73,7 @@ export const CppPacketStubOpcodes = {
   ClaimRewardsReplyMessage: 0xf7b0daec,
   CleanupInvalidItemRetrievalMessage: 0x2beeb2e9,
   ClientCreateCharacterFailed: 0xdf333c6e,
-  ClientCreateCharacterSuccess: 0xdf333c6e,
+  ClientCreateCharacterSuccess: 0x1db575cc,
   CloseHolocronMessage: 0xc0938a9d,
   ClusterWideDataGetElementMessage: 0x074406f8,
   ClusterWideDataGetElementResponseMessage: 0x9745c2ba,
@@ -7099,7 +7099,7 @@ export const CPP_PACKET_STUB_DEFINITIONS: CppPacketStubDefinition[] = [
   },
   {
     name: "ClientCreateCharacterSuccess",
-    swgCrc32: "0xdf333c6e",
+    swgCrc32: "0x1db575cc",
     headers: ["engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/ClientCentralMessages.h"],
     fieldCount: 1,
     fields: [

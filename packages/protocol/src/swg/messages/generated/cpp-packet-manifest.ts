@@ -6336,10 +6336,10 @@ export const CPP_PACKET_DEFINITIONS: CppPacketDefinition[] = [
   },
   {
     "name": "ClientCreateCharacterSuccess",
-    "swgCrc32": "0xdf333c6e",
+    "swgCrc32": "0x1db575cc",
     "crcSource": "constructorString",
     "wireNames": [
-      "ClientCreateCharacterFailed"
+      "ClientCreateCharacterSuccess"
     ],
     "headers": [
       "engine/shared/library/sharedNetworkMessages/src/shared/clientGameServer/ClientCentralMessages.h"

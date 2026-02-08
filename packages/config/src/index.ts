@@ -54,6 +54,8 @@ export type ConnectionServerConfig = z.infer<typeof connectionServerConfigSchema
 export const gameServerConfigSchema = z.object({
   port: z.number().default(44463),
   bindAddress: z.string().default('0.0.0.0'),
+  /** Public address advertised to clients via LoginClusterStatus */
+  publicAddress: z.string().optional(),
   maxConnections: z.number().default(3000),
   sessionTimeout: z.number().default(3600), // seconds
   tickRate: z.number().default(30), // updates per second
@@ -106,6 +108,15 @@ export function loadConfigFromEnv(): Record<string, unknown> {
       disconnectTimeout: parseInt(process.env['CONNECTION_DISCONNECT_TIMEOUT'] ?? '60000', 10),
     },
   };
+
+  // Game server public address (advertised to clients in LoginClusterStatus)
+  if (process.env['GAME_SERVER_PUBLIC_ADDRESS'] || process.env['GAME_SERVER_PORT']) {
+    config['gameServer'] = {
+      ...(config['gameServer'] as Record<string, unknown> ?? {}),
+      publicAddress: process.env['GAME_SERVER_PUBLIC_ADDRESS'] ?? process.env['CONNECTION_SERVER_PUBLIC_ADDRESS'],
+      port: process.env['GAME_SERVER_PORT'] ? parseInt(process.env['GAME_SERVER_PORT'], 10) : 44463,
+    };
+  }
 
   if (process.env['SWG_CLUSTER_ID']) {
     config['clusterId'] = process.env['SWG_CLUSTER_ID'];

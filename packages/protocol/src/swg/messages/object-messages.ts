@@ -224,24 +224,30 @@ export function createClientOpenContainerMessage(
 // ClientPermissionsMessage (0x09f0cdbb)
 // ============================================================================
 
+/**
+ * ClientPermissionsMessage - matches C++ field order:
+ * canLogin, canPlay, canSave, canSendMail, isAdmin
+ */
 export interface ClientPermissionsMessage {
   canLogin: boolean;
-  canCreateRegularCharacter: boolean;
-  canCreateJediCharacter: boolean;
-  canSkipTutorial: boolean;
+  canPlay: boolean;
+  canSave: boolean;
+  canSendMail: boolean;
+  isAdmin: boolean;
 }
 
 export function serializeClientPermissionsMessage(msg: ClientPermissionsMessage): Uint8Array {
   const writer = new BufferWriter();
 
-  // operandCount = 4
-  writer.writeUInt16LE(4);
+  // operandCount = 6 (5 fields + operandCount itself)
+  writer.writeUInt16LE(6);
   writer.writeUInt32LE(ObjectMessageOpcodes.ClientPermissionsMessage);
 
   writer.writeUInt8(msg.canLogin ? 1 : 0);
-  writer.writeUInt8(msg.canCreateRegularCharacter ? 1 : 0);
-  writer.writeUInt8(msg.canCreateJediCharacter ? 1 : 0);
-  writer.writeUInt8(msg.canSkipTutorial ? 1 : 0);
+  writer.writeUInt8(msg.canPlay ? 1 : 0);
+  writer.writeUInt8(msg.canSave ? 1 : 0);
+  writer.writeUInt8(msg.canSendMail ? 1 : 0);
+  writer.writeUInt8(msg.isAdmin ? 1 : 0);
 
   return writer.toBuffer();
 }
@@ -254,29 +260,27 @@ export function deserializeClientPermissionsMessage(data: Uint8Array): ClientPer
   reader.readUInt32LE();
 
   const canLogin = reader.readUInt8() !== 0;
-  const canCreateRegularCharacter = reader.readUInt8() !== 0;
-  const canCreateJediCharacter = reader.readUInt8() !== 0;
-  const canSkipTutorial = reader.readUInt8() !== 0;
+  const canPlay = reader.readUInt8() !== 0;
+  const canSave = reader.readUInt8() !== 0;
+  const canSendMail = reader.readUInt8() !== 0;
+  const isAdmin = reader.readUInt8() !== 0;
 
-  return {
-    canLogin,
-    canCreateRegularCharacter,
-    canCreateJediCharacter,
-    canSkipTutorial,
-  };
+  return { canLogin, canPlay, canSave, canSendMail, isAdmin };
 }
 
 export function createClientPermissionsMessage(
   canLogin: boolean,
-  canCreateRegularCharacter: boolean,
-  canCreateJediCharacter: boolean,
-  canSkipTutorial: boolean
+  canPlay: boolean,
+  canSave: boolean,
+  canSendMail: boolean,
+  isAdmin: boolean,
 ): Uint8Array {
   return serializeClientPermissionsMessage({
     canLogin,
-    canCreateRegularCharacter,
-    canCreateJediCharacter,
-    canSkipTutorial,
+    canPlay,
+    canSave,
+    canSendMail,
+    isAdmin,
   });
 }
 

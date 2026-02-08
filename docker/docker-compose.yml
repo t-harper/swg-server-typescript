@@ -75,7 +75,10 @@ services:
       # Server Settings
       SERVER_NAME: ${SERVER_NAME:-SWG Server}
       LOG_LEVEL: ${LOG_LEVEL:-info}
-      # Connection server public address (sent to clients in LoginClusterStatus)
+      # Game server public address/port (sent to clients in LoginClusterStatus)
+      GAME_SERVER_PUBLIC_ADDRESS: ${PUBLIC_ADDRESS:-10.254.0.212}
+      GAME_SERVER_PORT: 44463
+      # Legacy connection server address (kept for backwards compatibility)
       CONNECTION_SERVER_PUBLIC_ADDRESS: ${PUBLIC_ADDRESS:-10.254.0.212}
     ports:
       - "${LOGIN_SERVER_PORT:-44453}:44453/udp"

@@ -12,6 +12,8 @@ WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
 COPY apps/connection-server/package.json ./apps/connection-server/
 COPY packages/config/package.json ./packages/config/
+COPY packages/database/package.json ./packages/database/
+COPY packages/objects/package.json ./packages/objects/
 COPY packages/protocol/package.json ./packages/protocol/
 COPY packages/redis/package.json ./packages/redis/
 COPY packages/shared-types/package.json ./packages/shared-types/
@@ -22,6 +24,8 @@ RUN pnpm install --frozen-lockfile
 # Copy source code
 COPY apps/connection-server ./apps/connection-server
 COPY packages/config ./packages/config
+COPY packages/database ./packages/database
+COPY packages/objects ./packages/objects
 COPY packages/protocol ./packages/protocol
 COPY packages/redis ./packages/redis
 COPY packages/shared-types ./packages/shared-types
@@ -53,6 +57,8 @@ WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/connection-server/package.json ./apps/connection-server/
 COPY packages/config/package.json ./packages/config/
+COPY packages/database/package.json ./packages/database/
+COPY packages/objects/package.json ./packages/objects/
 COPY packages/protocol/package.json ./packages/protocol/
 COPY packages/redis/package.json ./packages/redis/
 COPY packages/shared-types/package.json ./packages/shared-types/
@@ -63,6 +69,8 @@ RUN pnpm install --frozen-lockfile --prod
 # Copy built application from builder stage
 COPY --from=builder /app/apps/connection-server/dist ./apps/connection-server/dist
 COPY --from=builder /app/packages/config/dist ./packages/config/dist
+COPY --from=builder /app/packages/database/dist ./packages/database/dist
+COPY --from=builder /app/packages/objects/dist ./packages/objects/dist
 COPY --from=builder /app/packages/protocol/dist ./packages/protocol/dist
 COPY --from=builder /app/packages/redis/dist ./packages/redis/dist
 COPY --from=builder /app/packages/shared-types/dist ./packages/shared-types/dist

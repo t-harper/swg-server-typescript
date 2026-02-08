@@ -24,12 +24,6 @@ import {
   serializeStationIdHasJediSlot,
 } from '@swg/protocol/swg/messages/login-messages.js';
 import {
-  CharacterCreationOpcode,
-  deserializeClientCreateCharacter,
-  deserializeClientVerifyAndLockNameRequest,
-  deserializeClientRandomNameRequest,
-} from '@swg/protocol/swg/messages/character-creation.js';
-import {
   serializeLoginEnumCluster,
   serializeLoginClusterStatus,
   createLoginEnumCluster,
@@ -50,10 +44,6 @@ import {
   CharacterHandler,
   createCharacterHandler,
 } from './handlers/character-handler.js';
-import {
-  CharacterCreationHandler,
-  createCharacterCreationHandler,
-} from './handlers/character-creation-handler.js';
 
 /**
  * Extended session with login-specific data
@@ -129,12 +119,6 @@ export async function createServer(config: ServerConfig): Promise<LoginServer> {
     sessionStore,
     serverId
   );
-  const characterCreationHandler = createCharacterCreationHandler(
-    characterRepository,
-    sessionStore,
-    serverId
-  );
-
   // Create UDP server
   const udpServer = createUdpServer({
     recvBufferSize: 65536,
@@ -215,10 +199,11 @@ export async function createServer(config: ServerConfig): Promise<LoginServer> {
         clusterId: config.clusterIdNumeric ?? serverId,
         clusterName: config.clusterName ?? 'SWG Server',
         connectionServerAddress:
+          config.gameServer?.publicAddress ??
           config.connectionServer?.publicAddress ??
           config.connectionServer?.bindAddress ??
           '127.0.0.1',
-        connectionServerPort: config.connectionServer?.port ?? 44455,
+        connectionServerPort: config.gameServer?.port ?? config.connectionServer?.port ?? 44463,
       };
 
       const clusterStatusEx = createLoginClusterStatusEx([{
@@ -247,6 +232,12 @@ export async function createServer(config: ServerConfig): Promise<LoginServer> {
       // C++ sends this pair proactively after auth/database avatar lookup.
       // StationIdHasJediSlot must immediately precede EnumerateCharacterId.
       const stationIdHasJediSlot = serializeStationIdHasJediSlot(0);
+
+      // Debug: dump avatar list messages
+      const avatarHex = Array.from(avatarResult.response.subarray(0, Math.min(64, avatarResult.response.length)))
+        .map(b => b.toString(16).padStart(2, '0')).join(' ');
+      console.log(`[LoginServer] AvatarList: count=${avatarResult.characterCount} response_len=${avatarResult.response.length} hex=[${avatarHex}]`);
+
       sessionManager.sendReliableGroup(soeSession, [
         stationIdHasJediSlot,
         avatarResult.response,
@@ -284,11 +275,18 @@ export async function createServer(config: ServerConfig): Promise<LoginServer> {
             const maxChars = config.maxCharsPerAccount ?? 20;
             const loginTimeZoneSeconds = -18000; // US Eastern offset used in legacy captures
             const maxCharsStatus = Math.min(maxChars, 10);
+            // Advertise the game server address/port to clients.
+            // In C++, the ConnectionServer proxies between client and GameServer.
+            // In our simplified architecture, the game server handles clients directly.
             const clusterConfig = {
               clusterId: config.clusterIdNumeric ?? serverId,
               clusterName: config.clusterName ?? 'SWG Server',
-              connectionServerAddress: config.connectionServer?.publicAddress ?? config.connectionServer?.bindAddress ?? '127.0.0.1',
-              connectionServerPort: config.connectionServer?.port ?? 44455,
+              connectionServerAddress:
+                config.gameServer?.publicAddress ??
+                config.connectionServer?.publicAddress ??
+                config.connectionServer?.bindAddress ??
+                '127.0.0.1',
+              connectionServerPort: config.gameServer?.port ?? config.connectionServer?.port ?? 44463,
             };
 
             // Store cluster config on login session for later use
@@ -310,19 +308,21 @@ export async function createServer(config: ServerConfig): Promise<LoginServer> {
               connectionServerAddress: clusterConfig.connectionServerAddress,
               connectionServerPort: clusterConfig.connectionServerPort,
               pingPort: clusterConfig.connectionServerPort,
-              populationOnline: -1,
+              populationOnline: -1, // C++ sends -1 for non-admin connections
               populationStatusLoaded: 0,
               maxCharactersPerAccount: maxCharsStatus,
               timeZone: loginTimeZoneSeconds,
-              status: 2, // 2 = online/up
-              notRecommended: true,
+              status: 2, // S_up = 2
+              notRecommended: false, // C++ pcap confirms false
               onlinePlayerLimit: 100,
-              onlineFreeTrialLimit: 0xfffffc19,
-              reserved: 0,
+              onlineFreeTrialLimit: 0xfffffc19, // C++ pcap confirms -999 (0xFFFFFC19)
             }]);
 
             // Send all login response messages in one atomic SOE Data packet.
             // This matches C++ behavior and avoids client-side ordering hazards.
+            // Send login response as one atomic group (matches C++ UdpPacketGroup).
+            // LoginClusterStatusEx is sent SEPARATELY — C++ processes each message
+            // individually via conn->send() and the SOE layer auto-groups.
             const loginResponseMessages = [
               serializeServerNowEpochTime(epochTime),
               result.response,
@@ -331,15 +331,23 @@ export async function createServer(config: ServerConfig): Promise<LoginServer> {
               serializeLoginClusterStatus(clusterStatus),
             ];
 
-            if (loginSession.extendedClusterInfoRequested) {
-              // Match C++ grouping behavior when RequestExtendedClusterInfo arrives
-              // in the same frame as LoginClientId.
-              loginResponseMessages.push(serializeExtendedClusterInfo());
-              loginSession.extendedClusterInfoRequested = false;
+            // Debug: dump each sub-message size and first 16 bytes
+            for (let mi = 0; mi < loginResponseMessages.length; mi++) {
+              const msg = loginResponseMessages[mi]!;
+              const hex = Array.from(msg.subarray(0, Math.min(16, msg.length)))
+                .map(b => b.toString(16).padStart(2, '0')).join(' ');
+              console.log(`[LoginServer] LoginResponse[${mi}] len=${msg.length} hex=[${hex}]`);
             }
-
             console.log(`[LoginServer] Sending login response: ${loginResponseMessages.length} grouped messages`);
             sessionManager.sendReliableGroup(soeSession, loginResponseMessages);
+
+            // Send LoginClusterStatusEx as a separate reliable message if requested.
+            // In C++, this is a separate conn->send() response to RequestExtendedClusterInfo,
+            // not bundled with the login response group.
+            if (loginSession.extendedClusterInfoRequested) {
+              sessionManager.sendReliable(soeSession, serializeExtendedClusterInfo());
+              loginSession.extendedClusterInfoRequested = false;
+            }
 
             // C++ does an async DB request and sends avatar list without a client-side
             // EnumerateCharacterId request; mirror that behavior.
@@ -368,50 +376,6 @@ export async function createServer(config: ServerConfig): Promise<LoginServer> {
           break;
         }
 
-        case CharacterCreationOpcode.ClientCreateCharacter: {
-          console.log(`[LoginServer] ClientCreateCharacter from ${clientKey}`);
-          const createMessage = deserializeClientCreateCharacter(data);
-          const result = await characterCreationHandler.createCharacter(
-            loginSession.clientSession,
-            createMessage
-          );
-
-          // Send response using reliable delivery
-          sessionManager.sendReliable(soeSession, result.response);
-
-          if (result.success) {
-            console.log(
-              `[LoginServer] Character created: ${createMessage.characterName} (ID: ${result.characterId})`
-            );
-          } else {
-            console.log(
-              `[LoginServer] Character creation failed: ${result.errorMessage}`
-            );
-          }
-          break;
-        }
-
-        case CharacterCreationOpcode.ClientVerifyAndLockNameRequest: {
-          console.log(`[LoginServer] ClientVerifyAndLockNameRequest from ${clientKey}`);
-          const verifyMessage = deserializeClientVerifyAndLockNameRequest(data);
-          const response = await characterCreationHandler.handleVerifyName(
-            loginSession.clientSession,
-            verifyMessage
-          );
-
-          sessionManager.sendReliable(soeSession, response);
-          break;
-        }
-
-        case CharacterCreationOpcode.ClientRandomNameRequest: {
-          console.log(`[LoginServer] ClientRandomNameRequest from ${clientKey}`);
-          const randomMessage = deserializeClientRandomNameRequest(data);
-          const response = characterCreationHandler.handleRandomName(randomMessage);
-
-          sessionManager.sendReliable(soeSession, response);
-          break;
-        }
-
         case LoginMessageOpcode.RequestExtendedClusterInfo: {
           console.log(`[LoginServer] RequestExtendedClusterInfo from ${clientKey}`);
           if (loginSession.authenticated) {
@@ -434,19 +398,15 @@ export async function createServer(config: ServerConfig): Promise<LoginServer> {
   }
 
   /**
-   * Clean up a login session
+   * Clean up a login session.
+   * NOTE: We intentionally do NOT delete the Redis session here.
+   * The client disconnects from the login server and then connects to the
+   * game server using the same session token. Deleting the session on login
+   * disconnect would break the handoff.
    */
   async function cleanupLoginSession(key: string): Promise<void> {
     const loginSession = loginSessions.get(key);
     if (loginSession) {
-      // Clean up Redis session if authenticated
-      if (loginSession.authenticated && loginSession.sessionToken) {
-        try {
-          await sessionStore.deleteSession(loginSession.sessionToken);
-        } catch (error) {
-          console.error(`[LoginServer] Error deleting Redis session:`, error);
-        }
-      }
       loginSessions.delete(key);
     }
   }

@@ -1,6 +1,7 @@
 /**
- * Character Creation Handler
- * Handles the full character creation flow including validation
+ * Character Creation Handler (Connection Server)
+ * Handles the full character creation flow including validation.
+ * Adapted from login-server version to work with connection-server session types.
  */
 
 import type { CharacterRepository, CreateCharacterData } from '@swg/database';
@@ -22,7 +23,7 @@ import {
   type ClientVerifyAndLockNameResponse,
   type ClientRandomNameRequest,
   type ClientRandomNameResponse,
-  type CharacterCreationStringId as StringId,
+  type CharacterCreationStringId,
   createCreateCharacterSuccess,
   createCreateCharacterFailure,
   createClientVerifyAndLockNameResponse,
@@ -49,16 +50,18 @@ import {
   type StartingLocation,
 } from '../data/starting-locations.js';
 import { checkProfanity } from '../data/profanity-filter.js';
-import type { ClientSession } from './login-handler.js';
 
 /**
- * Maximum characters per account
+ * Minimal session interface needed for character creation.
+ * Compatible with both login-server and connection-server session types.
  */
+export interface CharacterCreationSession {
+  authenticated: boolean;
+  accountId?: number | undefined;
+}
+
 const MAX_CHARACTERS_PER_ACCOUNT = 8;
 
-/**
- * Valid starting professions (pre-NGE)
- */
 const VALID_PROFESSIONS = [
   'crafting_artisan',
   'combat_brawler',
@@ -68,56 +71,8 @@ const VALID_PROFESSIONS = [
   'science_medic',
 ] as const;
 
-export type ValidProfession = (typeof VALID_PROFESSIONS)[number];
+type ValidProfession = (typeof VALID_PROFESSIONS)[number];
 
-/**
- * Name validation result
- */
-export interface NameValidationResult {
-  valid: boolean;
-  error: CharacterNameErrorType;
-  message: string;
-}
-
-/**
- * Species validation result
- */
-export interface SpeciesValidationResult {
-  valid: boolean;
-  species?: SpeciesDefinition;
-  gender?: GenderType;
-  error?: string;
-}
-
-/**
- * Profession validation result
- */
-export interface ProfessionValidationResult {
-  valid: boolean;
-  profession?: ValidProfession;
-  error?: string;
-}
-
-/**
- * Location validation result
- */
-export interface LocationValidationResult {
-  valid: boolean;
-  location?: StartingLocation;
-  error?: string;
-}
-
-/**
- * Customization validation result
- */
-export interface CustomizationValidationResult {
-  valid: boolean;
-  error?: string;
-}
-
-/**
- * Full character creation result
- */
 export interface CharacterCreationResult {
   success: boolean;
   response: Uint8Array;
@@ -151,9 +106,9 @@ const NAME_SYLLABLES: Record<string, { first: string[]; middle: string[]; last: 
     last: ['ca', 'wa', 'ra', 'la', 'ta', 'na', 'ma', 'pa'],
   },
   twilek: {
-    first: ["Aar", "Bib", "Dia", "For", "Lyn", "Mir", "Nal", "Orn", "Tann", "Vette"],
-    middle: ["aa", "oo", "ee", "ii", "uu", "ay", "ey", "iy"],
-    last: ["la", "ra", "na", "da", "ka", "ta", "sa", "ma"],
+    first: ['Aar', 'Bib', 'Dia', 'For', 'Lyn', 'Mir', 'Nal', 'Orn', 'Tann', 'Vette'],
+    middle: ['aa', 'oo', 'ee', 'ii', 'uu', 'ay', 'ey', 'iy'],
+    last: ['la', 'ra', 'na', 'da', 'ka', 'ta', 'sa', 'ma'],
   },
   default: {
     first: ['Ax', 'Bex', 'Cax', 'Dex', 'Fax', 'Gex', 'Hax', 'Jex', 'Kax', 'Lex'],
@@ -162,9 +117,6 @@ const NAME_SYLLABLES: Record<string, { first: string[]; middle: string[]; last: 
   },
 };
 
-/**
- * Character Creation Handler
- */
 export class CharacterCreationHandler {
   private readonly characterRepository: CharacterRepository;
   private readonly sessionStore: SessionStore;
@@ -173,21 +125,25 @@ export class CharacterCreationHandler {
   constructor(
     characterRepository: CharacterRepository,
     sessionStore: SessionStore,
-    serverId: number = 1
+    serverId: number = 1,
   ) {
     this.characterRepository = characterRepository;
     this.sessionStore = sessionStore;
     this.serverId = serverId;
   }
 
-  /**
-   * Validate a character name
-   */
+  private errorToStringId(error: CharacterNameErrorType): CharacterCreationStringId {
+    return {
+      table: 'ui',
+      textIndex: 0,
+      text: getCharacterNameErrorStringIdText(error),
+    };
+  }
+
   public async validateCharacterName(
     name: string,
-    species?: SpeciesDefinition
-  ): Promise<NameValidationResult> {
-    // Check for empty name
+    species?: SpeciesDefinition,
+  ): Promise<{ valid: boolean; error: CharacterNameErrorType; message: string }> {
     if (!name || name.trim().length === 0) {
       return {
         valid: false,
@@ -198,7 +154,6 @@ export class CharacterCreationHandler {
 
     const trimmedName = name.trim();
 
-    // Check for numbers
     if (NameValidation.HAS_NUMBERS_PATTERN.test(trimmedName)) {
       return {
         valid: false,
@@ -207,12 +162,10 @@ export class CharacterCreationHandler {
       };
     }
 
-    // Split into first and last name
     const nameParts = trimmedName.split(/\s+/);
     const firstName = nameParts[0]!;
     const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
 
-    // Validate first name length
     if (firstName.length < NameValidation.MIN_FIRST_NAME_LENGTH) {
       return {
         valid: false,
@@ -229,26 +182,15 @@ export class CharacterCreationHandler {
       };
     }
 
-    // Validate last name if present
     if (lastName) {
       if (lastName.length < NameValidation.MIN_LAST_NAME_LENGTH) {
-        return {
-          valid: false,
-          error: CharacterNameError.DECLINED_TOO_SHORT,
-          message: 'Last name is too short.',
-        };
+        return { valid: false, error: CharacterNameError.DECLINED_TOO_SHORT, message: 'Last name is too short.' };
       }
-
       if (lastName.length > NameValidation.MAX_LAST_NAME_LENGTH) {
-        return {
-          valid: false,
-          error: CharacterNameError.DECLINED_TOO_LONG,
-          message: 'Last name is too long.',
-        };
+        return { valid: false, error: CharacterNameError.DECLINED_TOO_LONG, message: 'Last name is too long.' };
       }
     }
 
-    // Check total length
     if (trimmedName.length > NameValidation.MAX_TOTAL_LENGTH) {
       return {
         valid: false,
@@ -257,7 +199,6 @@ export class CharacterCreationHandler {
       };
     }
 
-    // Check for valid characters
     if (!NameValidation.VALID_NAME_PATTERN.test(firstName)) {
       return {
         valid: false,
@@ -274,25 +215,14 @@ export class CharacterCreationHandler {
       };
     }
 
-    // Check for consecutive spaces
     if (NameValidation.CONSECUTIVE_SPACES_PATTERN.test(trimmedName)) {
-      return {
-        valid: false,
-        error: CharacterNameError.DECLINED_SYNTAX,
-        message: 'Name cannot contain consecutive spaces.',
-      };
+      return { valid: false, error: CharacterNameError.DECLINED_SYNTAX, message: 'Name cannot contain consecutive spaces.' };
     }
 
-    // Check for consecutive identical characters
     if (this.hasExcessiveRepeatingChars(firstName) || this.hasExcessiveRepeatingChars(lastName)) {
-      return {
-        valid: false,
-        error: CharacterNameError.DECLINED_SYNTAX,
-        message: 'Name contains too many repeating characters.',
-      };
+      return { valid: false, error: CharacterNameError.DECLINED_SYNTAX, message: 'Name contains too many repeating characters.' };
     }
 
-    // Check species-specific surname rules
     if (species) {
       if (species.requireSurname && !lastName) {
         return {
@@ -301,7 +231,6 @@ export class CharacterCreationHandler {
           message: getCharacterNameErrorString(CharacterNameError.DECLINED_MUST_INCLUDE_SURNAME),
         };
       }
-
       if (!species.allowSurname && lastName) {
         return {
           valid: false,
@@ -311,7 +240,6 @@ export class CharacterCreationHandler {
       }
     }
 
-    // Check profanity
     const profanityResult = checkProfanity(trimmedName);
     if (profanityResult.containsProfanity) {
       return {
@@ -321,7 +249,6 @@ export class CharacterCreationHandler {
       };
     }
 
-    // Check reserved prefixes
     const lowerName = trimmedName.toLowerCase();
     for (const prefix of ReservedPrefixes) {
       if (lowerName.startsWith(prefix)) {
@@ -333,7 +260,6 @@ export class CharacterCreationHandler {
       }
     }
 
-    // Check reserved names (fictional characters)
     for (const reserved of ReservedNames) {
       if (lowerName === reserved || lowerName.includes(reserved)) {
         return {
@@ -344,7 +270,6 @@ export class CharacterCreationHandler {
       }
     }
 
-    // Check uniqueness (case-insensitive)
     const existingCharacter = await this.characterRepository.findByName(trimmedName);
     if (existingCharacter) {
       return {
@@ -354,26 +279,16 @@ export class CharacterCreationHandler {
       };
     }
 
-    return {
-      valid: true,
-      error: CharacterNameError.ACCEPTED,
-      message: '',
-    };
+    return { valid: true, error: CharacterNameError.ACCEPTED, message: '' };
   }
 
-  /**
-   * Check for excessive repeating characters
-   */
   private hasExcessiveRepeatingChars(str: string): boolean {
     if (!str) return false;
-
     let count = 1;
     for (let i = 1; i < str.length; i++) {
       if (str[i]!.toLowerCase() === str[i - 1]!.toLowerCase()) {
         count++;
-        if (count > NameValidation.MAX_CONSECUTIVE_IDENTICAL) {
-          return true;
-        }
+        if (count > NameValidation.MAX_CONSECUTIVE_IDENTICAL) return true;
       } else {
         count = 1;
       }
@@ -381,176 +296,24 @@ export class CharacterCreationHandler {
     return false;
   }
 
-  /**
-   * Create a StringId from a CharacterNameErrorType
-   */
-  private errorToStringId(error: CharacterNameErrorType): StringId {
-    return {
-      table: 'ui',
-      textIndex: 0,
-      text: getCharacterNameErrorStringIdText(error),
-    };
-  }
-
-  /**
-   * Validate species template by name string
-   */
-  public validateSpeciesByName(templateName: string): SpeciesValidationResult {
-    const speciesInfo = getSpeciesByTemplate(templateName);
-    if (!speciesInfo) {
-      return {
-        valid: false,
-        error: `Invalid species template: ${templateName}`,
-      };
-    }
-
-    // Determine gender from template name
-    const gender = templateName.includes('female') ? 'female' as GenderType : 'male' as GenderType;
-
-    return {
-      valid: true,
-      species: speciesInfo,
-      gender,
-    };
-  }
-
-  /**
-   * Validate species template by CRC
-   */
-  public validateSpecies(templateCrc: number): SpeciesValidationResult {
-    if (!isValidSpeciesTemplate(templateCrc)) {
-      return {
-        valid: false,
-        error: `Invalid species template CRC: 0x${templateCrc.toString(16)}`,
-      };
-    }
-
-    const speciesInfo = getSpeciesByTemplateCrc(templateCrc);
-    if (!speciesInfo) {
-      return {
-        valid: false,
-        error: 'Species template not found',
-      };
-    }
-
-    return {
-      valid: true,
-      species: speciesInfo.species,
-      gender: speciesInfo.gender,
-    };
-  }
-
-  /**
-   * Validate starting profession
-   */
-  public validateProfession(profession: string): ProfessionValidationResult {
-    const normalizedProfession = profession.toLowerCase().trim();
-
-    if (!VALID_PROFESSIONS.includes(normalizedProfession as ValidProfession)) {
-      return {
-        valid: false,
-        error: `Invalid profession: ${profession}`,
-      };
-    }
-
-    return {
-      valid: true,
-      profession: normalizedProfession as ValidProfession,
-    };
-  }
-
-  /**
-   * Validate starting location
-   */
-  public validateStartingLocation(
-    locationId: string,
-    startTutorial: boolean
-  ): LocationValidationResult {
-    // If starting tutorial, use tutorial location
-    if (startTutorial) {
-      return {
-        valid: true,
-        location: getTutorialLocation(),
-      };
-    }
-
-    // Check if location is valid
-    if (!isValidStartingLocation(locationId)) {
-      // Default to tutorial if invalid
-      return {
-        valid: true,
-        location: getDefaultStartingLocation(),
-      };
-    }
-
-    const location = getStartingLocationById(locationId);
-    if (!location) {
-      return {
-        valid: true,
-        location: getDefaultStartingLocation(),
-      };
-    }
-
-    return {
-      valid: true,
-      location,
-    };
-  }
-
-  /**
-   * Validate appearance customization data
-   */
-  public validateCustomization(
-    appearanceData: string,
-    species: SpeciesDefinition
-  ): CustomizationValidationResult {
-    // Basic validation - check that appearance data is present and reasonable size
-    if (!appearanceData || appearanceData.length === 0) {
-      // Empty appearance data is allowed (will use defaults)
-      return { valid: true };
-    }
-
-    // Maximum expected size for appearance data
-    const MAX_APPEARANCE_SIZE = 4096;
-    if (appearanceData.length > MAX_APPEARANCE_SIZE) {
-      return {
-        valid: false,
-        error: 'Appearance data too large',
-      };
-    }
-
-    return { valid: true };
-  }
-
-  /**
-   * Generate a unique character ID
-   */
   private generateCharacterId(): bigint {
-    // Generate a unique ID using timestamp and random component
     const timestamp = BigInt(Date.now());
     const random = BigInt(Math.floor(Math.random() * 0xfffff));
     const serverId = BigInt(this.serverId);
-
-    // Format: [12 bits server][20 bits random][32 bits timestamp]
     return (serverId << 52n) | (random << 32n) | (timestamp & 0xffffffffn);
   }
 
-  /**
-   * Create a new character
-   * Full creation flow with validation
-   */
   public async createCharacter(
-    session: ClientSession,
-    message: ClientCreateCharacter
+    session: CharacterCreationSession,
+    message: ClientCreateCharacter,
   ): Promise<CharacterCreationResult> {
     const charName = message.characterName;
 
-    // Check if session is authenticated
     if (!session.authenticated || !session.accountId) {
       return {
         success: false,
         response: serializeCreateCharacterFailure(
-          createCreateCharacterFailure(charName, this.errorToStringId(CharacterNameError.DECLINED_NOT_AUTHORIZED))
+          createCreateCharacterFailure(charName, this.errorToStringId(CharacterNameError.DECLINED_NOT_AUTHORIZED)),
         ),
         error: CharacterNameError.DECLINED_NOT_AUTHORIZED,
         errorMessage: 'Not authenticated',
@@ -559,14 +322,13 @@ export class CharacterCreationHandler {
 
     const accountId = session.accountId;
 
-    // Check character count
     try {
       const existingCharacters = await this.characterRepository.findByAccountId(accountId);
       if (existingCharacters.length >= MAX_CHARACTERS_PER_ACCOUNT) {
         return {
           success: false,
           response: serializeCreateCharacterFailure(
-            createCreateCharacterFailure(charName, this.errorToStringId(CharacterNameError.DECLINED_TOO_MANY_CHARACTERS))
+            createCreateCharacterFailure(charName, this.errorToStringId(CharacterNameError.DECLINED_TOO_MANY_CHARACTERS)),
           ),
           error: CharacterNameError.DECLINED_TOO_MANY_CHARACTERS,
           errorMessage: `Maximum ${MAX_CHARACTERS_PER_ACCOUNT} characters per account`,
@@ -577,94 +339,77 @@ export class CharacterCreationHandler {
       return {
         success: false,
         response: serializeCreateCharacterFailure(
-          createCreateCharacterFailure(charName, this.errorToStringId(CharacterNameError.DECLINED_INTERNAL_ERROR))
+          createCreateCharacterFailure(charName, this.errorToStringId(CharacterNameError.DECLINED_INTERNAL_ERROR)),
         ),
         error: CharacterNameError.DECLINED_INTERNAL_ERROR,
         errorMessage: 'Internal error',
       };
     }
 
-    // Validate species by template name string
     const speciesResult = this.validateSpeciesByName(message.templateName);
     if (!speciesResult.valid || !speciesResult.species) {
       return {
         success: false,
         response: serializeCreateCharacterFailure(
-          createCreateCharacterFailure(charName, this.errorToStringId(CharacterNameError.DECLINED_CANT_CREATE_AVATAR))
+          createCreateCharacterFailure(charName, this.errorToStringId(CharacterNameError.DECLINED_CANT_CREATE_AVATAR)),
         ),
         error: CharacterNameError.DECLINED_CANT_CREATE_AVATAR,
         ...(speciesResult.error !== undefined && { errorMessage: speciesResult.error }),
       };
     }
 
-    // Validate name
-    const nameResult = await this.validateCharacterName(
-      charName,
-      speciesResult.species
-    );
+    const nameResult = await this.validateCharacterName(charName, speciesResult.species);
     if (!nameResult.valid) {
       return {
         success: false,
         response: serializeCreateCharacterFailure(
-          createCreateCharacterFailure(charName, this.errorToStringId(nameResult.error))
+          createCreateCharacterFailure(charName, this.errorToStringId(nameResult.error)),
         ),
         error: nameResult.error,
         errorMessage: nameResult.message,
       };
     }
 
-    // Validate profession
     const professionResult = this.validateProfession(message.profession);
     if (!professionResult.valid) {
       return {
         success: false,
         response: serializeCreateCharacterFailure(
-          createCreateCharacterFailure(charName, this.errorToStringId(CharacterNameError.DECLINED_CANT_CREATE_AVATAR))
+          createCreateCharacterFailure(charName, this.errorToStringId(CharacterNameError.DECLINED_CANT_CREATE_AVATAR)),
         ),
         error: CharacterNameError.DECLINED_CANT_CREATE_AVATAR,
         ...(professionResult.error !== undefined && { errorMessage: professionResult.error }),
       };
     }
 
-    // Validate starting location
-    const locationResult = this.validateStartingLocation(
-      message.startingLocation,
-      message.useNewbieTutorial
-    );
+    const locationResult = this.validateStartingLocation(message.startingLocation, message.useNewbieTutorial);
     if (!locationResult.valid || !locationResult.location) {
       return {
         success: false,
         response: serializeCreateCharacterFailure(
-          createCreateCharacterFailure(charName, this.errorToStringId(CharacterNameError.DECLINED_CANT_CREATE_AVATAR))
+          createCreateCharacterFailure(charName, this.errorToStringId(CharacterNameError.DECLINED_CANT_CREATE_AVATAR)),
         ),
         error: CharacterNameError.DECLINED_CANT_CREATE_AVATAR,
         ...(locationResult.error !== undefined && { errorMessage: locationResult.error }),
       };
     }
 
-    // Validate appearance (now a string, convert to buffer for storage)
     const appearanceBuffer = Buffer.from(message.appearanceData, 'ascii');
     if (appearanceBuffer.length > 4096) {
       return {
         success: false,
         response: serializeCreateCharacterFailure(
-          createCreateCharacterFailure(charName, this.errorToStringId(CharacterNameError.DECLINED_CANT_CREATE_AVATAR))
+          createCreateCharacterFailure(charName, this.errorToStringId(CharacterNameError.DECLINED_CANT_CREATE_AVATAR)),
         ),
         error: CharacterNameError.DECLINED_CANT_CREATE_AVATAR,
         errorMessage: 'Appearance data too large',
       };
     }
 
-    // Generate character ID
     const characterId = this.generateCharacterId();
     const location = locationResult.location;
-
-    // Determine the shared template name for the character
-    // The client sends the non-shared template (e.g., "object/creature/player/human_male.iff")
-    // We store the shared version for EnumerateCharacterIdResponse
     const sharedTemplateName = message.templateName.replace('/player/', '/player/shared_');
 
-    // Create character in database
     try {
       const characterData: CreateCharacterData = {
         characterId,
@@ -686,12 +431,10 @@ export class CharacterCreationHandler {
       };
 
       await this.characterRepository.create(characterData);
-
-      // Add starting skill for profession
       await this.addStartingSkills(characterId, professionResult.profession!);
 
       console.log(
-        `[CharacterCreation] Created character "${charName}" (ID: ${characterId}) for account ${accountId}`
+        `[CharacterCreation] Created character "${charName}" (ID: ${characterId}) for account ${accountId}`,
       );
 
       return {
@@ -704,7 +447,7 @@ export class CharacterCreationHandler {
       return {
         success: false,
         response: serializeCreateCharacterFailure(
-          createCreateCharacterFailure(charName, this.errorToStringId(CharacterNameError.DECLINED_INTERNAL_ERROR))
+          createCreateCharacterFailure(charName, this.errorToStringId(CharacterNameError.DECLINED_INTERNAL_ERROR)),
         ),
         error: CharacterNameError.DECLINED_INTERNAL_ERROR,
         errorMessage: 'Failed to create character',
@@ -712,13 +455,7 @@ export class CharacterCreationHandler {
     }
   }
 
-  /**
-   * Add starting skills based on profession
-   */
-  private async addStartingSkills(
-    characterId: bigint,
-    profession: ValidProfession
-  ): Promise<void> {
+  private async addStartingSkills(characterId: bigint, profession: ValidProfession): Promise<void> {
     const professionSkills: Record<ValidProfession, string[]> = {
       crafting_artisan: ['crafting_artisan_novice'],
       combat_brawler: ['combat_brawler_novice'],
@@ -729,7 +466,6 @@ export class CharacterCreationHandler {
     };
 
     const skills = professionSkills[profession] || [];
-
     for (const skill of skills) {
       try {
         await this.characterRepository.addSkill(characterId, skill);
@@ -739,56 +475,70 @@ export class CharacterCreationHandler {
     }
   }
 
-  /**
-   * Handle name verification request
-   */
   public async handleVerifyName(
-    session: ClientSession,
-    message: ClientVerifyAndLockNameRequest
+    session: CharacterCreationSession,
+    message: ClientVerifyAndLockNameRequest,
   ): Promise<Uint8Array> {
-    // Validate species first (now using template name string)
     const speciesResult = this.validateSpeciesByName(message.templateName);
-
-    // Validate name
-    const nameResult = await this.validateCharacterName(
-      message.characterName,
-      speciesResult.species
-    );
+    const nameResult = await this.validateCharacterName(message.characterName, speciesResult.species);
 
     const response = createClientVerifyAndLockNameResponse(
       message.characterName,
-      this.errorToStringId(nameResult.error)
+      this.errorToStringId(nameResult.error),
     );
 
     return serializeClientVerifyAndLockNameResponse(response);
   }
 
-  /**
-   * Handle random name request
-   */
   public handleRandomName(message: ClientRandomNameRequest): Uint8Array {
-    // Extract species from template name
     const speciesId = this.extractSpeciesFromTemplate(message.templateName);
     const syllables = NAME_SYLLABLES[speciesId] ?? NAME_SYLLABLES['default']!;
-
-    // Generate a random name
     const firstName = this.generateRandomNamePart(syllables);
 
     const response = createClientRandomNameResponse(
       message.templateName,
       firstName,
-      this.errorToStringId(CharacterNameError.ACCEPTED)
+      this.errorToStringId(CharacterNameError.ACCEPTED),
     );
 
     return serializeClientRandomNameResponse(response);
   }
 
-  /**
-   * Extract species ID from template name
-   */
+  private validateSpeciesByName(templateName: string): { valid: boolean; species?: SpeciesDefinition; error?: string } {
+    const speciesInfo = getSpeciesByTemplate(templateName);
+    if (!speciesInfo) {
+      return { valid: false, error: `Invalid species template: ${templateName}` };
+    }
+    return { valid: true, species: speciesInfo };
+  }
+
+  private validateProfession(profession: string): { valid: boolean; profession?: ValidProfession; error?: string } {
+    const normalizedProfession = profession.toLowerCase().trim();
+    if (!VALID_PROFESSIONS.includes(normalizedProfession as ValidProfession)) {
+      return { valid: false, error: `Invalid profession: ${profession}` };
+    }
+    return { valid: true, profession: normalizedProfession as ValidProfession };
+  }
+
+  private validateStartingLocation(
+    locationId: string,
+    startTutorial: boolean,
+  ): { valid: boolean; location?: StartingLocation; error?: string } {
+    if (startTutorial) {
+      return { valid: true, location: getTutorialLocation() };
+    }
+    if (!isValidStartingLocation(locationId)) {
+      return { valid: true, location: getDefaultStartingLocation() };
+    }
+    const location = getStartingLocationById(locationId);
+    if (!location) {
+      return { valid: true, location: getDefaultStartingLocation() };
+    }
+    return { valid: true, location };
+  }
+
   private extractSpeciesFromTemplate(template: string): string {
     const lower = template.toLowerCase();
-
     if (lower.includes('human')) return 'human';
     if (lower.includes('rodian')) return 'rodian';
     if (lower.includes('trandoshan')) return 'trandoshan';
@@ -799,54 +549,26 @@ export class CharacterCreationHandler {
     if (lower.includes('zabrak')) return 'zabrak';
     if (lower.includes('ithorian')) return 'ithorian';
     if (lower.includes('sullustan')) return 'sullustan';
-
     return 'default';
   }
 
-  /**
-   * Generate a random name part from syllables
-   */
-  private generateRandomNamePart(syllables: {
-    first: string[];
-    middle: string[];
-    last: string[];
-  }): string {
+  private generateRandomNamePart(syllables: { first: string[]; middle: string[]; last: string[] }): string {
     const randomFrom = (arr: string[]): string => arr[Math.floor(Math.random() * arr.length)]!;
-
-    // 2-3 syllables
     const syllableCount = Math.random() < 0.5 ? 2 : 3;
 
     let name = randomFrom(syllables.first);
-
-    if (syllableCount >= 2) {
-      name += randomFrom(syllables.middle);
-    }
-
-    if (syllableCount >= 3) {
-      name += randomFrom(syllables.middle);
-    }
-
+    if (syllableCount >= 2) name += randomFrom(syllables.middle);
+    if (syllableCount >= 3) name += randomFrom(syllables.middle);
     name += randomFrom(syllables.last);
 
-    // Capitalize first letter
     return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
-  }
-
-  /**
-   * Get the server ID
-   */
-  public getServerId(): number {
-    return this.serverId;
   }
 }
 
-/**
- * Create a new CharacterCreationHandler instance
- */
 export function createCharacterCreationHandler(
   characterRepository: CharacterRepository,
   sessionStore: SessionStore,
-  serverId?: number
+  serverId?: number,
 ): CharacterCreationHandler {
   return new CharacterCreationHandler(characterRepository, sessionStore, serverId);
 }
