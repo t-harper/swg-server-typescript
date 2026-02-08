@@ -151,6 +151,36 @@ Decodes SOE-encrypted packets from pcap files. Handles SOE session negotiation, 
 - `packages/protocol/src/swg/messages/cpp-packet-stubs.ts` - Stub serializers
 - `packages/protocol/src/swg/wire/cpp-wire-codec.ts` - Full wire codec for all 526 packets
 
+### Data Importer Tool (tools/data-importer/)
+
+CLI tool (`@swg/data-importer`) for processing SWG binary data files. Source in `tools/data-importer/src/iff/`.
+
+**IFF Template Extraction:**
+```bash
+npx tsx tools/data-importer/src/iff/cli.ts extract-single <file.iff>
+npx tsx tools/data-importer/src/iff/cli.ts extract-templates <input-dir> <output-dir>
+npx tsx tools/data-importer/src/iff/cli.ts inspect <file.iff> -v
+npx tsx tools/data-importer/src/iff/cli.ts generate-crc-table <template-dir> <output-file>
+```
+
+**DataTable Parsing (DTII format):**
+```bash
+npx tsx tools/data-importer/src/iff/cli.ts datatable <file.iff> [-o output.json]
+npx tsx tools/data-importer/src/iff/cli.ts datatable-dir <input-dir> <output-dir> [-r] [-v]
+```
+
+Parses 7,230 binary datatable files in `data/serverdata/datatables/` containing all game configuration data (skills, combat, crafting, buildout, character creation, commands, etc.). Uses SWG's DTII binary format:
+- Structure: `FORM/DTII > FORM/<version> > COLS + TYPE + ROWS`
+- **Critical**: DTII files have NO even-boundary padding between chunks. The parser uses `IffDataReader` directly (not `IffParser`) to avoid its padding logic.
+- Typespec chars: `i`=int, `f`=float, `s`=string, `h`=hex, `b`=bool, `e`=enum, `v`=bitvector, `p`=path, `z`=zero, `c`=comment
+- All numeric values are little-endian (i32/f32), strings are null-terminated
+- Programmatic: `parseDataTable(buffer, name?)` returns `DataTableResult` with typed columns and row objects
+
+Key source files:
+- `datatable-parser.ts` — Core DTII binary parser (`parseDataTable`, `parseTypeSpec`)
+- `datatable-converter.ts` — `DataTableConverter` class for file I/O and batch conversion
+- `datatable-parser.test.ts` — 21 tests using real datatable files
+
 ### Task Tracking (done/, in_progress/, to_do/)
 Markdown files tracking implementation progress. `done/` has 13 completed milestones (protocol layers, login, connection, zone-in, Redis, DB schema). `in_progress/` and `to_do/` have planned work.
 
@@ -182,6 +212,7 @@ Framework: Vitest with v8 coverage. Test files: `*.test.ts` in package `src/` di
 Key test suites:
 - `packages/protocol/src/swg/wire/cpp-wire-codec.test.ts` - 42 roundtrip tests for C++ packet codec
 - `packages/protocol/src/soe/udp-library-wire.test.ts` - SOE protocol tests
+- `tools/data-importer/src/iff/datatable-parser.test.ts` - 21 tests for DTII datatable parser
 - `tests/integration/` - Login and zone-entry integration tests
 
 ## Pre-existing Issues

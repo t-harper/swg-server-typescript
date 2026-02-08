@@ -71,5 +71,18 @@ export {
 } from './crc-table.js';
 export type { CrcEntry, CrcTable, CrcTableOptions } from './crc-table.js';
 
+// DataTable Parser
+export { parseDataTable, parseTypeSpec, getBasicType } from './datatable-parser.js';
+export type {
+  DataTableResult,
+  DataTableColumn,
+  DataTableColumnType,
+  DataTableBasicType,
+} from './datatable-parser.js';
+
+// DataTable Converter
+export { DataTableConverter } from './datatable-converter.js';
+export type { ConversionStats } from './datatable-converter.js';
+
 // CLI
 export { runIffCli } from './cli.js';
