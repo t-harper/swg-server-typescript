@@ -266,19 +266,19 @@ export const STRUCTURE_LOT_CATEGORIES = {
  * Check if a structure type is small (1 lot)
  */
 export function isSmallStructure(buildingType: BuildingType): boolean {
-  return STRUCTURE_LOT_CATEGORIES.small.includes(buildingType);
+  return (STRUCTURE_LOT_CATEGORIES.small as readonly BuildingType[]).includes(buildingType);
 }
 
 /**
  * Check if a structure type is medium (2-3 lots)
  */
 export function isMediumStructure(buildingType: BuildingType): boolean {
-  return STRUCTURE_LOT_CATEGORIES.medium.includes(buildingType);
+  return (STRUCTURE_LOT_CATEGORIES.medium as readonly BuildingType[]).includes(buildingType);
 }
 
 /**
  * Check if a structure type is large (5+ lots)
  */
 export function isLargeStructure(buildingType: BuildingType): boolean {
-  return STRUCTURE_LOT_CATEGORIES.large.includes(buildingType);
+  return (STRUCTURE_LOT_CATEGORIES.large as readonly BuildingType[]).includes(buildingType);
 }
