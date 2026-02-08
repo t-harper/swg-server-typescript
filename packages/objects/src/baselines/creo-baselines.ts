@@ -462,6 +462,34 @@ export function serializeCreoBaseline6(obj: CreatureObject): Uint8Array {
 }
 
 // ============================================
+// CREO Baseline 8 (firstParentAuthClientServer) - 0 vars
+// TangibleObject has no firstParentAuthClientServer variables,
+// but the client expects this package to exist. Send empty.
+// ============================================
+
+export function serializeCreoBaseline8(_obj: CreatureObject): Uint8Array {
+  const writer = new BufferWriter(16);
+  writer.writeUInt32LE(CREO_TYPE_CRC);
+  writer.writeUInt8(8);
+  writer.writeUInt16LE(0); // variable count = 0
+  return writer.toBuffer();
+}
+
+// ============================================
+// CREO Baseline 9 (firstParentAuthClientServer_np) - 0 vars
+// TangibleObject has no firstParentAuthClientServer_np variables,
+// but the client expects this package to exist. Send empty.
+// ============================================
+
+export function serializeCreoBaseline9(_obj: CreatureObject): Uint8Array {
+  const writer = new BufferWriter(16);
+  writer.writeUInt32LE(CREO_TYPE_CRC);
+  writer.writeUInt8(9);
+  writer.writeUInt16LE(0); // variable count = 0
+  return writer.toBuffer();
+}
+
+// ============================================
 // Delta Generators (stubs - not needed for zone-in)
 // ============================================
 
@@ -537,5 +565,7 @@ export function createCreoBaselines(obj: CreatureObject): Uint8Array[] {
     serializeCreoBaseline3(obj),
     serializeCreoBaseline4(obj),
     serializeCreoBaseline6(obj),
+    serializeCreoBaseline8(obj),
+    serializeCreoBaseline9(obj),
   ];
 }

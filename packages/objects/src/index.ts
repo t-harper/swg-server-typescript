@@ -213,6 +213,8 @@ export {
   serializeCreoBaseline3,
   serializeCreoBaseline4,
   serializeCreoBaseline6,
+  serializeCreoBaseline8,
+  serializeCreoBaseline9,
   generateCreoBaseline1Delta,
   generateCreoBaseline3Delta,
   generateCreoBaseline4Delta,

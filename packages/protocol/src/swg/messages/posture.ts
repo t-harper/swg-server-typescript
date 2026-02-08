@@ -214,6 +214,25 @@ export function getPostureSpeedModifier(posture: PostureType): number {
   }
 }
 
+// ============================================
+// UpdatePostureMessage (0x0bde6b41) — different from PostureMessage!
+// Sent from server to client during zone-in for CreatureObjects
+// ============================================
+
+const UPDATE_POSTURE_MESSAGE_OPCODE = 0x0bde6b41;
+
+export function createUpdatePostureMessage(
+  posture: number,
+  objectId: bigint
+): Uint8Array {
+  const writer = new BufferWriter(16);
+  writer.writeUInt16LE(3); // operandCount (2 fields + 1)
+  writer.writeUInt32LE(UPDATE_POSTURE_MESSAGE_OPCODE);
+  writer.writeUInt8(posture);
+  writer.writeUInt64LE(objectId);
+  return writer.toBuffer();
+}
+
 /**
  * Check if the posture represents an incapacitated state
  */

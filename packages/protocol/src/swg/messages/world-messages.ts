@@ -17,7 +17,7 @@ export const WorldMessageOpcode = {
   /** Server weather update with wind velocity */
   ServerWeatherMessage: 0xb071bef7,
   /** Server parameters (weather update interval, etc.) */
-  ParametersMessage: 0x3324f080,
+  ParametersMessage: 0x487652da,
   /** Response with galaxy loop frame times */
   GalaxyLoopTimesResponse: 0x32046a35,
   /** Request galaxy loop times from server */

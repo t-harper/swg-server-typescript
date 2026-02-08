@@ -30,6 +30,8 @@ import {
   serializeCreoBaseline3,
   serializeCreoBaseline4,
   serializeCreoBaseline6,
+  serializeCreoBaseline8,
+  serializeCreoBaseline9,
   serializePlayBaseline3,
   serializePlayBaseline6,
   serializePlayBaseline8,
@@ -70,6 +72,8 @@ export function sendCreatureBaselines(
     serializeCreoBaseline3(creature),
     serializeCreoBaseline4(creature),
     serializeCreoBaseline6(creature),
+    serializeCreoBaseline8(creature),
+    serializeCreoBaseline9(creature),
   ];
 
   for (const baseline of baselines) {

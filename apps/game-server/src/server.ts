@@ -32,6 +32,8 @@ import {
   serializeSceneEndBaselines,
   createServerTimeMessage,
   serializeServerTimeMessage,
+  createUpdateContainment,
+  serializeUpdateContainment,
 } from '@swg/protocol/swg/messages/zone-messages.js';
 import {
   ConnectionMessageOpcode,
@@ -45,7 +47,7 @@ import {
   deserializeClientRandomNameRequest,
 } from '@swg/protocol/swg/messages/character-creation.js';
 import { serializeHeartBeat } from '@swg/protocol/swg/messages/character-messages.js';
-import { createClientPermissionsMessage } from '@swg/protocol/swg/messages/object-messages.js';
+import { createClientPermissionsMessage, createUpdatePvpStatusMessage } from '@swg/protocol/swg/messages/object-messages.js';
 import {
   createChatServerStatus,
   serializeChatServerStatus,
@@ -53,8 +55,14 @@ import {
 import {
   PlayerObject as PlayerObjectClass,
   calculateTemplateCrc,
+  TemplateCrc,
 } from '@swg/objects';
 import { Posture } from '@swg/protocol';
+import {
+  createParametersMessage,
+  serializeParametersMessage,
+} from '@swg/protocol/swg/messages/world-messages.js';
+import { createUpdatePostureMessage } from '@swg/protocol/swg/messages/posture.js';
 
 import {
   MovementHandler,
@@ -507,6 +515,11 @@ export async function createServer(config: ServerConfig): Promise<GameServer> {
 
   // -----------------------------------------------------------------------
   // Zone-in packet sequence
+  // Matches C++ server pcap: ParametersMessage → CmdStartScene →
+  // SceneCreateObjectByCrc(CREO) → CREO baselines 1,3,4,6,8,9 →
+  // SceneCreateObjectByCrc(PLAY) → UpdateContainment → PLAY baselines 3,6,8,9 →
+  // SceneEndBaselines(PLAY) → UpdatePvpStatus → UpdatePosture →
+  // SceneEndBaselines(CREO) → ServerTimeMessage
   // -----------------------------------------------------------------------
   async function sendZoneInSequence(
     playerObj: PlayerObjectClass,
@@ -518,17 +531,22 @@ export async function createServer(config: ServerConfig): Promise<GameServer> {
     },
     send: SendReliable,
   ): Promise<void> {
-    const objectId = playerObj.objectId;
-    console.log(`[GameServer] Sending zone-in for ${objectId} to ${character.sceneId} (${character.x}, ${character.y}, ${character.z})`);
+    const creoId = playerObj.objectId;
+    // PLAY is a separate object with its own ID (C++ allocates these independently)
+    const playId = creoId + 1n;
+    console.log(`[GameServer] Sending zone-in for CREO=${creoId} PLAY=${playId} to ${character.sceneId} (${character.x}, ${character.y}, ${character.z})`);
 
     const templatePath = character.templateName || 'object/creature/player/shared_human_male.iff';
     const galacticTime = BigInt(Math.floor(Date.now() / 1000));
     const serverEpoch = Math.floor(Date.now() / 1000);
 
-    // 1. CmdStartScene — sceneName is the terrain file path, not just the scene ID
+    // 1. ParametersMessage — tells client weather update interval (required)
+    send(serializeParametersMessage(createParametersMessage(900)));
+
+    // 2. CmdStartScene — triggers the client loading screen
     const terrainFile = `terrain/${character.sceneId}.trn`;
     send(serializeCmdStartScene(createCmdStartScene(
-      objectId,
+      creoId,
       terrainFile,
       character.x, character.y, character.z,
       0,
@@ -537,28 +555,49 @@ export async function createServer(config: ServerConfig): Promise<GameServer> {
       serverEpoch,
     )));
 
-    // 2. SceneCreateObjectByCrc
+    // 3. SceneCreateObjectByCrc — create the CREO (creature) object
     send(serializeSceneCreateObjectByCrc(createSceneCreateObjectByCrc(
-      objectId,
+      creoId,
       playerObj.templateCrc,
       character.x, character.y, character.z,
       character.orientationX, character.orientationY, character.orientationZ, character.orientationW,
       false,
     )));
 
-    // 3. CREO baselines (1, 3, 4, 6)
-    sendCreatureBaselines(playerObj, objectId, send);
+    // 4. CREO baselines (1, 3, 4, 6, 8, 9) — all 6 packages
+    sendCreatureBaselines(playerObj, creoId, send);
 
-    // 4. PLAY baselines (3, 6, 8, 9)
-    sendPlayerBaselines(playerObj, objectId, send);
+    // 5. SceneCreateObjectByCrc — create the PLAY object (separate from CREO)
+    send(serializeSceneCreateObjectByCrc(createSceneCreateObjectByCrc(
+      playId,
+      TemplateCrc.PLAYER_OBJECT,
+      0, 0, 0,  // PLAY object has no world position
+      0, 0, 0, 1, // identity quaternion
+      false,
+    )));
 
-    // 5. SceneEndBaselines
-    send(serializeSceneEndBaselines(createSceneEndBaselines(objectId)));
+    // 6. UpdateContainment — link PLAY to CREO (slot -1 = no specific slot)
+    send(serializeUpdateContainment(createUpdateContainment(playId, creoId, -1)));
 
-    // 6. ServerTimeMessage
+    // 7. PLAY baselines (3, 6, 8, 9) — sent to PLAY objectId
+    sendPlayerBaselines(playerObj, playId, send);
+
+    // 8. SceneEndBaselines for PLAY object
+    send(serializeSceneEndBaselines(createSceneEndBaselines(playId)));
+
+    // 9. UpdatePvpStatusMessage for player (flags: IsPlayer=0x10)
+    send(createUpdatePvpStatusMessage(0x10, 0, creoId));
+
+    // 10. UpdatePostureMessage for player
+    send(createUpdatePostureMessage(Posture.UPRIGHT, creoId));
+
+    // 11. SceneEndBaselines for CREO object (comes AFTER all child objects)
+    send(serializeSceneEndBaselines(createSceneEndBaselines(creoId)));
+
+    // 12. ServerTimeMessage — synchronize the client clock
     send(serializeServerTimeMessage(createServerTimeMessage(BigInt(Math.floor(Date.now() / 1000)))));
 
-    console.log(`[GameServer] Zone-in sequence sent for ${objectId}`);
+    console.log(`[GameServer] Zone-in sequence sent for CREO=${creoId} PLAY=${playId}`);
   }
 
   // -----------------------------------------------------------------------
