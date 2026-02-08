@@ -7,9 +7,12 @@
  * selection, and zone-in.  This server merges that role with the GameServer.
  */
 
+import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import type { ServerConfig } from '@swg/config';
 import { initDb, CharacterRepository, ObjectRepository } from '@swg/database';
 import { getRedisClient, SessionStore } from '@swg/redis';
+import { DataTableManager, BuildoutLoader } from '@swg/datatable';
 import {
   SessionManager,
   type Session,
@@ -173,6 +176,14 @@ export async function createServer(config: ServerConfig): Promise<GameServer> {
     defaultTtlSeconds: config.gameServer?.sessionTimeout ?? 3600,
   });
 
+  // Initialize DataTableManager
+  const thisDir = typeof import.meta.dirname === 'string'
+    ? import.meta.dirname
+    : fileURLToPath(new URL('.', import.meta.url));
+  const dataRoot = process.env['DATA_ROOT'] ?? resolve(thisDir, '../../..', 'data/serverdata');
+  DataTableManager.install(dataRoot);
+  const buildoutLoader = new BuildoutLoader(DataTableManager.getInstance());
+
   // Create character creation handler
   const characterCreationHandler = createCharacterCreationHandler(
     characterRepository,
@@ -183,9 +194,13 @@ export async function createServer(config: ServerConfig): Promise<GameServer> {
   // Create zone service
   const zoneService = createZoneService(objectRepository, {
     viewDistance: config.gameServer?.viewDistance ?? 192,
-    autoLoadZones: ['tatooine', 'naboo', 'corellia'],
+    autoLoadZones: [
+      'tatooine', 'naboo', 'corellia', 'talus', 'rori',
+      'dantooine', 'dathomir', 'endor', 'lok', 'yavin4',
+    ],
     enableAutoSave: true,
     autoSaveInterval: 300000,
+    buildoutLoader,
   });
 
   // Create spawn manager

@@ -163,7 +163,7 @@ export class VendorManager {
   private readonly options: Required<VendorManagerOptions>;
 
   /** Maintenance tick timer */
-  private maintenanceTimer?: ReturnType<typeof setInterval>;
+  private maintenanceTimer: ReturnType<typeof setInterval> | undefined;
 
   /** Sale notification callbacks */
   private readonly saleCallbacks: Set<VendorSaleCallback>;

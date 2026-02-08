@@ -13,6 +13,7 @@ import {
 } from '@swg/world';
 import { SceneObject } from '@swg/objects';
 import { ObjectRepository } from '@swg/database';
+import type { BuildoutLoader } from '@swg/datatable';
 import {
   createCmdStartScene,
   serializeCmdStartScene,
@@ -63,6 +64,8 @@ export interface ZoneServiceOptions {
   enableAutoSave?: boolean;
   /** Auto-save interval in milliseconds */
   autoSaveInterval?: number;
+  /** Buildout loader for loading static world objects from datatables */
+  buildoutLoader?: BuildoutLoader;
 }
 
 /**
@@ -81,8 +84,9 @@ export class ZoneService {
   private readonly viewDistance: number;
   private readonly autoSaveInterval: number;
   private readonly enableAutoSave: boolean;
+  private readonly buildoutLoader: BuildoutLoader | undefined;
   private sendCallback?: SendCallback;
-  private autoSaveTimer?: ReturnType<typeof setInterval>;
+  private autoSaveTimer: ReturnType<typeof setInterval> | undefined;
   private initialized: boolean = false;
 
   constructor(
@@ -95,6 +99,7 @@ export class ZoneService {
     this.viewDistance = options.viewDistance ?? 192;
     this.autoSaveInterval = options.autoSaveInterval ?? 300000; // 5 minutes
     this.enableAutoSave = options.enableAutoSave ?? true;
+    this.buildoutLoader = options.buildoutLoader;
   }
 
   /**
@@ -199,6 +204,9 @@ export class ZoneService {
 
     // Load persistent objects from database
     await this.loadZoneObjects(sceneId);
+
+    // Load static buildout objects from datatables
+    this.loadBuildoutObjects(sceneId, zone);
 
     console.log(
       `[ZoneService] Zone ${sceneId} loaded with ${zone.objectCount} objects`
@@ -540,6 +548,41 @@ export class ZoneService {
         error
       );
       return [];
+    }
+  }
+
+  /**
+   * Load static buildout objects from datatables into the zone
+   */
+  private loadBuildoutObjects(sceneId: string, zone: Zone): void {
+    if (!this.buildoutLoader) return;
+
+    try {
+      const objects = this.buildoutLoader.loadBuildoutObjects(sceneId);
+      let count = 0;
+      for (const obj of objects) {
+        // Skip objects inside cells/interiors for now
+        if (obj.containerId !== 0) continue;
+
+        const worldObj: WorldSceneObject = {
+          id: BigInt(obj.objId >>> 0), // unsigned 32-bit to bigint
+          x: obj.position.x,
+          y: obj.position.y,
+          z: obj.position.z,
+          templateId: obj.sharedTemplateCrc,
+          active: true,
+        };
+
+        try {
+          zone.addObject(worldObj);
+          count++;
+        } catch {
+          // Object out of bounds or duplicate ID — skip silently
+        }
+      }
+      console.log(`[ZoneService] Loaded ${count} buildout objects for ${sceneId}`);
+    } catch (error) {
+      console.error(`[ZoneService] Error loading buildout for ${sceneId}:`, error);
     }
   }
 

@@ -7,7 +7,7 @@
 
 import { readFile, writeFile, mkdir, readdir, stat } from 'node:fs/promises';
 import { resolve, join, relative, dirname, extname } from 'node:path';
-import { parseDataTable, type DataTableResult } from './datatable-parser.js';
+import { parseDataTable, type DataTableResult } from '@swg/datatable';
 
 export interface ConversionStats {
   processed: number;

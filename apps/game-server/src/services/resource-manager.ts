@@ -176,16 +176,16 @@ export class ResourceManager {
   private onDespawnedCallbacks: Set<ResourceDespawnedCallback> = new Set();
 
   /** Persistence provider */
-  private persistenceProvider?: ResourcePersistenceProvider;
+  private persistenceProvider: ResourcePersistenceProvider | undefined;
 
   /** Auto rotation timer */
-  private rotationTimer?: ReturnType<typeof setInterval>;
+  private rotationTimer: ReturnType<typeof setInterval> | undefined;
 
   /** Initialization state */
   private initialized = false;
 
   /** Configuration options */
-  private readonly options: Required<Omit<ResourceManagerOptions, 'persistenceProvider'>> & Pick<ResourceManagerOptions, 'persistenceProvider'>;
+  private readonly options: Required<Omit<ResourceManagerOptions, 'persistenceProvider'>> & { persistenceProvider?: ResourcePersistenceProvider | undefined };
 
   /** Last rotation timestamp */
   private lastRotationTime: Date | null = null;
@@ -428,7 +428,7 @@ export class ResourceManager {
         expiresAt,
         isActive: true,
         serverId: this.options.serverId,
-        seed: options.seed,
+        ...(options.seed !== undefined ? { seed: options.seed } : {}),
       }
     );
 
@@ -508,7 +508,7 @@ export class ResourceManager {
     const classId = spawn.resourceInstance.resourceClass.classId;
     const history = this.spawnHistory.get(classId);
     if (history && history.entries.length > 0) {
-      const lastEntry = history.entries[history.entries.length - 1];
+      const lastEntry = history.entries[history.entries.length - 1]!;
       if (lastEntry.despawnedAt === null) {
         lastEntry.despawnedAt = new Date();
       }

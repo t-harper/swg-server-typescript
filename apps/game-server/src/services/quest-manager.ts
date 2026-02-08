@@ -179,7 +179,7 @@ export interface QuestManagerOptions {
 export interface QuestOperationResult {
   success: boolean;
   resultCode: number;
-  message?: string;
+  message?: string | undefined;
   data?: unknown;
 }
 

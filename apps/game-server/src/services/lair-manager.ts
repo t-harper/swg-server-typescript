@@ -32,9 +32,9 @@ export interface ActiveLairInfo {
   /** Time lair was created */
   createdTime: number;
   /** Pending respawn timer */
-  respawnTimer?: ReturnType<typeof setTimeout>;
+  respawnTimer?: ReturnType<typeof setTimeout> | undefined;
   /** Wave spawn timer */
-  waveTimer?: ReturnType<typeof setTimeout>;
+  waveTimer?: ReturnType<typeof setTimeout> | undefined;
 }
 
 /**
@@ -103,7 +103,7 @@ export class LairManager {
   private readonly options: Required<LairManagerOptions>;
 
   /** Tick timer reference */
-  private tickTimer?: ReturnType<typeof setInterval>;
+  private tickTimer: ReturnType<typeof setInterval> | undefined;
 
   /** Destruction event callbacks */
   private readonly destructionCallbacks: Set<LairDestructionCallback>;

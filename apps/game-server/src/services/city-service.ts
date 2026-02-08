@@ -136,17 +136,17 @@ export class CityService {
   private readonly options: Required<CityServiceOptions>;
 
   /** Persistence provider */
-  private persistenceProvider?: CityPersistenceProvider;
+  private persistenceProvider: CityPersistenceProvider | undefined;
 
   // ============================================
   // Timers and State
   // ============================================
 
   /** Upkeep processing timer */
-  private upkeepTimer?: ReturnType<typeof setInterval>;
+  private upkeepTimer: ReturnType<typeof setInterval> | undefined;
 
   /** Election processing timer */
-  private electionTimer?: ReturnType<typeof setInterval>;
+  private electionTimer: ReturnType<typeof setInterval> | undefined;
 
   /** Initialization flag */
   private initialized: boolean = false;
@@ -731,7 +731,7 @@ export class CityService {
   /**
    * Process election results for a city
    */
-  processElection(cityId: bigint): CityOperationResult & { winnerId?: ObjectId; winnerName?: string } {
+  processElection(cityId: bigint): CityOperationResult & { winnerId?: ObjectId | undefined; winnerName?: string | undefined } {
     const city = this.cities.get(cityId);
     if (!city) {
       return {

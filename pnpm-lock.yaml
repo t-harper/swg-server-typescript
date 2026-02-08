@@ -106,6 +106,9 @@ importers:
       '@swg/database':
         specifier: workspace:*
         version: link:../../packages/database
+      '@swg/datatable':
+        specifier: workspace:*
+        version: link:../../packages/datatable
       '@swg/game-logic':
         specifier: workspace:*
         version: link:../../packages/game-logic
@@ -238,6 +241,18 @@ importers:
         specifier: ^2.1.0
         version: 2.1.9(@types/node@22.19.9)
 
+  packages/datatable:
+    devDependencies:
+      '@types/node':
+        specifier: ^22.10.0
+        version: 22.19.9
+      typescript:
+        specifier: ^5.7.0
+        version: 5.9.3
+      vitest:
+        specifier: ^2.1.0
+        version: 2.1.9(@types/node@22.19.9)
+
   packages/game-logic:
     dependencies:
       '@swg/objects':
@@ -335,6 +350,9 @@ importers:
 
   tools/data-importer:
     dependencies:
+      '@swg/datatable':
+        specifier: workspace:*
+        version: link:../../packages/datatable
       '@swg/shared-types':
         specifier: workspace:*
         version: link:../../packages/shared-types

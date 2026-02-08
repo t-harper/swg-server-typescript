@@ -100,15 +100,15 @@ export interface GeneratedMission extends MissionData {
   /** Terminal that generated this mission */
   terminalId: bigint;
   /** Faction requirement (if any) */
-  faction?: FactionValue;
+  faction?: FactionValue | undefined;
   /** Minimum level requirement */
   minLevel: number;
   /** Target template for destroy missions */
-  targetTemplate?: string;
+  targetTemplate?: string | undefined;
   /** Pickup location for delivery missions */
-  pickupLocation?: MissionLocation;
+  pickupLocation?: MissionLocation | undefined;
   /** Destination for delivery missions */
-  deliveryLocation?: MissionLocation;
+  deliveryLocation?: MissionLocation | undefined;
 }
 
 /**

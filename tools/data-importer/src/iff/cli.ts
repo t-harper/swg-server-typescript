@@ -14,7 +14,7 @@ import {
   calculateCrc32,
   type CrcTable,
 } from './crc-table.js';
-import { parseDataTable } from './datatable-parser.js';
+import { parseDataTable } from '@swg/datatable';
 import { DataTableConverter } from './datatable-converter.js';
 
 /**
