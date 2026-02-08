@@ -28,6 +28,8 @@ export const LoginMessageOpcode = {
   ServerNowEpochTime: 0x24b73893,
   /** GenericValueTypeMessage<set<string>> - disabled cluster names */
   CharacterCreationDisabled: 0xf41a5265,
+  /** GenericValueTypeMessage<int32> - station has jedi slot flag */
+  StationIdHasJediSlot: 0xcc9fccf8,
   /** Client request for extended cluster info */
   RequestExtendedClusterInfo: 0x8e33ed05,
 } as const;
@@ -92,7 +94,7 @@ export interface CharacterData {
   objectTemplateCrc: number;
   characterId: bigint;
   clusterId: number;
-  characterType: number; // 0 = normal, 1 = jedi, etc.
+  characterType: number; // 1 = normal, 2 = jedi, 3 = spectral
 }
 
 /**
@@ -401,5 +403,17 @@ export function serializeCharacterCreationDisabled(disabledClusters: string[]): 
   for (const name of disabledClusters) {
     writer.writeStringWithLength16LE(name);
   }
+  return writer.toBuffer();
+}
+
+/**
+ * Serialize StationIdHasJediSlot message
+ * GenericValueTypeMessage<int32> sent before EnumerateCharacterId response
+ */
+export function serializeStationIdHasJediSlot(stationIdHasJediSlot: number): Uint8Array {
+  const writer = new BufferWriter(10);
+  writer.writeUInt16LE(2); // operandCount: cmd + value
+  writer.writeUInt32LE(LoginMessageOpcode.StationIdHasJediSlot);
+  writer.writeInt32LE(stationIdHasJediSlot);
   return writer.toBuffer();
 }

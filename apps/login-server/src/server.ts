@@ -21,6 +21,7 @@ import {
   getLoginMessageOpcode,
   serializeServerNowEpochTime,
   serializeCharacterCreationDisabled,
+  serializeStationIdHasJediSlot,
 } from '@swg/protocol/swg/messages/login-messages.js';
 import {
   CharacterCreationOpcode,
@@ -64,6 +65,7 @@ interface LoginSession {
   accountId?: number;
   stationId?: bigint;
   sessionToken?: string;
+  extendedClusterInfoRequested?: boolean;
   clusterConfig?: {
     clusterId: number;
     clusterName: string;
@@ -208,6 +210,49 @@ export async function createServer(config: ServerConfig): Promise<LoginServer> {
     const loginSession = getLoginSession(soeSession);
     const opcode = getLoginMessageOpcode(data);
 
+    const serializeExtendedClusterInfo = (): Uint8Array => {
+      const clusterConfig = loginSession.clusterConfig ?? {
+        clusterId: config.clusterIdNumeric ?? serverId,
+        clusterName: config.clusterName ?? 'SWG Server',
+        connectionServerAddress:
+          config.connectionServer?.publicAddress ??
+          config.connectionServer?.bindAddress ??
+          '127.0.0.1',
+        connectionServerPort: config.connectionServer?.port ?? 44455,
+      };
+
+      const clusterStatusEx = createLoginClusterStatusEx([{
+        clusterId: clusterConfig.clusterId,
+        branch: 'swg-main',
+        networkVersion: '20100225-17:43',
+        version: 0,
+        reserved1: 0,
+        reserved2: 0,
+        reserved3: 0,
+        reserved4: 0,
+      }]);
+
+      return serializeLoginClusterStatusEx(clusterStatusEx);
+    };
+
+    const sendExtendedClusterInfo = (): void => {
+      sessionManager.sendReliable(soeSession, serializeExtendedClusterInfo());
+    };
+
+    const sendAvatarList = async (): Promise<void> => {
+      const avatarResult = await characterHandler.handleEnumerateCharacterId(
+        loginSession.clientSession
+      );
+
+      // C++ sends this pair proactively after auth/database avatar lookup.
+      // StationIdHasJediSlot must immediately precede EnumerateCharacterId.
+      const stationIdHasJediSlot = serializeStationIdHasJediSlot(0);
+      sessionManager.sendReliableGroup(soeSession, [
+        stationIdHasJediSlot,
+        avatarResult.response,
+      ]);
+    };
+
     try {
       switch (opcode) {
         case LoginMessageOpcode.LoginClientId: {
@@ -236,7 +281,9 @@ export async function createServer(config: ServerConfig): Promise<LoginServer> {
             // The C++ server bundles these in one Data packet using UdpPacketGroup (0x00 0x19).
             // The client expects them to arrive atomically — sending LoginClientToken
             // before LoginEnumCluster causes a crash (client accesses uninitialized cluster data).
-            const maxChars = config.maxCharsPerAccount ?? 2;
+            const maxChars = config.maxCharsPerAccount ?? 20;
+            const loginTimeZoneSeconds = -18000; // US Eastern offset used in legacy captures
+            const maxCharsStatus = Math.min(maxChars, 10);
             const clusterConfig = {
               clusterId: config.clusterIdNumeric ?? serverId,
               clusterName: config.clusterName ?? 'SWG Server',
@@ -250,7 +297,11 @@ export async function createServer(config: ServerConfig): Promise<LoginServer> {
             const epochTime = Math.floor(Date.now() / 1000);
 
             const enumCluster = createLoginEnumCluster(
-              [{ clusterId: clusterConfig.clusterId, clusterName: clusterConfig.clusterName, timeZone: 0 }],
+              [{
+                clusterId: clusterConfig.clusterId,
+                clusterName: clusterConfig.clusterName,
+                timeZone: loginTimeZoneSeconds,
+              }],
               maxChars
             );
 
@@ -259,39 +310,40 @@ export async function createServer(config: ServerConfig): Promise<LoginServer> {
               connectionServerAddress: clusterConfig.connectionServerAddress,
               connectionServerPort: clusterConfig.connectionServerPort,
               pingPort: clusterConfig.connectionServerPort,
-              populationOnline: 0,
+              populationOnline: -1,
               populationStatusLoaded: 0,
-              maxCharactersPerAccount: maxChars,
-              timeZone: 0,
+              maxCharactersPerAccount: maxCharsStatus,
+              timeZone: loginTimeZoneSeconds,
               status: 2, // 2 = online/up
-              notRecommended: false,
-              onlinePlayerLimit: 3000,
-              onlineFreeTrialLimit: 3000,
+              notRecommended: true,
+              onlinePlayerLimit: 100,
+              onlineFreeTrialLimit: 0xfffffc19,
+              reserved: 0,
             }]);
 
-            const clusterStatusEx = createLoginClusterStatusEx([{
-              clusterId: clusterConfig.clusterId,
-              branch: 'swg-main',
-              networkVersion: '20100225-17:43',
-              version: 0,
-              reserved1: 0,
-              reserved2: 0,
-              reserved3: 0,
-              reserved4: 0,
-            }]);
-
-            // Send all 6 messages as a single atomic group (matches C++ server order)
+            // Send all login response messages in one atomic SOE Data packet.
+            // This matches C++ behavior and avoids client-side ordering hazards.
             const loginResponseMessages = [
               serializeServerNowEpochTime(epochTime),
-              result.response,                                    // LoginClientToken
+              result.response,
               serializeLoginEnumCluster(enumCluster),
               serializeCharacterCreationDisabled([]),
               serializeLoginClusterStatus(clusterStatus),
-              serializeLoginClusterStatusEx(clusterStatusEx),
             ];
 
-            console.log(`[LoginServer] Sending login response group: ${loginResponseMessages.length} messages`);
+            if (loginSession.extendedClusterInfoRequested) {
+              // Match C++ grouping behavior when RequestExtendedClusterInfo arrives
+              // in the same frame as LoginClientId.
+              loginResponseMessages.push(serializeExtendedClusterInfo());
+              loginSession.extendedClusterInfoRequested = false;
+            }
+
+            console.log(`[LoginServer] Sending login response: ${loginResponseMessages.length} grouped messages`);
             sessionManager.sendReliableGroup(soeSession, loginResponseMessages);
+
+            // C++ does an async DB request and sends avatar list without a client-side
+            // EnumerateCharacterId request; mirror that behavior.
+            void sendAvatarList();
           } else {
             // Auth failed - disconnect the client
             sessionManager.disconnectSession(soeSession, DisconnectReason.Application);
@@ -306,8 +358,13 @@ export async function createServer(config: ServerConfig): Promise<LoginServer> {
             loginSession.clientSession
           );
 
-          // Send response using reliable delivery
-          sessionManager.sendReliable(soeSession, result.response);
+          // Match C++ ordering: StationIdHasJediSlot MUST precede EnumerateCharacterId.
+          // The client expects this pair together in one grouped reliable packet.
+          const stationIdHasJediSlot = serializeStationIdHasJediSlot(0);
+          sessionManager.sendReliableGroup(soeSession, [
+            stationIdHasJediSlot,
+            result.response,
+          ]);
           break;
         }
 
@@ -356,8 +413,13 @@ export async function createServer(config: ServerConfig): Promise<LoginServer> {
         }
 
         case LoginMessageOpcode.RequestExtendedClusterInfo: {
-          console.log(`[LoginServer] RequestExtendedClusterInfo from ${clientKey} (ignoring for now)`);
-          // TODO: respond with LoginClusterStatusEx after auth flow completes
+          console.log(`[LoginServer] RequestExtendedClusterInfo from ${clientKey}`);
+          if (loginSession.authenticated) {
+            sendExtendedClusterInfo();
+          } else {
+            // Client can pipeline this before auth completes; defer until login success.
+            loginSession.extendedClusterInfoRequested = true;
+          }
           break;
         }
 
@@ -399,6 +461,32 @@ export async function createServer(config: ServerConfig): Promise<LoginServer> {
     const key = session.getKey();
     console.log(`[LoginServer] Session connected: ${key}`);
     getLoginSession(session);
+
+    // Send proactive GameServerLagResponse + SystemAssignedProcessId (matches C++ server behavior).
+    // The C++ login server sends these as Data seq=0 immediately after session setup,
+    // before the client sends LoginClientId. This makes the login response Data seq=1.
+    const processId = process.pid;
+    const serverName = `LoginServer:${processId}`;
+
+    // GameServerLagResponse (0x0e20d7e9): operandCount(u16LE) + opcode(u32LE) + serverName(string)
+    const lagRespBuf = new ArrayBuffer(2 + 4 + 2 + serverName.length);
+    const lagResp = new DataView(lagRespBuf);
+    lagResp.setUint16(0, 2, true); // operandCount=2
+    lagResp.setUint32(2, 0x0e20d7e9, true); // opcode
+    lagResp.setUint16(6, serverName.length, true); // string length
+    const lagRespBytes = new Uint8Array(lagRespBuf);
+    for (let i = 0; i < serverName.length; i++) {
+      lagRespBytes[8 + i] = serverName.charCodeAt(i);
+    }
+
+    // SystemAssignedProcessId (0x58c07f21): operandCount(u16LE) + opcode(u32LE) + processId(u32LE)
+    const pidBuf = new ArrayBuffer(2 + 4 + 4);
+    const pidView = new DataView(pidBuf);
+    pidView.setUint16(0, 2, true); // operandCount=2
+    pidView.setUint32(2, 0x58c07f21, true); // opcode
+    pidView.setUint32(6, processId, true); // processId
+
+    sessionManager.sendReliableGroup(session, [lagRespBytes, new Uint8Array(pidBuf)]);
   });
 
   // Handle disconnections

@@ -4,7 +4,7 @@ export const ObjectMessageOpcodes = {
   AttributeListMessage: 0xf35dbfbe,
   SceneCreateObjectByName: 0x32d0e73b,
   ClientOpenContainerMessage: 0xd61fe1ea,
-  ClientPermissionsMessage: 0x09f0cdbb,
+  ClientPermissionsMessage: 0xe00730e5,
   UpdatePvpStatusMessage: 0x08a1c126,
   ConsentResponseMessage: 0x371d2925,
   UpdateCellPermissionMessage: 0xf612499c,
@@ -226,20 +226,22 @@ export function createClientOpenContainerMessage(
 
 export interface ClientPermissionsMessage {
   canLogin: boolean;
-  canCreateCharacter: boolean;
-  canCreateOverlimitCharacter: boolean;
+  canCreateRegularCharacter: boolean;
+  canCreateJediCharacter: boolean;
+  canSkipTutorial: boolean;
 }
 
 export function serializeClientPermissionsMessage(msg: ClientPermissionsMessage): Uint8Array {
   const writer = new BufferWriter();
 
-  // operandCount = 3
-  writer.writeUInt16LE(3);
+  // operandCount = 4
+  writer.writeUInt16LE(4);
   writer.writeUInt32LE(ObjectMessageOpcodes.ClientPermissionsMessage);
 
   writer.writeUInt8(msg.canLogin ? 1 : 0);
-  writer.writeUInt8(msg.canCreateCharacter ? 1 : 0);
-  writer.writeUInt8(msg.canCreateOverlimitCharacter ? 1 : 0);
+  writer.writeUInt8(msg.canCreateRegularCharacter ? 1 : 0);
+  writer.writeUInt8(msg.canCreateJediCharacter ? 1 : 0);
+  writer.writeUInt8(msg.canSkipTutorial ? 1 : 0);
 
   return writer.toBuffer();
 }
@@ -252,21 +254,29 @@ export function deserializeClientPermissionsMessage(data: Uint8Array): ClientPer
   reader.readUInt32LE();
 
   const canLogin = reader.readUInt8() !== 0;
-  const canCreateCharacter = reader.readUInt8() !== 0;
-  const canCreateOverlimitCharacter = reader.readUInt8() !== 0;
+  const canCreateRegularCharacter = reader.readUInt8() !== 0;
+  const canCreateJediCharacter = reader.readUInt8() !== 0;
+  const canSkipTutorial = reader.readUInt8() !== 0;
 
-  return { canLogin, canCreateCharacter, canCreateOverlimitCharacter };
+  return {
+    canLogin,
+    canCreateRegularCharacter,
+    canCreateJediCharacter,
+    canSkipTutorial,
+  };
 }
 
 export function createClientPermissionsMessage(
   canLogin: boolean,
-  canCreateCharacter: boolean,
-  canCreateOverlimitCharacter: boolean
+  canCreateRegularCharacter: boolean,
+  canCreateJediCharacter: boolean,
+  canSkipTutorial: boolean
 ): Uint8Array {
   return serializeClientPermissionsMessage({
     canLogin,
-    canCreateCharacter,
-    canCreateOverlimitCharacter,
+    canCreateRegularCharacter,
+    canCreateJediCharacter,
+    canSkipTutorial,
   });
 }
 

@@ -99,16 +99,24 @@ wait_for_service() {
     local port="$2"
     local name="$3"
     local max_attempts="${4:-30}"
+    local protocol="${5:-tcp}"
     local attempt=1
 
     if [ -z "$host" ] || [ -z "$port" ]; then
         return 0
     fi
 
-    log_info "Waiting for ${name} at ${host}:${port}..."
+    log_info "Waiting for ${name} at ${host}:${port} (${protocol})..."
 
     while [ $attempt -le $max_attempts ]; do
-        if nc -z "$host" "$port" 2>/dev/null; then
+        if [ "$protocol" = "udp" ]; then
+            # UDP "open" checks are best-effort. Prefer a successful probe,
+            # but accept DNS-resolvable service names to avoid false negatives.
+            if nc -zu -w 1 "$host" "$port" 2>/dev/null || getent hosts "$host" >/dev/null 2>&1; then
+                log_info "${name} is available after ${attempt} seconds"
+                return 0
+            fi
+        elif nc -z "$host" "$port" 2>/dev/null; then
             log_info "${name} is available after ${attempt} seconds"
             return 0
         fi
@@ -220,11 +228,11 @@ main() {
 
     # Wait for other internal services if needed
     if [ -n "$CHAT_SERVER_HOST" ] && [ -n "$CHAT_SERVER_PORT" ]; then
-        wait_for_service "$CHAT_SERVER_HOST" "$CHAT_SERVER_PORT" "Chat Server" 60
+        wait_for_service "$CHAT_SERVER_HOST" "$CHAT_SERVER_PORT" "Chat Server" 60 tcp
     fi
 
     if [ -n "$CONNECTION_SERVER_HOST" ] && [ -n "$CONNECTION_SERVER_PORT" ]; then
-        wait_for_service "$CONNECTION_SERVER_HOST" "$CONNECTION_SERVER_PORT" "Connection Server" 60
+        wait_for_service "$CONNECTION_SERVER_HOST" "$CONNECTION_SERVER_PORT" "Connection Server" 60 udp
     fi
 
     # Run database migrations

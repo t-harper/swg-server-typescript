@@ -98,14 +98,15 @@ RUN mkdir -p /app/logs /app/data && \
 # Environment
 ENV NODE_ENV=production
 ENV SERVER_TYPE=game-server
-ENV GAME_SERVER_PORT=44460
+ENV GAME_SERVER_PORT=44463
+ENV GAME_PORT=44463
 
 # Expose dynamic UDP port (can be configured via environment)
-EXPOSE 44460/udp
+EXPOSE 44463/udp
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
-    CMD /usr/local/bin/healthcheck.sh game-server ${GAME_SERVER_PORT:-44460}
+    CMD /usr/local/bin/healthcheck.sh game-server ${GAME_PORT:-44463}
 
 # Labels
 LABEL org.opencontainers.image.title="SWG Game Server"

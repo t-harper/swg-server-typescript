@@ -112,7 +112,7 @@ check_chat_server() {
 }
 
 check_game_server() {
-    local port="${1:-44460}"
+    local port="${1:-44463}"
 
     # Check if UDP port is listening
     if ! check_udp_port "$port"; then

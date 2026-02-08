@@ -25,6 +25,13 @@ import {
   deserializeSelectCharacter,
   getConnectionMessageOpcode,
 } from '@swg/protocol/swg/messages/connection-messages.js';
+import { BufferWriter } from '@swg/protocol/soe/buffer-utils.js';
+import { serializeHeartBeat } from '@swg/protocol/swg/messages/character-messages.js';
+import { createClientPermissionsMessage } from '@swg/protocol/swg/messages/object-messages.js';
+import {
+  createChatServerStatus,
+  serializeChatServerStatus,
+} from '@swg/protocol/swg/messages/chat/chat-core.js';
 
 import { UdpServer, createUdpServer } from './network/udp-server.js';
 import {
@@ -83,9 +90,52 @@ interface ConnectionSession {
   soeSession: Session;
   clientSession: ClientSession;
   authenticated: boolean;
+  receivedConnectionOpen: boolean;
+  sentPostAuthPackets: boolean;
+  sentPostSelectPackets: boolean;
   accountId?: number;
   stationId?: number;
   sessionToken?: string;
+  gameFeatures?: number;
+  subscriptionFeatures?: number;
+}
+
+const ConnectionServerClientOpcode = {
+  ConnectionOpen: 0x31805ee0,
+} as const;
+
+const ConnectionServerMessageOpcode = {
+  AccountFeatureBits: 0x979f0279,
+  VoiceChatStatus: 0x9e601905,
+} as const;
+
+const DefaultFeatureBits = {
+  game: 0xffffffff,
+  subscription: 0x00000001,
+} as const;
+
+function serializeAccountFeatureBits(
+  gameFeatures: number,
+  subscriptionFeatures: number,
+  connectionServerNumber: number,
+  epochSeconds: number,
+): Uint8Array {
+  const writer = new BufferWriter(32);
+  writer.writeUInt16LE(1); // GenericValueTypeMessage has 1 variable payload
+  writer.writeUInt32LE(ConnectionServerMessageOpcode.AccountFeatureBits);
+  writer.writeUInt32LE(gameFeatures >>> 0);
+  writer.writeUInt32LE(subscriptionFeatures >>> 0);
+  writer.writeInt32LE(connectionServerNumber | 0);
+  writer.writeInt32LE(epochSeconds | 0);
+  return writer.toBuffer();
+}
+
+function serializeVoiceChatStatus(statusCode: number): Uint8Array {
+  const writer = new BufferWriter(16);
+  writer.writeUInt16LE(1);
+  writer.writeUInt32LE(ConnectionServerMessageOpcode.VoiceChatStatus);
+  writer.writeUInt32LE(statusCode >>> 0);
+  return writer.toBuffer();
 }
 
 /**
@@ -176,6 +226,9 @@ export async function createServer(config: ServerConfig): Promise<ConnectionServ
         soeSession,
         clientSession,
         authenticated: false,
+        receivedConnectionOpen: false,
+        sentPostAuthPackets: false,
+        sentPostSelectPackets: false,
       };
 
       connectionSessions.set(key, connSession);
@@ -193,7 +246,7 @@ export async function createServer(config: ServerConfig): Promise<ConnectionServ
   ): Promise<void> {
     const clientKey = soeSession.getKey();
 
-    if (data.length < 4) {
+    if (data.length < 6) {
       console.warn(`[ConnectionServer] SWG message too short from ${clientKey}`);
       return;
     }
@@ -213,6 +266,11 @@ export async function createServer(config: ServerConfig): Promise<ConnectionServ
           break;
         }
 
+        case ConnectionServerClientOpcode.ConnectionOpen: {
+          handleConnectionOpen(connSession, clientKey);
+          break;
+        }
+
         default:
           console.log(
             `[ConnectionServer] Unknown SWG message opcode: 0x${opcode.toString(16)} from ${clientKey}`,
@@ -221,6 +279,107 @@ export async function createServer(config: ServerConfig): Promise<ConnectionServ
     } catch (error) {
       console.error(`[ConnectionServer] Error handling SWG message from ${clientKey}:`, error);
     }
+  }
+
+  function bytesToHex(bytes: Uint8Array): string {
+    return Array.from(bytes)
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('');
+  }
+
+  function tryUnpackLegacyLoginToken(tokenBytes: Uint8Array): Uint8Array | null {
+    // Legacy C++ LoginClientToken format:
+    // u32LE cipherDataLen + u32LE dataLen + cipherData + digest[16]
+    if (tokenBytes.length < 24) {
+      return null;
+    }
+
+    const view = new DataView(
+      tokenBytes.buffer,
+      tokenBytes.byteOffset,
+      tokenBytes.byteLength,
+    );
+    const cipherDataLen = view.getUint32(0, true);
+    const dataLen = view.getUint32(4, true);
+    const expectedLen = 8 + cipherDataLen + 16;
+
+    if (expectedLen !== tokenBytes.length) {
+      return null;
+    }
+
+    // In TS login we preserve Redis token bytes inside cipherData.
+    if (cipherDataLen !== dataLen || dataLen === 0) {
+      return null;
+    }
+
+    return tokenBytes.subarray(8, 8 + dataLen);
+  }
+
+  function sendPostAuthPackets(
+    connSession: ConnectionSession,
+    clientKey: string,
+  ): void {
+    if (!connSession.authenticated || !connSession.receivedConnectionOpen || connSession.sentPostAuthPackets) {
+      return;
+    }
+
+    const accountFeatureBits = serializeAccountFeatureBits(
+      connSession.gameFeatures ?? DefaultFeatureBits.game,
+      connSession.subscriptionFeatures ?? DefaultFeatureBits.subscription,
+      1,
+      Math.floor(Date.now() / 1000),
+    );
+
+    const clientPermissions = createClientPermissionsMessage(
+      true,
+      true,
+      true,
+      true,
+    );
+
+    // Match C++ post-auth ordering seen in packet captures.
+    const postAuthGroup = [
+      serializeHeartBeat(),
+      accountFeatureBits,
+      clientPermissions,
+    ];
+
+    sessionManager.sendReliableGroup(connSession.soeSession, postAuthGroup);
+    connSession.sentPostAuthPackets = true;
+
+    console.log(
+      `[ConnectionServer] Sent post-auth packet group (${postAuthGroup.length} messages) to ${clientKey}`,
+    );
+  }
+
+  function sendPostSelectPackets(
+    connSession: ConnectionSession,
+    clientKey: string,
+  ): void {
+    if (connSession.sentPostSelectPackets) {
+      return;
+    }
+
+    const chatStatus = serializeChatServerStatus(createChatServerStatus(true));
+    // VoiceChatStatus::SC_VoiceEnabled = 0 in C++
+    const voiceStatus = serializeVoiceChatStatus(0);
+
+    sessionManager.sendReliableGroup(connSession.soeSession, [
+      chatStatus,
+      voiceStatus,
+    ]);
+    connSession.sentPostSelectPackets = true;
+
+    console.log(`[ConnectionServer] Sent chat/voice status packets to ${clientKey}`);
+  }
+
+  function handleConnectionOpen(
+    connSession: ConnectionSession,
+    clientKey: string,
+  ): void {
+    connSession.receivedConnectionOpen = true;
+    console.log(`[ConnectionServer] ConnectionOpen from ${clientKey}`);
+    sendPostAuthPackets(connSession, clientKey);
   }
 
   /**
@@ -235,15 +394,20 @@ export async function createServer(config: ServerConfig): Promise<ConnectionServ
 
     const message = deserializeClientIdMsg(data);
 
-    // Convert token bytes to hex string for Redis lookup
-    const tokenHex = [...new Uint8Array(message.token)]
-      .map((b) => b.toString(16).padStart(2, '0'))
-      .join('');
+    const tokenBytes = new Uint8Array(message.token);
+    const unpackedLegacyToken = tryUnpackLegacyLoginToken(tokenBytes);
+    const tokenHex = bytesToHex(unpackedLegacyToken ?? tokenBytes);
 
     console.log(
       `[ConnectionServer] Token received from ${clientKey}, ` +
       `clientVersion: ${message.clientVersion}`,
     );
+    if (unpackedLegacyToken) {
+      console.log(
+        `[ConnectionServer] Unpacked legacy login token envelope: ` +
+        `${tokenBytes.length} -> ${unpackedLegacyToken.length} bytes`,
+      );
+    }
 
     if (!tokenHex || tokenHex.length === 0) {
       console.log(`[ConnectionServer] Empty token from ${clientKey}`);
@@ -280,11 +444,17 @@ export async function createServer(config: ServerConfig): Promise<ConnectionServ
     connSession.accountId = result.session.accountId;
     connSession.stationId = result.session.stationId;
     connSession.sessionToken = tokenHex;
+    connSession.gameFeatures = DefaultFeatureBits.game;
+    connSession.subscriptionFeatures = DefaultFeatureBits.subscription;
 
     console.log(
       `[ConnectionServer] Session authenticated for account ${result.session.accountId} ` +
       `(station: ${result.session.stationId}) from ${clientKey}`,
     );
+
+    // The client sends ConnectionOpen (0x31805ee0) right after ClientIdMsg.
+    // If we've already received it, release the post-auth packet group now.
+    sendPostAuthPackets(connSession, clientKey);
   }
 
   /**
@@ -367,6 +537,9 @@ export async function createServer(config: ServerConfig): Promise<ConnectionServ
         gameServer: routeResult.gameServer,
         timestamp: Date.now(),
       });
+
+      // Match C++ behavior: after character selection, push chat/voice status.
+      sendPostSelectPackets(connSession, clientKey);
     } catch (error) {
       console.error(
         `[ConnectionServer] Error handling SelectCharacter for ${clientKey}:`,
@@ -435,7 +608,17 @@ export async function createServer(config: ServerConfig): Promise<ConnectionServ
 
   // Route all incoming UDP packets through SessionManager
   udpServer.onMessage((data, rinfo) => {
-    sessionManager.handlePacket(new Uint8Array(data), {
+    const packet = new Uint8Array(data);
+
+    // C++ ConnectionServer exposes a lightweight ping endpoint that echoes
+    // short probe packets so the client can measure cluster latency.
+    // Without this, the client hangs after "connection is now open".
+    if (packet.length > 0 && packet.length <= 4) {
+      udpServer.sendAsync(packet, rinfo.address, rinfo.port);
+      return;
+    }
+
+    sessionManager.handlePacket(packet, {
       address: rinfo.address,
       port: rinfo.port,
     });

@@ -20,7 +20,7 @@ export const ChatCoreOpcodes = {
   ChatRemoveAvatarFromRoom: 0x493e3ffa,
   ChatOnLeaveRoom: 0x60b5098b,
   ChatDestroyRoom: 0x094b2a47,
-  ChatServerStatus: 0x1b25c08b,
+  ChatServerStatus: 0x7102b15f,
 } as const;
 
 // Helper interfaces and functions for composite types

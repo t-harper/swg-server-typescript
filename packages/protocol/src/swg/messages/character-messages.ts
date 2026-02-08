@@ -4,7 +4,7 @@ export const CharacterMessageOpcodes = {
   DeleteCharacterMessage: 0xe87ad031,
   DeleteCharacterReplyMessage: 0x8268616c,
   LogoutMessage: 0x42878cb1,
-  HeartBeat: 0xa16cf56c,
+  HeartBeat: 0xa16cf9af,
   CharacterSheetResponseMessage: 0x9b3a17c4,
   RefreshCharacterList: 0x4aaf6e21,
   ErrorMessage: 0xb5abf91a,

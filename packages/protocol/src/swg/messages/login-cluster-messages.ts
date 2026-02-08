@@ -112,6 +112,11 @@ export interface ClusterStatusDataEntry {
   notRecommended: boolean;
   onlinePlayerLimit: number;
   onlineFreeTrialLimit: number;
+  /**
+   * Observed on live C++ wire captures as a trailing u16 (typically 0).
+   * Keeping this preserves packet-for-packet parity for LoginClusterStatus.
+   */
+  reserved?: number;
 }
 
 /**
@@ -137,14 +142,15 @@ export function serializeLoginClusterStatus(message: LoginClusterStatus): Uint8A
     writer.writeStringWithLength16LE(entry.connectionServerAddress);
     writer.writeUInt16LE(entry.connectionServerPort);
     writer.writeUInt16LE(entry.pingPort);
-    writer.writeUInt32LE(entry.populationOnline);
-    writer.writeUInt32LE(entry.populationStatusLoaded);
-    writer.writeUInt32LE(entry.maxCharactersPerAccount);
+    writer.writeInt32LE(entry.populationOnline);
+    writer.writeInt32LE(entry.populationStatusLoaded);
+    writer.writeInt32LE(entry.maxCharactersPerAccount);
     writer.writeInt32LE(entry.timeZone);
-    writer.writeUInt32LE(entry.status);
+    writer.writeInt32LE(entry.status);
     writer.writeUInt8(entry.notRecommended ? 1 : 0);
     writer.writeUInt32LE(entry.onlinePlayerLimit);
     writer.writeUInt32LE(entry.onlineFreeTrialLimit);
+    writer.writeUInt16LE(entry.reserved ?? 0);
   }
 
   return writer.toBuffer();
@@ -169,14 +175,15 @@ export function deserializeLoginClusterStatus(data: Uint8Array): LoginClusterSta
     const connectionServerAddress = reader.readStringWithLength16LE();
     const connectionServerPort = reader.readUInt16LE();
     const pingPort = reader.readUInt16LE();
-    const populationOnline = reader.readUInt32LE();
-    const populationStatusLoaded = reader.readUInt32LE();
-    const maxCharactersPerAccount = reader.readUInt32LE();
+    const populationOnline = reader.readInt32LE();
+    const populationStatusLoaded = reader.readInt32LE();
+    const maxCharactersPerAccount = reader.readInt32LE();
     const timeZone = reader.readInt32LE();
-    const status = reader.readUInt32LE();
+    const status = reader.readInt32LE();
     const notRecommended = reader.readUInt8() !== 0;
     const onlinePlayerLimit = reader.readUInt32LE();
     const onlineFreeTrialLimit = reader.readUInt32LE();
+    const reserved = reader.readUInt16LE();
 
     clusterStatusData.push({
       clusterId,
@@ -191,6 +198,7 @@ export function deserializeLoginClusterStatus(data: Uint8Array): LoginClusterSta
       notRecommended,
       onlinePlayerLimit,
       onlineFreeTrialLimit,
+      reserved,
     });
   }
 

@@ -3,9 +3,11 @@
  * Handles authentication flow for login requests
  */
 
+import { createHash } from 'node:crypto';
 import type { Account } from '@swg/database';
 import { AccountRepository } from '@swg/database';
 import { SessionStore, type SessionData } from '@swg/redis';
+import { BufferWriter } from '@swg/protocol/soe/buffer-utils.js';
 import {
   LoginMessageOpcode,
   type LoginClientId,
@@ -117,15 +119,17 @@ export class LoginHandler {
         `[LoginHandler] Login successful for ${username} (accountId: ${account.accountId})`
       );
 
-      // Convert session token hex string to byte array for AutoArray<u8> format
-      const tokenBytes = new Uint8Array(sessionToken.length);
-      for (let i = 0; i < sessionToken.length; i++) {
-        tokenBytes[i] = sessionToken.charCodeAt(i);
-      }
+      // Convert Redis token hex to bytes.
+      const tokenBytes = this.hexToBytes(sessionToken);
+
+      // Match C++ LoginClientToken payload shape:
+      // AutoArray<u8> carries a packed KeyShare::Token blob.
+      // We preserve Redis interoperability by embedding token bytes in cipherData.
+      const legacyTokenBytes = this.packLegacyLoginToken(tokenBytes);
 
       // Create success response with C++ format: token(AutoArray<u8>) + stationId(u32) + username(string)
       const tokenResponse = createLoginClientToken(
-        tokenBytes,
+        legacyTokenBytes,
         Number(stationId),
         username
       );
@@ -231,6 +235,38 @@ export class LoginHandler {
       account,
       errorMessage: '',
     };
+  }
+
+  private hexToBytes(hex: string): Uint8Array {
+    if (hex.length % 2 !== 0) {
+      throw new Error('Invalid session token hex length');
+    }
+
+    const bytes = new Uint8Array(hex.length / 2);
+    for (let i = 0; i < bytes.length; i++) {
+      const byteHex = hex.substring(i * 2, i * 2 + 2);
+      const parsed = Number.parseInt(byteHex, 16);
+      if (Number.isNaN(parsed)) {
+        throw new Error(`Invalid session token hex at index ${i}`);
+      }
+      bytes[i] = parsed;
+    }
+    return bytes;
+  }
+
+  private packLegacyLoginToken(rawTokenBytes: Uint8Array): Uint8Array {
+    // KeyShare::Token wire layout used by C++ login:
+    // u32LE cipherDataLen + u32LE dataLen + cipherData + digest[16]
+    const writer = new BufferWriter(8 + rawTokenBytes.length + 16);
+    writer.writeUInt32LE(rawTokenBytes.length);
+    writer.writeUInt32LE(rawTokenBytes.length);
+    writer.writeBytes(rawTokenBytes);
+
+    // Digest is opaque to the client; keep deterministic bytes for debugging.
+    const digest = createHash('md5').update(rawTokenBytes).digest();
+    writer.writeBytes(new Uint8Array(digest));
+
+    return writer.toBuffer();
   }
 
   /**

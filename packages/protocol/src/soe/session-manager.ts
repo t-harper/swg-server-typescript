@@ -402,8 +402,8 @@ export class SessionManager extends EventEmitter {
     const crcSeed = this.options.enableEncryption ? generateRandomSeed() : 0;
 
     // Encryption config: match C++ server [1,4] = compression + XOR
-    const encryptMethod0 = 1; // UserSupplied (compression)
-    const encryptMethod1 = 4; // XOR CBC cipher
+    const encryptMethod0 = 1; // UserSupplied (zlib compression with flag byte)
+    const encryptMethod1 = 4; // XOR CBC cipher using CRC seed
 
     // Create new session
     const session = this.createSession(

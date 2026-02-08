@@ -19,9 +19,10 @@ import { TemplateCrc, calculateTemplateCrc } from '@swg/objects';
  * Character type constants
  */
 export const CharacterType = {
-  Normal: 0,
-  Jedi: 1,
-  Spectral: 2,
+  // C++ enum values: CT_normal=1, CT_jedi=2, CT_spectral=3
+  Normal: 1,
+  Jedi: 2,
+  Spectral: 3,
 } as const;
 
 export type CharacterTypeValue = (typeof CharacterType)[keyof typeof CharacterType];

@@ -86,3 +86,6 @@ secrets/
 
 # Docker
 docker/secrets/
+
+# personal pcaps
+docs/pcaps
