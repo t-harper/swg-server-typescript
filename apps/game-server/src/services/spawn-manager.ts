@@ -113,7 +113,7 @@ export class SpawnManager {
   private readonly activeSpawns: Map<string, ActiveSpawn>;
   private readonly objectToSpawn: Map<bigint, string>;
   private readonly defaultRespawnDelay: number;
-  private tickTimer?: ReturnType<typeof setInterval>;
+  private tickTimer: ReturnType<typeof setInterval> | undefined;
   private initialized: boolean = false;
 
   constructor(zoneService: ZoneService, options: SpawnManagerOptions = {}) {
@@ -180,112 +180,12 @@ export class SpawnManager {
   // ============================================
 
   /**
-   * Load default spawn tables
+   * Load default spawn tables.
+   * Static world objects are now loaded from buildout datatables by ZoneService.
+   * Dynamic spawn tables can be registered at runtime via registerSpawnTable().
    */
   private loadDefaultSpawnTables(): void {
-    // Example spawn tables for common creature types
-    // In production, these would be loaded from data files
-
-    // Tatooine desert creatures
-    this.registerSpawnTable({
-      id: 'tatooine_desert',
-      name: 'Tatooine Desert Creatures',
-      entries: [
-        {
-          templateCrc: 0x12345678,
-          templatePath: 'object/mobile/womp_rat.iff',
-          weight: 50,
-          minLevel: 1,
-          maxLevel: 5,
-          name: 'Womp Rat',
-        },
-        {
-          templateCrc: 0x23456789,
-          templatePath: 'object/mobile/desert_demon.iff',
-          weight: 30,
-          minLevel: 5,
-          maxLevel: 10,
-          name: 'Desert Demon',
-        },
-        {
-          templateCrc: 0x34567890,
-          templatePath: 'object/mobile/dewback.iff',
-          weight: 20,
-          minLevel: 10,
-          maxLevel: 15,
-          name: 'Dewback',
-        },
-      ],
-      totalWeight: 100,
-    });
-
-    // Naboo plains creatures
-    this.registerSpawnTable({
-      id: 'naboo_plains',
-      name: 'Naboo Plains Creatures',
-      entries: [
-        {
-          templateCrc: 0x45678901,
-          templatePath: 'object/mobile/peko_peko.iff',
-          weight: 40,
-          minLevel: 1,
-          maxLevel: 5,
-          name: 'Peko Peko',
-        },
-        {
-          templateCrc: 0x56789012,
-          templatePath: 'object/mobile/kaadu.iff',
-          weight: 35,
-          minLevel: 5,
-          maxLevel: 10,
-          name: 'Kaadu',
-        },
-        {
-          templateCrc: 0x67890123,
-          templatePath: 'object/mobile/fambaa.iff',
-          weight: 25,
-          minLevel: 15,
-          maxLevel: 25,
-          name: 'Fambaa',
-        },
-      ],
-      totalWeight: 100,
-    });
-
-    // Generic NPC table
-    this.registerSpawnTable({
-      id: 'generic_npcs',
-      name: 'Generic NPCs',
-      entries: [
-        {
-          templateCrc: 0x78901234,
-          templatePath: 'object/mobile/dressed_commoner_human_male_01.iff',
-          weight: 50,
-          minLevel: 1,
-          maxLevel: 1,
-          name: 'Commoner',
-        },
-        {
-          templateCrc: 0x89012345,
-          templatePath: 'object/mobile/dressed_merchant_human_female_01.iff',
-          weight: 30,
-          minLevel: 1,
-          maxLevel: 1,
-          name: 'Merchant',
-        },
-        {
-          templateCrc: 0x90123456,
-          templatePath: 'object/mobile/dressed_stormtrooper.iff',
-          weight: 20,
-          minLevel: 50,
-          maxLevel: 60,
-          name: 'Stormtrooper',
-        },
-      ],
-      totalWeight: 100,
-    });
-
-    console.log(`[SpawnManager] Loaded ${this.spawnTables.size} spawn tables`);
+    console.log('[SpawnManager] Ready for dynamic spawn table registration');
   }
 
   /**
@@ -541,6 +441,54 @@ export class SpawnManager {
     while (spawn.currentSpawns < spawn.maxSpawns) {
       await this.spawnCreature(spawn);
     }
+  }
+
+  // ============================================
+  // Buildout Creature Loading
+  // ============================================
+
+  /**
+   * Register a single buildout creature as a spawn point
+   * Creates a spawn table with one entry and a spawn point at the buildout position
+   */
+  loadBuildoutCreature(info: {
+    templateCrc: number;
+    templatePath: string;
+    position: Vector3;
+    heading: number;
+    sceneId: string;
+  }): void {
+    const spawnId = `buildout_${info.sceneId}_${info.templateCrc}_${info.position.x.toFixed(0)}_${info.position.z.toFixed(0)}_${this.activeSpawns.size}`;
+
+    // Create a single-entry spawn table
+    const tableId = `buildout_table_${spawnId}`;
+    this.registerSpawnTable({
+      id: tableId,
+      name: info.templatePath,
+      entries: [{
+        templateCrc: info.templateCrc,
+        templatePath: info.templatePath,
+        weight: 1,
+        minLevel: 1,
+        maxLevel: 1,
+        name: info.templatePath.split('/').pop()?.replace('shared_', '').replace('.iff', ''),
+      }],
+      totalWeight: 1,
+    });
+
+    // Create spawn point at buildout position
+    this.createSpawnPoint({
+      location: {
+        id: spawnId,
+        sceneId: info.sceneId,
+        position: info.position,
+        radius: 0,
+        heading: info.heading,
+      },
+      tableId,
+      maxSpawns: 1,
+      respawnDelay: this.defaultRespawnDelay,
+    });
   }
 
   // ============================================

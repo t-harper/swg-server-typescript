@@ -4,7 +4,7 @@
  * hit/miss calculations, armor mitigation, state effects, and AOE targeting.
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import {
   CombatManager,
   createCombatManager,
@@ -460,6 +460,10 @@ describe('CombatManager', () => {
     );
   });
 
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   describe('Attack Execution Flow', () => {
     it('should execute a basic attack successfully', () => {
       const attacker = createMockCreature();
@@ -518,7 +522,7 @@ describe('CombatManager', () => {
       );
 
       expect(result.success).toBe(false);
-      expect(result.errorMessage).toContain('Insufficient');
+      expect(result.errorMessage).toContain('Not enough action');
     });
 
     it('should enter combat state for both attacker and target', () => {
@@ -1161,6 +1165,8 @@ describe('CombatManager', () => {
         isAoe: true,
         aoeRadius: 10,
         maxTargets: 5,
+        globalCooldown: 0,
+        cooldownTime: 0,
       });
 
       const aoeTargets = combatManager.getTargetsInRadius(

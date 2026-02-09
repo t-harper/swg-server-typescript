@@ -43,7 +43,7 @@ export interface ActiveCreatureInfo {
   /** Template used to spawn */
   template: CreatureTemplate;
   /** Spawn point ID (if from SpawnManager) */
-  spawnPointId?: string;
+  spawnPointId?: string | undefined;
   /** Original spawn position */
   spawnPosition: Vector3;
   /** Scene/zone ID */
@@ -83,9 +83,9 @@ export interface CreatureAIState {
   /** Home position (spawn point) */
   homePosition: Vector3;
   /** Current patrol waypoint index */
-  patrolIndex?: number;
+  patrolIndex?: number | undefined;
   /** Patrol path identifier */
-  patrolPath?: string;
+  patrolPath?: string | undefined;
   /** Is currently in combat */
   inCombat: boolean;
   /** Is returning to home */

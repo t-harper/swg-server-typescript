@@ -88,9 +88,9 @@ export interface HousingServiceOptions {
  */
 export interface PlaceStructureResult {
   success: boolean;
-  building?: BuildingObject;
-  errorCode?: PlacementErrorCode;
-  errorMessage?: string;
+  building?: BuildingObject | undefined;
+  errorCode?: PlacementErrorCode | undefined;
+  errorMessage?: string | undefined;
 }
 
 /**

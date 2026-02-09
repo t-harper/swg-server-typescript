@@ -297,8 +297,8 @@ export class BazaarHandler {
     try {
       const auctions = await this.repository.searchListings(repoFilters);
       const totalCount = await this.repository.getActiveListingCount({
-        category: repoFilters.category,
-        planetId: repoFilters.planetId,
+        ...(repoFilters.category !== undefined ? { category: repoFilters.category } : {}),
+        ...(repoFilters.planetId !== undefined ? { planetId: repoFilters.planetId } : {}),
       });
 
       // Convert to client format
@@ -506,7 +506,7 @@ export class BazaarHandler {
       itemAttributes: item.itemAttributes,
       price,
       isAuction,
-      instantSalePrice: isAuction ? price : undefined,
+      ...(isAuction ? { instantSalePrice: price } : {}),
       planetId,
       regionId,
       expiresAt,

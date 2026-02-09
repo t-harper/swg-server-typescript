@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@swg/config": "workspace:*",
+    "@swg/datatable": "workspace:*",
     "@swg/database": "workspace:*",
     "@swg/game-logic": "workspace:*",
     "@swg/objects": "workspace:*",

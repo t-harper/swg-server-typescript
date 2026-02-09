@@ -44,6 +44,7 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
+    "@swg/datatable": "workspace:*",
     "@swg/objects": "workspace:*",
     "@swg/protocol": "workspace:*",
     "@swg/shared-types": "workspace:*",

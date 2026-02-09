@@ -13,6 +13,10 @@ import {
 } from '@swg/world';
 import { SceneObject } from '@swg/objects';
 import { ObjectRepository } from '@swg/database';
+import { type BuildoutLoader, parseCrcStringTable, type CrcStringTable } from '@swg/datatable';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import type { SpawnManager } from './spawn-manager.js';
 import {
   createCmdStartScene,
   serializeCmdStartScene,
@@ -63,6 +67,12 @@ export interface ZoneServiceOptions {
   enableAutoSave?: boolean;
   /** Auto-save interval in milliseconds */
   autoSaveInterval?: number;
+  /** Buildout loader for loading static world objects from datatables */
+  buildoutLoader?: BuildoutLoader;
+  /** Spawn manager for creature spawning from buildout data */
+  spawnManager?: SpawnManager;
+  /** Data root path for loading CRC string table */
+  dataRoot?: string;
 }
 
 /**
@@ -81,8 +91,12 @@ export class ZoneService {
   private readonly viewDistance: number;
   private readonly autoSaveInterval: number;
   private readonly enableAutoSave: boolean;
+  private readonly buildoutLoader: BuildoutLoader | undefined;
+  private readonly spawnManager: SpawnManager | undefined;
+  private readonly dataRoot: string | undefined;
+  private crcToPath: Map<number, string> | undefined;
   private sendCallback?: SendCallback;
-  private autoSaveTimer?: ReturnType<typeof setInterval>;
+  private autoSaveTimer: ReturnType<typeof setInterval> | undefined;
   private initialized: boolean = false;
 
   constructor(
@@ -95,6 +109,9 @@ export class ZoneService {
     this.viewDistance = options.viewDistance ?? 192;
     this.autoSaveInterval = options.autoSaveInterval ?? 300000; // 5 minutes
     this.enableAutoSave = options.enableAutoSave ?? true;
+    this.buildoutLoader = options.buildoutLoader;
+    this.spawnManager = options.spawnManager;
+    this.dataRoot = options.dataRoot;
   }
 
   /**
@@ -162,6 +179,20 @@ export class ZoneService {
   }
 
   /**
+   * Set the spawn manager for buildout creature spawning
+   */
+  setSpawnManager(manager: SpawnManager): void {
+    (this as { spawnManager: SpawnManager | undefined }).spawnManager = manager;
+  }
+
+  /**
+   * Set the data root path for CRC string table loading
+   */
+  setDataRoot(dataRoot: string): void {
+    (this as { dataRoot: string | undefined }).dataRoot = dataRoot;
+  }
+
+  /**
    * Set the callback for sending data to players
    */
   setSendCallback(callback: SendCallback): void {
@@ -199,6 +230,17 @@ export class ZoneService {
 
     // Load persistent objects from database
     await this.loadZoneObjects(sceneId);
+
+    // Load static buildout objects from datatables
+    this.loadBuildoutObjects(sceneId, zone);
+
+    // Spawn buildout creatures via SpawnManager
+    if (this.spawnManager) {
+      const creatureCount = this.loadBuildoutCreatures(sceneId, zone);
+      if (creatureCount > 0) {
+        console.log(`[ZoneService] Registered ${creatureCount} buildout creature spawn points for ${sceneId}`);
+      }
+    }
 
     console.log(
       `[ZoneService] Zone ${sceneId} loaded with ${zone.objectCount} objects`
@@ -541,6 +583,110 @@ export class ZoneService {
       );
       return [];
     }
+  }
+
+  /**
+   * Load static buildout objects from datatables into the zone
+   */
+  private loadBuildoutObjects(sceneId: string, zone: Zone): void {
+    if (!this.buildoutLoader) return;
+
+    try {
+      const objects = this.buildoutLoader.loadBuildoutObjects(sceneId);
+      // Build CRC map for creature filtering (if available)
+      const crcMap = this.loadCrcStringTable();
+
+      let count = 0;
+      for (const obj of objects) {
+        // Skip objects inside cells/interiors for now
+        if (obj.containerId !== 0) continue;
+
+        // Skip creatures/mobiles - they're handled by loadBuildoutCreatures
+        if (crcMap) {
+          const path = crcMap.get(obj.sharedTemplateCrc);
+          if (path && (path.startsWith('object/creature/') || path.startsWith('object/mobile/'))) {
+            continue;
+          }
+        }
+
+        const worldObj: WorldSceneObject = {
+          id: BigInt(obj.objId >>> 0), // unsigned 32-bit to bigint
+          x: obj.position.x,
+          y: obj.position.y,
+          z: obj.position.z,
+          templateId: obj.sharedTemplateCrc,
+          active: true,
+        };
+
+        try {
+          zone.addObject(worldObj);
+          count++;
+        } catch {
+          // Object out of bounds or duplicate ID — skip silently
+        }
+      }
+      console.log(`[ZoneService] Loaded ${count} buildout objects for ${sceneId}`);
+    } catch (error) {
+      console.error(`[ZoneService] Error loading buildout for ${sceneId}:`, error);
+    }
+  }
+
+  /**
+   * Load the CRC string table from disk (lazy, cached)
+   */
+  private loadCrcStringTable(): Map<number, string> | undefined {
+    if (this.crcToPath) return this.crcToPath;
+
+    const dataRoot = this.dataRoot;
+    if (!dataRoot) return undefined;
+
+    try {
+      const cstbPath = resolve(dataRoot, 'misc/object_template_crc_string_table.iff');
+      const data = readFileSync(cstbPath);
+      const table = parseCrcStringTable(new Uint8Array(data));
+      this.crcToPath = table.crcToPath;
+      console.log(`[ZoneService] Loaded CRC string table: ${table.entryCount} entries`);
+      return this.crcToPath;
+    } catch (error) {
+      console.warn('[ZoneService] Failed to load CRC string table:', error instanceof Error ? error.message : error);
+      return undefined;
+    }
+  }
+
+  /**
+   * Load buildout creatures and register them as spawn points
+   */
+  private loadBuildoutCreatures(sceneId: string, zone: Zone): number {
+    if (!this.buildoutLoader || !this.spawnManager) return 0;
+
+    const crcMap = this.loadCrcStringTable();
+    if (!crcMap) return 0;
+
+    const objects = this.buildoutLoader.loadBuildoutObjects(sceneId);
+    let count = 0;
+
+    for (const obj of objects) {
+      if (obj.containerId !== 0) continue;
+
+      const path = crcMap.get(obj.sharedTemplateCrc);
+      if (!path) continue;
+      if (!path.startsWith('object/creature/') && !path.startsWith('object/mobile/')) continue;
+
+      try {
+        this.spawnManager.loadBuildoutCreature({
+          templateCrc: obj.sharedTemplateCrc,
+          templatePath: path,
+          position: obj.position,
+          heading: 0,
+          sceneId,
+        });
+        count++;
+      } catch {
+        // Skip creatures that fail to register
+      }
+    }
+
+    return count;
   }
 
   /**

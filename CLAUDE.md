@@ -31,6 +31,7 @@ TypeScript reimplementation of the Star Wars Galaxies (SWG) server. The original
 | @swg/world | Zone management, spatial partitioning (quad-tree) |
 | @swg/redis | Redis client wrapper, session store, pub/sub |
 | @swg/shared-types | Shared TypeScript type definitions |
+| @swg/datatable | DTII binary parser, DataTableManager singleton, BuildoutLoader |
 | @swg/ai | NPC behavior trees |
 | @swg/metrics | Metrics collection (stub) |
 
@@ -188,6 +189,55 @@ Decodes SOE-encrypted packets from pcap files. Handles SOE session negotiation, 
 - `packages/protocol/src/swg/messages/cpp-packet-stubs.ts` - Stub serializers
 - `packages/protocol/src/swg/wire/cpp-wire-codec.ts` - Full wire codec for all 526 packets
 
+### DataTable Package (@swg/datatable)
+
+Canonical home for the DTII binary parser, `DataTableManager` singleton, and `BuildoutLoader`. Located at `packages/datatable/src/`. The data-importer CLI re-exports from this package.
+
+**DTII Binary Format:**
+- 7,230 binary datatable files in `data/serverdata/datatables/` containing all game configuration data (skills, combat, crafting, buildout, character creation, commands, etc.)
+- Structure: `FORM/DTII > FORM/<version> > COLS + TYPE + ROWS`
+- **Critical**: DTII files have NO even-boundary padding between chunks. The parser uses `IffDataReader` directly (not `IffParser`) to avoid its padding logic.
+- Typespec chars: `i`=int, `f`=float, `s`=string, `h`=hex, `b`=bool, `e`=enum, `v`=bitvector, `p`=path, `z`=zero, `c`=comment
+- All numeric values are little-endian (i32/f32), strings are null-terminated
+
+**DataTableManager** — Singleton that lazy-loads and caches datatable files at runtime (mirrors C++ `DataTableManager`):
+- `DataTableManager.install(dataRoot)` — initializes with path to `data/serverdata/`
+- `getTable(path)` — reads, parses, and caches a `.iff` file; returns `undefined` for missing files
+- `searchColumnString(table, column, value)` — find row index by string column value
+- `getIntValue/getFloatValue/getStringValue(table, column, row)` — typed cell accessors
+- Configured via `DATA_ROOT` env var or defaults to `data/serverdata/` relative to game server
+
+**BuildoutLoader** — Loads static world objects (buildings, NPCs, terminals, decorations) from buildout datatables:
+- `getSceneNames()` — reads `datatables/buildout/buildout_scenes.iff` (22 scenes)
+- `getAreasForScene(sceneId)` — reads `datatables/buildout/areas_<scene>.iff`
+- `loadBuildoutObjects(sceneId)` — reads grid files from `datatables/buildout/<scene>/`, returns `BuildoutObject[]` with position, orientation, template CRC, container info
+- Skips event-gated areas (halloween, lifeday, etc.)
+- Called by `ZoneService.loadZone()` at startup for each planet; only top-level objects (containerId=0) are added to the zone
+
+Key source files:
+- `packages/datatable/src/iff-data-reader.ts` — Low-level binary reader for IFF data (no padding)
+- `packages/datatable/src/datatable-parser.ts` — Core DTII binary parser (`parseDataTable`, `parseTypeSpec`)
+- `packages/datatable/src/datatable-manager.ts` — Singleton manager with lazy loading and caching
+- `packages/datatable/src/buildout-loader.ts` — Buildout object loading from datatable grid files
+
+### Data Importer Tool (tools/data-importer/)
+
+CLI tool (`@swg/data-importer`) for processing SWG binary data files. Re-exports parser and `IffDataReader` from `@swg/datatable`. Source in `tools/data-importer/src/iff/`.
+
+**IFF Template Extraction:**
+```bash
+npx tsx tools/data-importer/src/iff/cli.ts extract-single <file.iff>
+npx tsx tools/data-importer/src/iff/cli.ts extract-templates <input-dir> <output-dir>
+npx tsx tools/data-importer/src/iff/cli.ts inspect <file.iff> -v
+npx tsx tools/data-importer/src/iff/cli.ts generate-crc-table <template-dir> <output-file>
+```
+
+**DataTable CLI:**
+```bash
+npx tsx tools/data-importer/src/iff/cli.ts datatable <file.iff> [-o output.json]
+npx tsx tools/data-importer/src/iff/cli.ts datatable-dir <input-dir> <output-dir> [-r] [-v]
+```
+
 ### Task Tracking (done/, in_progress/, to_do/)
 Markdown files tracking implementation progress. `done/` has 13 completed milestones (protocol layers, login, connection, zone-in, Redis, DB schema). `in_progress/` and `to_do/` have planned work.
 
@@ -219,6 +269,9 @@ Framework: Vitest with v8 coverage. Test files: `*.test.ts` in package `src/` di
 Key test suites:
 - `packages/protocol/src/swg/wire/cpp-wire-codec.test.ts` - 42 roundtrip tests for C++ packet codec
 - `packages/protocol/src/soe/udp-library-wire.test.ts` - SOE protocol tests
+- `packages/datatable/src/datatable-parser.test.ts` - 21 tests for DTII datatable parser
+- `packages/datatable/src/datatable-manager.test.ts` - 12 tests for DataTableManager + BuildoutLoader
+- `tools/data-importer/src/iff/datatable-parser.test.ts` - 21 tests (re-exports from @swg/datatable)
 - `tests/integration/` - Login and zone-entry integration tests
 
 ## Data Management
@@ -237,4 +290,5 @@ Profanity filter exists in 3 copies (login-server, connection-server, game-serve
 
 - Type errors in `packages/protocol/src/soe/` (crc32.ts, packet.ts, session-manager.ts) - pre-existing, not from our changes
 - Build errors in `@swg/objects` (ship, guild, harvester files) and `@swg/metrics` - pre-existing
+- `bazaar-handler.ts` has 20 type errors from missing exports in `@swg/protocol` (bazaar-messages) and `@swg/database` (market-repository) — those modules haven't been implemented yet
 - The `Makefile` references `docker-compose` but the system uses `podman compose`

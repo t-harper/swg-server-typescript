@@ -7,9 +7,12 @@
  * selection, and zone-in.  This server merges that role with the GameServer.
  */
 
+import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import type { ServerConfig } from '@swg/config';
 import { initDb, CharacterRepository, ObjectRepository } from '@swg/database';
 import { getRedisClient, SessionStore } from '@swg/redis';
+import { DataTableManager, BuildoutLoader } from '@swg/datatable';
 import {
   SessionManager,
   type Session,
@@ -87,6 +90,7 @@ import {
   createZoneService,
   SpawnManager,
   createSpawnManager,
+  initializeGameDatatables,
 } from './services/index.js';
 
 // ---------------------------------------------------------------------------
@@ -176,6 +180,18 @@ export async function createServer(config: ServerConfig): Promise<GameServer> {
     defaultTtlSeconds: config.gameServer?.sessionTimeout ?? 3600,
   });
 
+  // Initialize DataTableManager
+  const thisDir = typeof import.meta.dirname === 'string'
+    ? import.meta.dirname
+    : fileURLToPath(new URL('.', import.meta.url));
+  const dataRoot = process.env['DATA_ROOT'] ?? resolve(thisDir, '../../..', 'data/serverdata');
+  DataTableManager.install(dataRoot);
+  const buildoutLoader = new BuildoutLoader(DataTableManager.getInstance());
+
+  // Initialize game data from datatables
+  const dtResult = initializeGameDatatables(DataTableManager.getInstance());
+  console.log(`[GameServer] Loaded ${dtResult.skills.loaded} skills, ${dtResult.commands.loaded} commands, ${dtResult.combatData.merged} combat entries, ${dtResult.xpLimits.loaded} XP limits`);
+
   // Create character creation handler
   const characterCreationHandler = createCharacterCreationHandler(
     characterRepository,
@@ -186,15 +202,21 @@ export async function createServer(config: ServerConfig): Promise<GameServer> {
   // Create zone service
   const zoneService = createZoneService(objectRepository, {
     viewDistance: config.gameServer?.viewDistance ?? 192,
-    autoLoadZones: ['tatooine', 'naboo', 'corellia'],
+    autoLoadZones: [
+      'tatooine', 'naboo', 'corellia', 'talus', 'rori',
+      'dantooine', 'dathomir', 'endor', 'lok', 'yavin4',
+    ],
     enableAutoSave: true,
     autoSaveInterval: 300000,
+    buildoutLoader,
+    dataRoot,
   });
 
-  // Create spawn manager
+  // Create spawn manager and wire it into zone service for buildout creature spawning
   const spawnManager = createSpawnManager(zoneService, {
     defaultRespawnDelay: 300000,
   });
+  zoneService.setSpawnManager(spawnManager);
 
   // Create movement handler
   const movementHandler = createMovementHandler({

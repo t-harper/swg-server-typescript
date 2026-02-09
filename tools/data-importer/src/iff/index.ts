@@ -4,7 +4,8 @@
  */
 
 // IFF Parser
-export { IffParser, IffDataReader, IffParseError } from './iff-parser.js';
+export { IffParser, IffParseError } from './iff-parser.js';
+export { IffDataReader } from '@swg/datatable';
 export type { IffChunk } from './iff-parser.js';
 
 // Template Types
@@ -70,6 +71,19 @@ export {
   mergeCrcTables,
 } from './crc-table.js';
 export type { CrcEntry, CrcTable, CrcTableOptions } from './crc-table.js';
+
+// DataTable Parser
+export { parseDataTable, parseTypeSpec, getBasicType } from '@swg/datatable';
+export type {
+  DataTableResult,
+  DataTableColumn,
+  DataTableColumnType,
+  DataTableBasicType,
+} from '@swg/datatable';
+
+// DataTable Converter
+export { DataTableConverter } from './datatable-converter.js';
+export type { ConversionStats } from './datatable-converter.js';
 
 // CLI
 export { runIffCli } from './cli.js';

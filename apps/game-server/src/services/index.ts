@@ -257,6 +257,12 @@ export {
   type MissionOperationResult,
 } from './mission-terminal-service.js';
 
+// Datatable Init
+export {
+  initializeGameDatatables,
+  type DatatableInitResult,
+} from './datatable-init.js';
+
 // Quest Messages
 export {
   QuestMessageOpcode,

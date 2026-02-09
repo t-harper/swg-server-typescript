@@ -286,7 +286,7 @@ export class CityElectionProcessor {
     }
 
     // Clear winner
-    const [winnerId, winnerVotes] = topCandidates[0];
+    const [winnerId, winnerVotes] = topCandidates[0]!;
     const winner = city.citizens.get(winnerId);
 
     // Apply result
@@ -408,7 +408,7 @@ export class CityElectionProcessor {
     } else {
       // Random selection (in a real implementation, might use runoff)
       const randomIndex = Math.floor(Math.random() * tiedCandidates.length);
-      const randomWinner = tiedCandidates[randomIndex];
+      const randomWinner = tiedCandidates[randomIndex]!;
       winnerId = randomWinner.candidateId;
       winnerName = randomWinner.candidateName;
       resolution = 'random';

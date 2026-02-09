@@ -9,7 +9,7 @@ import {
   PlayerVendor,
   VendorType,
   VendorItem,
-  MaintenanceStatus,
+  VendorMaintenanceStatus,
   generateObjectId,
   VENDOR_INVENTORY_SIZES,
   VENDOR_MAINTENANCE_COSTS,
@@ -163,7 +163,7 @@ export class VendorManager {
   private readonly options: Required<VendorManagerOptions>;
 
   /** Maintenance tick timer */
-  private maintenanceTimer?: ReturnType<typeof setInterval>;
+  private maintenanceTimer: ReturnType<typeof setInterval> | undefined;
 
   /** Sale notification callbacks */
   private readonly saleCallbacks: Set<VendorSaleCallback>;
@@ -653,9 +653,9 @@ export class VendorManager {
   /**
    * Get vendors needing maintenance (owner notification)
    */
-  getVendorsNeedingMaintenance(ownerId: ObjectId): Array<{ vendor: PlayerVendor; status: MaintenanceStatus }> {
+  getVendorsNeedingMaintenance(ownerId: ObjectId): Array<{ vendor: PlayerVendor; status: VendorMaintenanceStatus }> {
     const vendors = this.getVendorsByOwner(ownerId);
-    const needingMaintenance: Array<{ vendor: PlayerVendor; status: MaintenanceStatus }> = [];
+    const needingMaintenance: Array<{ vendor: PlayerVendor; status: VendorMaintenanceStatus }> = [];
 
     for (const vendor of vendors) {
       const status = vendor.checkMaintenance();

@@ -14,6 +14,8 @@ import {
   calculateCrc32,
   type CrcTable,
 } from './crc-table.js';
+import { parseDataTable } from '@swg/datatable';
+import { DataTableConverter } from './datatable-converter.js';
 
 /**
  * Available IFF CLI commands
@@ -23,6 +25,8 @@ type IffCommand =
   | 'extract-single'
   | 'generate-crc-table'
   | 'inspect'
+  | 'datatable'
+  | 'datatable-dir'
   | 'help';
 
 /**
@@ -49,6 +53,8 @@ function parseIffArgs(): {
     'extract-single',
     'generate-crc-table',
     'inspect',
+    'datatable',
+    'datatable-dir',
     'help',
   ];
 
@@ -121,6 +127,13 @@ Commands:
   inspect <iff-file>                          Inspect IFF structure
     -v, --verbose        Show raw chunk data
 
+  datatable <file.iff> [-o output.json]       Parse a single DTII datatable
+    -o, --output <file>  Output file path (default: stdout)
+
+  datatable-dir <input-dir> <output-dir>      Batch convert datatables to JSON
+    -r, --recursive      Process subdirectories (default: true)
+    -v, --verbose        Show detailed progress
+
   help                                         Show this help message
 
 Examples:
@@ -129,6 +142,8 @@ Examples:
   swg-iff generate-crc-table ./templates ./crc-table.json
   swg-iff generate-crc-table ./templates ./crc-table.ts -f typescript
   swg-iff inspect ./weapon.iff -v
+  swg-iff datatable ./starting_locations.iff -o locations.json
+  swg-iff datatable-dir ./datatables ./output -r -v
 `);
 }
 
@@ -317,6 +332,76 @@ function showCrc(path: string): void {
 }
 
 /**
+ * Parse a single datatable file
+ */
+async function parseDatatable(
+  inputFile: string,
+  outputFile: string | undefined,
+  options: { verbose: boolean }
+): Promise<void> {
+  const inputPath = resolve(inputFile);
+
+  if (options.verbose) {
+    console.log(`Reading: ${inputPath}`);
+  }
+
+  const data = await readFile(inputPath);
+  const result = parseDataTable(new Uint8Array(data), basename(inputPath));
+
+  const json = JSON.stringify(result, null, 2);
+
+  if (outputFile) {
+    const outputPath = resolve(outputFile);
+    await mkdir(dirname(outputPath), { recursive: true });
+    await writeFile(outputPath, json);
+    console.log(`Written: ${outputPath} (${result.rowCount} rows, ${result.columnCount} cols)`);
+  } else {
+    console.log(json);
+  }
+}
+
+/**
+ * Batch convert a directory of datatables
+ */
+async function convertDatatableDir(
+  inputDir: string,
+  outputDir: string,
+  options: { recursive: boolean; verbose: boolean }
+): Promise<void> {
+  const inputPath = resolve(inputDir);
+  const outputPath = resolve(outputDir);
+
+  console.log(`Converting datatables from: ${inputPath}`);
+  console.log(`Output directory: ${outputPath}`);
+  console.log(`Recursive: ${options.recursive}`);
+  console.log('');
+
+  const converter = new DataTableConverter();
+  const result = await converter.convertDirectory(inputPath, outputPath, {
+    recursive: options.recursive,
+    verbose: options.verbose,
+  });
+
+  console.log('\nConversion complete:');
+  console.log(`  Files processed: ${result.processed}`);
+  console.log(`  Successful: ${result.successful}`);
+  console.log(`  Failed: ${result.failed}`);
+
+  if (result.errors.length > 0 && options.verbose) {
+    console.log('\nErrors:');
+    for (const error of result.errors) {
+      console.log(`  ${error.file}: ${error.error}`);
+    }
+  } else if (result.errors.length > 0) {
+    console.log(`\nUse -v to see ${result.errors.length} error details`);
+  }
+
+  if (result.failed > 0) {
+    process.exitCode = 1;
+  }
+}
+
+/**
  * Main entry point for IFF CLI
  */
 export async function runIffCli(): Promise<void> {
@@ -373,6 +458,33 @@ export async function runIffCli(): Promise<void> {
           return;
         }
         await inspectIff(inputFile, { verbose: options.verbose });
+        break;
+      }
+
+      case 'datatable': {
+        const [inputFile] = args;
+        if (!inputFile) {
+          console.error('Usage: datatable <file.iff> [-o output.json]');
+          process.exitCode = 1;
+          return;
+        }
+        await parseDatatable(inputFile, options.output, {
+          verbose: options.verbose,
+        });
+        break;
+      }
+
+      case 'datatable-dir': {
+        const [inputDir, outputDir] = args;
+        if (!inputDir || !outputDir) {
+          console.error('Usage: datatable-dir <input-dir> <output-dir>');
+          process.exitCode = 1;
+          return;
+        }
+        await convertDatatableDir(inputDir, outputDir, {
+          recursive: options.recursive,
+          verbose: options.verbose,
+        });
         break;
       }
 

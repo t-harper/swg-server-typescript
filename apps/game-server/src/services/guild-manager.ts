@@ -71,10 +71,10 @@ export interface GuildMemberPersistenceData {
   rank: number;
   joinedAt: number;
   lastOnline: number;
-  title?: string;
-  sponsoredBy?: string;
+  title?: string | undefined;
+  sponsoredBy?: string | undefined;
   totalDonated: string;
-  notes?: string;
+  notes?: string | undefined;
 }
 
 /**
@@ -88,8 +88,8 @@ export interface GuildWarPersistenceData {
   status: number;
   kills: number;
   deaths: number;
-  peaceOfferedAt?: number;
-  endedAt?: number;
+  peaceOfferedAt?: number | undefined;
+  endedAt?: number | undefined;
 }
 
 /**
@@ -144,13 +144,13 @@ export class GuildManager {
   private readonly playerGuilds: Map<ObjectId, bigint>;
 
   /** Persistence provider */
-  private readonly persistence?: GuildPersistenceProvider;
+  private readonly persistence: GuildPersistenceProvider | undefined;
 
   /** Configuration options */
   private readonly options: Required<Omit<GuildManagerOptions, 'persistenceProvider'>>;
 
   /** Auto-save timer */
-  private autoSaveTimer?: ReturnType<typeof setInterval>;
+  private autoSaveTimer: ReturnType<typeof setInterval> | undefined;
 
   /** Dirty guilds needing save */
   private readonly dirtyGuilds: Set<bigint>;
@@ -488,7 +488,7 @@ export class GuildManager {
       const guildIds = await this.persistence.getPlayerGuildIds(playerId);
       if (guildIds.length > 0) {
         // Player should only be in one guild
-        return this.loadGuild(guildIds[0]);
+        return this.loadGuild(guildIds[0]!);
       }
     }
 

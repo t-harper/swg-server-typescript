@@ -141,10 +141,10 @@ export interface ObjectiveProgressData {
 export interface RewardData {
   type: RewardTypeValue;
   value: number;
-  itemTemplate?: string;
-  itemQuantity?: number;
-  xpType?: string;
-  factionName?: string;
+  itemTemplate?: string | undefined;
+  itemQuantity?: number | undefined;
+  xpType?: string | undefined;
+  factionName?: string | undefined;
 }
 
 /**
