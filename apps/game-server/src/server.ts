@@ -87,6 +87,7 @@ import {
   createZoneService,
   SpawnManager,
   createSpawnManager,
+  initializeGameDatatables,
 } from './services/index.js';
 
 // ---------------------------------------------------------------------------
@@ -184,6 +185,10 @@ export async function createServer(config: ServerConfig): Promise<GameServer> {
   DataTableManager.install(dataRoot);
   const buildoutLoader = new BuildoutLoader(DataTableManager.getInstance());
 
+  // Initialize game data from datatables
+  const dtResult = initializeGameDatatables(DataTableManager.getInstance());
+  console.log(`[GameServer] Loaded ${dtResult.skills.loaded} skills, ${dtResult.commands.loaded} commands, ${dtResult.combatData.merged} combat entries, ${dtResult.xpLimits.loaded} XP limits`);
+
   // Create character creation handler
   const characterCreationHandler = createCharacterCreationHandler(
     characterRepository,
@@ -201,12 +206,14 @@ export async function createServer(config: ServerConfig): Promise<GameServer> {
     enableAutoSave: true,
     autoSaveInterval: 300000,
     buildoutLoader,
+    dataRoot,
   });
 
-  // Create spawn manager
+  // Create spawn manager and wire it into zone service for buildout creature spawning
   const spawnManager = createSpawnManager(zoneService, {
     defaultRespawnDelay: 300000,
   });
+  zoneService.setSpawnManager(spawnManager);
 
   // Create movement handler
   const movementHandler = createMovementHandler({

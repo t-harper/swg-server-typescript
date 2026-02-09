@@ -5,6 +5,7 @@
 
 import { describe, it, expect, beforeEach, vi, type Mock } from 'vitest';
 import { SkillManager, DEFAULT_MAX_SKILL_POINTS } from '../skill-manager.js';
+import { canSpeciesLearnSkill, isNoviceSkill } from '../skill-template.js';
 
 // ============================================
 // Mock skill-loader module
@@ -268,8 +269,7 @@ describe('SkillManager', () => {
     });
 
     it('should get novice skills', () => {
-      const { isNoviceSkill } = require('../skill-template.js');
-      isNoviceSkill.mockImplementation((skill: any) => skill.name?.includes('novice'));
+      vi.mocked(isNoviceSkill).mockImplementation((skill: any) => skill.name?.includes('novice'));
 
       const novice = skillManager.getNoviceSkills();
       expect(novice.some(s => s.name === 'brawler_novice')).toBe(true);
@@ -405,8 +405,7 @@ describe('SkillManager', () => {
     });
 
     it('should not allow species-restricted skill', () => {
-      const { canSpeciesLearnSkill } = require('../skill-template.js');
-      canSpeciesLearnSkill.mockReturnValue(false);
+      vi.mocked(canSpeciesLearnSkill).mockReturnValue(false);
 
       const player = createMockPlayer();
       player.skills.add('brawler_novice');
@@ -431,8 +430,7 @@ describe('SkillManager', () => {
   describe('Learn Skill', () => {
     beforeEach(() => {
       vi.clearAllMocks();
-      const { canSpeciesLearnSkill } = require('../skill-template.js');
-      canSpeciesLearnSkill.mockReturnValue(true);
+      vi.mocked(canSpeciesLearnSkill).mockReturnValue(true);
 
       const templates = (skillManager as any).skillTemplates as Map<string, MockSkillTemplate>;
 
@@ -560,8 +558,7 @@ describe('SkillManager', () => {
 
   describe('Surrender Skill', () => {
     beforeEach(() => {
-      const { isNoviceSkill } = require('../skill-template.js');
-      isNoviceSkill.mockImplementation((skill: any) => skill.name?.includes('novice'));
+      vi.mocked(isNoviceSkill).mockImplementation((skill: any) => skill.name?.includes('novice'));
 
       const templates = (skillManager as any).skillTemplates as Map<string, MockSkillTemplate>;
 
@@ -891,9 +888,8 @@ describe('SkillManager', () => {
   describe('Realistic SWG Scenarios', () => {
     beforeEach(() => {
       vi.clearAllMocks();
-      const { canSpeciesLearnSkill, isNoviceSkill } = require('../skill-template.js');
-      canSpeciesLearnSkill.mockReturnValue(true);
-      isNoviceSkill.mockImplementation((skill: any) => skill.name?.includes('novice'));
+      vi.mocked(canSpeciesLearnSkill).mockReturnValue(true);
+      vi.mocked(isNoviceSkill).mockImplementation((skill: any) => skill.name?.includes('novice'));
 
       const templates = (skillManager as any).skillTemplates as Map<string, MockSkillTemplate>;
 

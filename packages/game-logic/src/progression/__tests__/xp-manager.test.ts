@@ -287,7 +287,7 @@ describe('XpManager', () => {
       const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
       const player = createMockPlayer();
 
-      xpManager.awardXp(player as any, 'unknown_xp_type', 100);
+      xpManager.awardXp(player as any, '123-invalid-type', 100);
 
       expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Unknown XP type'));
       consoleSpy.mockRestore();
@@ -719,6 +719,9 @@ describe('XpManager', () => {
       });
 
       mockSkillRegistry.getChildSkills.mockReturnValue([]);
+      mockSkillRegistry.get.mockImplementation((name: string) =>
+        name === 'test_skill' ? skill : null
+      );
 
       xpManager.surrenderSkill(player as any, skill as any);
 

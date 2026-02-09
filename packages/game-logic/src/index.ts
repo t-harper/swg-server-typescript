@@ -642,3 +642,4 @@ export {
 } from './space-combat/index.js';
 
 export * from './pvp/index.js';
+export * from './datatable-loaders/index.js';

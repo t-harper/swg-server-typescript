@@ -203,6 +203,20 @@ export class SkillManager {
   }
 
   /**
+   * Initialize the skill manager from pre-built maps (datatable loader path)
+   * @param skills - Pre-built skill template map
+   * @param tree - Pre-built skill tree map
+   */
+  initializeFromMaps(
+    skills: Map<string, SkillTemplate>,
+    tree: Map<string, SkillTreeNode>,
+  ): void {
+    this.skillTemplates = skills;
+    this.skillTree = tree;
+    this.initialized = true;
+  }
+
+  /**
    * Check if the manager is initialized
    */
   isInitialized(): boolean {

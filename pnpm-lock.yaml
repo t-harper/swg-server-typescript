@@ -255,6 +255,9 @@ importers:
 
   packages/game-logic:
     dependencies:
+      '@swg/datatable':
+        specifier: workspace:*
+        version: link:../datatable
       '@swg/objects':
         specifier: workspace:*
         version: link:../objects

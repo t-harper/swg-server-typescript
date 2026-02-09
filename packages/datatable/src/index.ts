@@ -20,3 +20,7 @@ export { DataTableManager } from './datatable-manager.js';
 // Buildout Loader
 export { BuildoutLoader } from './buildout-loader.js';
 export type { BuildoutArea, BuildoutObject } from './buildout-loader.js';
+
+// CSTB Parser
+export { parseCrcStringTable } from './cstb-parser.js';
+export type { CrcStringTable } from './cstb-parser.js';

@@ -444,6 +444,54 @@ export class SpawnManager {
   }
 
   // ============================================
+  // Buildout Creature Loading
+  // ============================================
+
+  /**
+   * Register a single buildout creature as a spawn point
+   * Creates a spawn table with one entry and a spawn point at the buildout position
+   */
+  loadBuildoutCreature(info: {
+    templateCrc: number;
+    templatePath: string;
+    position: Vector3;
+    heading: number;
+    sceneId: string;
+  }): void {
+    const spawnId = `buildout_${info.sceneId}_${info.templateCrc}_${info.position.x.toFixed(0)}_${info.position.z.toFixed(0)}_${this.activeSpawns.size}`;
+
+    // Create a single-entry spawn table
+    const tableId = `buildout_table_${spawnId}`;
+    this.registerSpawnTable({
+      id: tableId,
+      name: info.templatePath,
+      entries: [{
+        templateCrc: info.templateCrc,
+        templatePath: info.templatePath,
+        weight: 1,
+        minLevel: 1,
+        maxLevel: 1,
+        name: info.templatePath.split('/').pop()?.replace('shared_', '').replace('.iff', ''),
+      }],
+      totalWeight: 1,
+    });
+
+    // Create spawn point at buildout position
+    this.createSpawnPoint({
+      location: {
+        id: spawnId,
+        sceneId: info.sceneId,
+        position: info.position,
+        radius: 0,
+        heading: info.heading,
+      },
+      tableId,
+      maxSpawns: 1,
+      respawnDelay: this.defaultRespawnDelay,
+    });
+  }
+
+  // ============================================
   // Statistics
   // ============================================
 

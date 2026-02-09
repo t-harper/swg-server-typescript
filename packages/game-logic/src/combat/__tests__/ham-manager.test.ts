@@ -6,6 +6,15 @@
 import { describe, it, expect, beforeEach, vi, type Mock } from 'vitest';
 import { HamManager, createHamManager, DEFAULT_HAM_CONFIG } from '../ham-manager.js';
 import { HamAttribute, DamageType, CreatureState } from '@swg/objects';
+import {
+  createRegenState, processRegeneration, pauseRegeneration,
+  resumeRegeneration, updateRegenBonuses,
+} from '../regeneration.js';
+import {
+  createIncapState, checkIncapacitation, applyIncapacitation,
+  processIncapTick, reviveFromIncap, processDeath, cloneCreature,
+  applyDeathblow, hasCloneSickness,
+} from '../incapacitation.js';
 
 // ============================================
 // Mock @swg/objects module
@@ -163,6 +172,8 @@ interface MockHamPool {
 interface MockCreature {
   objectId: bigint;
   zone: string;
+  sceneId: string;
+  position: { x: number; y: number; z: number };
   transform: { position: { x: number; y: number; z: number } };
   health: MockHamPool;
   action: MockHamPool;
@@ -192,9 +203,14 @@ interface MockCreature {
 }
 
 function createMockCreature(overrides: Partial<MockCreature> = {}): MockCreature {
+  // Create the creature object first, then define methods as arrow-function
+  // spies that capture the creature via closure. This avoids .bind() which
+  // strips the vitest spy wrapper and causes "not a spy" errors.
   const creature: MockCreature = {
     objectId: BigInt(Math.floor(Math.random() * 1000000)),
     zone: 'tatooine',
+    sceneId: 'tatooine',
+    position: { x: 100, y: 0, z: 100 },
     transform: { position: { x: 100, y: 0, z: 100 } },
     health: { current: 1000, max: 1000, wounds: 0 },
     action: { current: 500, max: 500, wounds: 0 },
@@ -203,80 +219,113 @@ function createMockCreature(overrides: Partial<MockCreature> = {}): MockCreature
     defenders: new Set(),
     isDead: vi.fn(() => false),
     isIncapacitated: vi.fn(() => false),
-    damageHealth: vi.fn(function(this: MockCreature, amount: number) {
-      this.health.current = Math.max(0, this.health.current - amount);
-    }),
-    damageAction: vi.fn(function(this: MockCreature, amount: number) {
-      this.action.current = Math.max(0, this.action.current - amount);
-    }),
-    damageMind: vi.fn(function(this: MockCreature, amount: number) {
-      this.mind.current = Math.max(0, this.mind.current - amount);
-    }),
-    healHealth: vi.fn(function(this: MockCreature, amount: number) {
-      this.health.current = Math.min(this.health.max - this.health.wounds, this.health.current + amount);
-    }),
-    healAction: vi.fn(function(this: MockCreature, amount: number) {
-      this.action.current = Math.min(this.action.max - this.action.wounds, this.action.current + amount);
-    }),
-    healMind: vi.fn(function(this: MockCreature, amount: number) {
-      this.mind.current = Math.min(this.mind.max - this.mind.wounds, this.mind.current + amount);
-    }),
-    getEffectiveHealthMax: vi.fn(function(this: MockCreature) {
-      return this.health.max - this.health.wounds;
-    }),
-    getEffectiveActionMax: vi.fn(function(this: MockCreature) {
-      return this.action.max - this.action.wounds;
-    }),
-    getEffectiveMindMax: vi.fn(function(this: MockCreature) {
-      return this.mind.max - this.mind.wounds;
-    }),
+    // Use vi.fn() with late-binding implementations that reference `creature`
+    damageHealth: null as any,
+    damageAction: null as any,
+    damageMind: null as any,
+    healHealth: null as any,
+    healAction: null as any,
+    healMind: null as any,
+    getEffectiveHealthMax: null as any,
+    getEffectiveActionMax: null as any,
+    getEffectiveMindMax: null as any,
     getProtection: vi.fn(() => 0),
-    setHealthCurrent: vi.fn(function(this: MockCreature, value: number) {
-      this.health.current = value;
-    }),
-    setActionCurrent: vi.fn(function(this: MockCreature, value: number) {
-      this.action.current = value;
-    }),
-    setMindCurrent: vi.fn(function(this: MockCreature, value: number) {
-      this.mind.current = value;
-    }),
-    addWounds: vi.fn(function(this: MockCreature, attribute: number, amount: number) {
-      if (attribute <= 2) this.health.wounds += amount;
-      else if (attribute <= 5) this.action.wounds += amount;
-      else this.mind.wounds += amount;
-    }),
-    healWounds: vi.fn(function(this: MockCreature, attribute: number, amount: number) {
-      if (attribute <= 2) this.health.wounds = Math.max(0, this.health.wounds - amount);
-      else if (attribute <= 5) this.action.wounds = Math.max(0, this.action.wounds - amount);
-      else this.mind.wounds = Math.max(0, this.mind.wounds - amount);
-    }),
-    addDefender: vi.fn(function(this: MockCreature, id: bigint) {
-      this.defenders.add(id);
-    }),
+    setHealthCurrent: null as any,
+    setActionCurrent: null as any,
+    setMindCurrent: null as any,
+    addWounds: null as any,
+    healWounds: null as any,
+    addDefender: null as any,
     enterCombat: vi.fn(),
-    setIncapacitated: vi.fn(function(this: MockCreature) {
-      this.state = 1;
-    }),
+    setIncapacitated: null as any,
     ...overrides,
   };
 
-  // Bind methods to the creature
-  creature.damageHealth = creature.damageHealth.bind(creature);
-  creature.damageAction = creature.damageAction.bind(creature);
-  creature.damageMind = creature.damageMind.bind(creature);
-  creature.healHealth = creature.healHealth.bind(creature);
-  creature.healAction = creature.healAction.bind(creature);
-  creature.healMind = creature.healMind.bind(creature);
-  creature.getEffectiveHealthMax = creature.getEffectiveHealthMax.bind(creature);
-  creature.getEffectiveActionMax = creature.getEffectiveActionMax.bind(creature);
-  creature.getEffectiveMindMax = creature.getEffectiveMindMax.bind(creature);
-  creature.setHealthCurrent = creature.setHealthCurrent.bind(creature);
-  creature.setActionCurrent = creature.setActionCurrent.bind(creature);
-  creature.setMindCurrent = creature.setMindCurrent.bind(creature);
-  creature.addWounds = creature.addWounds.bind(creature);
-  creature.healWounds = creature.healWounds.bind(creature);
-  creature.addDefender = creature.addDefender.bind(creature);
-  creature.setIncapacitated = creature.setIncapacitated.bind(creature);
+  // Only set up default implementations for methods that were NOT provided via overrides
+  if (!overrides.damageHealth) {
+    creature.damageHealth = vi.fn((amount: number) => {
+      creature.health.current = Math.max(0, creature.health.current - amount);
+    });
+  }
+  if (!overrides.damageAction) {
+    creature.damageAction = vi.fn((amount: number) => {
+      creature.action.current = Math.max(0, creature.action.current - amount);
+    });
+  }
+  if (!overrides.damageMind) {
+    creature.damageMind = vi.fn((amount: number) => {
+      creature.mind.current = Math.max(0, creature.mind.current - amount);
+    });
+  }
+  if (!overrides.healHealth) {
+    creature.healHealth = vi.fn((amount: number) => {
+      creature.health.current = Math.min(creature.health.max - creature.health.wounds, creature.health.current + amount);
+    });
+  }
+  if (!overrides.healAction) {
+    creature.healAction = vi.fn((amount: number) => {
+      creature.action.current = Math.min(creature.action.max - creature.action.wounds, creature.action.current + amount);
+    });
+  }
+  if (!overrides.healMind) {
+    creature.healMind = vi.fn((amount: number) => {
+      creature.mind.current = Math.min(creature.mind.max - creature.mind.wounds, creature.mind.current + amount);
+    });
+  }
+  if (!overrides.getEffectiveHealthMax) {
+    creature.getEffectiveHealthMax = vi.fn(() => {
+      return creature.health.max - creature.health.wounds;
+    });
+  }
+  if (!overrides.getEffectiveActionMax) {
+    creature.getEffectiveActionMax = vi.fn(() => {
+      return creature.action.max - creature.action.wounds;
+    });
+  }
+  if (!overrides.getEffectiveMindMax) {
+    creature.getEffectiveMindMax = vi.fn(() => {
+      return creature.mind.max - creature.mind.wounds;
+    });
+  }
+  if (!overrides.setHealthCurrent) {
+    creature.setHealthCurrent = vi.fn((value: number) => {
+      creature.health.current = value;
+    });
+  }
+  if (!overrides.setActionCurrent) {
+    creature.setActionCurrent = vi.fn((value: number) => {
+      creature.action.current = value;
+    });
+  }
+  if (!overrides.setMindCurrent) {
+    creature.setMindCurrent = vi.fn((value: number) => {
+      creature.mind.current = value;
+    });
+  }
+  if (!overrides.addWounds) {
+    creature.addWounds = vi.fn((attribute: number, amount: number) => {
+      if (attribute <= 2) creature.health.wounds += amount;
+      else if (attribute <= 5) creature.action.wounds += amount;
+      else creature.mind.wounds += amount;
+    });
+  }
+  if (!overrides.healWounds) {
+    creature.healWounds = vi.fn((attribute: number, amount: number) => {
+      if (attribute <= 2) creature.health.wounds = Math.max(0, creature.health.wounds - amount);
+      else if (attribute <= 5) creature.action.wounds = Math.max(0, creature.action.wounds - amount);
+      else creature.mind.wounds = Math.max(0, creature.mind.wounds - amount);
+    });
+  }
+  if (!overrides.addDefender) {
+    creature.addDefender = vi.fn((id: bigint) => {
+      creature.defenders.add(id);
+    });
+  }
+  if (!overrides.setIncapacitated) {
+    creature.setIncapacitated = vi.fn(() => {
+      creature.state = 1;
+    });
+  }
 
   return creature;
 }
@@ -612,13 +661,12 @@ describe('HamManager', () => {
 
   describe('Regeneration', () => {
     it('should start regeneration for registered creature', () => {
-      const { resumeRegeneration } = require('../regeneration.js');
       const target = createMockCreature();
       hamManager.registerCreature(target as any);
 
       hamManager.startRegeneration(target as any);
 
-      expect(resumeRegeneration).toHaveBeenCalled();
+      expect(vi.mocked(resumeRegeneration)).toHaveBeenCalled();
     });
 
     it('should auto-register creature when starting regeneration', () => {
@@ -630,17 +678,15 @@ describe('HamManager', () => {
     });
 
     it('should stop regeneration for creature', () => {
-      const { pauseRegeneration } = require('../regeneration.js');
       const target = createMockCreature();
       hamManager.registerCreature(target as any);
 
       hamManager.stopRegeneration(target as any);
 
-      expect(pauseRegeneration).toHaveBeenCalled();
+      expect(vi.mocked(pauseRegeneration)).toHaveBeenCalled();
     });
 
     it('should update regen bonuses', () => {
-      const { updateRegenBonuses } = require('../regeneration.js');
       const target = createMockCreature();
       hamManager.registerCreature(target as any);
 
@@ -649,7 +695,7 @@ describe('HamManager', () => {
         entertainerBonus: true,
       });
 
-      expect(updateRegenBonuses).toHaveBeenCalled();
+      expect(vi.mocked(updateRegenBonuses)).toHaveBeenCalled();
     });
   });
 
@@ -729,7 +775,6 @@ describe('HamManager', () => {
 
   describe('Deathblow', () => {
     it('should apply deathblow to incapacitated target', () => {
-      const { applyDeathblow: mockApplyDeathblow } = require('../incapacitation.js');
       const attacker = createMockCreature();
       const target = createMockCreature();
       target.isIncapacitated = vi.fn(() => true);
@@ -742,7 +787,7 @@ describe('HamManager', () => {
       const result = hamManager.applyDeathblow(attacker as any, target as any);
 
       expect(result).toBe(true);
-      expect(mockApplyDeathblow).toHaveBeenCalled();
+      expect(vi.mocked(applyDeathblow)).toHaveBeenCalled();
     });
 
     it('should not apply deathblow to non-incapacitated target', () => {
@@ -762,7 +807,6 @@ describe('HamManager', () => {
 
   describe('Cloning', () => {
     it('should clone dead creature', () => {
-      const { cloneCreature: mockCloneCreature } = require('../incapacitation.js');
       const target = createMockCreature();
       target.isDead = vi.fn(() => true);
       hamManager.registerCreature(target as any);
@@ -774,7 +818,7 @@ describe('HamManager', () => {
       const result = hamManager.clone(target as any, { x: 0, y: 0, z: 0 });
 
       expect(result).toBe(true);
-      expect(mockCloneCreature).toHaveBeenCalled();
+      expect(vi.mocked(cloneCreature)).toHaveBeenCalled();
     });
 
     it('should not clone living creature', () => {
@@ -787,13 +831,12 @@ describe('HamManager', () => {
     });
 
     it('should check for clone sickness', () => {
-      const { hasCloneSickness: mockHasCloneSickness } = require('../incapacitation.js');
       const target = createMockCreature();
       hamManager.registerCreature(target as any);
 
       hamManager.hasCloneSickness(target as any);
 
-      expect(mockHasCloneSickness).toHaveBeenCalled();
+      expect(vi.mocked(hasCloneSickness)).toHaveBeenCalled();
     });
   });
 
@@ -854,7 +897,6 @@ describe('HamManager', () => {
 
   describe('Tick Processing', () => {
     it('should process tick for all registered creatures', () => {
-      const { processRegeneration } = require('../regeneration.js');
       const creature1 = createMockCreature();
       const creature2 = createMockCreature();
 
@@ -863,11 +905,10 @@ describe('HamManager', () => {
 
       hamManager.tick(1000);
 
-      expect(processRegeneration).toHaveBeenCalledTimes(2);
+      expect(vi.mocked(processRegeneration)).toHaveBeenCalledTimes(2);
     });
 
     it('should skip dead creatures during tick', () => {
-      const { processRegeneration } = require('../regeneration.js');
       const deadCreature = createMockCreature();
       deadCreature.isDead = vi.fn(() => true);
 
@@ -875,11 +916,10 @@ describe('HamManager', () => {
 
       hamManager.tick(1000);
 
-      expect(processRegeneration).not.toHaveBeenCalled();
+      expect(vi.mocked(processRegeneration)).not.toHaveBeenCalled();
     });
 
     it('should process incap timer for incapacitated creatures', () => {
-      const { processIncapTick } = require('../incapacitation.js');
       const incappedCreature = createMockCreature();
       hamManager.registerCreature(incappedCreature as any);
 
@@ -889,7 +929,7 @@ describe('HamManager', () => {
 
       hamManager.tick(1000);
 
-      expect(processIncapTick).toHaveBeenCalled();
+      expect(vi.mocked(processIncapTick)).toHaveBeenCalled();
     });
   });
 
@@ -899,6 +939,10 @@ describe('HamManager', () => {
 
   describe('Realistic SWG Scenarios', () => {
     it('should handle womp rat attacking player', () => {
+      // Mock Math.random to ensure deterministic hit location (body, 1.0x)
+      // and no crit/glancing rolls, so damage > protection
+      vi.spyOn(Math, 'random').mockReturnValue(0.5);
+
       const player = createMockCreature();
       player.health = { current: 800, max: 800, wounds: 0 };
       player.getProtection = vi.fn(() => 25); // Light armor
@@ -918,6 +962,8 @@ describe('HamManager', () => {
       expect(result.rawDamage).toBe(45);
       expect(player.damageHealth).toHaveBeenCalled();
       expect(player.enterCombat).toHaveBeenCalled();
+
+      vi.restoreAllMocks();
     });
 
     it('should handle medic healing wounded player', () => {
