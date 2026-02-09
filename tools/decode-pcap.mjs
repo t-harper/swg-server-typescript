@@ -166,11 +166,17 @@ function validateAndStripCrc(data, crcLen, seed) {
 
 // ── SWG Message Opcode Names ─────────────────────────────────────────
 const KNOWN_OPCODES = {
+  // Login messages
   0x41131f96: 'LoginClientId',
   0x00000005: 'LoginClientToken',
   0xc11c63b9: 'LoginEnumCluster',
   0x3436aeb6: 'LoginClusterStatus',
   0xc4de864c: 'EnumerateCharacterId',
+  0xa25b53d0: 'EnumerateCharacterIdResponse',
+  0xd5ea6a39: 'LoginIncorrectClientId',
+  0x44b3a15c: 'StationIdHasJediSlot',
+  0x60579eb3: 'GalaxyLoopTimesResponse',
+  // Character creation
   0xb97f3074: 'ClientCreateCharacter',
   0x1db575cc: 'CreateCharacterSuccess',
   0xdf333c6e: 'CreateCharacterFailure',
@@ -178,26 +184,35 @@ const KNOWN_OPCODES = {
   0x9b2c6ba7: 'ClientVerifyAndLockNameResponse',
   0xd6d1b6d1: 'ClientRandomNameRequest',
   0xe85fb868: 'ClientRandomNameResponse',
+  // Connection messages
   0xd5899226: 'ClientIdMsg',
   0xb5098d76: 'SelectCharacter',
   0x31805ee0: 'ConnectionOpen',
   0x979f0279: 'AccountFeatureBits',
-  0x04726d9a: 'CmdStartScene',
+  // Zone messages (verified from C++ pcap)
+  0x3ae6dfae: 'CmdStartScene',
+  0x487652da: 'ParametersMessage',
   0xfe89ddea: 'SceneCreateObjectByCrc',
   0x68a75f0c: 'BaselinesMessage',
   0x12862153: 'DeltasMessage',
   0x2c436037: 'SceneEndBaselines',
-  0x2e365218: 'ServerTimeMessage',
   0x43fd1c22: 'CmdSceneReady',
-  0x80ce5e46: 'HeartBeat',
-  0xe00cc70b: 'ClientPermissionsMessage',
-  0x6862a120: 'ChatServerStatus',
-  0x65ea4574: 'ParametersMessage',
-  0x44b3a15c: 'StationIdHasJediSlot',
-  0xd5ea6a39: 'LoginIncorrectClientId',
+  0x2efaa1e9: 'ServerTimeMessage',
+  0x56cbde9e: 'UpdateContainment',
+  0x08a1c126: 'UpdatePvpStatusMessage',
+  0x0bde6b41: 'UpdatePostureMessage',
+  // Object/game messages
+  0x80ce5e46: 'ObjControllerMessage',
+  0xe00730e5: 'ClientPermissionsMessage',
+  0x7102b15f: 'ChatServerStatus',
   0x9e601905: 'VoiceChatStatus',
-  0xa25b53d0: 'EnumerateCharacterIdResponse',
-  0x60579eb3: 'GalaxyLoopTimesResponse',
+  0xf5ea7b42: 'PostureMessage',
+  0xf35dbfbe: 'AttributeListMessage',
+  // Client post-zone messages
+  0x4c3d2cfa: 'ChatRequestRoomList',
+  0x2e365218: 'ConnectPlayerMessage',
+  0xd44b7259: 'SuiCreatePageMessage',
+  0x6d2a6413: 'PlayClientEffectObjectMessage',
 };
 
 function opcodeName(op) {
@@ -212,10 +227,54 @@ function hex(bytes, max) {
 // ── Parse SWG message from decrypted payload ─────────────────────────
 function parseSwgMessages(data) {
   const messages = [];
-  if (data.length < 6) return messages;
+  if (data.length < 2) return messages;
 
-  // Check if this looks like a multi-message (opcode 0x0019 etc)
-  // The SWG game-level message starts with operandCount(u16LE) + opcode(u32LE)
+  // Check for UdpPacketGroup (0x00 0x19) — multiple SWG messages bundled
+  // with variable-length size prefixes
+  if (data[0] === 0x00 && data[1] === 0x19) {
+    let off = 2;
+    while (off < data.length) {
+      // Read variable-length size: 1 byte if < 0xFF, else 0xFF + u16BE
+      let msgSize = data[off++];
+      if (msgSize === 0xff && off + 2 <= data.length) {
+        msgSize = (data[off] << 8) | data[off + 1];
+        off += 2;
+      } else if (msgSize === 0xfe && off + 3 <= data.length) {
+        msgSize = (data[off] << 16) | (data[off + 1] << 8) | data[off + 2];
+        off += 3;
+      }
+      if (msgSize === 0 || off + msgSize > data.length) break;
+
+      const msgData = data.subarray(off, off + msgSize);
+      off += msgSize;
+
+      if (msgData.length >= 6) {
+        const operandCount = msgData[0] | (msgData[1] << 8);
+        const opcode = (msgData[2] | (msgData[3] << 8) | (msgData[4] << 16) | (msgData[5] << 24)) >>> 0;
+        messages.push({ operandCount, opcode, name: opcodeName(opcode), data: msgData });
+      } else if (msgData.length >= 2) {
+        // Short message (e.g., CmdSceneReady with operandCount=1)
+        const operandCount = msgData[0] | (msgData[1] << 8);
+        if (msgData.length >= 6) {
+          const opcode = (msgData[2] | (msgData[3] << 8) | (msgData[4] << 16) | (msgData[5] << 24)) >>> 0;
+          messages.push({ operandCount, opcode, name: opcodeName(opcode), data: msgData });
+        } else {
+          messages.push({ operandCount, opcode: 0, name: `Short(${msgData.length}b)`, data: msgData });
+        }
+      }
+    }
+    return messages;
+  }
+
+  // Single SWG message: operandCount(u16LE) + opcode(u32LE)
+  if (data.length < 6) {
+    if (data.length >= 2) {
+      const operandCount = data[0] | (data[1] << 8);
+      messages.push({ operandCount, opcode: 0, name: `Short(${data.length}b)`, data });
+    }
+    return messages;
+  }
+
   const operandCount = data[0] | (data[1] << 8);
   const opcode = (data[2] | (data[3] << 8) | (data[4] << 16) | (data[5] << 24)) >>> 0;
 
@@ -381,9 +440,19 @@ for (let i = 0; i < packets.length; i++) {
     const rel = parseReliableData(decrypted);
     if (!rel) continue;
     const msgs = parseSwgMessages(rel.payload);
-    for (const msg of msgs) {
-      console.log(`--- Frame ${i + 1} [${direction}] port=${serverPort} SOE=Data seq=${rel.seq} | SWG: ${msg.name} (0x${msg.opcode.toString(16)}) operands=${msg.operandCount} len=${msg.data.length}`);
-      console.log(`    hex: ${hex(msg.data, 80)}`);
+    const isGroup = rel.payload.length >= 2 && rel.payload[0] === 0x00 && rel.payload[1] === 0x19;
+    if (isGroup && msgs.length > 0) {
+      console.log(`--- Frame ${i + 1} [${direction}] port=${serverPort} SOE=Data seq=${rel.seq} | MultiMessage (${msgs.length} SWG messages)`);
+      for (let mi = 0; mi < msgs.length; mi++) {
+        const msg = msgs[mi];
+        console.log(`    [${mi}] ${msg.name} (0x${msg.opcode.toString(16)}) operands=${msg.operandCount} len=${msg.data.length}`);
+        console.log(`        hex: ${hex(msg.data, 80)}`);
+      }
+    } else if (msgs.length > 0) {
+      for (const msg of msgs) {
+        console.log(`--- Frame ${i + 1} [${direction}] port=${serverPort} SOE=Data seq=${rel.seq} | SWG: ${msg.name} (0x${msg.opcode.toString(16)}) operands=${msg.operandCount} len=${msg.data.length}`);
+        console.log(`    hex: ${hex(msg.data, 80)}`);
+      }
     }
     if (msgs.length === 0) {
       console.log(`--- Frame ${i + 1} [${direction}] port=${serverPort} SOE=Data seq=${rel.seq} payload_len=${rel.payload.length} hex=[${hex(rel.payload, 60)}]`);
@@ -406,9 +475,19 @@ for (let i = 0; i < packets.length; i++) {
           const seq = (sub[2] << 8) | sub[3];
           const payload = sub.subarray(4);
           const msgs = parseSwgMessages(payload);
-          for (const msg of msgs) {
-            console.log(`    sub[${si}] Data seq=${seq} | SWG: ${msg.name} (0x${msg.opcode.toString(16)}) operands=${msg.operandCount} len=${msg.data.length}`);
-            console.log(`      hex: ${hex(msg.data, 80)}`);
+          const isGroup = payload.length >= 2 && payload[0] === 0x00 && payload[1] === 0x19;
+          if (isGroup && msgs.length > 0) {
+            console.log(`    sub[${si}] Data seq=${seq} | MultiMessage (${msgs.length} SWG messages)`);
+            for (let mi = 0; mi < msgs.length; mi++) {
+              const msg = msgs[mi];
+              console.log(`      [${mi}] ${msg.name} (0x${msg.opcode.toString(16)}) operands=${msg.operandCount} len=${msg.data.length}`);
+              console.log(`          hex: ${hex(msg.data, 80)}`);
+            }
+          } else {
+            for (const msg of msgs) {
+              console.log(`    sub[${si}] Data seq=${seq} | SWG: ${msg.name} (0x${msg.opcode.toString(16)}) operands=${msg.operandCount} len=${msg.data.length}`);
+              console.log(`      hex: ${hex(msg.data, 80)}`);
+            }
           }
           if (msgs.length === 0) {
             console.log(`    sub[${si}] Data seq=${seq} payload_len=${payload.length} hex=[${hex(payload, 40)}]`);

@@ -77,6 +77,7 @@ export interface PostureMessage extends PostureMessageBase {
  */
 export function serializePostureMessage(message: PostureMessage): Uint8Array {
   const writer = new BufferWriter(16);
+  writer.writeUInt16LE(3); // operandCount (2 fields + cmd)
   writer.writeUInt32LE(message.opcode);
   writer.writeUInt64LE(message.objectId);
   writer.writeUInt8(message.posture);
@@ -88,6 +89,7 @@ export function serializePostureMessage(message: PostureMessage): Uint8Array {
  */
 export function deserializePostureMessage(data: Uint8Array): PostureMessage {
   const reader = new BufferReader(data);
+  reader.readUInt16LE(); // operandCount
   const opcode = reader.readUInt32LE();
   if (opcode !== PostureMessageOpcode.PostureMessage) {
     throw new Error(`Invalid opcode for PostureMessage: 0x${opcode.toString(16)}`);

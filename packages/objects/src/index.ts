@@ -194,16 +194,12 @@ export {
 export {
   TANO_TYPE_CRC,
   DeltaOperation,
+  serializeTanoBaseline1,
   serializeTanoBaseline3,
+  serializeTanoBaseline4,
   serializeTanoBaseline6,
-  generateTanoBaseline3Delta,
-  generateTanoBaseline6Delta,
-  generateEffectsListDelta,
-  generateDefendersListDelta,
-  deserializeTanoBaseline3,
-  deserializeTanoBaseline6,
-  createBaselinePacket,
-  createDeltaPacket,
+  serializeTanoBaseline8,
+  serializeTanoBaseline9,
 } from './baselines/tano-baselines.js';
 
 // CREO-specific baseline serialization

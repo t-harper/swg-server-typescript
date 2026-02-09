@@ -26,6 +26,7 @@ import {
   isZoneMessageOpcode,
   createCmdStartScene,
   serializeCmdStartScene,
+  serializeCmdSceneReady,
   createSceneCreateObjectByCrc,
   serializeSceneCreateObjectByCrc,
   createSceneEndBaselines,
@@ -54,6 +55,7 @@ import {
 } from '@swg/protocol/swg/messages/chat/chat-core.js';
 import {
   PlayerObject as PlayerObjectClass,
+  TangibleObject,
   calculateTemplateCrc,
   TemplateCrc,
 } from '@swg/objects';
@@ -77,6 +79,7 @@ import {
 import {
   sendCreatureBaselines,
   sendPlayerBaselines,
+  sendTangibleBaselines,
   type SendReliable,
 } from './services/baseline-sender.js';
 import {
@@ -585,16 +588,56 @@ export async function createServer(config: ServerConfig): Promise<GameServer> {
     // 8. SceneEndBaselines for PLAY object
     send(serializeSceneEndBaselines(createSceneEndBaselines(playId)));
 
-    // 9. UpdatePvpStatusMessage for player (flags: IsPlayer=0x10)
+    // 9-12. Child container objects (inventory, datapad, bank, mission_bag)
+    // C++ creates these as TANO children of the CREO, each in their own slot.
+    // The client requires these to complete the loading screen.
+    const childContainers = [
+      { id: creoId + 2n, crc: TemplateCrc.INVENTORY, name: 'inventory' },
+      { id: creoId + 3n, crc: TemplateCrc.DATAPAD, name: 'datapad' },
+      { id: creoId + 4n, crc: TemplateCrc.BANK, name: 'bank' },
+      { id: creoId + 5n, crc: TemplateCrc.MISSION_BAG, name: 'mission_bag' },
+    ];
+
+    for (const container of childContainers) {
+      const tano = new TangibleObject(container.id, container.crc);
+      tano.visible = true;
+      tano.volume = 1;
+
+      // SceneCreateObjectByCrc
+      send(serializeSceneCreateObjectByCrc(createSceneCreateObjectByCrc(
+        container.id,
+        container.crc,
+        0, 0, 0,      // no world position (contained in CREO)
+        0, 0, 0, 1,   // identity quaternion
+        false,
+      )));
+
+      // UpdateContainment — link child to CREO (slot arrangement = 4)
+      // Arrangement index 4 = first real slot after 4 "anything" slots
+      send(serializeUpdateContainment(createUpdateContainment(container.id, creoId, 4)));
+
+      // TANO baselines (3, 6, 1, 4, 8, 9)
+      sendTangibleBaselines(tano, container.id, send);
+
+      // UpdatePvpStatusMessage (flags=0 for containers)
+      send(createUpdatePvpStatusMessage(0, 0, container.id));
+
+      // SceneEndBaselines
+      send(serializeSceneEndBaselines(createSceneEndBaselines(container.id)));
+    }
+
+    console.log(`[GameServer] Sent ${childContainers.length} child container objects`);
+
+    // 13. UpdatePvpStatusMessage for player (flags: IsPlayer=0x10)
     send(createUpdatePvpStatusMessage(0x10, 0, creoId));
 
-    // 10. UpdatePostureMessage for player
+    // 14. UpdatePostureMessage for player
     send(createUpdatePostureMessage(Posture.UPRIGHT, creoId));
 
-    // 11. SceneEndBaselines for CREO object (comes AFTER all child objects)
+    // 15. SceneEndBaselines for CREO object (comes AFTER all child objects)
     send(serializeSceneEndBaselines(createSceneEndBaselines(creoId)));
 
-    // 12. ServerTimeMessage — synchronize the client clock
+    // 16. ServerTimeMessage — synchronize the client clock
     send(serializeServerTimeMessage(createServerTimeMessage(BigInt(Math.floor(Date.now() / 1000)))));
 
     console.log(`[GameServer] Zone-in sequence sent for CREO=${creoId} PLAY=${playId}`);
@@ -609,6 +652,17 @@ export async function createServer(config: ServerConfig): Promise<GameServer> {
     if (data.length < 1) {
       console.warn(`[GameServer] SWG message too short from ${clientKey}`);
       return;
+    }
+
+    // Debug: log first bytes of ALL incoming SWG messages
+    const hexPreview = Array.from(data.subarray(0, Math.min(20, data.length)))
+      .map(b => b.toString(16).padStart(2, '0')).join(' ');
+    if (data.length >= 6) {
+      const dbgView = new DataView(data.buffer, data.byteOffset, data.byteLength);
+      const dbgOpcode = dbgView.getUint32(2, true);
+      console.log(`[GameServer] SWG msg len=${data.length} opcode=0x${dbgOpcode.toString(16)} hex=[${hexPreview}] from ${clientKey}`);
+    } else {
+      console.log(`[GameServer] SWG msg len=${data.length} hex=[${hexPreview}] from ${clientKey}`);
     }
 
     // 4-byte opcode messages (preceded by u16 operandCount)
@@ -688,6 +742,8 @@ export async function createServer(config: ServerConfig): Promise<GameServer> {
 
         if (opcode === ZoneMessageOpcode.CmdSceneReady) {
           console.log(`[GameServer] CmdSceneReady from ${clientKey}`);
+          // Echo CmdSceneReady back to client (C++ server does this to signal gameplay start)
+          sessionManager.sendReliable(soeSession, serializeCmdSceneReady());
           if (session.player) {
             await zoneService.onSceneReady(session.player);
           }

@@ -25,6 +25,7 @@ import {
   serializeBaselinesMessage,
 } from '@swg/protocol';
 import type { CreatureObject, PlayerObject } from '@swg/objects';
+import { TangibleObject } from '@swg/objects';
 import {
   serializeCreoBaseline1,
   serializeCreoBaseline3,
@@ -36,6 +37,12 @@ import {
   serializePlayBaseline6,
   serializePlayBaseline8,
   serializePlayBaseline9,
+  serializeTanoBaseline1,
+  serializeTanoBaseline3,
+  serializeTanoBaseline4,
+  serializeTanoBaseline6,
+  serializeTanoBaseline8,
+  serializeTanoBaseline9,
 } from '@swg/objects';
 
 /**
@@ -94,6 +101,30 @@ export function sendPlayerBaselines(
     serializePlayBaseline6(player),
     serializePlayBaseline8(player),
     serializePlayBaseline9(player),
+  ];
+
+  for (const baseline of baselines) {
+    send(wrapBaseline(objectId, baseline));
+  }
+}
+
+/**
+ * Send all baselines for a tangible object (TANO 3, 6, 1, 4, 8, 9)
+ * Used for child container objects (inventory, datapad, bank, mission_bag)
+ */
+export function sendTangibleBaselines(
+  tangible: TangibleObject,
+  objectId: bigint,
+  send: SendReliable
+): void {
+  // C++ order: shared (3,6), auth client (1,4), first parent (8,9)
+  const baselines = [
+    serializeTanoBaseline3(tangible),
+    serializeTanoBaseline6(tangible),
+    serializeTanoBaseline1(tangible),
+    serializeTanoBaseline4(),
+    serializeTanoBaseline8(),
+    serializeTanoBaseline9(),
   ];
 
   for (const baseline of baselines) {

@@ -64,7 +64,9 @@ podman logs swg-js-login-server        # View logs
 
 **Use `podman compose`** (not `docker compose`) on this system. Must run from the `docker/` directory.
 
-Services: MySQL 8, Redis 7, login-server, connection-server, game-server, chat-server. All on a bridge network (172.28.0.0/16). `PUBLIC_ADDRESS` in `.env` controls what IP clients connect to.
+**IMPORTANT**: `podman compose restart` does NOT pick up new container images — it just restarts existing containers. To deploy code changes, you must `podman compose down` then `podman compose up -d` (or `podman compose build <service>` first for a single service).
+
+Services: MySQL 8, Redis 7, login-server, connection-server, game-server, chat-server. All on a bridge network (172.28.0.0/16). `PUBLIC_ADDRESS` in `.env` controls what IP clients connect to. MySQL port is 3307, Redis port is 6380 (non-default to avoid conflicts).
 
 ## Protocol Architecture
 
@@ -89,7 +91,34 @@ Two-layer protocol stack:
 1. **Login**: `LoginClientId` -> `LoginClientToken` + `LoginEnumCluster` + `LoginClusterStatus` + `CharacterCreationDisabled` (grouped) -> `StationIdHasJediSlot` + `EnumerateCharacterIdResponse` (grouped)
 2. **Game Server Auth**: Client connects to game server -> `ClientIdMsg` (token validation) -> `HeartBeat` + `AccountFeatureBits` + `ClientPermissions` (grouped)
 3. **Character Select**: `SelectCharacter` -> `ChatServerStatus` + `VoiceChatStatus` -> zone-in sequence
-4. **Zone-In**: `CmdStartScene` -> `SceneCreateObjectByCrc` -> CREO baselines (1,3,4,6) -> PLAY baselines (3,6,8,9) -> `SceneEndBaselines` -> `ServerTimeMessage`
+4. **Zone-In** (see detailed sequence below)
+
+## Zone-In Sequence (C++ pcap verified)
+
+The zone-in is implemented in `apps/game-server/src/server.ts` (`sendZoneInSequence`). The exact packet order matters — the client crashes if messages are missing or misordered.
+
+```
+1.  ParametersMessage(weatherUpdateInterval=900)     ← REQUIRED, client crashes without it
+2.  CmdStartScene(terrainFile, position, template)   ← sceneName = "terrain/tatooine.trn"
+3.  SceneCreateObjectByCrc(CREO objectId)            ← creature object
+4.  BaselinesMessage × 6: CREO 1, 3, 4, 6, 8, 9    ← pkgs 8/9 are empty (varCount=0) but required
+5.  SceneCreateObjectByCrc(PLAY objectId)            ← PLAY is a SEPARATE object (creoId + 1)
+6.  UpdateContainment(PLAY → CREO, slot=-1)          ← links PLAY inside CREO
+7.  BaselinesMessage × 4: PLAY 3, 6, 8, 9           ← sent to PLAY objectId, NOT CREO objectId
+8.  SceneEndBaselines(PLAY)
+9.  UpdatePvpStatusMessage(flags=0x10, target=CREO)  ← IsPlayer flag
+10. UpdatePostureMessage(UPRIGHT, target=CREO)
+11. SceneEndBaselines(CREO)                          ← CREO end comes AFTER all child objects
+12. ServerTimeMessage
+```
+
+**Key rules:**
+- PLAY object MUST have its own objectId (currently `creoId + 1n`) and its own `SceneCreateObjectByCrc`
+- CREO MUST send all 6 baseline packages (1,3,4,6,8,9) even though 8/9 are empty
+- `CmdStartScene` sceneName is the terrain file path (`terrain/tatooine.trn`), NOT the scene ID (`tatooine`)
+- `SceneEndBaselines` for CREO must come AFTER PLAY's `SceneEndBaselines`
+- `ParametersMessage` opcode is `0x487652da` (the `world-messages.ts` value was wrong as `0x3324f080` and has been fixed)
+- `UpdatePostureMessage` (`0x0bde6b41`) is a different message from `PostureMessage` (`0xf5ea7b42`)
 
 ## Critical Protocol Gotchas
 
@@ -98,6 +127,8 @@ Two-layer protocol stack:
 - **LoginClusterStatus trailing `reserved` u16**: The C++ *server* source code does NOT have this field, but the *client binary* REQUIRES it. Removing it causes exception `e06d7363`. This is a client/server source version mismatch. Always write `reserved ?? 0` as a u16 at the end of each ClusterStatusDataEntry.
 
 - **AccountFeatureBits `epochSeconds` field**: Must include all 4 fields after opcode: `gameFeatures(u32)` + `subscriptionFeatures(u32)` + `connectionServerNumber(i32)` + `epochSeconds(i32)`. Missing the epoch crashes the client.
+
+- **ParametersMessage before zone-in**: Must be sent before `CmdStartScene`. Contains `weatherUpdateInterval` (default 900). Client crashes without it.
 
 ### Message grouping matters
 
@@ -116,8 +147,14 @@ Two-layer protocol stack:
 ### Baseline format (C++ Packager.cpp match)
 - Package mapping: `addSharedVariable`->Pkg3, `addSharedVariable_np`->Pkg6, `addAuthClientServerVariable`->Pkg1, `addAuthClientServerVariable_np`->Pkg4, `addFirstParentAuthClientServerVariable`->Pkg8, `addFirstParentAuthClientServerVariable_np`->Pkg9
 - Server-only vars (`addServerVariable`/`addServerVariable_np`) are NOT sent to client
+- CREO sends 6 packages: 1(4 vars), 3(19), 4(16), 6(35), 8(0 empty), 9(0 empty)
+- PLAY sends 4 packages: 3(20 vars), 6(17), 8(9), 9(29)
 - `AutoDeltaVector` baseline: `size + counter + elements` (NO cmd byte)
 - `AutoDeltaSet/Map`: `size + counter + [u8(cmd) + element]`
+
+### Opcode pitfalls
+- Some opcodes in `world-messages.ts` and `cpp-packet-stubs.ts` were auto-generated and may be wrong. Always verify against `cpp-packet-manifest.ts` (`swgCrc32` field) which is parsed from C++ constructor strings.
+- `UpdatePostureMessage` (0x0bde6b41) vs `PostureMessage` (0xf5ea7b42) — different opcodes, different wire formats.
 
 ## Reference Materials
 
@@ -139,7 +176,7 @@ Located at `/home/tharper/code/swg-source-docker/swg-main/src/`. This is the ope
 ```bash
 node tools/decode-pcap.mjs docs/pcaps/login_capture_c++.pcap [port-filter]
 ```
-Decodes SOE-encrypted packets from pcap files. Handles SOE session negotiation, decryption, decompression, and SWG opcode identification. Note: some opcode mappings in this tool may be outdated.
+Decodes SOE-encrypted packets from pcap files. Handles SOE session negotiation, decryption, decompression, and SWG opcode identification. Properly unwraps UdpPacketGroup / MultiMessage (0x00 0x19) bundles into individual SWG messages with correct opcode resolution. Output shows `MultiMessage (N SWG messages)` with indexed sub-messages for easy protocol analysis.
 
 ### Packet Parity Tools (tools/packet-parity/)
 - `generate-cpp-packet-manifest.mjs` - Parses C++ source to generate TypeScript manifest of all 526 packet types
@@ -183,6 +220,18 @@ Key test suites:
 - `packages/protocol/src/swg/wire/cpp-wire-codec.test.ts` - 42 roundtrip tests for C++ packet codec
 - `packages/protocol/src/soe/udp-library-wire.test.ts` - SOE protocol tests
 - `tests/integration/` - Login and zone-entry integration tests
+
+## Data Management
+
+Clear all game data (useful when testing protocol changes):
+```bash
+mysql -h 127.0.0.1 -P 3307 -u swg -pswg swg -e "DELETE FROM character_skills; DELETE FROM character_experience; DELETE FROM characters; DELETE FROM accounts;"
+podman exec swg-js-redis redis-cli -a swg_redis_password FLUSHALL
+```
+
+## Profanity Filter
+
+Profanity filter exists in 3 copies (login-server, connection-server, game-server `src/data/profanity-filter.ts`). All 3 must be kept in sync. The `normalizeString()` function strips non-alphanumeric characters, so symbol-heavy entries like `a$$` normalize to `a` which matches every name via substring check. A minimum-length guard (< 3 chars) prevents these false positives.
 
 ## Pre-existing Issues
 

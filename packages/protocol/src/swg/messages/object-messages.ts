@@ -190,8 +190,8 @@ export interface ClientOpenContainerMessage {
 export function serializeClientOpenContainerMessage(msg: ClientOpenContainerMessage): Uint8Array {
   const writer = new BufferWriter();
 
-  // operandCount = 2
-  writer.writeUInt16LE(2);
+  // operandCount = 3 (2 fields + cmd)
+  writer.writeUInt16LE(3);
   writer.writeUInt32LE(ObjectMessageOpcodes.ClientOpenContainerMessage);
 
   writer.writeUInt64LE(msg.containerId);
@@ -297,8 +297,8 @@ export interface UpdatePvpStatusMessage {
 export function serializeUpdatePvpStatusMessage(msg: UpdatePvpStatusMessage): Uint8Array {
   const writer = new BufferWriter();
 
-  // operandCount = 3
-  writer.writeUInt16LE(3);
+  // operandCount = 4 (3 fields + cmd)
+  writer.writeUInt16LE(4);
   writer.writeUInt32LE(ObjectMessageOpcodes.UpdatePvpStatusMessage);
 
   writer.writeUInt32LE(msg.pvpFlags);
@@ -342,8 +342,8 @@ export interface ConsentResponseMessage {
 export function serializeConsentResponseMessage(msg: ConsentResponseMessage): Uint8Array {
   const writer = new BufferWriter();
 
-  // operandCount = 2
-  writer.writeUInt16LE(2);
+  // operandCount = 3 (2 fields + cmd)
+  writer.writeUInt16LE(3);
   writer.writeUInt32LE(ObjectMessageOpcodes.ConsentResponseMessage);
 
   writer.writeStringWithLength16LE(msg.playerName);
@@ -384,8 +384,8 @@ export interface UpdateCellPermissionMessage {
 export function serializeUpdateCellPermissionMessage(msg: UpdateCellPermissionMessage): Uint8Array {
   const writer = new BufferWriter();
 
-  // operandCount = 2
-  writer.writeUInt16LE(2);
+  // operandCount = 3 (2 fields + cmd)
+  writer.writeUInt16LE(3);
   writer.writeUInt32LE(ObjectMessageOpcodes.UpdateCellPermissionMessage);
 
   writer.writeUInt8(msg.allowed ? 1 : 0);
