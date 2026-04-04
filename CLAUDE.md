@@ -90,7 +90,7 @@ Two-layer protocol stack:
 
 ### Client Login Flow
 1. **Login**: `LoginClientId` -> `LoginClientToken` + `LoginEnumCluster` + `LoginClusterStatus` + `CharacterCreationDisabled` (grouped) -> `StationIdHasJediSlot` + `EnumerateCharacterIdResponse` (grouped)
-2. **Game Server Auth**: Client connects to game server -> `ClientIdMsg` (token validation) -> `HeartBeat` + `AccountFeatureBits` + `ClientPermissions` (grouped)
+2. **Game Server Auth**: Client connects to game server -> proactive group (`GameServerLagResponse` + `SystemAssignedProcessId`) -> `ClientIdMsg` (token validation) -> `AccountFeatureBits` + `ClientPermissions` (individual reliable sends, NOT grouped)
 3. **Character Select**: `SelectCharacter` -> `ChatServerStatus` + `VoiceChatStatus` -> zone-in sequence
 4. **Zone-In** (see detailed sequence below)
 
@@ -131,12 +131,19 @@ The zone-in is implemented in `apps/game-server/src/server.ts` (`sendZoneInSeque
 
 - **ParametersMessage before zone-in**: Must be sent before `CmdStartScene`. Contains `weatherUpdateInterval` (default 900). Client crashes without it.
 
+- **SWG messages require trailing zero padding**: The client's `NetworkMessageFactory::makeMessage()` creates a base `GameNetworkMessage` to read the opcode. The base class's `AutoByteStream::unpack()` iterates `operandCount` times over `m_members`, but only 1 member (cmd) exists. The out-of-bounds reads attempt to deserialize from the remaining buffer. If the buffer is exactly message-sized (no extra bytes), `ByteStream::get()` throws `ReadException` (exception `e06d7363`). **Fix**: Pad all SWG messages with 64 trailing zero bytes so the client's overread has safe buffer room. This is why `ClientPermissionsMessage` and other messages need extra padding in their serializers.
+
+- **GameServerLagResponse opcode**: The correct opcode is `0x789a4e0a` (swgCrc32 of "GameServerLagResponse"). The value `0x0e20d7e9` that appeared in earlier code was WRONG. The SWG CRC algorithm (in `Crc.cpp`) uses a left-shifting polynomial table, NOT the standard IEEE CRC32.
+
+- **ClientPermissionsMessage fields (C++ ClientPermissionsMessage.h)**: 4 fields: `canLogin(bool)` + `canCreateRegularCharacter(bool)` + `canCreateJediCharacter(bool)` + `canSkipTutorial(bool)`. operandCount=5. NOT the 5-field version (canLogin, canPlay, canSave, canSendMail, isAdmin) that was in earlier code.
+
 ### Message grouping matters
 
 - **LoginClusterStatusEx** must be sent as a **separate** `sendReliable()`, NOT bundled in the login response group.
 - The login response group (Data seq=1) should contain exactly: `ServerNowEpochTime` + `LoginClientToken` + `LoginEnumCluster` + `CharacterCreationDisabled` + `LoginClusterStatus`.
 - Avatar list is a separate group (Data seq=2): `StationIdHasJediSlot` + `EnumerateCharacterIdResponse`.
-- On session connect, send proactive group (Data seq=0): `GameServerLagResponse` + `SystemAssignedProcessId`.
+- On session connect, send proactive group (Data seq=0): `GameServerLagResponse` (`0x789a4e0a`) + `SystemAssignedProcessId` (`0x58c07f21`). Both login server AND game server must send this.
+- Post-auth messages (`AccountFeatureBits` + `ClientPermissionsMessage`) must be sent as **individual** `sendReliable()` calls, NOT in a `sendReliableGroup()`. HeartBeat is NOT part of auth — it's a keepalive.
 
 ### Wire format specifics
 - `LoginClientToken`: `token(AutoArray<u8>)` + `stationId(u32)` + `username(string)`
@@ -156,6 +163,7 @@ The zone-in is implemented in `apps/game-server/src/server.ts` (`sendZoneInSeque
 ### Opcode pitfalls
 - Some opcodes in `world-messages.ts` and `cpp-packet-stubs.ts` were auto-generated and may be wrong. Always verify against `cpp-packet-manifest.ts` (`swgCrc32` field) which is parsed from C++ constructor strings.
 - `UpdatePostureMessage` (0x0bde6b41) vs `PostureMessage` (0xf5ea7b42) — different opcodes, different wire formats.
+- **SWG CRC is NOT standard IEEE CRC32**. SWG uses a left-shifting CRC with polynomial table `0x04C11DB7` (see `Crc.cpp` in C++ source). Use the `swgCrc32()` function from `Crc.cpp` to compute opcodes, NOT `calculateCrc32()` from the SOE layer. Hardcoded opcodes for messages not in the manifest (e.g., `GameServerLagResponse`, `AccountFeatureBits`) must be verified against this algorithm.
 
 ## Reference Materials
 

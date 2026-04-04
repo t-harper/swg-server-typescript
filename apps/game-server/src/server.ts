@@ -102,8 +102,8 @@ const ConnectionServerMessageOpcode = {
 } as const;
 
 const DefaultFeatureBits = {
-  game: 0x00000000,
-  subscription: 0x00000001,
+  game: 0xFFFFFFFF,
+  subscription: 0xFFFFFFFF,
 } as const;
 
 function serializeAccountFeatureBits(
@@ -112,13 +112,20 @@ function serializeAccountFeatureBits(
   connectionServerNumber: number,
   epochSeconds: number,
 ): Uint8Array {
-  const writer = new BufferWriter(32);
+  // Extra trailing zero padding (64 bytes) to prevent ReadException in the client's
+  // makeMessage() — the base GameNetworkMessage constructor's AutoByteStream::unpack
+  // reads operandCount members from m_members, but only 1 (cmd) exists. The out-of-bounds
+  // access reads a garbage pointer whose unpack() reads additional bytes from the stream.
+  // Without padding, the stream is exactly 22 bytes and the overread throws ReadException.
+  const writer = new BufferWriter(128);
   writer.writeUInt16LE(2); // operandCount
   writer.writeUInt32LE(ConnectionServerMessageOpcode.AccountFeatureBits);
   writer.writeUInt32LE(gameFeatures >>> 0);
   writer.writeUInt32LE(subscriptionFeatures >>> 0);
   writer.writeInt32LE(connectionServerNumber | 0);
   writer.writeInt32LE(epochSeconds | 0);
+  // Pad with zeros so the ByteStream has room for garbage reads
+  for (let i = 0; i < 64; i++) writer.writeUInt8(0);
   return writer.toBuffer();
 }
 
@@ -264,17 +271,13 @@ export async function createServer(config: ServerConfig): Promise<GameServer> {
 
     const clientPermissions = createClientPermissionsMessage(
       true,  // canLogin
-      true,  // canPlay
-      false, // canSave
-      true,  // canSendMail
-      false, // isAdmin
+      true,  // canCreateRegularCharacter
+      true,  // canCreateJediCharacter
+      true,  // canSkipTutorial
     );
 
-    sessionManager.sendReliableGroup(ext.soeSession, [
-      serializeHeartBeat(),
-      accountFeatureBits,
-      clientPermissions,
-    ]);
+    sessionManager.sendReliable(ext.soeSession, accountFeatureBits);
+    sessionManager.sendReliable(ext.soeSession, clientPermissions);
 
     ext.sentPostAuthPackets = true;
     console.log(`[GameServer] Sent post-auth packets to ${ext.soeSession.getKey()}`);
@@ -492,6 +495,30 @@ export async function createServer(config: ServerConfig): Promise<GameServer> {
         playerObj.setExperience(xp.experienceType, xp.amount);
       }
     }
+
+    // Load appearance data from DB
+    if (character.appearance) {
+      if (character.appearance.customizationData) {
+        playerObj.appearanceData = new Uint8Array(character.appearance.customizationData);
+      }
+      if (character.appearance.scale != null) {
+        playerObj.height = character.appearance.scale;
+      }
+    }
+
+    // Set SWG-appropriate HAM defaults for a new player character
+    const defaultHam = 300;
+    playerObj.health.current = defaultHam;
+    playerObj.health.max = defaultHam;
+    playerObj.health.baseMax = defaultHam;
+    playerObj.action.current = defaultHam;
+    playerObj.action.max = defaultHam;
+    playerObj.action.baseMax = defaultHam;
+    playerObj.mind.current = defaultHam;
+    playerObj.mind.max = defaultHam;
+    playerObj.mind.baseMax = defaultHam;
+    playerObj.secondaryAttributes = [defaultHam, defaultHam, defaultHam, defaultHam, defaultHam, defaultHam];
+
     playerObj.startSession();
 
     // Movement-handler lightweight position tracker
@@ -634,9 +661,9 @@ export async function createServer(config: ServerConfig): Promise<GameServer> {
         false,
       )));
 
-      // UpdateContainment — link child to CREO (slot arrangement = 4)
-      // Arrangement index 4 = first real slot after 4 "anything" slots
-      send(serializeUpdateContainment(createUpdateContainment(container.id, creoId, 4)));
+      // UpdateContainment — link child to CREO (slot arrangement = -1)
+      // -1 = unslotted containment; client discovers containers by template type
+      send(serializeUpdateContainment(createUpdateContainment(container.id, creoId, -1)));
 
       // TANO baselines (3, 6, 1, 4, 8, 9)
       sendTangibleBaselines(tano, container.id, send);
@@ -817,6 +844,32 @@ export async function createServer(config: ServerConfig): Promise<GameServer> {
 
   sessionManager.on('session:connected', (session: Session) => {
     console.log(`[GameServer] Session connected: ${session.getKey()}`);
+
+    // Send proactive GameServerLagResponse + SystemAssignedProcessId (Data seq=0).
+    // The C++ server sends these immediately on session connect, before the client
+    // sends ClientIdMsg. This makes the post-auth group land on Data seq=1.
+    const processId = process.pid;
+    const serverName = `GameServer:${processId}`;
+
+    // GameServerLagResponse (0x0e20d7e9)
+    const lagRespBuf = new ArrayBuffer(2 + 4 + 2 + serverName.length);
+    const lagResp = new DataView(lagRespBuf);
+    lagResp.setUint16(0, 2, true); // operandCount=2
+    lagResp.setUint32(2, 0x789a4e0a, true); // swgCrc32("GameServerLagResponse")
+    lagResp.setUint16(6, serverName.length, true);
+    const lagRespBytes = new Uint8Array(lagRespBuf);
+    for (let i = 0; i < serverName.length; i++) {
+      lagRespBytes[8 + i] = serverName.charCodeAt(i);
+    }
+
+    // SystemAssignedProcessId (0x58c07f21)
+    const pidBuf = new ArrayBuffer(2 + 4 + 4);
+    const pidView = new DataView(pidBuf);
+    pidView.setUint16(0, 2, true); // operandCount=2
+    pidView.setUint32(2, 0x58c07f21, true);
+    pidView.setUint32(6, processId, true);
+
+    sessionManager.sendReliableGroup(session, [lagRespBytes, new Uint8Array(pidBuf)]);
   });
 
   sessionManager.on('session:disconnected', (session: Session, reason: number) => {

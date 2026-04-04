@@ -1639,16 +1639,17 @@ export class CreatureObject extends TangibleObject {
    * Get HAM current values as an array
    */
   getHamCurrentArray(): number[] {
+    const sa = this.secondaryAttributes;
     return [
       this.health.current,
-      0, // Strength (not tracked as current)
-      0, // Constitution
+      sa[0] ?? 0,  // Strength
+      sa[1] ?? 0,  // Constitution
       this.action.current,
-      0, // Quickness
-      0, // Stamina
+      sa[2] ?? 0,  // Quickness
+      sa[3] ?? 0,  // Stamina
       this.mind.current,
-      0, // Focus
-      0, // Willpower
+      sa[4] ?? 0,  // Focus
+      sa[5] ?? 0,  // Willpower
     ];
   }
 
@@ -1656,16 +1657,17 @@ export class CreatureObject extends TangibleObject {
    * Get HAM max values as an array
    */
   getHamMaxArray(): number[] {
+    const sa = this.secondaryAttributes;
     return [
       this.health.max,
-      0,
-      0,
+      sa[0] ?? 0,  // Strength
+      sa[1] ?? 0,  // Constitution
       this.action.max,
-      0,
-      0,
+      sa[2] ?? 0,  // Quickness
+      sa[3] ?? 0,  // Stamina
       this.mind.max,
-      0,
-      0,
+      sa[4] ?? 0,  // Focus
+      sa[5] ?? 0,  // Willpower
     ];
   }
 

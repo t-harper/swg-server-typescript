@@ -390,10 +390,9 @@ export async function createServer(config: ServerConfig): Promise<ConnectionServ
 
     const clientPermissions = createClientPermissionsMessage(
       true,  // canLogin
-      true,  // canPlay
-      false, // canSave (matches C++ default)
-      true,  // canSendMail
-      false, // isAdmin
+      true,  // canCreateRegularCharacter
+      true,  // canCreateJediCharacter
+      true,  // canSkipTutorial
     );
 
     // Match C++ post-auth ordering seen in packet captures.

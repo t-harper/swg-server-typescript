@@ -432,7 +432,7 @@ export async function createServer(config: ServerConfig): Promise<LoginServer> {
     const lagRespBuf = new ArrayBuffer(2 + 4 + 2 + serverName.length);
     const lagResp = new DataView(lagRespBuf);
     lagResp.setUint16(0, 2, true); // operandCount=2
-    lagResp.setUint32(2, 0x0e20d7e9, true); // opcode
+    lagResp.setUint32(2, 0x789a4e0a, true); // swgCrc32("GameServerLagResponse")
     lagResp.setUint16(6, serverName.length, true); // string length
     const lagRespBytes = new Uint8Array(lagRespBuf);
     for (let i = 0; i < serverName.length; i++) {

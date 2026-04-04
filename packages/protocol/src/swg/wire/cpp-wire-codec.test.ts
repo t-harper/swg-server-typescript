@@ -330,24 +330,17 @@ describe('cpp wire codec', () => {
   });
 
   it('forces disambiguation when one opcode maps to multiple packet names', () => {
-    const errorMessage: CppStringId = {
-      table: 'ui',
-      textIndex: 0,
-      text: 'name_declined',
-    };
-
-    const encoded = encodeCppWirePacketByName('ClientCreateCharacterFailed', {
-      m_name: 'Tester',
-      m_errorMessage: errorMessage,
+    // AddItemFailedMessage and RemoveItemMessage share opcode 0x4417af8b
+    const encoded = encodeCppWirePacketByName('RemoveItemMessage', {
+      m_object: 999n,
     });
 
     expect(() => decodeCppWirePacketByOpcode(encoded)).toThrow(/ambiguous/i);
 
     const registry = new SwgMessageRegistry();
-    const decoded = registry.decodeByOpcode(encoded, 'ClientCreateCharacterFailed');
-    expect(decoded.name).toBe('ClientCreateCharacterFailed');
-    expect(decoded.fields.m_name).toBe('Tester');
-    expect(decoded.fields.m_errorMessage).toEqual(errorMessage);
+    const decoded = registry.decodeByOpcode(encoded, 'RemoveItemMessage');
+    expect(decoded.name).toBe('RemoveItemMessage');
+    expect(decoded.fields.m_object).toBe(999n);
   });
 
   it('round-trips LoginEnumCluster::ClusterData', () => {
